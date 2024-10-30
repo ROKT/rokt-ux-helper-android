@@ -51,8 +51,8 @@ android {
 
 dependencies {
 
-    implementation(projects.roktux)
-    implementation(projects.networkhelper)
+    implementation(projects.uxHelper.roktux)
+    implementation(projects.uxHelper.networkhelper)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
