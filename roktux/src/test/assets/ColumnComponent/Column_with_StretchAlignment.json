@@ -1,0 +1,42 @@
+{
+  "type": "Column",
+  "node": {
+    "styles": {
+      "elements": {
+        "own": [
+          {
+            "default": {
+              "container": {
+                "alignItems": "stretch"
+              }
+            }
+          }
+        ]
+      }
+    },
+    "children": [
+      {
+        "type": "BasicText",
+        "node": {
+          "value": "Test Offer",
+          "styles": {
+            "elements": {
+              "own": []
+            }
+          }
+        }
+      },
+      {
+        "type": "BasicText",
+        "node": {
+          "value": "Long Offer with multiple test in it to verify the height",
+          "styles": {
+            "elements": {
+              "own": []
+            }
+          }
+        }
+      }
+    ]
+  }
+}

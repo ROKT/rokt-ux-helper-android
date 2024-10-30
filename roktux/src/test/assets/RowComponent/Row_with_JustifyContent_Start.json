@@ -1,0 +1,32 @@
+{
+  "type": "Row",
+  "node": {
+    "styles": {
+      "elements": {
+        "own": [
+          {
+            "default": {
+              "dimension": {
+                "height": {
+                  "type": "fixed",
+                  "value": "200"
+                }
+              },
+              "container": {
+                "justifyContent": "flex-start"
+              }
+            }
+          }
+        ]
+      }
+    },
+    "children": [
+      {
+        "type": "BasicText",
+        "node": {
+          "value": "Test Offer"
+        }
+      }
+    ]
+  }
+}

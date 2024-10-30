@@ -1,0 +1,39 @@
+{
+  "type": "Row",
+  "node": {
+    "styles": {
+      "elements": {
+        "own": [
+          {
+            "default": {
+              "dimension": {
+                "height": {
+                  "type": "fixed",
+                  "value": "200"
+                }
+              },
+              "container": {
+                "alignItems": "flex-start"
+              }
+            }
+          },
+          {
+            "default": {
+              "container": {
+                "alignItems": "center"
+              }
+            }
+          }
+        ]
+      }
+    },
+    "children": [
+      {
+        "type": "BasicText",
+        "node": {
+          "value": "Test Offer"
+        }
+      }
+    ]
+  }
+}

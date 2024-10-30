@@ -1,0 +1,38 @@
+{
+  "type": "RichText",
+  "node": {
+    "value": "<a href='https://rokt.com'>Click here</a>",
+    "styles": {
+      "elements": {
+        "own": [
+          {
+            "default": {
+              "text": {
+                "fontSize": 16,
+                "fontWeight": "400",
+                "fontStyle": "italic",
+                "lineHeight": 19,
+                "letterSpacing": 4,
+                "horizontalTextAlign": "right",
+                "baselineTextAlign": "super",
+                "textDecoration": "underline",
+                "textColor": {
+                  "light": "#FF3700B3"
+                }
+              }
+            }
+          }
+        ],
+        "link": [
+          {
+            "default": {
+              "text": {
+                "textTransform": "lowercase"
+              }
+            }
+          }
+        ]
+      }
+    }
+  }
+}

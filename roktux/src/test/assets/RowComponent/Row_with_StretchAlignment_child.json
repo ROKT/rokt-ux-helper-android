@@ -1,0 +1,42 @@
+{
+  "type": "Row",
+  "node": {
+    "styles": {
+      "elements": {
+        "own": []
+      }
+    },
+    "children": [
+      {
+        "type": "BasicText",
+        "node": {
+          "value": "Long Offer with multiple test in it to verify the height",
+          "styles": {
+            "elements": {
+              "own": []
+            }
+          }
+        }
+      },
+      {
+        "type": "BasicText",
+        "node": {
+          "value": "Test Offer",
+          "styles": {
+            "elements": {
+              "own": [
+                {
+                  "default": {
+                    "flexChild": {
+                      "alignSelf": "stretch"
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        }
+      }
+    ]
+  }
+}

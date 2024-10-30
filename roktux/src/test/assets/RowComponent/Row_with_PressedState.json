@@ -1,0 +1,35 @@
+{
+  "type": "Row",
+  "node": {
+    "styles": {
+      "elements": {
+        "own": [
+          {
+            "default": {
+              "background": {
+                "backgroundColor": {
+                  "light": "#ff0000"
+                }
+              }
+            },
+            "pressed": {
+              "background": {
+                "backgroundColor": {
+                  "light": "#00ff00"
+                }
+              }
+            }
+          }
+        ]
+      }
+    },
+    "children": [
+      {
+        "type": "BasicText",
+        "node": {
+          "value": "Test1"
+        }
+      }
+    ]
+  }
+}

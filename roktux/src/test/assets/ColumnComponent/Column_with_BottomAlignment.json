@@ -1,0 +1,46 @@
+{
+  "type": "Column",
+  "node": {
+    "styles": {
+      "elements": {
+        "own": [
+          {
+            "default": {
+              "dimension": {
+                "width": {
+                  "type": "fixed",
+                  "value": "200"
+                },
+                "height": {
+                  "type": "fixed",
+                  "value": "200"
+                }
+              }
+            }
+          }
+        ]
+      }
+    },
+    "children": [
+      {
+        "type": "BasicText",
+        "node": {
+          "value": "Test Offer",
+          "styles": {
+            "elements": {
+              "own": [
+                {
+                  "default": {
+                    "flexChild": {
+                      "alignSelf": "flex-end"
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        }
+      }
+    ]
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "type": "Column",
+  "node": {
+    "styles": {
+      "elements": {
+        "own": [
+          {
+            "default": {
+              "dimension": {
+                "maxWidth": 10,
+                "maxHeight": 5
+              }
+            }
+          }
+        ]
+      }
+    },
+    "children": [
+      {
+        "type": "BasicText",
+        "node": {
+          "value": "Jenny, thank you for your purchase this product:"
+        }
+      }
+    ]
+  }
+}

@@ -1,0 +1,52 @@
+{
+  "type": "CreativeResponse",
+  "node": {
+    "responseKey": "positive",
+    "children": [
+      {
+        "type": "When",
+        "node": {
+          "predicates": [
+            {
+              "type": "Breakpoint",
+              "predicate": {
+                "condition": "is-above",
+                "value": "Landscape"
+              }
+            }
+          ],
+          "children": [
+            {
+              "type": "BasicText",
+              "node": {
+                "value": "This is above landscape"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "type": "When",
+        "node": {
+          "predicates": [
+            {
+              "type": "Breakpoint",
+              "predicate": {
+                "condition": "is-below",
+                "value": "Landscape"
+              }
+            }
+          ],
+          "children": [
+            {
+              "type": "BasicText",
+              "node": {
+                "value": "This is below landscape"
+              }
+            }
+          ]
+        }
+      }
+    ]
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "type": "When",
+  "node": {
+    "predicates": [
+      {
+        "type": "CreativeCopy",
+        "predicate": {
+          "condition": "not-exists",
+          "value": "creative.test"
+        }
+      }
+    ],
+    "children": [
+      {
+        "type": "BasicText",
+        "node": {
+          "value": "Test Offer"
+        }
+      }
+    ]
+  }
+}

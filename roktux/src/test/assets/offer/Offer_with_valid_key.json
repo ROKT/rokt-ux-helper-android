@@ -1,0 +1,73 @@
+{
+  "campaignId": "2732344566234284034",
+  "creativeId": "2732356166940819466",
+  "creative": {
+    "referralCreativeId": "2732356166940819466",
+    "instanceGuid": "f5987bb9-f7ba-4a89-91e7-80a446c5d29c",
+    "token": "creative_token",
+    "responseOptionsMap": {
+      "positive": {
+        "id": "2732356166940819464",
+        "action": "CaptureOnly",
+        "instanceGuid": "549a346b-cd76-4f04-bccd-a1168c870e97",
+        "token": "response_token",
+        "signalType": "SignalResponse",
+        "shortLabel": "Claim offer",
+        "longLabel": "Claim offer",
+        "shortSuccessLabel": "Claim offer",
+        "isPositive": true,
+        "url": ""
+      },
+      "negative": {
+        "id": "2732356166940819465",
+        "action": "CaptureOnly",
+        "instanceGuid": "c94a4aab-8e73-47f1-ad5b-a07bf00703ec",
+        "token": "response_token",
+        "signalType": "SignalResponse",
+        "shortLabel": "No thanks",
+        "longLabel": "No thanks",
+        "shortSuccessLabel": "",
+        "isPositive": false,
+        "url": ""
+      }
+    },
+    "copy": {
+      "creative.copy": "Some copy",
+      "creative.title": "You've unlocked a partner offer!",
+      "creative.disclaimer": "This is a disclaimer here. Not all advertisers have one.",
+      "creative.termsAndConditions.link": "/LegalTerms/TermsAndConditions/2732356166940819466",
+      "creative.termsAndConditions.close.copy": "Close",
+      "creative.termsAndConditions.title": "Terms of Use",
+      "creative.privacyPolicy.link": "/LegalTerms/PrivacyPolicy/2732356166940819466",
+      "creative.privacyPolicy.close.copy": "Close",
+      "creative.privacyPolicy.title": "Privacy Policy",
+      "creative.confirmation.message": "Details will go to test1593754986316@rokt.com",
+      "creative.success.title": "Success",
+      "creative.success.copy": "We have sent a confirmation to test1593754986316@rokt.com."
+    },
+    "data-elements": {},
+    "images": {
+      "creativeImage": {
+        "alt": "alt text",
+        "dark": "",
+        "light": "https://example.com/example.png",
+        "title": "title"
+      }
+    },
+    "links": {
+      "privacyPolicy": {
+        "url": "https://www.rokt.com/privacy-policy/",
+        "title": "Privacy Policy"
+      },
+      "termsCondition": {
+        "url": "https://www.rokt.com/privacy-policy/",
+        "title": "Terms and Condition"
+      }
+    },
+    "icons": {
+      "icon.1": {
+        "name": "Dollar"
+      }
+    }
+  }
+}

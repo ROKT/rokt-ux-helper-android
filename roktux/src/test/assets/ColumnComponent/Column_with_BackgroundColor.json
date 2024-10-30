@@ -1,0 +1,22 @@
+{
+  "type": "Column",
+  "node": {
+    "styles": {
+      "elements": {
+        "own": [
+          {
+            "default": {
+              "background": {
+                "backgroundColor": {
+                  "light": "#d51a1a",
+                  "dark": "#ababab"
+                }
+              }
+            }
+          }
+        ]
+      }
+    },
+    "children": []
+  }
+}

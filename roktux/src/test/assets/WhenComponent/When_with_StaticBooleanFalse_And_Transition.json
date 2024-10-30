@@ -1,0 +1,40 @@
+{
+  "type": "When",
+  "node": {
+    "transition": {
+      "inTransition": [
+        {
+          "type": "FadeIn",
+          "settings": {
+            "duration": 5000
+          }
+        }
+      ],
+      "outTransition": [
+        {
+          "type": "FadeOut",
+          "settings": {
+            "duration": 5000
+          }
+        }
+      ]
+    },
+    "predicates": [
+      {
+        "type": "StaticBoolean",
+        "predicate": {
+          "condition": "is-true",
+          "value": false
+        }
+      }
+    ],
+    "children": [
+      {
+        "type": "BasicText",
+        "node": {
+          "value": "Test Offer"
+        }
+      }
+    ]
+  }
+}

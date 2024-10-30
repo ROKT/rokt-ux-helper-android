@@ -1,0 +1,80 @@
+{
+  "type": "StaticLink",
+  "node": {
+    "src": "someUrl",
+    "open": "internally",
+    "children": [
+      {
+        "type": "Column",
+        "node": {
+          "styles": {
+            "elements": {
+              "own": [
+                {
+                  "default": {
+                    "dimension": {
+                      "height": {
+                        "type": "fit",
+                        "value": "fit-height"
+                      }
+                    },
+                    "spacing": {
+                      "margin": "0 0 8 0"
+                    }
+                  }
+                }
+              ]
+            }
+          },
+          "children": [
+            {
+              "type": "BasicText",
+              "node": {
+                "value": "Test1"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "styles": {
+      "elements": {
+        "own": [
+          {
+            "default": {
+              "dimension": {
+                "width": {
+                  "type": "fit",
+                  "value": "fit-width"
+                },
+                "height": {
+                  "type": "fixed",
+                  "value": 200
+                }
+              },
+              "background": {
+                "backgroundColor": {
+                  "light": "#d51a1a",
+                  "dark": "#cdcdcd"
+                }
+              },
+              "spacing": {
+                "padding": "10 20"
+              }
+            }
+          },
+          {
+            "default": {
+              "background": {
+                "backgroundColor": {
+                  "light": "#ababab",
+                  "dark": "#ababab"
+                }
+              }
+            }
+          }
+        ]
+      }
+    }
+  }
+}

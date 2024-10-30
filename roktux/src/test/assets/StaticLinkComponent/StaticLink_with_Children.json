@@ -1,0 +1,34 @@
+{
+  "type": "StaticLink",
+  "node": {
+    "src": "someUrl",
+    "open": "internally",
+    "children": [
+      {
+        "type": "BasicText",
+        "node": {
+          "value": "Test1"
+        }
+      },
+      {
+        "type": "Column",
+        "node": {
+          "children": [
+            {
+              "type": "BasicText",
+              "node": {
+                "value": "Test2"
+              }
+            },
+            {
+              "type": "BasicText",
+              "node": {
+                "value": "Test3"
+              }
+            }
+          ]
+        }
+      }
+    ]
+  }
+}

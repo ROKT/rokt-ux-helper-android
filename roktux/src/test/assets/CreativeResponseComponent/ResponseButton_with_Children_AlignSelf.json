@@ -1,0 +1,54 @@
+{
+  "type": "CreativeResponse",
+  "node": {
+    "responseKey": "positive",
+    "openLinks": "internally",
+    "styles": {
+      "elements": {
+        "own": [
+          {
+            "default": {
+              "dimension": {
+                "width": {
+                  "type": "fixed",
+                  "value": "300"
+                },
+                "height": {
+                  "type": "fixed",
+                  "value": "400"
+                }
+              },
+              "container": {
+                "justifyContent": "center"
+              }
+            }
+          }
+        ]
+      }
+    },
+    "children": [
+      {
+        "type": "BasicText",
+        "node": {
+          "value": "Test",
+          "styles": {
+            "elements": {
+              "own": [
+                {
+                  "default": {
+                    "spacing": {
+                      "margin": "0"
+                    },
+                    "flexChild": {
+                      "alignSelf": "center"
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        }
+      }
+    ]
+  }
+}

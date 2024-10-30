@@ -1,0 +1,19 @@
+{
+  "type": "Row",
+  "node": {
+    "styles": {
+      "elements": {
+        "own": [
+          {
+            "default": {
+              "spacing": {
+                "margin": "10 20 30"
+              }
+            }
+          }
+        ]
+      }
+    },
+    "children": []
+  }
+}

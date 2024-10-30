@@ -1,0 +1,51 @@
+{
+  "type": "BasicText",
+  "node": {
+    "value": "ORDER NUMBER: UK171359906",
+    "styles": {
+      "elements": {
+        "own": [
+          {
+            "default": {
+              "dimension": {
+                "width": {
+                  "type": "fixed",
+                  "value": "100"
+                }
+              },
+              "spacing": {
+                "padding": "10 20 15 25"
+              }
+            },
+            "pressed": {
+              "dimension": {
+                "height": {
+                  "type": "fixed",
+                  "value": "215"
+                }
+              }
+            }
+          },
+          {
+            "default": {
+              "dimension": {
+                "height": {
+                  "type": "fixed",
+                  "value": "200"
+                }
+              }
+            },
+            "pressed": {
+              "dimension": {
+                "width": {
+                  "type": "fixed",
+                  "value": "315"
+                }
+              }
+            }
+          }
+        ]
+      }
+    }
+  }
+}

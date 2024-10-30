@@ -1,0 +1,32 @@
+{
+  "type": "Row",
+  "node": {
+    "styles": {
+      "elements": {
+        "own": [
+          {
+            "default": {
+              "background": {
+                "backgroundColor": {
+                  "light": "#d51a1a",
+                  "dark": "#cdcdcd"
+                }
+              }
+            }
+          },
+          {
+            "default": {
+              "background": {
+                "backgroundColor": {
+                  "light": "#ababab",
+                  "dark": "#ababad"
+                }
+              }
+            }
+          }
+        ]
+      }
+    },
+    "children": []
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "type": "Row",
+  "node": {
+    "styles": {
+      "elements": {
+        "own": [
+          {
+            "default": {
+              "spacing": {
+                "padding": "10 20 15 25"
+              }
+            }
+          }
+        ]
+      }
+    },
+    "children": []
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "type": "BasicText",
+  "node": {
+    "value": "Test",
+    "styles": {
+      "elements": {
+        "own": [
+          {
+            "default": {
+              "spacing": {
+                "padding": "10 20 15 25"
+              }
+            }
+          },
+          {
+            "default": {
+              "spacing": {
+                "padding": "2 4 8 16"
+              }
+            }
+          }
+        ]
+      }
+    }
+  }
+}

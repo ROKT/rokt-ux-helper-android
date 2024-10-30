@@ -1,0 +1,33 @@
+{
+  "type": "Column",
+  "node": {
+    "styles": {
+      "elements": {
+        "own": [
+          {
+            "default": {
+              "dimension": {
+                "width": {
+                  "type": "fit",
+                  "value": "wrap-content"
+                },
+                "height": {
+                  "type": "fit",
+                  "value": "wrap-content"
+                }
+              }
+            }
+          }
+        ]
+      }
+    },
+    "children": [
+      {
+        "type": "BasicText",
+        "node": {
+          "value": "Test Offer"
+        }
+      }
+    ]
+  }
+}

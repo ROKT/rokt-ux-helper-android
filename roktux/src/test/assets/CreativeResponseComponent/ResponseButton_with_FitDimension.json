@@ -1,0 +1,34 @@
+{
+  "type": "CreativeResponse",
+  "node": {
+    "responseKey": "positive",
+    "children": [
+      {
+        "type": "BasicText",
+        "node": {
+          "value": "Test2"
+        }
+      }
+    ],
+    "styles": {
+      "elements": {
+        "own": [
+          {
+            "default": {
+              "dimension": {
+                "width": {
+                  "type": "fit",
+                  "value": "fit-width"
+                },
+                "height": {
+                  "type": "fit",
+                  "value": "fit-height"
+                }
+              }
+            }
+          }
+        ]
+      }
+    }
+  }
+}

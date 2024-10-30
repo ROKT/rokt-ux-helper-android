@@ -1,0 +1,34 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="288dp"
+    android:height="288dp"
+    android:viewportWidth="288"
+    android:viewportHeight="288">
+    <path
+        android:fillColor="#FF000000"
+        android:fillType="evenOdd"
+        android:pathData="M104.58 117.76c0.58 0.79 0.42 1.9-0.37 2.48l-46.27 34.23c-0.79 0.58-1.9 0.41-2.48-0.37-0.58-0.8-0.41-1.9 0.37-2.48l46.28-34.23c0.78-0.58 1.9-0.42 2.47 0.37Z"/>
+    <path
+        android:fillColor="#FF420B27"
+        android:fillType="evenOdd"
+        android:pathData="M104.08 117.45c1.1 0.52 1.58 1.84 1.06 2.95l-24.22 51.4c-0.53 1.12-1.85 1.59-2.95 1.07-1.1-0.53-1.58-1.85-1.06-2.95l24.22-51.4c0.53-1.12 1.84-1.6 2.95-1.07Z"/>
+    <path
+        android:fillColor="#FF580E3A"
+        android:fillType="evenOdd"
+        android:pathData="M163.16 85.93c1.22 1.2 1.25 3.17 0.05 4.4L81.69 173.7c-1.2 1.22-3.16 1.24-4.39 0.05-1.22-1.2-1.24-3.17-0.04-4.4l81.52-83.37c1.2-1.22 3.16-1.24 4.38-0.05Z"/>
+    <path
+        android:fillColor="#FF6E1242"
+        android:fillType="evenOdd"
+        android:pathData="M163.25 85.81c1.78 1.1 2.33 3.41 1.24 5.19L97.64 199.87c-1.09 1.77-3.4 2.32-5.18 1.23-1.77-1.09-2.32-3.4-1.23-5.18l66.84-108.87c1.1-1.77 3.41-2.33 5.18-1.24Z"/>
+    <path
+        android:fillColor="#FF83154F"
+        android:fillType="evenOdd"
+        android:pathData="M187.4 117.89c1.53 1.76 1.33 4.42-0.43 5.94l-89.2 76.98c-1.77 1.52-4.43 1.33-5.94-0.44-1.52-1.76-1.32-4.42 0.44-5.94l89.2-76.98c1.76-1.52 4.42-1.32 5.94 0.44Z"/>
+    <path
+        android:fillColor="#FF99195C"
+        android:fillType="evenOdd"
+        android:pathData="M186.22 116.87c2.25 0.98 3.27 3.6 2.29 5.84l-21.66 49.54c-0.98 2.24-3.59 3.26-5.83 2.28s-3.26-3.6-2.28-5.84l21.65-49.54c0.98-2.24 3.6-3.26 5.84-2.28Z"/>
+    <path
+        android:fillColor="#FFB51E6D"
+        android:fillType="evenOdd"
+        android:pathData="M232 129.37c1.58 2.62 0.74 6.03-1.88 7.6l-63.07 38.18c-2.62 1.58-6.02 0.74-7.6-1.88-1.59-2.62-0.75-6.02 1.87-7.6l63.08-38.18c2.61-1.58 6.02-0.74 7.6 1.88Z"/>
+</vector>

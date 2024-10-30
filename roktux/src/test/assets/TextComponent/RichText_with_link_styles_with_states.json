@@ -1,0 +1,96 @@
+{
+  "type": "RichText",
+  "node": {
+    "value": "<a href='https://rokt.com'>Click here</a>",
+    "styles": {
+      "elements": {
+        "own": [
+          {
+            "default": {
+              "text": {
+                "fontSize": 16,
+                "fontWeight": "400",
+                "fontStyle": "italic",
+                "lineHeight": 19,
+                "letterSpacing": 4,
+                "horizontalTextAlign": "right",
+                "baselineTextAlign": "super",
+                "textDecoration": "underline",
+                "textColor": {
+                  "light": "#FF3700B3"
+                }
+              }
+            }
+          }
+        ],
+        "link": [
+          {
+            "default": {
+              "text": {}
+            },
+            "focussed": {
+              "text": {
+                "fontSize": 22,
+                "fontWeight": "600",
+                "fontStyle": "italic",
+                "lineHeight": 27,
+                "letterSpacing": 10,
+                "horizontalTextAlign": "left",
+                "baselineTextAlign": "baseline",
+                "textDecoration": "strike-through",
+                "textColor": {
+                  "light": "#FF4900B5"
+                }
+              }
+            },
+            "pressed": {
+              "text": {
+                "fontSize": 12,
+                "fontWeight": "100",
+                "fontStyle": "italic",
+                "lineHeight": 29,
+                "letterSpacing": 11,
+                "horizontalTextAlign": "right",
+                "baselineTextAlign": "baseline",
+                "textDecoration": "strike-through",
+                "textColor": {
+                  "light": "#FF4900B1"
+                }
+              }
+            },
+            "hovered": {
+              "text": {
+                "fontSize": 44,
+                "fontWeight": "200",
+                "fontStyle": "italic",
+                "lineHeight": 29,
+                "letterSpacing": 15,
+                "horizontalTextAlign": "right",
+                "baselineTextAlign": "baseline",
+                "textDecoration": "strike-through",
+                "textColor": {
+                  "light": "#FF4900B8"
+                }
+              }
+            },
+            "disabled": {
+              "text": {
+                "fontSize": 14,
+                "fontWeight": "700",
+                "fontStyle": "normal",
+                "lineHeight": 24,
+                "letterSpacing": 8,
+                "horizontalTextAlign": "right",
+                "baselineTextAlign": "baseline",
+                "textDecoration": "strike-through",
+                "textColor": {
+                  "light": "#FF4900B6"
+                }
+              }
+            }
+          }
+        ]
+      }
+    }
+  }
+}

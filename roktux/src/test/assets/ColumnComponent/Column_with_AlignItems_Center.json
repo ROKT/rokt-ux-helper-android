@@ -1,0 +1,53 @@
+{
+  "type": "Column",
+  "node": {
+    "styles": {
+      "elements": {
+        "own": [
+          {
+            "default": {
+              "dimension": {
+                "width": {
+                  "type": "fixed",
+                  "value": "200"
+                },
+                "height": {
+                  "type": "fixed",
+                  "value": "200"
+                }
+              },
+              "container": {
+                "alignItems": "center"
+              }
+            }
+          },
+          {
+            "default": {
+              "dimension": {
+                "width": {
+                  "type": "fixed",
+                  "value": "200"
+                },
+                "height": {
+                  "type": "fixed",
+                  "value": "200"
+                }
+              },
+              "container": {
+                "alignItems": "flex-start"
+              }
+            }
+          }
+        ]
+      }
+    },
+    "children": [
+      {
+        "type": "BasicText",
+        "node": {
+          "value": "Test Offer"
+        }
+      }
+    ]
+  }
+}

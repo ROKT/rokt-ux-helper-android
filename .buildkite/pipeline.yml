@@ -1,0 +1,150 @@
+env:
+  STAGE_BK_AGENT: rokt-stage-us-west-2-intel-linux-build-large
+
+steps:
+  - label: ":android: :gradle: Assemble debug"
+    key: "build-uxhelper-debug"
+    commands:
+      - ./gradlew assembleDebug
+    artifact_paths:
+      - "**/*.aar"
+      - "**/*.apk"
+    plugins:
+      - docker#v5.11.0:
+          image: "cimg/android:2024.09.1"
+          propagate-environment: true
+          user: root
+          environment:
+            - JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
+    agents:
+      queue: ${STAGE_BK_AGENT}
+    timeout_in_minutes: 25
+
+  - label: ":android: :junit: Unit test"
+    key: "unit-test-uxhelper"
+    commands:
+      - ./gradlew testDebugUnitTest
+    artifact_paths:
+      - "**/build/test-results/*/*.xml"
+    plugins:
+      - docker#v5.11.0:
+          image: "cimg/android:2024.09.1"
+          propagate-environment: true
+          user: root
+          environment:
+            - JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
+    agents:
+      queue: ${STAGE_BK_AGENT}
+    timeout_in_minutes: 25
+
+  - label: ":android: :pick: Lint check"
+    key: "lint-check-uxhelper"
+    commands:
+      - ./gradlew lintRelease
+    artifact_paths:
+      - "**/lint-results-*.html"
+    plugins:
+      - docker#v5.11.0:
+          image: "cimg/android:2024.09.1"
+          propagate-environment: true
+          user: root
+          environment:
+            - JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
+    agents:
+      queue: ${STAGE_BK_AGENT}
+    timeout_in_minutes: 25
+
+  - wait: ~
+
+  - input: ":whale: :maven: Publish prompt"
+    prompt: "Publish the SDK to Maven?"
+    key: "publish-prompt-uxhelper"
+    branches: "!main !release-*"
+    fields:
+      - text: "Version suffix? (Eg: -rc.1, -alpha.1)"
+        key: "version_suffix"
+        required: true
+
+  - label: ":maven: :rocket: Publish SDK to MavenCentral"
+    key: "publish-uxhelper-feature-branch"
+    depends_on: "publish-prompt-uxhelper"
+    branches: "!main !release-*"
+    commands:
+      - . ./export_env_vars.sh
+      - ./gradlew publishMavenPublicationToMavenLocal
+      - ./gradlew publishMavenPublicationToMavenCentralRepository --no-configuration-cache
+    artifact_paths:
+      - "**/build/outputs/aar/*.*"
+      - "**/build/publications/maven/*.*"
+    plugins:
+      - seek-oss/aws-sm#v2.3.1:
+          env:
+            SIGNING_KEY:
+              secret-id: stage-android-sdk-buildkite
+              json-key: .SIGNING_KEY
+            SIGNING_PASSWORD:
+              secret-id: stage-android-sdk-buildkite
+              json-key: .SIGNING_PASSWORD
+            SONATYPE_USERNAME:
+              secret-id: stage-android-sdk-buildkite
+              json-key: .SONATYPE_USERNAME
+            SONATYPE_PASSWORD:
+              secret-id: stage-android-sdk-buildkite
+              json-key: .SONATYPE_PASSWORD
+      - docker#v5.11.0:
+          image: "cimg/android:2024.09.1"
+          user: root
+          mount-buildkite-agent: true
+          mount-checkout: true
+          propagate-environment: true
+          environment:
+            - JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
+            - SIGNING_KEY
+            - SIGNING_PASSWORD
+            - SONATYPE_USERNAME
+            - SONATYPE_PASSWORD
+    agents:
+      queue: ${STAGE_BK_AGENT}
+    timeout_in_minutes: 30
+
+  - label: ":maven: :rocket: Publish SDK to MavenCentral"
+    key: "publish-uxhelper"
+    branches: "main release-*"
+    commands:
+      - . ./export_env_vars.sh
+      - ./gradlew publishMavenPublicationToMavenLocal
+      - ./gradlew publishMavenPublicationToMavenCentralRepository --no-configuration-cache
+    soft_fail: true # Publishing to external repository may fail if the version already exists
+    artifact_paths:
+      - "**/build/outputs/aar/*.*"
+      - "**/build/publications/maven/*.*"
+    plugins:
+      - seek-oss/aws-sm#v2.3.1:
+          env:
+            SIGNING_KEY:
+              secret-id: stage-android-sdk-buildkite
+              json-key: .SIGNING_KEY
+            SIGNING_PASSWORD:
+              secret-id: stage-android-sdk-buildkite
+              json-key: .SIGNING_PASSWORD
+            SONATYPE_USERNAME:
+              secret-id: stage-android-sdk-buildkite
+              json-key: .SONATYPE_USERNAME
+            SONATYPE_PASSWORD:
+              secret-id: stage-android-sdk-buildkite
+              json-key: .SONATYPE_PASSWORD
+      - docker#v5.11.0:
+          image: "cimg/android:2024.09.1"
+          user: root
+          mount-buildkite-agent: true
+          mount-checkout: true
+          propagate-environment: true
+          environment:
+            - JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
+            - SIGNING_KEY
+            - SIGNING_PASSWORD
+            - SONATYPE_USERNAME
+            - SONATYPE_PASSWORD
+    agents:
+      queue: ${STAGE_BK_AGENT}
+    timeout_in_minutes: 30

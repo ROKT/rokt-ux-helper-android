@@ -1,0 +1,47 @@
+{
+  "type": "Row",
+  "node": {
+    "styles": {
+      "elements": {
+        "own": [
+          {
+            "default": {
+              "dimension": {
+                "width": {
+                  "type": "fit",
+                  "value": "wrap-content"
+                },
+                "height": {
+                  "type": "fit",
+                  "value": "wrap-content"
+                }
+              }
+            }
+          },
+          {
+            "default": {
+              "dimension": {
+                "width": {
+                  "type": "fit",
+                  "value": "wrap-content"
+                },
+                "height": {
+                  "type": "fit",
+                  "value": "fit-height"
+                }
+              }
+            }
+          }
+        ]
+      }
+    },
+    "children": [
+      {
+        "type": "BasicText",
+        "node": {
+          "value": "Test Offer"
+        }
+      }
+    ]
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "type": "When",
+  "node": {
+    "predicates": [
+      {
+        "type": "Position",
+        "predicate": {
+          "condition": "is-above",
+          "value": "0"
+        }
+      }
+    ],
+    "children": [
+      {
+        "type": "BasicText",
+        "node": {
+          "value": "Test Offer"
+        }
+      }
+    ]
+  }
+}

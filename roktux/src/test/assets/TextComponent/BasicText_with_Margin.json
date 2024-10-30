@@ -1,0 +1,33 @@
+{
+  "type": "BasicText",
+  "node": {
+    "value": "Test",
+    "styles": {
+      "elements": {
+        "own": [
+          {
+            "default": {
+              "spacing": {
+                "margin": "10 20 15 25"
+              }
+            }
+          },
+          {
+            "default": {
+              "spacing": {
+                "margin": "5 10 15 25"
+              }
+            }
+          },
+          {
+            "default": {
+              "spacing": {
+                "margin": "2 4 8 16"
+              }
+            }
+          }
+        ]
+      }
+    }
+  }
+}

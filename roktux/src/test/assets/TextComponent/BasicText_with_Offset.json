@@ -1,0 +1,19 @@
+{
+  "type": "BasicText",
+  "node": {
+    "value": "Test",
+    "styles": {
+      "elements": {
+        "own": [
+          {
+            "default": {
+              "spacing": {
+                "offset": "20 25"
+              }
+            }
+          }
+        ]
+      }
+    }
+  }
+}

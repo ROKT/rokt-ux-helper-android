@@ -1,0 +1,34 @@
+{
+  "type": "Column",
+  "node": {
+    "styles": {
+      "elements": {
+        "own": [
+          {
+            "default": {
+              "dimension": {
+                "width": {
+                  "type": "fit",
+                  "value": "fit-width"
+                },
+                "height": {
+                  "type": "fit",
+                  "value": "fit-height"
+                },
+                "border": {
+                  "borderStyle": "dashed",
+                  "borderWidth": 1,
+                  "borderColor": {
+                    "light": "#00ff00"
+                  },
+                  "borderRadius": 2
+                }
+              }
+            }
+          }
+        ]
+      }
+    },
+    "children": []
+  }
+}

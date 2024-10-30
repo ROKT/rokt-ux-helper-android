@@ -1,0 +1,22 @@
+{
+  "type": "When",
+  "node": {
+    "predicates": [
+      {
+        "type": "DarkMode",
+        "predicate": {
+          "condition": "is",
+          "value": false
+        }
+      }
+    ],
+    "children": [
+      {
+        "type": "BasicText",
+        "node": {
+          "value": "Test Offer"
+        }
+      }
+    ]
+  }
+}

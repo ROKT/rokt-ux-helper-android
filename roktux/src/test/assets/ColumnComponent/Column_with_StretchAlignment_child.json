@@ -1,0 +1,70 @@
+{
+  "type": "Column",
+  "node": {
+    "styles": {
+      "elements": {
+        "own": [
+          {
+            "default": {
+              "container": {
+                "alignItems": "stretch"
+              }
+            }
+          }
+        ]
+      }
+    },
+    "children": [
+      {
+        "type": "When",
+        "node": {
+          "predicates": [
+            {
+              "type": "StaticBoolean",
+              "predicate": {
+                "value": true,
+                "condition": "is-true"
+              }
+            }
+          ],
+          "children": [
+            {
+              "type": "BasicText",
+              "node": {
+                "value": "Test Offer",
+                "styles": {
+                  "elements": {
+                    "own": [
+                      {
+                        "default": {
+                          "flexChild": {
+                            "alignSelf": "stretch"
+                          }
+                        }
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          ]
+        }
+      },
+      {
+        "type": "BasicText",
+        "node": {
+          "value": "Long Offer with multiple test in it to verify the height",
+          "styles": {
+            "elements": {
+              "own": [
+                {
+                  "default": {}
+                }
+              ]
+            }
+          }
+        }
+      }
+    ]
+  }
+}

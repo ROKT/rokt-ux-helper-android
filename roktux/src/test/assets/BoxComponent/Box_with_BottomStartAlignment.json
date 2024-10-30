@@ -1,0 +1,42 @@
+{
+  "type": "ZStack",
+  "node": {
+    "styles": {
+      "elements": {
+        "own": [
+          {
+            "default": {
+              "dimension": {
+                "height": {
+                  "type": "fixed",
+                  "value": "200"
+                }
+              }
+            }
+          }
+        ]
+      }
+    },
+    "children": [
+      {
+        "type": "BasicText",
+        "node": {
+          "value": "Test Offer",
+          "styles": {
+            "elements": {
+              "own": [
+                {
+                  "default": {
+                    "flexChild": {
+                      "alignSelf": "flex-end"
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        }
+      }
+    ]
+  }
+}

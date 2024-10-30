@@ -1,0 +1,14 @@
+{
+  "type": "ToggleButtonStateTrigger",
+  "node": {
+    "customStateKey": "ToggleButtonState",
+    "children": [
+      {
+        "type": "BasicText",
+        "node": {
+          "value": "Toggle button"
+        }
+      }
+    ]
+  }
+}

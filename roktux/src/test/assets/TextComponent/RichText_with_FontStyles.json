@@ -1,0 +1,57 @@
+{
+  "type": "RichText",
+  "node": {
+    "value": "ORDER NUMBER: UK171359906",
+    "styles": {
+      "elements": {
+        "own": [
+          {
+            "default": {
+              "text": {
+                "fontSize": 16,
+                "fontWeight": "400",
+                "fontStyle": "italic",
+                "lineHeight": 19,
+                "letterSpacing": 4,
+                "horizontalTextAlign": "right",
+                "baselineTextAlign": "super",
+                "textDecoration": "underline",
+                "textColor": {
+                  "light": "#FF3700B3"
+                }
+              }
+            },
+            "pressed": {
+              "text": {
+                "fontSize": 18,
+                "fontWeight": "500",
+                "fontStyle": "italic",
+                "lineHeight": 20,
+                "letterSpacing": 5,
+                "horizontalTextAlign": "left",
+                "baselineTextAlign": "sub",
+                "textDecoration": "strike-through",
+                "textColor": {
+                  "light": "#FF4400B3"
+                }
+              }
+            }
+          },
+          {
+            "default": {
+              "text": {
+                "fontSize": 20,
+                "lineHeight": 20,
+                "letterSpacing": 5,
+                "textColor": {
+                  "light": "#FFABABAB",
+                  "dark": "#FF3700B4"
+                }
+              }
+            }
+          }
+        ]
+      }
+    }
+  }
+}

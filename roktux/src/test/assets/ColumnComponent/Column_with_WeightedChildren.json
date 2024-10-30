@@ -1,0 +1,80 @@
+{
+  "type": "Column",
+  "node": {
+    "styles": {
+      "elements": {
+        "own": [
+          {
+            "default": {
+              "dimension": {
+                "height": {
+                  "type": "fixed",
+                  "value": "200"
+                }
+              }
+            }
+          }
+        ]
+      }
+    },
+    "children": [
+      {
+        "type": "BasicText",
+        "node": {
+          "value": "AB",
+          "styles": {
+            "elements": {
+              "own": [
+                {
+                  "default": {
+                    "flexChild": {
+                      "weight": "1"
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        }
+      },
+      {
+        "type": "BasicText",
+        "node": {
+          "value": "CD",
+          "styles": {
+            "elements": {
+              "own": [
+                {
+                  "default": {
+                    "flexChild": {
+                      "weight": "2"
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        }
+      },
+      {
+        "type": "BasicText",
+        "node": {
+          "value": "EF",
+          "styles": {
+            "elements": {
+              "own": [
+                {
+                  "default": {
+                    "flexChild": {
+                      "weight": "1"
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        }
+      }
+    ]
+  }
+}

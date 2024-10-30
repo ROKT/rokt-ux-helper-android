@@ -1,0 +1,62 @@
+{
+  "type": "Column",
+  "node": {
+    "styles": {
+      "elements": {
+        "own": [
+          {
+            "default": {
+              "dimension": {
+                "width": {
+                  "type": "fixed",
+                  "value": "200"
+                },
+                "height": {
+                  "type": "fixed",
+                  "value": "200"
+                }
+              },
+              "container": {
+                "justifyContent": "center",
+                "shadow": {
+                  "color": {
+                    "light": "#0000ff"
+                  },
+                  "blurRadius": 10,
+                  "offsetX": 5,
+                  "offsetY": 5,
+                  "spreadRadius": 4
+                }
+              }
+            }
+          },
+          {
+            "default": {
+              "dimension": {
+                "width": {
+                  "type": "fixed",
+                  "value": "200"
+                },
+                "height": {
+                  "type": "fixed",
+                  "value": "200"
+                }
+              },
+              "container": {
+                "justifyContent": "flex-start"
+              }
+            }
+          }
+        ]
+      }
+    },
+    "children": [
+      {
+        "type": "BasicText",
+        "node": {
+          "value": "Test Offer"
+        }
+      }
+    ]
+  }
+}

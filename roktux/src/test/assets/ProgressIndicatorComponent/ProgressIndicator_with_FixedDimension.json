@@ -1,0 +1,73 @@
+{
+  "type": "ProgressIndicator",
+  "node": {
+    "indicator": "",
+    "styles": {
+      "elements": {
+        "own": [
+          {
+            "default": {
+              "dimension": {
+                "width": {
+                  "type": "fixed",
+                  "value": "150"
+                },
+                "height": {
+                  "type": "fixed",
+                  "value": "180"
+                }
+              }
+            }
+          },
+          {
+            "default": {
+              "dimension": {
+                "width": {
+                  "type": "fixed",
+                  "value": "200"
+                }
+              }
+            }
+          }
+        ],
+        "indicator": [
+          {
+            "default": {
+              "container": {
+                "alignItems": "center",
+                "justifyContent": "center"
+              },
+              "border": {
+                "borderRadius": 10
+              },
+              "background": {
+                "backgroundColor": {
+                  "light": "#ff0000",
+                  "dark": "#ff0000"
+                }
+              },
+              "dimension": {
+                "width": {
+                  "type": "fixed",
+                  "value": 20
+                },
+                "height": {
+                  "type": "fixed",
+                  "value": 20
+                }
+              },
+              "text": {
+                "textColor": {
+                  "light": "#000000"
+                },
+                "horizontalTextAlign": "center",
+                "fontSize": 10,
+                "fontFamily": "arial"
+              }
+            }
+          }
+        ]
+      }
+    }
+  }
+}

@@ -1,0 +1,103 @@
+{
+  "type": "ProgressIndicator",
+  "node": {
+    "indicator": "%^STATE.IndicatorPosition^%",
+    "styles": {
+      "elements": {
+        "own": [
+          {
+            "default": {
+              "dimension": {
+                "width": {
+                  "type": "fixed",
+                  "value": "300"
+                },
+                "height": {
+                  "type": "fixed",
+                  "value": "200"
+                }
+              },
+              "container": {
+                "justifyContent": "center"
+              }
+            }
+          }
+        ],
+        "activeIndicator": [
+          {
+            "default": {
+              "container": {
+                "alignItems": "center",
+                "justifyContent": "center"
+              },
+              "border": {
+                "borderRadius": 10
+              },
+              "background": {
+                "backgroundColor": {
+                  "light": "#d51a1a",
+                  "dark": "#d51a1a"
+                }
+              },
+              "dimension": {
+                "width": {
+                  "type": "fixed",
+                  "value": 20
+                },
+                "height": {
+                  "type": "fixed",
+                  "value": 20
+                }
+              },
+              "text": {
+                "textColor": {
+                  "light": "#000000"
+                },
+                "horizontalTextAlign": "center",
+                "fontSize": 10,
+                "fontFamily": "arial"
+              }
+            }
+          }
+        ],
+        "indicator": [
+          {
+            "default": {
+              "container": {
+                "alignItems": "center",
+                "justifyContent": "center"
+              },
+              "border": {
+                "borderRadius": 10
+              },
+              "background": {
+                "backgroundColor": {
+                  "light": "#000000",
+                  "dark": "#000000"
+                }
+              },
+              "dimension": {
+                "width": {
+                  "type": "fixed",
+                  "value": 20
+                },
+                "height": {
+                  "type": "fixed",
+                  "value": 20
+                }
+              },
+              "text": {
+                "textColor": {
+                  "light": "#000000"
+                },
+                "horizontalTextAlign": "center",
+                "fontSize": 10,
+                "fontFamily": "arial"
+              }
+            }
+          }
+        ]
+      }
+    }
+  }
+}

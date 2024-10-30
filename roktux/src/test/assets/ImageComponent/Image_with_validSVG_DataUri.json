@@ -1,0 +1,29 @@
+{
+  "type": "StaticImage",
+  "node": {
+    "url": {
+      "light": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB2ZXJzaW9uPSIxLjFcIiB2aWV3Qm94PSIwIDAgMjQgMjQiPjxnPjxwb2x5Z29uIGZpbGw9InJnYigxNTMsIDE1MywgMTUzKSIgcG9pbnRzPSIyNCAyLjQxIDIxLjU4IDAgMTIgOS41OCAyLjQxIDAgMCAyLjQxIDkuNTggMTIgMCAyMS41OCAyLjQxIDI0IDEyIDE0LjQxIDIxLjU4IDI0IDI0IDIxLjU4IDE0LjQxIDEyIj48L3BvbHlnb24+PC9nPjwvc3ZnPg==",
+      "dark": ""
+    },
+    "styles": {
+      "elements": {
+        "own": [
+          {
+            "default": {
+              "dimension": {
+                "width": {
+                  "type": "fixed",
+                  "value": "100"
+                },
+                "height": {
+                  "type": "fixed",
+                  "value": "100"
+                }
+              }
+            }
+          }
+        ]
+      }
+    }
+  }
+}
