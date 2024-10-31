@@ -115,8 +115,8 @@ tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
 
 dependencies {
 
-    api(projects.modelmapper)
-    testDebugImplementation(projects.testutils)
+    api(projects.uxHelper.modelmapper)
+    testDebugImplementation(projects.uxHelper.testutils)
     implementation(libs.coil.kt)
     implementation(libs.coil.kt.compose)
     implementation(libs.coil.kt.svg)
@@ -137,7 +137,7 @@ dependencies {
     implementation(libs.androidx.compose.ui.util)
     implementation(libs.androidx.compose.runtime)
     implementation(libs.androidx.browser)
-    testImplementation(projects.modelmapper)
+    testImplementation(projects.uxHelper.modelmapper)
     testImplementation(libs.junit4)
     testImplementation(libs.junit.params)
     testImplementation(libs.robolectric)
