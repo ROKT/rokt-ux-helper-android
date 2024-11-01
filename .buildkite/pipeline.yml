@@ -4,10 +4,8 @@ env:
 
 steps:
   - name: ":kotlin::broom: Trunk code check"
-    key: "trunk-code-check"
     plugins:
       - ssh://git@github.com/ROKT/trunk-buildkite-plugin.git#stable:
-          team: "new-integrations"
     agents:
       queue: ${ENG_BK_AGENT}
     timeout_in_minutes: 15

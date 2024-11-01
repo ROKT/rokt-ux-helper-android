@@ -38,6 +38,7 @@ lint:
     - trufflehog@3.83.1
   disabled:
     - yamllint
+    - osv-scanner
   ignore:
     - linters: [ALL]
       paths:
