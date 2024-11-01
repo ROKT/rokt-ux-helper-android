@@ -1,7 +1,15 @@
 env:
+  ENG_BK_AGENT: eng-default
   STAGE_BK_AGENT: rokt-stage-us-west-2-intel-linux-build-large
 
 steps:
+  - name: ":kotlin::broom: Trunk code check"
+    plugins:
+      - ssh://git@github.com/ROKT/trunk-buildkite-plugin.git#stable:
+    agents:
+      queue: ${ENG_BK_AGENT}
+    timeout_in_minutes: 15
+
   - label: ":android: :gradle: Assemble debug"
     key: "build-uxhelper-debug"
     commands:
