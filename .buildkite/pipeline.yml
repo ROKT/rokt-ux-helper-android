@@ -1,17 +1,44 @@
-env:
-  ENG_BK_AGENT: eng-default
-  STAGE_BK_AGENT: rokt-stage-us-west-2-intel-linux-build-large
-
 steps:
   - name: ":kotlin::broom: Trunk code check"
     plugins:
       - ssh://git@github.com/ROKT/trunk-buildkite-plugin.git#stable:
     agents:
-      queue: ${ENG_BK_AGENT}
+      queue: ${ENG_DEFAULT}
     timeout_in_minutes: 15
+
+  - label: ":docker: Build and Publish Builder Image"
+    key: "build-builder-image"
+    agents:
+      queue: ${ENG_DEFAULT}
+    plugins:
+      - ssh://git@github.com/ROKT/docker-ecr-buildkite-plugin.git#stable:
+          name: ${SERVICE_NAME}-builder
+          target-region-group: hub
+          default-branch: main
+          repo-configuration:
+            scan-on-push: true
+            tags:
+              service: ${SERVICE_NAME}
+              team: "new-integrations"
+            pull-policy:
+              realms:
+                - rokt
+          docker-configuration:
+            driver: "buildkit"
+            cache-from:
+              - ecr://${SERVICE_NAME}-builder:${SANITISED_BRANCH_NAME}-latest
+              - ecr://${SERVICE_NAME}-builder:main-latest
+            tags:
+              - "${SANITISED_BRANCH_NAME}-${BUILDKITE_COMMIT}"
+              - "${SANITISED_BRANCH_NAME}-latest"
+            args:
+              - "ssh=default"
+          security:
+            snyk: true
 
   - label: ":android: :gradle: Assemble debug"
     key: "build-uxhelper-debug"
+    depends_on: "build-builder-image"
     commands:
       - ./gradlew assembleDebug
     artifact_paths:
@@ -19,47 +46,40 @@ steps:
       - "**/*.apk"
     plugins:
       - docker#v5.11.0:
-          image: "cimg/android:2024.09.1"
-          propagate-environment: true
+          image: "${ECR_HOST}/${SERVICE_NAME}-builder:${SANITISED_BRANCH_NAME}-${BUILDKITE_COMMIT}"
           user: root
-          environment:
-            - JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
     agents:
-      queue: ${STAGE_BK_AGENT}
+      queue: ${ENG_BK_AGENT}
     timeout_in_minutes: 25
 
   - label: ":android: :junit: Unit test"
     key: "unit-test-uxhelper"
+    depends_on: "build-builder-image"
     commands:
       - ./gradlew testDebugUnitTest
     artifact_paths:
       - "**/build/test-results/*/*.xml"
     plugins:
       - docker#v5.11.0:
-          image: "cimg/android:2024.09.1"
-          propagate-environment: true
+          image: "${ECR_HOST}/${SERVICE_NAME}-builder:${SANITISED_BRANCH_NAME}-${BUILDKITE_COMMIT}"
           user: root
-          environment:
-            - JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
     agents:
-      queue: ${STAGE_BK_AGENT}
+      queue: ${ENG_BK_AGENT}
     timeout_in_minutes: 25
 
   - label: ":android: :pick: Lint check"
     key: "lint-check-uxhelper"
+    depends_on: "build-builder-image"
     commands:
       - ./gradlew lintRelease
     artifact_paths:
       - "**/lint-results-*.html"
     plugins:
       - docker#v5.11.0:
-          image: "cimg/android:2024.09.1"
-          propagate-environment: true
+          image: "${ECR_HOST}/${SERVICE_NAME}-builder:${SANITISED_BRANCH_NAME}-${BUILDKITE_COMMIT}"
           user: root
-          environment:
-            - JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
     agents:
-      queue: ${STAGE_BK_AGENT}
+      queue: ${ENG_BK_AGENT}
     timeout_in_minutes: 25
 
   - wait: ~
@@ -75,7 +95,12 @@ steps:
 
   - label: ":maven: :rocket: Publish SDK to MavenCentral"
     key: "publish-uxhelper-feature-branch"
-    depends_on: "publish-prompt-uxhelper"
+    depends_on:
+      - "publish-prompt-uxhelper"
+      - "build-builder-image"
+      - "build-uxhelper-debug"
+      - "unit-test-uxhelper"
+      - "lint-check-uxhelper"
     branches: "!main !release-*"
     commands:
       - . ./export_env_vars.sh
@@ -99,14 +124,16 @@ steps:
             SONATYPE_PASSWORD:
               secret-id: stage-android-sdk-buildkite
               json-key: .SONATYPE_PASSWORD
+      - ecr#v2.8.0:
+          login: true
+          account_ids: "${ENG_ACCOUNT}"
       - docker#v5.11.0:
-          image: "cimg/android:2024.09.1"
+          image: "${ECR_HOST}/${SERVICE_NAME}-builder:${SANITISED_BRANCH_NAME}-${BUILDKITE_COMMIT}"
           user: root
           mount-buildkite-agent: true
           mount-checkout: true
           propagate-environment: true
           environment:
-            - JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
             - SIGNING_KEY
             - SIGNING_PASSWORD
             - SONATYPE_USERNAME
@@ -117,6 +144,11 @@ steps:
 
   - label: ":maven: :rocket: Publish SDK to MavenCentral"
     key: "publish-uxhelper"
+    depends_on:
+      - "build-builder-image"
+      - "build-uxhelper-debug"
+      - "unit-test-uxhelper"
+      - "lint-check-uxhelper"
     branches: "main release-*"
     commands:
       - . ./export_env_vars.sh
@@ -141,14 +173,16 @@ steps:
             SONATYPE_PASSWORD:
               secret-id: stage-android-sdk-buildkite
               json-key: .SONATYPE_PASSWORD
+      - ecr#v2.8.0:
+          login: true
+          account_ids: "${ENG_ACCOUNT}"
       - docker#v5.11.0:
-          image: "cimg/android:2024.09.1"
+          image: "${ECR_HOST}/${SERVICE_NAME}-builder:${SANITISED_BRANCH_NAME}-${BUILDKITE_COMMIT}"
           user: root
           mount-buildkite-agent: true
           mount-checkout: true
           propagate-environment: true
           environment:
-            - JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
             - SIGNING_KEY
             - SIGNING_PASSWORD
             - SONATYPE_USERNAME
