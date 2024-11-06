@@ -1,0 +1,49 @@
+# This file controls the behavior of Trunk: https://docs.trunk.io/cli
+# To learn more about the format of this file, see https://docs.trunk.io/reference/trunk-yaml
+version: 0.1
+cli:
+  version: 1.22.8
+  sha256:
+    darwin_arm64: aa5721bac03ea4e244cfe71f41a12a4a1cbf36746bfae1bc125a13a26d8d1a59
+    darwin_x86_64: 9ad94bf53fd6f0232cc89ff744477251e7f33634c77326a7b710770fa91344aa
+    linux_arm64: 67c66c5f616fc6b36a41ea3c673a30587555ea0674fab34b54afb66fe2932420
+    linux_x86_64: c02184f82905221f52a3bb43ec2ba9acb554d2727e69919d352a2386c49213e9
+    mingw_x86_64: 84725a1e85f2fdc1500b7de5c75af9d2642c4947d429c66de862da001fe3cd0b
+# Trunk provides extensibility via plugins. (https://docs.trunk.io/plugins)
+plugins:
+  sources:
+    - id: trunk
+      ref: v1.6.4
+      uri: https://github.com/trunk-io/plugins
+# Many linters and tools depend on runtimes - configure them here. (https://docs.trunk.io/runtimes)
+runtimes:
+  enabled:
+    - go@1.21.0
+    - java@13.0.11
+    - node@18.12.1
+    - python@3.10.8
+# This is the section where you manage your linters. (https://docs.trunk.io/check/configuration)
+lint:
+  enabled:
+    - checkov@3.2.278
+    - git-diff-check
+    - ktlint@1.4.0
+    - markdownlint@0.42.0
+    - oxipng@9.1.2
+    - prettier@3.3.3
+    - shellcheck@0.10.0
+    - shfmt@3.6.0
+    - taplo@0.9.3
+    - trufflehog@3.83.2
+  disabled:
+    - yamllint
+    - osv-scanner
+  ignore:
+    - linters: [ALL]
+      paths:
+        - gradlew
+actions:
+  enabled:
+    - trunk-check-pre-push-always
+    - trunk-fmt-pre-commit
+    - trunk-upgrade-available
