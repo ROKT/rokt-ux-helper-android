@@ -2,6 +2,7 @@ package com.rokt.demoapp.ui.screen.tutorials.three
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.rokt.demoapp.BuildConfig
 import com.rokt.demoapp.ui.state.RoktDemoErrorTypes
 import com.rokt.demoapp.ui.state.UiState
 import com.rokt.demoapp.ui.state.ViewState
@@ -15,8 +16,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class TutorialThreeViewModel @Inject constructor() : ViewModel() {
-    private val viewName = "" // Add your view name here
-    private val roktTagId = "" // Add your Rokt Tag ID here
+    private val viewName = BuildConfig.VIEW_NAME // Update value in local.properties
+    private val roktTagId = BuildConfig.ROKT_TAG_ID // Update value in local.properties
     private val attributes = mapOf(
         "lastname" to "Smith",
         "mobile" to "(323) 867-5309",

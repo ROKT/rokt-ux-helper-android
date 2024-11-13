@@ -72,7 +72,6 @@ private const val EXPERIENCE_JSON = """
 }
 """
 
-// TODO: Copy this class out into UXHelper
 private const val PARTNER_EXPERIENCE_JSON = """
 {
   "sessionId": "",

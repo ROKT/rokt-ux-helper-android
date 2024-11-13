@@ -4,11 +4,6 @@ plugins {
     alias(libs.plugins.kotlin.serialization)
 }
 
-// Retrieve API keys from environment variables
-val roktPubId: String? = System.getenv("ROKT_PUB_ID")
-val roktSecret: String? = System.getenv("ROKT_SECRET")
-val roktClientUniqueId: String? = System.getenv("ROKT_CLIENT_UNIQUE_ID")
-
 android {
     namespace = "com.rokt.networkhelper"
     compileSdk = 34
@@ -18,9 +13,10 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles("consumer-rules.pro")
-        buildConfigField("String", "ROKT_PUB_ID", "\"$roktPubId\"")
-        buildConfigField("String", "ROKT_SECRET", "\"$roktSecret\"")
-        buildConfigField("String", "ROKT_CLIENT_UNIQUE_ID", "\"$roktClientUniqueId\"")
+        buildConfigField("String", "BASE_URL", "\"${rootProject.extra["BASE_URL"] as String}\"")
+        buildConfigField("String", "ROKT_PUB_ID", "\"${rootProject.extra["ROKT_PUB_ID"] as String}\"")
+        buildConfigField("String", "ROKT_SECRET", "\"${rootProject.extra["ROKT_SECRET"] as String}\"")
+        buildConfigField("String", "ROKT_CLIENT_UNIQUE_ID", "\"${rootProject.extra["ROKT_CLIENT_UNIQUE_ID"] as String}\"")
     }
 
     buildTypes {

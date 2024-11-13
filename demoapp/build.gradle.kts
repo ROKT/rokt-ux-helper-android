@@ -21,6 +21,8 @@ android {
         vectorDrawables {
             useSupportLibrary = true
         }
+        buildConfigField("String", "VIEW_NAME", "\"${rootProject.extra["VIEW_NAME"] as String}\"")
+        buildConfigField("String", "ROKT_TAG_ID", "\"${rootProject.extra["ROKT_TAG_ID"] as String}\"")
     }
 
     buildTypes {
