@@ -28,7 +28,7 @@ internal interface RoktNetworkHelper {
 
 object RoktNetwork : RoktNetworkHelper {
 
-    private const val BASE_URL = "https://url.com" // Add your base URL here
+    private const val BASE_URL = BuildConfig.BASE_URL // Update value in local.properties
 
     private var roktTagId: String? = null
     private lateinit var roktRepository: RoktRepository
@@ -93,8 +93,8 @@ object RoktNetwork : RoktNetworkHelper {
             val request = chain.request().newBuilder()
                 .addHeader("Accept", "application/json")
                 .addHeader("Content-Type", "application/json")
-                .addHeader("rokt-pub-id", BuildConfig.ROKT_PUB_ID) // get this from Rokt
-                .addHeader("rokt-secret", BuildConfig.ROKT_SECRET) // get this from Rokt
+                .addHeader("rokt-pub-id", BuildConfig.ROKT_PUB_ID) // Update value in local.properties
+                .addHeader("rokt-secret", BuildConfig.ROKT_SECRET) // Update value in local.properties
                 .addHeader("rokt-tag-id", roktTagId ?: "")
                 .addHeader(
                     "rokt-client-unique-id",

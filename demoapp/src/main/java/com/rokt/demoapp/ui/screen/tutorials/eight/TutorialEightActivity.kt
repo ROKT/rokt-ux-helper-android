@@ -17,6 +17,9 @@ import androidx.lifecycle.lifecycleScope
 import com.rokt.demoapp.R
 import com.rokt.demoapp.ui.screen.tutorials.TutorialViewModel
 import com.rokt.modelmapper.uimodel.OpenLinks
+import com.rokt.roktux.FontItemStyle
+import com.rokt.roktux.FontItemWeight
+import com.rokt.roktux.ResourceFontItem
 import com.rokt.roktux.RoktLayoutView
 import com.rokt.roktux.RoktUx
 import com.rokt.roktux.RoktUxConfig
@@ -41,13 +44,7 @@ class TutorialEightActivity : AppCompatActivity() {
         val backButton: ImageView = findViewById(R.id.back_button)
         val loadingIndicator: ProgressBar = findViewById(R.id.loading_indicator)
         val errorMessage: TextView = findViewById(R.id.error_message)
-        val runtimeRoktLayoutView = RoktLayoutView(this, location = "Location1")
-        findViewById<FrameLayout?>(R.id.roktContainer).also {
-            it.isVisible = true
-            it.addView(runtimeRoktLayoutView)
-        }
         val roktLayoutView: RoktLayoutView = findViewById(R.id.roktLayoutView)
-        roktLayoutView.isVisible = false
 
         backButton.setOnClickListener { this.onBackPressed() }
 

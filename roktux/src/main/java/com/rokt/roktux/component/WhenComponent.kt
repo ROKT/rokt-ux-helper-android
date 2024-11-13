@@ -191,8 +191,6 @@ internal fun findWrappedChild(child: LayoutSchemaUiModel): LayoutSchemaUiModel {
     }
 }
 
-// TODO: Add findWrappedChildren for dealing with nested alignSelf stretch
-
 private fun OrderableWhenUiCondition.evaluate(leftValue: Int?, rightValue: Int?): Boolean {
     if (leftValue == null || rightValue == null) return false
     return when (this) {

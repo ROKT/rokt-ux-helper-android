@@ -15,16 +15,6 @@
         app:layout_constraintTop_toBottomOf="@id/tutorial_heading"
         app:location="Location1" />
 
-    <FrameLayout
-        android:id="@+id/roktContainer"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/space_4x"
-        android:visibility="gone"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tutorial_heading" />
-
     <ImageView
         android:id="@+id/back_button"
         android:layout_width="wrap_content"
