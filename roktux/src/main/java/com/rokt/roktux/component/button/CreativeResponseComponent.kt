@@ -2,6 +2,9 @@ package com.rokt.roktux.component.button
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
+import com.rokt.modelmapper.hmap.get
+import com.rokt.modelmapper.mappers.ExperienceModelMapperImpl.Companion.KEY_IS_POSITIVE
 import com.rokt.modelmapper.uimodel.LayoutSchemaUiModel
 import com.rokt.roktux.component.ComposableComponent
 import com.rokt.roktux.component.LayoutUiModelFactory
@@ -29,7 +32,16 @@ internal class CreativeResponseComponent(
                 model = model,
                 factory = factory,
                 modifierFactory = modifierFactory,
-                modifier = modifier,
+                modifier = modifier
+                    .testTag(
+                        if (responseOptionModel.properties.get<Boolean>(KEY_IS_POSITIVE) ==
+                            true
+                        ) {
+                            "positive_button"
+                        } else {
+                            "negative_button"
+                        },
+                    ),
                 offerState = offerState,
                 isDarkModeEnabled = isDarkModeEnabled,
                 breakpointIndex = breakpointIndex,
