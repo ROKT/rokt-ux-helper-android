@@ -43,9 +43,9 @@ internal class CreativeResponseComponent(
                         if (responseOptionModel.properties.get<Boolean>(KEY_IS_POSITIVE) ==
                             true
                         ) {
-                            "positive_button"
+                            POSITIVE_BUTTON_TEST_TAG
                         } else {
-                            "negative_button"
+                            NEGATIVE_BUTTON_TEST_TAG
                         },
                     ),
                 offerState = offerState,
@@ -62,5 +62,10 @@ internal class CreativeResponseComponent(
                 )
             }
         }
+    }
+
+    companion object {
+        private const val POSITIVE_BUTTON_TEST_TAG = "positive_button"
+        private const val NEGATIVE_BUTTON_TEST_TAG = "negative_button"
     }
 }
