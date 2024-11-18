@@ -163,6 +163,47 @@ internal fun transformCreativeResponse(
     )
 }
 
+internal fun transformCatalogResponseButton(
+    catalogResponseModel: LayoutSchemaModel.CatalogResponseButton,
+    transformLayoutSchemaChildren: (LayoutSchemaModel) -> LayoutSchemaUiModel?,
+): LayoutSchemaUiModel.CatalogResponseButtonUiModel {
+    val ownStyles = catalogResponseModel.node.styles?.elements?.own?.toImmutableList()
+    val ownModifiers = ownStyles.transformModifier(
+        transformSpacing = { ownStyle -> ownStyle.toBasicStateStylingBlock { style -> style.spacing } },
+        transformDimension = { ownStyle -> ownStyle.toBasicStateStylingBlock { style -> style.dimension } },
+        transformBackground = { ownStyle -> ownStyle.toBasicStateStylingBlock { style -> style.background } },
+        transformBorder = { ownStyle -> ownStyle.toBasicStateStylingBlock { style -> style.border } },
+        transformContainer = { ownStyle -> ownStyle.toBasicStateStylingBlock { style -> style.container } },
+    )
+    val conditionalStyleTransition = catalogResponseModel.node.styles?.conditionalTransitions?.let {
+        ConditionalTransitionModifier(
+            modifier = transformModifier(
+                it.value.own?.spacing,
+                it.value.own?.dimension,
+                it.value.own?.background,
+                it.value.own?.border,
+                it.value.own?.container,
+            ),
+            predicates = it.predicates.map { predicate -> predicate.transformWhenPredicate() }.toImmutableList(),
+            duration = it.duration,
+        )
+    }
+
+    return LayoutSchemaUiModel.CatalogResponseButtonUiModel(
+        ownModifiers = ownModifiers,
+        containerProperties = ownStyles.transformContainer(
+            transformContainer = { ownStyle -> ownStyle.toBasicStateStylingBlock { style -> style.container } },
+            transformFlexChild = { ownStyle -> ownStyle.toBasicStateStylingBlock { style -> style.flexChild } },
+        ),
+        conditionalTransitionModifiers = conditionalStyleTransition,
+        children = catalogResponseModel.node.children.mapNotNull { child ->
+            transformLayoutSchemaChildren(
+                child,
+            )
+        }.toImmutableList(),
+    )
+}
+
 internal fun transformCloseButton(
     closeButtonModel: LayoutSchemaModel.CloseButton,
     transformLayoutSchemaChildren: (LayoutSchemaModel) -> LayoutSchemaUiModel?,
@@ -338,66 +379,62 @@ internal fun transformProgressControl(
 internal fun transformWhen(
     whenModel: LayoutSchemaModel.When,
     transformLayoutSchemaChildren: (LayoutSchemaModel) -> LayoutSchemaUiModel?,
-): LayoutSchemaUiModel.WhenUiModel {
-    return LayoutSchemaUiModel.WhenUiModel(
-        predicates = whenModel.node.predicates.map { it.transformWhenPredicate() }.toImmutableList(),
-        children = whenModel.node.children.mapNotNull { child ->
-            transformLayoutSchemaChildren(child)
-        }.toImmutableList(),
-        transition = whenModel.node.transition?.toTransitionUiModel() ?: WhenUiTransition(
-            EnterTransition.None,
-            ExitTransition.None,
-        ),
-        hide = whenModel.node.hide?.toHideUiModel(),
+): LayoutSchemaUiModel.WhenUiModel = LayoutSchemaUiModel.WhenUiModel(
+    predicates = whenModel.node.predicates.map { it.transformWhenPredicate() }.toImmutableList(),
+    children = whenModel.node.children.mapNotNull { child ->
+        transformLayoutSchemaChildren(child)
+    }.toImmutableList(),
+    transition = whenModel.node.transition?.toTransitionUiModel() ?: WhenUiTransition(
+        EnterTransition.None,
+        ExitTransition.None,
+    ),
+    hide = whenModel.node.hide?.toHideUiModel(),
+)
+
+internal fun WhenPredicate.transformWhenPredicate(): WhenUiPredicate = when (this) {
+    is WhenPredicate.Breakpoint -> WhenUiPredicate.Breakpoint(
+        condition = predicate.condition.toUiModel(),
+        value = predicate.value,
     )
-}
 
-internal fun WhenPredicate.transformWhenPredicate(): WhenUiPredicate {
-    return when (this) {
-        is WhenPredicate.Breakpoint -> WhenUiPredicate.Breakpoint(
-            condition = predicate.condition.toUiModel(),
-            value = predicate.value,
-        )
+    is WhenPredicate.Position -> WhenUiPredicate.Position(
+        condition = predicate.condition.toUiModel(),
+        value = predicate.value,
+    )
 
-        is WhenPredicate.Position -> WhenUiPredicate.Position(
-            condition = predicate.condition.toUiModel(),
-            value = predicate.value,
-        )
+    is WhenPredicate.Progression -> WhenUiPredicate.Progression(
+        condition = predicate.condition.toUiModel(),
+        value = predicate.value,
+    )
 
-        is WhenPredicate.Progression -> WhenUiPredicate.Progression(
-            condition = predicate.condition.toUiModel(),
-            value = predicate.value,
-        )
+    is WhenPredicate.DarkMode -> WhenUiPredicate.DarkMode(
+        condition = predicate.condition.toUiModel(),
+        value = predicate.value,
+    )
 
-        is WhenPredicate.DarkMode -> WhenUiPredicate.DarkMode(
-            condition = predicate.condition.toUiModel(),
-            value = predicate.value,
-        )
+    is WhenPredicate.CreativeCopy -> WhenUiPredicate.CreativeCopy(
+        condition = predicate.condition.toUiModel(),
+        value = predicate.value,
+    )
 
-        is WhenPredicate.CreativeCopy -> WhenUiPredicate.CreativeCopy(
-            condition = predicate.condition.toUiModel(),
-            value = predicate.value,
-        )
+    is WhenPredicate.StaticBoolean -> WhenUiPredicate.StaticBoolean(
+        condition = predicate.condition.toUiModel(),
+        value = predicate.value,
+    )
 
-        is WhenPredicate.StaticBoolean -> WhenUiPredicate.StaticBoolean(
-            condition = predicate.condition.toUiModel(),
-            value = predicate.value,
-        )
+    is WhenPredicate.CustomState -> WhenUiPredicate.CustomState(
+        condition = predicate.condition.toUiModel(),
+        value = predicate.value,
+        key = predicate.key,
+    )
 
-        is WhenPredicate.CustomState -> WhenUiPredicate.CustomState(
-            condition = predicate.condition.toUiModel(),
-            value = predicate.value,
-            key = predicate.key,
-        )
+    is WhenPredicate.StaticString -> WhenUiPredicate.StaticString(
+        condition = predicate.condition.toUiModel(),
+        input = predicate.input,
+        value = predicate.value,
+    )
 
-        is WhenPredicate.StaticString -> WhenUiPredicate.StaticString(
-            condition = predicate.condition.toUiModel(),
-            input = predicate.input,
-            value = predicate.value,
-        )
-
-        else -> throw IllegalArgumentException()
-    }
+    else -> throw IllegalArgumentException()
 }
 
 private fun OrderableWhenCondition.toUiModel() = when (this) {

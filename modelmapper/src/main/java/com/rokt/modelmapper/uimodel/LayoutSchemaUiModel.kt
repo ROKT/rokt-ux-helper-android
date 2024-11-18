@@ -69,6 +69,13 @@ sealed class LayoutSchemaUiModel(
         val children: ImmutableList<LayoutSchemaUiModel?>,
     ) : LayoutSchemaUiModel(ownModifiers, containerProperties, conditionalTransitionModifiers)
 
+    class CatalogStackedCollectionUiModel(
+        ownModifiers: ImmutableList<StateBlock<ModifierProperties>>?,
+        containerProperties: ImmutableList<StateBlock<ContainerProperties>>?,
+        conditionalTransitionModifiers: ConditionalTransitionModifier?,
+        val children: ImmutableList<LayoutSchemaUiModel?>,
+    ) : LayoutSchemaUiModel(ownModifiers, containerProperties, conditionalTransitionModifiers)
+
     class ProgressIndicatorUiModel(
         ownModifiers: ImmutableList<StateBlock<ModifierProperties>>?,
         containerProperties: ImmutableList<StateBlock<ContainerProperties>>?,
@@ -103,6 +110,13 @@ sealed class LayoutSchemaUiModel(
         conditionalTransitionModifiers: ConditionalTransitionModifier?,
         children: ImmutableList<LayoutSchemaUiModel?>,
         val dismissalMethod: String?,
+    ) : ButtonUiModel(ownModifiers, containerProperties, conditionalTransitionModifiers, children)
+
+    class CatalogResponseButtonUiModel(
+        ownModifiers: ImmutableList<StateBlock<ModifierProperties>>?,
+        containerProperties: ImmutableList<StateBlock<ContainerProperties>>?,
+        conditionalTransitionModifiers: ConditionalTransitionModifier?,
+        children: ImmutableList<LayoutSchemaUiModel?>,
     ) : ButtonUiModel(ownModifiers, containerProperties, conditionalTransitionModifiers, children)
 
     class StaticLinkUiModel(
@@ -153,7 +167,7 @@ sealed class LayoutSchemaUiModel(
         val peekThroughSizeUiModel: ImmutableList<PeekThroughSizeUiModel>,
     ) : LayoutSchemaUiModel(ownModifiers, containerProperties, conditionalTransitionModifiers)
 
-    class MarketingUiModel() : LayoutSchemaUiModel()
+    class MarketingUiModel : LayoutSchemaUiModel()
 
     class OverlayUiModel(
         ownModifiers: ImmutableList<StateBlock<ModifierProperties>>?,
@@ -227,10 +241,7 @@ interface ConditionalTransition {
 }
 
 @Immutable
-data class StateBlock<T>(
-    val default: T,
-    val pressed: T? = null,
-)
+data class StateBlock<T>(val default: T, val pressed: T? = null)
 
 @Immutable
 interface BaseTextStylingUiProperties {
@@ -327,11 +338,7 @@ sealed class WidthUiModel {
     object WrapContent : WidthUiModel()
 }
 
-data class BackgroundImageUiModel(
-    val url: ThemeColorUiModel,
-    val position: Alignment,
-    val scaleType: ContentScale,
-)
+data class BackgroundImageUiModel(val url: ThemeColorUiModel, val position: Alignment, val scaleType: ContentScale)
 
 @Immutable
 interface BaseModifierProperties {
@@ -482,7 +489,7 @@ sealed class WhenUiPredicate {
         WhenUiPredicate()
 }
 
-enum class OrderableWhenUiCondition() {
+enum class OrderableWhenUiCondition {
     Is,
     IsNot,
     IsBelow,
