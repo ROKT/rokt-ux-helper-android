@@ -34,6 +34,7 @@ import kotlinx.collections.immutable.persistentMapOf
 import kotlinx.collections.immutable.toImmutableMap
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -68,9 +69,11 @@ internal class LayoutViewModel(
         // It queues the request in a chunk of 25ms and max buffer as 20 and sends
         // them together.
         viewModelScope.launch(Dispatchers.IO) {
-            _eventsQueue.chunk(EVENT_REQUEST_BUFFER_MILLIS, QUEUE_CAPACITY).collect { events ->
-                events.distinct().filterNot { _sentEvents.contains(it) }.takeIf { it.isNotEmpty() }?.let {
-                    processEventQueue(it)
+            withContext(NonCancellable) {
+                _eventsQueue.chunk(EVENT_REQUEST_BUFFER_MILLIS, QUEUE_CAPACITY).collect { events ->
+                    events.distinct().filterNot { _sentEvents.contains(it) }.takeIf { it.isNotEmpty() }?.let {
+                        processEventQueue(it)
+                    }
                 }
             }
         }
