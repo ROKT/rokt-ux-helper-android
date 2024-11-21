@@ -34,6 +34,7 @@ import kotlinx.collections.immutable.persistentMapOf
 import kotlinx.collections.immutable.toImmutableMap
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -60,7 +61,7 @@ internal class LayoutViewModel(
     // SDK's internal thread-safe structure to track URL states
     private val urlEventStateMap = ConcurrentHashMap<String, UrlEventState>()
 
-    private val _eventsQueue = MutableSharedFlow<RoktPlatformEvent>()
+    private val _eventsQueue = MutableSharedFlow<RoktPlatformEvent>(replay = 5)
     private val _sentEvents = mutableSetOf<RoktPlatformEvent>()
 
     init {
@@ -68,10 +69,21 @@ internal class LayoutViewModel(
         // It queues the request in a chunk of 25ms and max buffer as 20 and sends
         // them together.
         viewModelScope.launch(Dispatchers.IO) {
-            _eventsQueue.chunk(EVENT_REQUEST_BUFFER_MILLIS, QUEUE_CAPACITY).collect { events ->
-                events.distinct().filterNot { _sentEvents.contains(it) }.takeIf { it.isNotEmpty() }?.let {
-                    processEventQueue(it)
+            try {
+                _eventsQueue.chunk(EVENT_REQUEST_BUFFER_MILLIS, QUEUE_CAPACITY).collect { events ->
+                    events.distinct().filterNot { _sentEvents.contains(it) }.takeIf { it.isNotEmpty() }?.let {
+                        processEventQueue(it)
+                    }
                 }
+            } finally {
+                // If the composable exits and the VM is cleared, the job is cancelled while events may still be in the queue
+                // This processes the final batch of events before the job is finally cancelled
+                _eventsQueue.replayCache.distinct().filterNot { _sentEvents.contains(it) }.takeIf { it.isNotEmpty() }
+                    ?.let {
+                        withContext(NonCancellable) {
+                            processEventQueue(it)
+                        }
+                    }
             }
         }
     }
@@ -450,7 +462,7 @@ internal class LayoutViewModel(
         }
     }
 
-    fun handlePlatformEvent(event: RoktPlatformEvent) {
+    private fun handlePlatformEvent(event: RoktPlatformEvent) {
         viewModelScope.launch(ioDispatcher) {
             _eventsQueue.emit(event)
         }
