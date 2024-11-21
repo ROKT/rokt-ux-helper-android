@@ -5,8 +5,9 @@ import com.rokt.modelmapper.data.bindModel
 import com.rokt.modelmapper.uimodel.ConditionalTransitionModifier
 import com.rokt.modelmapper.uimodel.ConditionalTransitionTextStyling
 import com.rokt.modelmapper.uimodel.CreativeIcon
-import com.rokt.modelmapper.uimodel.CreativeImageModel
 import com.rokt.modelmapper.uimodel.LayoutSchemaUiModel
+import com.rokt.modelmapper.uimodel.Module
+import com.rokt.modelmapper.uimodel.OfferImageModel
 import com.rokt.modelmapper.uimodel.OfferModel
 import com.rokt.network.model.BasicStateStylingBlock
 import com.rokt.network.model.BasicTextStyle
@@ -120,6 +121,8 @@ internal fun transformRichText(
 internal fun transformDataImage(
     dataImageModel: LayoutSchemaModel.DataImage,
     offerModel: OfferModel?,
+    module: Module,
+    itemIndex: Int,
 ): LayoutSchemaUiModel.ImageUiModel {
     val ownStyles = dataImageModel.node.styles?.elements?.own?.toImmutableList()
     val ownModifiers = ownStyles.transformModifier(
@@ -128,7 +131,7 @@ internal fun transformDataImage(
         transformDimension = { ownStyle -> ownStyle.toBasicStateStylingBlock { style -> style.dimension } },
         transformBackground = { ownStyle -> ownStyle.toBasicStateStylingBlock { style -> style.background } },
     )
-    val boundModel = bindModel<CreativeImageModel>(dataImageModel.node.imageKey, offerModel)
+    val boundModel = bindModel<OfferImageModel>(dataImageModel.node.imageKey, offerModel, module, itemIndex)
 
     val conditionalStyleTransition = dataImageModel.node.styles?.conditionalTransitions?.let {
         ConditionalTransitionModifier(
@@ -194,6 +197,8 @@ internal fun transformStaticImage(staticImageModel: LayoutSchemaModel.StaticImag
 internal fun transformDataIcon(
     dataIconModel: LayoutSchemaModel.DataIcon,
     offerModel: OfferModel?,
+    module: Module,
+    itemIndex: Int,
 ): LayoutSchemaUiModel.IconUiModel {
     val ownStyles = dataIconModel.node.styles?.elements?.own?.toImmutableList()
     val ownModifiers = ownStyles.transformModifier(
@@ -216,7 +221,7 @@ internal fun transformDataIcon(
         )
     }
 
-    val boundModel = bindModel<CreativeIcon>(dataIconModel.node.iconKey, offerModel)?.name.orEmpty()
+    val boundModel = bindModel<CreativeIcon>(dataIconModel.node.iconKey, offerModel, module, itemIndex)?.name.orEmpty()
 
     return LayoutSchemaUiModel.IconUiModel(
         ownModifiers = ownModifiers,

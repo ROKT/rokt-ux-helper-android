@@ -36,6 +36,7 @@ import com.rokt.demoapp.ui.common.SmallSpace
 import com.rokt.demoapp.ui.common.error.RoktError
 import com.rokt.demoapp.ui.screen.layouts.HEADER_TOP_PADDING
 import com.rokt.demoapp.ui.screen.tutorials.TutorialViewModel
+import com.rokt.demoapp.ui.state.UiContent
 import com.rokt.demoapp.utils.openInBrowser
 import com.rokt.modelmapper.uimodel.OpenLinks
 import com.rokt.roktux.RoktLayout
@@ -98,28 +99,31 @@ fun TutorialFourCompose(backPressed: () -> Unit, viewModel: TutorialViewModel = 
                 }
 
                 state.value.hasData -> {
-                    RoktLayout(
-                        experienceResponse = state.value.data!!.experienceResponse,
-                        location = state.value.data!!.location,
-                        onUxEvent = { event ->
-                            if (event is RoktUxEvent.OpenUrl) {
-                                if (event.type != OpenLinks.Externally) {
-                                    currentUrlEvent = event
-                                    event.url.toUri().openInBrowser(context) {
-                                        currentUrlEvent = null
-                                        event.onError(event.id, it)
+                    val content = state.value.data
+                    if (content is UiContent.ExperienceContent) {
+                        RoktLayout(
+                            experienceResponse = content.experienceResponse,
+                            location = content.location,
+                            onUxEvent = { event ->
+                                if (event is RoktUxEvent.OpenUrl) {
+                                    if (event.type != OpenLinks.Externally) {
+                                        currentUrlEvent = event
+                                        event.url.toUri().openInBrowser(context) {
+                                            currentUrlEvent = null
+                                            event.onError(event.id, it)
+                                        }
+                                    } else {
+                                        customTabLauncher.launch(event)
                                     }
-                                } else {
-                                    customTabLauncher.launch(event)
                                 }
-                            }
-                        },
-                        onPlatformEvent = {
-                            println("RoktEvent: onPlatformEvent received $it")
-                        },
-                        roktUxConfig = RoktUxConfig.builder()
-                            .imageHandlingStrategy(NetworkStrategy()).build(),
-                    )
+                            },
+                            onPlatformEvent = {
+                                println("RoktEvent: onPlatformEvent received $it")
+                            },
+                            roktUxConfig = RoktUxConfig.builder()
+                                .imageHandlingStrategy(NetworkStrategy()).build(),
+                        )
+                    }
                 }
 
                 else -> {

@@ -16,6 +16,7 @@ enum class DestinationType(val value: String) {
     TUTORIAL_TWO_COMPOSE("tutorial_two_compose"),
     TUTORIAL_THREE_COMPOSE("tutorial_three_compose"),
     TUTORIAL_FOUR_COMPOSE("tutorial_four_compose"),
+    TUTORIAL_NINE_COMPOSE("tutorial_nine_compose"),
 }
 
 /**

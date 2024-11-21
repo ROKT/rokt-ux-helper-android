@@ -3,6 +3,8 @@ package com.rokt.modelmapper.mappers
 import com.rokt.modelmapper.uimodel.ConditionalTransitionModifier
 import com.rokt.modelmapper.uimodel.LayoutSchemaUiModel
 import com.rokt.modelmapper.uimodel.ModifierProperties
+import com.rokt.modelmapper.uimodel.Module
+import com.rokt.modelmapper.uimodel.OfferModel
 import com.rokt.modelmapper.uimodel.StateBlock
 import com.rokt.modelmapper.uimodel.WidthUiModel
 import com.rokt.network.model.BasicStateStylingBlock
@@ -19,7 +21,6 @@ import com.rokt.network.model.RowStyle
 import com.rokt.network.model.ScrollableColumnStyle
 import com.rokt.network.model.ScrollableRowStyle
 import com.rokt.network.model.ZStackContainerStylingProperties
-import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
 
 internal fun transformColumn(
@@ -169,7 +170,8 @@ internal fun transformZStack(
 
 internal fun transformCatalogStackedCollection(
     catalogStackedCollection: LayoutSchemaModel.CatalogStackedCollection,
-    transformLayoutSchemaChildren: (LayoutSchemaModel) -> LayoutSchemaUiModel?,
+    offerModel: OfferModel?,
+    transformLayoutSchemaChildren: (Int, Module, LayoutSchemaModel) -> LayoutSchemaUiModel?,
 ): LayoutSchemaUiModel.CatalogStackedCollectionUiModel {
     val ownStyles = catalogStackedCollection.node.styles?.elements?.own?.toImmutableList().toBasicStateStylingBlock()
     val ownModifiers = ownStyles.transformModifier(
@@ -193,6 +195,16 @@ internal fun transformCatalogStackedCollection(
             duration = it.duration,
         )
     }
+    val catalogItemList = mutableListOf<LayoutSchemaUiModel>()
+    offerModel?.catalogItems?.forEachIndexed { i, _ ->
+        transformLayoutSchemaChildren(
+            i,
+            Module.AddToCart,
+            catalogStackedCollection.node.template.toLayoutSchemaModel(),
+        )?.let {
+            catalogItemList.add(i, it)
+        }
+    }
     return LayoutSchemaUiModel.CatalogStackedCollectionUiModel(
         ownModifiers = ownModifiers,
         containerProperties = ownStyles.transformContainer(
@@ -202,11 +214,7 @@ internal fun transformCatalogStackedCollection(
             transformFlexChild = { ownStyle -> ownStyle.toBasicStateStylingBlock { style -> style.flexChild } },
         ),
         conditionalTransitionModifiers = conditionalStyleTransition,
-        children = persistentListOf(
-            transformLayoutSchemaChildren(
-                catalogStackedCollection.node.template.toLayoutSchemaModel(),
-            ),
-        ),
+        children = catalogItemList.toImmutableList(),
     )
 }
 

@@ -5,6 +5,7 @@ import androidx.compose.runtime.Immutable
 import androidx.compose.ui.Modifier
 import com.rokt.modelmapper.uimodel.LayoutSchemaUiModel
 import com.rokt.modelmapper.uimodel.LayoutSchemaUiModel.ToggleButtonStateTriggerUiModel
+import com.rokt.roktux.component.button.CatalogResponseComponent
 import com.rokt.roktux.component.button.CloseButtonComponent
 import com.rokt.roktux.component.button.CreativeResponseComponent
 import com.rokt.roktux.component.button.ProgressControlComponent
@@ -18,9 +19,7 @@ import kotlinx.collections.immutable.persistentMapOf
 import kotlin.reflect.KClass
 
 @Immutable
-internal class LayoutUiModelFactory(
-    modifierFactory: ModifierFactory = ModifierFactory(),
-) {
+internal class LayoutUiModelFactory(modifierFactory: ModifierFactory = ModifierFactory()) {
     private val composableMap:
         ImmutableMap<KClass<out LayoutSchemaUiModel>, ComposableComponent<out LayoutSchemaUiModel>> =
         persistentMapOf(
@@ -41,6 +40,7 @@ internal class LayoutUiModelFactory(
                 this,
                 modifierFactory,
             ),
+            LayoutSchemaUiModel.CatalogResponseButtonUiModel::class to CatalogResponseComponent(this, modifierFactory),
             LayoutSchemaUiModel.ProgressControlUiModel::class to ProgressControlComponent(
                 this,
                 modifierFactory,
@@ -73,6 +73,8 @@ internal class LayoutUiModelFactory(
                 this,
                 modifierFactory,
             ),
+            LayoutSchemaUiModel.CatalogStackedCollectionUiModel::class to
+                CatalogStackedCollectionComponent(this, modifierFactory),
         )
 
     @Composable

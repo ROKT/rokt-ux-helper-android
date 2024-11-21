@@ -8,6 +8,7 @@ import androidx.compose.animation.fadeOut
 import com.rokt.modelmapper.data.BindData
 import com.rokt.modelmapper.data.bindModel
 import com.rokt.modelmapper.uimodel.BooleanWhenUiCondition
+import com.rokt.modelmapper.uimodel.CatalogItemModel
 import com.rokt.modelmapper.uimodel.ConditionalTransitionModifier
 import com.rokt.modelmapper.uimodel.EqualityWhenUiCondition
 import com.rokt.modelmapper.uimodel.ExistenceWhenUiCondition
@@ -165,6 +166,8 @@ internal fun transformCreativeResponse(
 
 internal fun transformCatalogResponseButton(
     catalogResponseModel: LayoutSchemaModel.CatalogResponseButton,
+    offerModel: OfferModel?,
+    itemIndex: Int,
     transformLayoutSchemaChildren: (LayoutSchemaModel) -> LayoutSchemaUiModel?,
 ): LayoutSchemaUiModel.CatalogResponseButtonUiModel {
     val ownStyles = catalogResponseModel.node.styles?.elements?.own?.toImmutableList()
@@ -201,6 +204,7 @@ internal fun transformCatalogResponseButton(
                 child,
             )
         }.toImmutableList(),
+        catalogItemModel = bindModel<CatalogItemModel>(offerModel = offerModel, itemIndex = itemIndex)?.properties,
     )
 }
 

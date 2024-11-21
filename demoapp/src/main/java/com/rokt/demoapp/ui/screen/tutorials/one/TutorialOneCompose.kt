@@ -27,6 +27,7 @@ import com.rokt.demoapp.ui.common.SmallSpace
 import com.rokt.demoapp.ui.common.error.RoktError
 import com.rokt.demoapp.ui.screen.layouts.HEADER_TOP_PADDING
 import com.rokt.demoapp.ui.screen.tutorials.TutorialViewModel
+import com.rokt.demoapp.ui.state.UiContent
 import com.rokt.roktux.RoktLayout
 import com.rokt.roktux.RoktUx
 import com.rokt.roktux.RoktUxConfig
@@ -62,14 +63,17 @@ fun TutorialOneCompose(backPressed: () -> Unit, viewModel: TutorialViewModel = h
                 }
 
                 state.value.hasData -> {
-                    RoktLayout(
-                        experienceResponse = state.value.data!!.experienceResponse,
-                        location = state.value.data!!.location,
-                        onUxEvent = { println("RoktEvent: UxEvent Received $it") },
-                        onPlatformEvent = { println("RoktEvent: onPlatformEvents received $it") },
-                        roktUxConfig = RoktUxConfig.builder()
-                            .imageHandlingStrategy(NetworkStrategy()).build(),
-                    )
+                    val content = state.value.data
+                    if (content is UiContent.ExperienceContent) {
+                        RoktLayout(
+                            experienceResponse = content.experienceResponse,
+                            location = content.location,
+                            onUxEvent = { println("RoktEvent: UxEvent Received $it") },
+                            onPlatformEvent = { println("RoktEvent: onPlatformEvents received $it") },
+                            roktUxConfig = RoktUxConfig.builder()
+                                .imageHandlingStrategy(NetworkStrategy()).build(),
+                        )
+                    }
                 }
 
                 else -> {
