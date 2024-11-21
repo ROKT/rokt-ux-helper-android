@@ -19,6 +19,8 @@ dependencyResolutionManagement {
     repositories {
         google()
         mavenCentral()
+        // TODO: remove this once stable version is released to maven central
+        maven("https://apps.rokt.com/msdk")
     }
 }
 

@@ -65,6 +65,21 @@ sealed interface RoktUxEvent {
      * @param onClose - callback when url is closed
      * @param onError - callback when url fails to open
      */
+    @Serializable
+    data class CartItemInstantPurchase(
+        @SerialName("layoutId") val layoutId: String,
+        @SerialName("cartItemId") val cartItemId: String,
+        @SerialName("catalogItemId") val catalogItemId: String,
+        @SerialName("currency") val currency: String,
+        @SerialName("description") val description: String,
+        @SerialName("linkedProductId") val linkedProductId: String,
+        @SerialName("totalPrice") val totalPrice: Double,
+        @SerialName("quantity") val quantity: Int,
+        @SerialName("unitPrice") val unitPrice: Double,
+    ) : RoktUxEvent {
+        fun toJsonString(): String = Json { encodeDefaults = true }.encodeToString(this)
+    }
+
     data class OpenUrl(
         val url: String,
         val id: String,
@@ -126,6 +141,9 @@ enum class EventType {
 
     @SerialName("SignalSdkDiagnostic")
     SignalSdkDiagnostic,
+
+    @SerialName("SignalCartItemInstantPurchaseInitiated")
+    SignalCartItemInstantPurchaseInitiated,
 }
 
 @Serializable

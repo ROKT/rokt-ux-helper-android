@@ -15,6 +15,7 @@ import com.rokt.modelmapper.mappers.ExperienceModelMapperImpl.Companion.KEY_DARK
 import com.rokt.modelmapper.mappers.ExperienceModelMapperImpl.Companion.KEY_LIGHT
 import com.rokt.modelmapper.mappers.ExperienceModelMapperImpl.Companion.KEY_TITLE
 import com.rokt.modelmapper.uimodel.BooleanWhenUiCondition
+import com.rokt.modelmapper.uimodel.CatalogItemModel
 import com.rokt.modelmapper.uimodel.ConditionalTransitionModifier
 import com.rokt.modelmapper.uimodel.EqualityWhenUiCondition
 import com.rokt.modelmapper.uimodel.ExistenceWhenUiCondition
@@ -169,6 +170,50 @@ internal fun transformCreativeResponse(
                 responseKey,
             )
         }.toImmutableList(),
+    )
+}
+
+internal fun transformCatalogResponseButton(
+    catalogResponseModel: LayoutSchemaModel.CatalogResponseButton,
+    offerModel: OfferModel?,
+    itemIndex: Int,
+    transformLayoutSchemaChildren: (LayoutSchemaModel) -> LayoutSchemaUiModel?,
+): LayoutSchemaUiModel.CatalogResponseButtonUiModel {
+    val ownStyles = catalogResponseModel.node.styles?.elements?.own?.toImmutableList()
+    val ownModifiers = ownStyles.transformModifier(
+        transformSpacing = { ownStyle -> ownStyle.toBasicStateStylingBlock { style -> style.spacing } },
+        transformDimension = { ownStyle -> ownStyle.toBasicStateStylingBlock { style -> style.dimension } },
+        transformBackground = { ownStyle -> ownStyle.toBasicStateStylingBlock { style -> style.background } },
+        transformBorder = { ownStyle -> ownStyle.toBasicStateStylingBlock { style -> style.border } },
+        transformContainer = { ownStyle -> ownStyle.toBasicStateStylingBlock { style -> style.container } },
+    )
+    val conditionalStyleTransition = catalogResponseModel.node.styles?.conditionalTransitions?.let {
+        ConditionalTransitionModifier(
+            modifier = transformModifier(
+                it.value.own?.spacing,
+                it.value.own?.dimension,
+                it.value.own?.background,
+                it.value.own?.border,
+                it.value.own?.container,
+            ),
+            predicates = it.predicates.map { predicate -> predicate.transformWhenPredicate() }.toImmutableList(),
+            duration = it.duration,
+        )
+    }
+
+    return LayoutSchemaUiModel.CatalogResponseButtonUiModel(
+        ownModifiers = ownModifiers,
+        containerProperties = ownStyles.transformContainer(
+            transformContainer = { ownStyle -> ownStyle.toBasicStateStylingBlock { style -> style.container } },
+            transformFlexChild = { ownStyle -> ownStyle.toBasicStateStylingBlock { style -> style.flexChild } },
+        ),
+        conditionalTransitionModifiers = conditionalStyleTransition,
+        children = catalogResponseModel.node.children.mapNotNull { child ->
+            transformLayoutSchemaChildren(
+                child,
+            )
+        }.toImmutableList(),
+        catalogItemModel = bindModel<CatalogItemModel>(offerModel = offerModel, itemIndex = itemIndex)?.properties,
     )
 }
 

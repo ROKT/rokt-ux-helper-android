@@ -18,6 +18,7 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.DpOffset
 import com.rokt.modelmapper.data.BindData
+import com.rokt.modelmapper.hmap.HMap
 import kotlinx.collections.immutable.ImmutableList
 
 @Immutable
@@ -69,6 +70,14 @@ sealed class LayoutSchemaUiModel(
         val children: ImmutableList<LayoutSchemaUiModel?>,
     ) : LayoutSchemaUiModel(ownModifiers, containerProperties, conditionalTransitionModifiers)
 
+    // Column
+    class CatalogStackedCollectionUiModel(
+        ownModifiers: ImmutableList<StateBlock<ModifierProperties>>?,
+        containerProperties: ImmutableList<StateBlock<ContainerProperties>>?,
+        conditionalTransitionModifiers: ConditionalTransitionModifier?,
+        val children: ImmutableList<LayoutSchemaUiModel?>, // the type of it is either RowUiModel or ColumnUiModel
+    ) : LayoutSchemaUiModel(ownModifiers, containerProperties, conditionalTransitionModifiers)
+
     class ProgressIndicatorUiModel(
         ownModifiers: ImmutableList<StateBlock<ModifierProperties>>?,
         containerProperties: ImmutableList<StateBlock<ContainerProperties>>?,
@@ -103,6 +112,14 @@ sealed class LayoutSchemaUiModel(
         conditionalTransitionModifiers: ConditionalTransitionModifier?,
         children: ImmutableList<LayoutSchemaUiModel?>,
         val dismissalMethod: String?,
+    ) : ButtonUiModel(ownModifiers, containerProperties, conditionalTransitionModifiers, children)
+
+    class CatalogResponseButtonUiModel(
+        ownModifiers: ImmutableList<StateBlock<ModifierProperties>>?,
+        containerProperties: ImmutableList<StateBlock<ContainerProperties>>?,
+        conditionalTransitionModifiers: ConditionalTransitionModifier?,
+        children: ImmutableList<LayoutSchemaUiModel?>,
+        val catalogItemModel: HMap?,
     ) : ButtonUiModel(ownModifiers, containerProperties, conditionalTransitionModifiers, children)
 
     class StaticLinkUiModel(
