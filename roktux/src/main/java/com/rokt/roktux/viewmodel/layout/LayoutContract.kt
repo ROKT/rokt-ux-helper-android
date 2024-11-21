@@ -27,6 +27,7 @@ internal class LayoutContract {
         data class LayoutVariantNavigated(val targetOffer: Int) : LayoutEvent
         data class SetCurrentOffer(val currentOffer: Int) : LayoutEvent
         data class SignalViewed(val offerId: Int) : LayoutEvent
+        data class CartItemInstantPurchaseSelected(val catalogItemModel: HMap) : LayoutEvent
     }
 
     sealed interface LayoutEffect : BaseContract.BaseEffect {

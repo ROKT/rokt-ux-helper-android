@@ -107,7 +107,11 @@ internal class LayoutViewModel(
         experienceModel = modelMapper.getSavedExperience() ?: return
         pluginModel = experienceModel.plugins.firstOrNull() ?: return
         val layoutSchema = pluginModel.outerLayoutSchema
-        if (layoutSchema?.isEmbedded() == true && !location.equals(pluginModel.targetElementSelector, ignoreCase = true)
+        if (layoutSchema?.isEmbedded() == true &&
+            !location.equals(
+                pluginModel.targetElementSelector,
+                ignoreCase = true,
+            )
         ) {
             handleError(IllegalArgumentException(LOCATION_TARGET_ELEMENT_DOES_NOT_MATCH))
             return
@@ -214,6 +218,10 @@ internal class LayoutViewModel(
             is LayoutContract.LayoutEvent.SignalViewed -> {
                 handleSignalViewed(event.offerId)
             }
+
+            is LayoutContract.LayoutEvent.CartItemInstantPurchaseSelected -> {
+                handleCartItemInstancePurchaseSelected(event.catalogItemModel)
+            }
         }
     }
 
@@ -270,6 +278,42 @@ internal class LayoutViewModel(
                 ),
             )
         }
+    }
+
+    private fun handleCartItemInstancePurchaseSelected(catalogItemProperties: HMap) {
+        with(catalogItemProperties) {
+            uxEvent(
+                RoktUxEvent.CartItemInstantPurchase(
+                    layoutId = pluginId,
+                    cartItemId = get<String>(KEY_CART_ITEM_ID).orEmpty(),
+                    catalogItemId = get<String>(KEY_CATALOG_ITEM_ID).orEmpty(),
+                    currency = get<String>(KEY_CURRENCY).orEmpty(),
+                    description = get<String>(KEY_DESCRIPTION).orEmpty(),
+                    linkedProductId = get<String>(KEY_LINKED_PRODUCT_ID).orEmpty(),
+                    totalPrice = get<Double>(KEY_ORIGINAL_PRICE) ?: 0.0,
+                    quantity = 1,
+                    unitPrice = get<Double>(KEY_ORIGINAL_PRICE) ?: 0.0,
+                ),
+            )
+            handlePlatformEvent(
+                RoktPlatformEvent(
+                    eventType = EventType.SignalCartItemInstantPurchaseInitiated,
+                    sessionId = experienceModel.sessionId,
+                    parentGuid = get<String>("instanceGuid").orEmpty(),
+                    eventData = mapOf(
+                        KEY_CART_ITEM_ID to get<String>(KEY_CART_ITEM_ID).orEmpty(),
+                        KEY_CATALOG_ITEM_ID to get<String>(KEY_CATALOG_ITEM_ID).orEmpty(),
+                        KEY_CURRENCY to get<String>(KEY_CURRENCY).orEmpty(),
+                        KEY_DESCRIPTION to get<String>(KEY_DESCRIPTION).orEmpty(),
+                        KEY_LINKED_PRODUCT_ID to get<String>(KEY_LINKED_PRODUCT_ID).orEmpty(),
+                        KEY_TOTAL_PRICE to (get<Double>(KEY_ORIGINAL_PRICE) ?: 0.0).toString(),
+                        KEY_QUANTITY to "1",
+                        KEY_UNIT_PRICE to (get<Double>(KEY_ORIGINAL_PRICE) ?: 0.0).toString(),
+                    ),
+                ),
+            )
+        }
+        setEvent(LayoutContract.LayoutEvent.CloseSelected(isDismissed = false))
     }
 
     private fun handleResponseOptionSelected(
@@ -477,6 +521,17 @@ internal class LayoutViewModel(
             "Plugin targetElementSelector does not match the location"
         private const val QUEUE_CAPACITY = 20
         private const val EVENT_REQUEST_BUFFER_MILLIS = 25L
+
+        // Cart Item Instant Purchase Properties
+        private const val KEY_CART_ITEM_ID = "cartItemId"
+        private const val KEY_CATALOG_ITEM_ID = "catalogItemId"
+        private const val KEY_CURRENCY = "currency"
+        private const val KEY_DESCRIPTION = "description"
+        private const val KEY_LINKED_PRODUCT_ID = "linkedProductId"
+        private const val KEY_ORIGINAL_PRICE = "originalPrice"
+        private const val KEY_TOTAL_PRICE = "totalPrice"
+        private const val KEY_QUANTITY = "quantity"
+        private const val KEY_UNIT_PRICE = "unitPrice"
     }
 
     class RoktViewModelFactory(
