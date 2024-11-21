@@ -4,12 +4,11 @@ import com.rokt.roktux.BuildConfigs
 import com.rokt.roktux.configureFlavors
 import com.rokt.roktux.configureKotlinAndroid
 import com.rokt.roktux.configurePrintApksTask
+import com.rokt.roktux.libs
 import org.gradle.api.Plugin
 import org.gradle.api.Project
-import org.gradle.api.artifacts.VersionCatalogsExtension
 import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.dependencies
-import org.gradle.kotlin.dsl.getByType
 import org.gradle.kotlin.dsl.kotlin
 import org.gradle.kotlin.dsl.project
 
@@ -20,9 +19,20 @@ class AndroidLibraryConventionPlugin : Plugin<Project> {
                 apply("com.android.library")
                 apply("org.jetbrains.kotlin.android")
             }
-
-            val libs = extensions.getByType<VersionCatalogsExtension>().named("libs")
-            val sdkVersionName = libs.findVersion("sdkVersionName").get().toString()
+            var versionParam = "sdkVersionName"
+            var testModuleName = ":ux-helper:testutils"
+            if (rootProject.name.contains(
+                    "UxHelper",
+                    true,
+                )
+            ) {
+                versionParam = "roktUxHelper"
+                testModuleName = ":testutils"
+            }
+            if (target.path.contains(":ux-helper:")) {
+                versionParam = "roktUxHelper"
+            }
+            val sdkVersionName = libs.findVersion(versionParam).get().toString()
             val sdkVersionCode = libs.findVersion("sdkVersionCode").get().toString().toInt()
             val dcuiVersion = libs.findVersion("dcui").get().toString()
             extensions.configure<LibraryExtension> {
@@ -42,7 +52,7 @@ class AndroidLibraryConventionPlugin : Plugin<Project> {
             dependencies {
                 add("androidTestImplementation", kotlin("test"))
                 add("testImplementation", kotlin("test"))
-                add("testImplementation", project(":ux-helper:testutils"))
+                add("testImplementation", project(testModuleName))
             }
         }
     }

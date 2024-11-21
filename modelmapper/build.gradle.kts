@@ -1,16 +1,23 @@
-buildscript {
-    // Used by the Maven Publish plugin to setup the details for Maven central in root build.gradle.kts
-    extra["libGroupId"] = "com.rokt"
-    extra["libDescription"] = "Rokt Model Mapper Library"
-}
-
 plugins {
-    alias(libs.plugins.android.library)
-    alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.rokt.android.library)
+    alias(libs.plugins.rokt.android.library.compose)
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.dokka)
-    alias(libs.plugins.maven.publish)
     alias(libs.plugins.kover)
+    alias(libs.plugins.rokt.android.library.publish)
+}
+
+val libGroupId = "com.rokt"
+val libArtifactId = "modelmapper"
+val formattedVersion =
+    "${libs.versions.roktUxHelper.get()}${System.getenv("VERSION_SUFFIX").takeIf { !it.isNullOrBlank() } ?: ""}"
+val libDescription = "Rokt Model Mapper Library"
+
+roktMavenPublish {
+    version.set(formattedVersion)
+    groupId.set(libGroupId)
+    artifactId.set(libArtifactId)
+    description.set(libDescription)
 }
 
 android {
@@ -29,41 +36,6 @@ android {
             isMinifyEnabled = false
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
-    }
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
-    }
-    kotlinOptions {
-        jvmTarget = "1.8"
-    }
-    composeOptions {
-        kotlinCompilerExtensionVersion = "1.4.7"
-    }
-    buildFeatures {
-        compose = true
-    }
-}
-
-tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
-    val enableMetricsProvider = project.localGradleProperty("enableComposeCompilerMetrics")
-    if (enableMetricsProvider.orNull == "true") {
-        val metricsFolder = File(project.buildDir, "compose-metrics")
-        compilerOptions.freeCompilerArgs.addAll(
-            "-P",
-            "plugin:androidx.compose.compiler.plugins.kotlin:metricsDestination=" + metricsFolder.absolutePath,
-        )
-    }
-}
-
-tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
-    val enableReportsProvider = project.localGradleProperty("enableComposeCompilerReports")
-    if (enableReportsProvider.orNull == "true") {
-        val reportsFolder = File(project.buildDir, "compose-reports")
-        compilerOptions.freeCompilerArgs.addAll(
-            "-P",
-            "plugin:androidx.compose.compiler.plugins.kotlin:reportsDestination=" + reportsFolder.absolutePath,
-        )
     }
 }
 

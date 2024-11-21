@@ -20,6 +20,7 @@ tasks.withType<KotlinCompile>().configureEach {
 dependencies {
     compileOnly(libs.android.gradlePlugin)
     compileOnly(libs.kotlin.gradlePlugin)
+    implementation(libs.maven.publishPlugin)
 }
 
 gradlePlugin {
@@ -41,6 +42,10 @@ gradlePlugin {
         register("androidLibrary") {
             id = libs.plugins.rokt.android.library.asProvider().get().pluginId
             implementationClass = "AndroidLibraryConventionPlugin"
+        }
+        register("androidLibraryPublish") {
+            id = "rokt.android.library.publish"
+            implementationClass = "AndroidLibraryMavenCentralPublishPlugin"
         }
     }
 }
