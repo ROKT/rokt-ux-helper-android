@@ -34,6 +34,7 @@ import kotlinx.collections.immutable.persistentMapOf
 import kotlinx.collections.immutable.toImmutableMap
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -79,7 +80,9 @@ internal class LayoutViewModel(
                 // This processes the final batch of events before the job is finally cancelled
                 _eventsQueue.replayCache.distinct().filterNot { _sentEvents.contains(it) }.takeIf { it.isNotEmpty() }
                     ?.let {
-                        processEventQueue(it)
+                        withContext(NonCancellable) {
+                            processEventQueue(it)
+                        }
                     }
             }
         }
