@@ -5,7 +5,7 @@ HEALTHCHECK NONE
 # Set up environment
 RUN apt-get update && apt-get upgrade -y \
     && apt-get install -y --no-install-recommends \
-    openjdk-17-jdk=17.0.12+7-1ubuntu2~22.04 \
+    openjdk-17-jdk=17.0.13+11-2ubuntu1~22.04 \
     wget=1.21.2-2ubuntu1.1 \
     unzip=6.0-26ubuntu3.2 \
     && \

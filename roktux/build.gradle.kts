@@ -116,7 +116,7 @@ tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
 dependencies {
 
     api(projects.uxHelper.modelmapper)
-    testDebugImplementation(projects.uxHelper.testutils)
+    testImplementation(projects.uxHelper.testutils)
     implementation(libs.coil.kt)
     implementation(libs.coil.kt.compose)
     implementation(libs.coil.kt.svg)
