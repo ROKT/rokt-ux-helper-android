@@ -47,9 +47,9 @@ When making changes to UX Helper you can utilise the [Demo app](demoapp/README.m
 
 Before submitting changes ensure that:
 
-- Builds succeed with `./gradlew build`
-- Tests pass with `./gradlew test`
-- Lint checks pass with `./gradlew lint`
+-   Builds succeed with `./gradlew build`
+-   Tests pass with `./gradlew test`
+-   Lint checks pass with `./gradlew lint`
 
 Additional checks may be conducted using Buildkite which runs on all pull requests and are required to pass before the changes are merged. You can find the details of the full pipeline [here](.buildkite/pipeline.yml).
 
