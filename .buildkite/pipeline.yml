@@ -56,7 +56,7 @@ steps:
     key: "unit-test-uxhelper"
     depends_on: "build-builder-image"
     commands:
-      - ./gradlew testDebugUnitTest
+      - ./gradlew test
     artifact_paths:
       - "**/build/test-results/*/*.xml"
     plugins:
@@ -71,7 +71,7 @@ steps:
     key: "lint-check-uxhelper"
     depends_on: "build-builder-image"
     commands:
-      - ./gradlew lintRelease
+      - ./gradlew lint
     artifact_paths:
       - "**/lint-results-*.html"
     plugins:
