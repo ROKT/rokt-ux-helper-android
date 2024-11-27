@@ -14,14 +14,9 @@ data class ExperienceModel(
     val options: OptionsModel,
 )
 
-data class PlacementContextModel(
-    val pageInstanceGuid: String,
-    val token: String,
-)
+data class PlacementContextModel(val pageInstanceGuid: String, val token: String)
 
-data class OptionsModel(
-    val useDiagnosticEvents: Boolean,
-)
+data class OptionsModel(val useDiagnosticEvents: Boolean)
 
 data class PluginModel(
     val id: String,
@@ -35,9 +30,7 @@ data class PluginModel(
     val settings: LayoutSettings,
 )
 
-data class LayoutSettings(
-    val closeOnComplete: Boolean,
-)
+data class LayoutSettings(val closeOnComplete: Boolean)
 
 data class SlotModel(
     val instanceGuid: String,
@@ -46,10 +39,7 @@ data class SlotModel(
     val layoutVariant: LayoutVariantModel?,
 )
 
-data class OfferModel(
-    val campaignId: String,
-    val creative: CreativeModel,
-)
+data class OfferModel(val campaignId: String, val creative: CreativeModel)
 
 data class CreativeModel(
     val referralCreativeId: String,
@@ -62,25 +52,13 @@ data class CreativeModel(
     val icons: ImmutableMap<String, CreativeIcon>,
 )
 
-data class CreativeImageModel(
-    val light: String,
-    val dark: String,
-    val alt: String,
-    val title: String,
-)
+data class CreativeImageModel(val light: String, val dark: String, val alt: String, val title: String)
 
-data class CreativeLink(
-    val url: String,
-    val title: String,
-)
+data class CreativeLink(val url: String, val title: String)
 
-data class CreativeIcon(
-    val name: String,
-)
+data class CreativeIcon(val name: String)
 
-data class ResponseOptionModel(
-    val properties: HMap,
-)
+data class ResponseOptionModel(val properties: HMap)
 
 data class LayoutVariantModel(
     val layoutVariantId: String,

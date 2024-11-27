@@ -4,10 +4,7 @@ import androidx.compose.runtime.Immutable
 import com.rokt.modelmapper.uimodel.LayoutSchemaUiModel
 import kotlinx.collections.immutable.ImmutableMap
 
-internal data class LayoutUiState(
-    val model: LayoutSchemaUiModel,
-    val offerUiState: OfferUiState,
-)
+internal data class LayoutUiState(val model: LayoutSchemaUiModel, val offerUiState: OfferUiState)
 
 @Immutable
 internal data class OfferUiState(

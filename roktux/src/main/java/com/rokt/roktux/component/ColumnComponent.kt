@@ -65,7 +65,13 @@ internal class ColumnComponent(
                     },
                 ),
             horizontalAlignment = BiasAlignment.Horizontal(
-                if (container.alignmentBias == AlignmentUiModel.Stretch.bias) AlignmentUiModel.Start.bias else container.alignmentBias,
+                if (container.alignmentBias ==
+                    AlignmentUiModel.Stretch.bias
+                ) {
+                    AlignmentUiModel.Start.bias
+                } else {
+                    container.alignmentBias
+                },
             ),
             verticalArrangement = container.verticalArrangement,
         ) {

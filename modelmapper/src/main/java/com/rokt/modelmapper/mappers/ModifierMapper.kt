@@ -81,26 +81,24 @@ private fun transformModifierList(
     borderProperties: ImmutableList<BasicStateStylingBlock<BorderStylingProperties?>>?,
     containerProperties: ImmutableList<BasicStateStylingBlock<ContainerStylingProperties?>>?,
     breakpoints: Int,
-): ImmutableList<StateBlock<ModifierProperties>> {
-    return List(breakpoints) { i ->
-        StateBlock(
-            default = transformModifier(
-                spacingProperties?.getOrNull(i)?.default,
-                dimensionProperties?.getOrNull(i)?.default,
-                backgroundProperties?.getOrNull(i)?.default,
-                borderProperties?.getOrNull(i)?.default,
-                containerProperties?.getOrNull(i)?.default,
-            ),
-            pressed = transformModifier(
-                spacingProperties?.getOrNull(i)?.pressed,
-                dimensionProperties?.getOrNull(i)?.pressed,
-                backgroundProperties?.getOrNull(i)?.pressed,
-                borderProperties?.getOrNull(i)?.pressed,
-                containerProperties?.getOrNull(i)?.pressed,
-            ),
-        )
-    }.toImmutableList()
-}
+): ImmutableList<StateBlock<ModifierProperties>> = List(breakpoints) { i ->
+    StateBlock(
+        default = transformModifier(
+            spacingProperties?.getOrNull(i)?.default,
+            dimensionProperties?.getOrNull(i)?.default,
+            backgroundProperties?.getOrNull(i)?.default,
+            borderProperties?.getOrNull(i)?.default,
+            containerProperties?.getOrNull(i)?.default,
+        ),
+        pressed = transformModifier(
+            spacingProperties?.getOrNull(i)?.pressed,
+            dimensionProperties?.getOrNull(i)?.pressed,
+            backgroundProperties?.getOrNull(i)?.pressed,
+            borderProperties?.getOrNull(i)?.pressed,
+            containerProperties?.getOrNull(i)?.pressed,
+        ),
+    )
+}.toImmutableList()
 
 internal fun transformModifier(
     spacingProperties: SpacingStylingProperties?,
@@ -108,39 +106,37 @@ internal fun transformModifier(
     backgroundProperties: BackgroundStylingProperties?,
     borderProperties: BorderStylingProperties? = null,
     containerProperties: ContainerStylingProperties? = null,
-): ModifierProperties {
-    return ModifierProperties(
-        minHeight = dimensionProperties?.minHeight?.dp,
-        minWidth = dimensionProperties?.minWidth?.dp,
-        maxHeight = dimensionProperties?.maxHeight?.dp,
-        maxWidth = dimensionProperties?.maxWidth?.dp,
-        height = transformHeight(dimensionProperties?.height),
-        width = transformWidth(dimensionProperties?.width),
-        padding = spacingProperties?.padding?.let { transformPadding(it) },
-        margin = spacingProperties?.margin?.let { transformPadding(it) },
-        offset = spacingProperties?.offset?.let { transformOffset(it) },
-        rotateZ = dimensionProperties?.rotateZ,
-        shadow = containerProperties?.shadow?.let {
-            ShadowUiModel(
-                ThemeColorUiModel(it.color.light, it.color.dark),
-                it.blurRadius?.dp ?: 0.dp,
-                it.spreadRadius ?: 0F,
-                DpOffset(it.offsetX?.dp ?: 0.dp, it.offsetY?.dp ?: 0.dp),
-            )
-        },
-        border = borderProperties?.let {
-            BorderUiModel(
-                ThemeColorUiModel(it.borderColor?.light, it.borderColor?.dark),
-                it.borderRadius?.dp ?: 0.dp,
-                transformBorderWidth(it.borderWidth ?: "0"),
-                if (it.borderStyle == BorderStyle.Dashed) BorderStyleUiModel.Dashed else BorderStyleUiModel.Solid,
-            )
-        },
-        blurRadius = containerProperties?.blur,
-        backgroundColor = backgroundProperties?.backgroundColor?.let { ThemeColorUiModel(it.light, it.dark) },
-        backgroundImage = transformBackgroundImage(backgroundProperties?.backgroundImage),
-    )
-}
+): ModifierProperties = ModifierProperties(
+    minHeight = dimensionProperties?.minHeight?.dp,
+    minWidth = dimensionProperties?.minWidth?.dp,
+    maxHeight = dimensionProperties?.maxHeight?.dp,
+    maxWidth = dimensionProperties?.maxWidth?.dp,
+    height = transformHeight(dimensionProperties?.height),
+    width = transformWidth(dimensionProperties?.width),
+    padding = spacingProperties?.padding?.let { transformPadding(it) },
+    margin = spacingProperties?.margin?.let { transformPadding(it) },
+    offset = spacingProperties?.offset?.let { transformOffset(it) },
+    rotateZ = dimensionProperties?.rotateZ,
+    shadow = containerProperties?.shadow?.let {
+        ShadowUiModel(
+            ThemeColorUiModel(it.color.light, it.color.dark),
+            it.blurRadius?.dp ?: 0.dp,
+            it.spreadRadius ?: 0F,
+            DpOffset(it.offsetX?.dp ?: 0.dp, it.offsetY?.dp ?: 0.dp),
+        )
+    },
+    border = borderProperties?.let {
+        BorderUiModel(
+            ThemeColorUiModel(it.borderColor?.light, it.borderColor?.dark),
+            it.borderRadius?.dp ?: 0.dp,
+            transformBorderWidth(it.borderWidth ?: "0"),
+            if (it.borderStyle == BorderStyle.Dashed) BorderStyleUiModel.Dashed else BorderStyleUiModel.Solid,
+        )
+    },
+    blurRadius = containerProperties?.blur,
+    backgroundColor = backgroundProperties?.backgroundColor?.let { ThemeColorUiModel(it.light, it.dark) },
+    backgroundImage = transformBackgroundImage(backgroundProperties?.backgroundImage),
+)
 
 private fun transformHeight(height: DimensionHeightValue?): HeightUiModel? = height?.let { heightValue ->
     when (heightValue) {
@@ -213,34 +209,30 @@ private fun transformContainerPropertiesList(
     flexChildProperties: ImmutableList<BasicStateStylingBlock<FlexChildStylingProperties?>>?,
     containerProperties: ImmutableList<BasicStateStylingBlock<ContainerStylingProperties?>>?,
     breakpoints: Int,
-): ImmutableList<StateBlock<ContainerProperties>> {
-    return List(breakpoints) { i ->
-        StateBlock(
-            default = transformContainerProperties(
-                flexChildProperties?.getOrNull(i)?.default,
-                containerProperties?.getOrNull(i)?.default,
-            ),
-            pressed = transformContainerProperties(
-                flexChildProperties?.getOrNull(i)?.pressed,
-                containerProperties?.getOrNull(i)?.pressed,
-            ),
-        )
-    }.toImmutableList()
-}
+): ImmutableList<StateBlock<ContainerProperties>> = List(breakpoints) { i ->
+    StateBlock(
+        default = transformContainerProperties(
+            flexChildProperties?.getOrNull(i)?.default,
+            containerProperties?.getOrNull(i)?.default,
+        ),
+        pressed = transformContainerProperties(
+            flexChildProperties?.getOrNull(i)?.pressed,
+            containerProperties?.getOrNull(i)?.pressed,
+        ),
+    )
+}.toImmutableList()
 
 private fun transformContainerProperties(
     flexChildProperties: FlexChildStylingProperties?,
     containerProperties: ContainerStylingProperties?,
-): ContainerProperties {
-    return ContainerProperties(
-        weight = flexChildProperties?.weight,
-        arrangementUiModel = transformArrangement(containerProperties?.justifyContent),
-        alignmentUiModel = transformAlignment(containerProperties?.alignItems),
-        gap = containerProperties?.gap,
-        alignSelfVertical = transformSelfAlignment(flexChildProperties?.alignSelf),
-        alignSelfHorizontal = transformSelfAlignment(flexChildProperties?.alignSelf),
-    )
-}
+): ContainerProperties = ContainerProperties(
+    weight = flexChildProperties?.weight,
+    arrangementUiModel = transformArrangement(containerProperties?.justifyContent),
+    alignmentUiModel = transformAlignment(containerProperties?.alignItems),
+    gap = containerProperties?.gap,
+    alignSelfVertical = transformSelfAlignment(flexChildProperties?.alignSelf),
+    alignSelfHorizontal = transformSelfAlignment(flexChildProperties?.alignSelf),
+)
 
 private fun transformArrangement(arrangementModel: FlexJustification?) = arrangementModel?.let { arrangement ->
     when (arrangement) {
@@ -259,14 +251,12 @@ private fun transformAlignment(alignmentModel: FlexAlignment?) = alignmentModel?
     }
 }
 
-private fun transformSelfAlignment(alignSelf: FlexAlignment?): AlignmentUiModel? {
-    return alignSelf?.run {
-        when (this) {
-            FlexAlignment.Center -> AlignmentUiModel.Center
-            FlexAlignment.FlexStart -> AlignmentUiModel.Start
-            FlexAlignment.FlexEnd -> AlignmentUiModel.End
-            FlexAlignment.Stretch -> AlignmentUiModel.Stretch
-        }
+private fun transformSelfAlignment(alignSelf: FlexAlignment?): AlignmentUiModel? = alignSelf?.run {
+    when (this) {
+        FlexAlignment.Center -> AlignmentUiModel.Center
+        FlexAlignment.FlexStart -> AlignmentUiModel.Start
+        FlexAlignment.FlexEnd -> AlignmentUiModel.End
+        FlexAlignment.Stretch -> AlignmentUiModel.Stretch
     }
 }
 
@@ -308,16 +298,14 @@ private fun transformPadding(padding: String?): PaddingValues {
     } ?: defaultPadding
 }
 
-internal fun transformOpenLinks(openTarget: LinkOpenTarget?): OpenLinks {
-    return when (openTarget) {
-        LinkOpenTarget.Internally -> OpenLinks.Internally
-        else -> OpenLinks.Externally
-    }
+internal fun transformOpenLinks(openTarget: LinkOpenTarget?): OpenLinks = when (openTarget) {
+    LinkOpenTarget.Internally -> OpenLinks.Internally
+    else -> OpenLinks.Externally
 }
 
-private fun splitValues(value: String, size: Int): ImmutableList<Dp> {
-    return value.split(' ').take(size).map { it.toIntOrNull()?.dp ?: 0.dp }.toImmutableList()
-}
+private fun splitValues(value: String, size: Int): ImmutableList<Dp> = value.split(' ').take(size).map {
+    it.toIntOrNull()?.dp ?: 0.dp
+}.toImmutableList()
 
 private fun DimensionHeightValue?.toDimensionFitValue() = (this as? DimensionHeightValue.Fit)?.value?.let {
     if (it == DimensionHeightFitValue.WrapContent) 0F else 1F

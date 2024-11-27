@@ -1,8 +1,6 @@
 package com.rokt.demoapp.ui.screen.layouts.model
 
-data class DemoModeConfig(
-    val layouts: List<DemoLayoutConfig>,
-)
+data class DemoModeConfig(val layouts: List<DemoLayoutConfig>)
 
 data class DemoLayoutConfig(
     val layoutId: String,
@@ -11,7 +9,4 @@ data class DemoLayoutConfig(
     val slots: List<DemoLayoutSlotConfig>,
 )
 
-data class DemoLayoutSlotConfig(
-    val layoutVariantId: String,
-    val creativeId: String,
-)
+data class DemoLayoutSlotConfig(val layoutVariantId: String, val creativeId: String)

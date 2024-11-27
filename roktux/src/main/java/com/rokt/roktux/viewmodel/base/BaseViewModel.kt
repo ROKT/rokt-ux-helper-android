@@ -12,8 +12,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 
-internal abstract class BaseViewModel<Event, UiState, Effect> :
-    ViewModel() {
+internal abstract class BaseViewModel<Event, UiState, Effect> : ViewModel() {
 
     private val exceptionHandler = CoroutineExceptionHandler { _, exception ->
         handleError(exception)

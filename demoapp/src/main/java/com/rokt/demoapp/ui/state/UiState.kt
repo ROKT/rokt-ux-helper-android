@@ -1,10 +1,6 @@
 package com.rokt.demoapp.ui.state
 
-data class UiState<T>(
-    val loading: Boolean = false,
-    val error: RoktDemoErrorTypes? = null,
-    val data: T? = null,
-) {
+data class UiState<T>(val loading: Boolean = false, val error: RoktDemoErrorTypes? = null, val data: T? = null) {
     val hasError: Boolean
         get() = error != null
 
@@ -18,7 +14,4 @@ enum class RoktDemoErrorTypes {
     QRCODE,
 }
 
-data class ViewState(
-    val experienceResponse: String,
-    val location: String,
-)
+data class ViewState(val experienceResponse: String, val location: String)

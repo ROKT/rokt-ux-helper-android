@@ -26,10 +26,6 @@ inline operator fun <reified T> HMap.set(key: TypedKey<T>, value: T?) {
  * the requested type being incorrect,
  * or due to the value itself being null.
  */
-inline operator fun <reified T : Any> HMap.get(key: TypedKey<T>): T? {
-    return map[key] as T?
-}
+inline operator fun <reified T : Any> HMap.get(key: TypedKey<T>): T? = map[key] as T?
 
-inline operator fun <reified T : Any> HMap.get(key: String): T? {
-    return map[TypedKey<T>(key)] as T?
-}
+inline operator fun <reified T : Any> HMap.get(key: String): T? = map[TypedKey<T>(key)] as T?

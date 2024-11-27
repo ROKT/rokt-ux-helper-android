@@ -16,7 +16,11 @@ android {
         buildConfigField("String", "BASE_URL", "\"${rootProject.extra["BASE_URL"] as String}\"")
         buildConfigField("String", "ROKT_PUB_ID", "\"${rootProject.extra["ROKT_PUB_ID"] as String}\"")
         buildConfigField("String", "ROKT_SECRET", "\"${rootProject.extra["ROKT_SECRET"] as String}\"")
-        buildConfigField("String", "ROKT_CLIENT_UNIQUE_ID", "\"${rootProject.extra["ROKT_CLIENT_UNIQUE_ID"] as String}\"")
+        buildConfigField(
+            "String",
+            "ROKT_CLIENT_UNIQUE_ID",
+            "\"${rootProject.extra["ROKT_CLIENT_UNIQUE_ID"] as String}\"",
+        )
     }
 
     buildTypes {

@@ -68,44 +68,35 @@ class ExperienceModelMapperImpl(private val experienceResponse: String, private 
 
     override fun getSavedExperience(): ExperienceModel? = savedExperienceModel?.getOrNull()
 
-    private fun NetworkExperienceResponse.toExperienceModel(): ExperienceModel {
-        return ExperienceModel(
-            sessionId = sessionId,
-            token = pageContext.token,
-            pageId = pageContext.pageId,
-            placementContext = pageContext.toPlacementContextModel(),
-            plugins = plugins.map { it.plugin.toPluginModel() }.toImmutableList(),
-            options = options.toOptionsModel(),
-        )
-    }
+    private fun NetworkExperienceResponse.toExperienceModel(): ExperienceModel = ExperienceModel(
+        sessionId = sessionId,
+        token = pageContext.token,
+        pageId = pageContext.pageId,
+        placementContext = pageContext.toPlacementContextModel(),
+        plugins = plugins.map { it.plugin.toPluginModel() }.toImmutableList(),
+        options = options.toOptionsModel(),
+    )
 
-    private fun NetworkPageContext.toPlacementContextModel(): PlacementContextModel {
-        return PlacementContextModel(pageInstanceGuid, token)
-    }
+    private fun NetworkPageContext.toPlacementContextModel(): PlacementContextModel =
+        PlacementContextModel(pageInstanceGuid, token)
 
-    private fun NetworkOptions.toOptionsModel(): OptionsModel {
-        return OptionsModel(useDiagnosticEvents)
-    }
+    private fun NetworkOptions.toOptionsModel(): OptionsModel = OptionsModel(useDiagnosticEvents)
 
-    private fun NetworkPlugin.toPluginModel(): PluginModel {
-        return PluginModel(
-            id = id,
-            name = name,
-            targetElementSelector = targetElementSelector,
-            instanceGuid = config.instanceGuid,
-            token = config.token,
-            outerLayoutSchema = transformLayoutSchemaModel(config.outerLayoutSchema.layout),
-            slots = config.slots.map { it.toSlotModel() }.toImmutableList(),
-            breakpoint = config.outerLayoutSchema.breakpoints.buildBreakpoints(),
-            settings = buildSettings(config.outerLayoutSchema.settings),
-        )
-    }
+    private fun NetworkPlugin.toPluginModel(): PluginModel = PluginModel(
+        id = id,
+        name = name,
+        targetElementSelector = targetElementSelector,
+        instanceGuid = config.instanceGuid,
+        token = config.token,
+        outerLayoutSchema = transformLayoutSchemaModel(config.outerLayoutSchema.layout),
+        slots = config.slots.map { it.toSlotModel() }.toImmutableList(),
+        breakpoint = config.outerLayoutSchema.breakpoints.buildBreakpoints(),
+        settings = buildSettings(config.outerLayoutSchema.settings),
+    )
 
-    private fun buildSettings(settings: com.rokt.network.model.LayoutSettings?): LayoutSettings {
-        return LayoutSettings(
-            closeOnComplete = settings?.closeOnComplete ?: true,
-        )
-    }
+    private fun buildSettings(settings: com.rokt.network.model.LayoutSettings?): LayoutSettings = LayoutSettings(
+        closeOnComplete = settings?.closeOnComplete ?: true,
+    )
 
     private fun HashMap<String, Float>.buildBreakpoints(): ImmutableMap<String, Int> {
         val breakpoints = mutableMapOf<String, Int>()
@@ -128,69 +119,57 @@ class ExperienceModelMapperImpl(private val experienceResponse: String, private 
         )
     }
 
-    private fun NetworkOfferLayout.toOfferModel(): OfferModel {
-        return OfferModel(
-            campaignId = campaignId,
-            creative = creative.toCreativeModel(),
-        )
+    private fun NetworkOfferLayout.toOfferModel(): OfferModel = OfferModel(
+        campaignId = campaignId,
+        creative = creative.toCreativeModel(),
+    )
+
+    private fun NetworkCreativeLayout.toCreativeModel(): CreativeModel = CreativeModel(
+        referralCreativeId = referralCreativeId,
+        instanceGuid = instanceGuid,
+        token = token,
+        responseOptions = responseOptions.mapValues { it.value.toResponseOptionModel() }.toImmutableMap(),
+        copy = copy.toImmutableMap(),
+        icons = icons.mapValues { CreativeIcon(it.value.name) }.toImmutableMap(),
+        images = images.mapValues { it.value.toCreateImageModel() }.toImmutableMap(),
+        links = links.mapValues { CreativeLink(it.value.url, it.value.title) }.toImmutableMap(),
+    )
+
+    private fun NetworkCreativeImage.toCreateImageModel(): CreativeImageModel = CreativeImageModel(
+        light = light,
+        dark = dark,
+        alt = alt,
+        title = title,
+    )
+
+    private fun NetworkResponseOption.toResponseOptionModel(): ResponseOptionModel = ResponseOptionModel(
+        HMap().apply {
+            set(TypedKey<String>(KEY_ID), id)
+            set(TypedKey<Action>(KEY_ACTION), action?.toActionModel())
+            set(TypedKey<String>(KEY_INSTANCE_GUID), instanceGuid)
+            set(TypedKey<String>(KEY_TOKEN), token)
+            set(TypedKey<SignalType>(KEY_SIGNAL_TYPE), signalType.toSignalTypeModel())
+            set(TypedKey<String>(KEY_SHORT_LABEL), shortLabel)
+            set(TypedKey<String>(KEY_LONG_LABEL), longLabel)
+            set(TypedKey<String>(KEY_SHORT_SUCCESS_LABEL), shortSuccessLabel)
+            set(TypedKey<Boolean>(KEY_IS_POSITIVE), isPositive)
+            set(TypedKey<String>(KEY_URL), url)
+            set(TypedKey<Boolean>(KEY_IGNORE_BRANCH), ignoreBranch)
+        },
+    )
+
+    private fun NetworkAction.toActionModel(): Action = when (this) {
+        NetworkAction.Url -> Action.Url
+        NetworkAction.CaptureOnly -> Action.CaptureOnly
     }
 
-    private fun NetworkCreativeLayout.toCreativeModel(): CreativeModel {
-        return CreativeModel(
-            referralCreativeId = referralCreativeId,
-            instanceGuid = instanceGuid,
-            token = token,
-            responseOptions = responseOptions.mapValues { it.value.toResponseOptionModel() }.toImmutableMap(),
-            copy = copy.toImmutableMap(),
-            icons = icons.mapValues { CreativeIcon(it.value.name) }.toImmutableMap(),
-            images = images.mapValues { it.value.toCreateImageModel() }.toImmutableMap(),
-            links = links.mapValues { CreativeLink(it.value.url, it.value.title) }.toImmutableMap(),
-        )
+    private fun NetworkSignalType.toSignalTypeModel(): SignalType = when (this) {
+        NetworkSignalType.SignalResponse -> SignalType.SignalResponse
+        NetworkSignalType.SignalGatedResponse -> SignalType.SignalGatedResponse
     }
 
-    private fun NetworkCreativeImage.toCreateImageModel(): CreativeImageModel {
-        return CreativeImageModel(
-            light = light,
-            dark = dark,
-            alt = alt,
-            title = title,
-        )
-    }
-
-    private fun NetworkResponseOption.toResponseOptionModel(): ResponseOptionModel {
-        return ResponseOptionModel(
-            HMap().apply {
-                set(TypedKey<String>(KEY_ID), id)
-                set(TypedKey<Action>(KEY_ACTION), action?.toActionModel())
-                set(TypedKey<String>(KEY_INSTANCE_GUID), instanceGuid)
-                set(TypedKey<String>(KEY_TOKEN), token)
-                set(TypedKey<SignalType>(KEY_SIGNAL_TYPE), signalType.toSignalTypeModel())
-                set(TypedKey<String>(KEY_SHORT_LABEL), shortLabel)
-                set(TypedKey<String>(KEY_LONG_LABEL), longLabel)
-                set(TypedKey<String>(KEY_SHORT_SUCCESS_LABEL), shortSuccessLabel)
-                set(TypedKey<Boolean>(KEY_IS_POSITIVE), isPositive)
-                set(TypedKey<String>(KEY_URL), url)
-                set(TypedKey<Boolean>(KEY_IGNORE_BRANCH), ignoreBranch)
-            },
-        )
-    }
-
-    private fun NetworkAction.toActionModel(): Action {
-        return when (this) {
-            NetworkAction.Url -> Action.Url
-            NetworkAction.CaptureOnly -> Action.CaptureOnly
-        }
-    }
-
-    private fun NetworkSignalType.toSignalTypeModel(): SignalType {
-        return when (this) {
-            NetworkSignalType.SignalResponse -> SignalType.SignalResponse
-            NetworkSignalType.SignalGatedResponse -> SignalType.SignalGatedResponse
-        }
-    }
-
-    private fun NetworkLayoutVariant.toLayoutVariantModel(offerModel: OfferModel?): LayoutVariantModel {
-        return LayoutVariantModel(
+    private fun NetworkLayoutVariant.toLayoutVariantModel(offerModel: OfferModel?): LayoutVariantModel =
+        LayoutVariantModel(
             layoutVariantId = layoutVariantId,
             moduleName = moduleName,
             layoutVariantSchema = transformLayoutSchemaModel(
@@ -198,95 +177,92 @@ class ExperienceModelMapperImpl(private val experienceResponse: String, private 
                 offerModel = offerModel,
             ),
         )
-    }
 
     private fun transformLayoutSchemaModel(
         layoutSchemaModel: LayoutSchemaModel,
         offerModel: OfferModel? = null,
         responseContextKey: String? = null,
-    ): LayoutSchemaUiModel? {
-        return when (layoutSchemaModel) {
-            is LayoutSchemaModel.BasicText -> transformBasicText(layoutSchemaModel) { value ->
-                bindValue(value, responseContextKey, offerModel)
-            }
-
-            is LayoutSchemaModel.RichText -> transformRichText(layoutSchemaModel) { value ->
-                bindValue(value, responseContextKey, offerModel)
-            }
-
-            is LayoutSchemaModel.Column -> transformColumn(
-                layoutSchemaModel,
-                false,
-            ) { child -> transformLayoutSchemaModel(child, offerModel, responseContextKey) }
-
-            is LayoutSchemaModel.ScrollableColumn -> transformColumn(
-                layoutSchemaModel.toColumn(),
-                true,
-            ) { child -> transformLayoutSchemaModel(child, offerModel, responseContextKey) }
-
-            is LayoutSchemaModel.Row -> transformRow(
-                layoutSchemaModel,
-                false,
-            ) { child -> transformLayoutSchemaModel(child, offerModel, responseContextKey) }
-
-            is LayoutSchemaModel.ScrollableRow -> transformRow(
-                layoutSchemaModel.toRow(),
-                true,
-            ) { child -> transformLayoutSchemaModel(child, offerModel, responseContextKey) }
-
-            is LayoutSchemaModel.ZStack -> transformZStack(
-                layoutSchemaModel,
-            ) { child -> transformLayoutSchemaModel(child, offerModel, responseContextKey) }
-
-            is LayoutSchemaModel.ProgressIndicator -> transformProgressIndicator(layoutSchemaModel) { indicatorText ->
-                bindValue(indicatorText, responseContextKey, offerModel)
-            }
-
-            is LayoutSchemaModel.CreativeResponse -> transformCreativeResponse(
-                layoutSchemaModel,
-                offerModel,
-            ) { child, key -> transformLayoutSchemaModel(child, offerModel, key) }
-
-            is LayoutSchemaModel.CloseButton -> transformCloseButton(
-                layoutSchemaModel,
-            ) { child -> transformLayoutSchemaModel(child, offerModel, responseContextKey) }
-
-            is LayoutSchemaModel.StaticLink -> transformStaticLink(
-                layoutSchemaModel,
-            ) { child -> transformLayoutSchemaModel(child, offerModel, responseContextKey) }
-
-            is LayoutSchemaModel.ToggleButtonStateTrigger -> transformToggleButtonStateTrigger(
-                layoutSchemaModel,
-            ) { child -> transformLayoutSchemaModel(child, offerModel, responseContextKey) }
-
-            is LayoutSchemaModel.ProgressControl -> transformProgressControl(
-                layoutSchemaModel,
-            ) { child -> transformLayoutSchemaModel(child, offerModel, responseContextKey) }
-
-            is LayoutSchemaModel.OneByOneDistribution -> transformOneByOneDistribution(layoutSchemaModel)
-            is LayoutSchemaModel.GroupedDistribution -> transformGroupedDistribution(layoutSchemaModel)
-            is LayoutSchemaModel.CarouselDistribution -> transformCarouselDistribution(layoutSchemaModel)
-            is LayoutSchemaModel.Overlay -> transformOverlay(layoutSchemaModel) { child ->
-                transformLayoutSchemaModel(child, offerModel, responseContextKey)
-            }
-
-            is LayoutSchemaModel.BottomSheet -> transformBottomSheet(layoutSchemaModel) { child ->
-                transformLayoutSchemaModel(child, offerModel, responseContextKey)
-            }
-
-            is LayoutSchemaModel.StaticImage -> transformStaticImage(layoutSchemaModel)
-
-            is LayoutSchemaModel.DataImage -> transformDataImage(layoutSchemaModel, offerModel)
-
-            is LayoutSchemaModel.When -> transformWhen(
-                layoutSchemaModel,
-            ) { child -> transformLayoutSchemaModel(child, offerModel, responseContextKey) }
-
-            is LayoutSchemaModel.DataIcon -> transformDataIcon(layoutSchemaModel, offerModel)
-
-            is LayoutSchemaModel.StaticIcon -> transformStaticIcon(layoutSchemaModel)
-            else -> null
+    ): LayoutSchemaUiModel? = when (layoutSchemaModel) {
+        is LayoutSchemaModel.BasicText -> transformBasicText(layoutSchemaModel) { value ->
+            bindValue(value, responseContextKey, offerModel)
         }
+
+        is LayoutSchemaModel.RichText -> transformRichText(layoutSchemaModel) { value ->
+            bindValue(value, responseContextKey, offerModel)
+        }
+
+        is LayoutSchemaModel.Column -> transformColumn(
+            layoutSchemaModel,
+            false,
+        ) { child -> transformLayoutSchemaModel(child, offerModel, responseContextKey) }
+
+        is LayoutSchemaModel.ScrollableColumn -> transformColumn(
+            layoutSchemaModel.toColumn(),
+            true,
+        ) { child -> transformLayoutSchemaModel(child, offerModel, responseContextKey) }
+
+        is LayoutSchemaModel.Row -> transformRow(
+            layoutSchemaModel,
+            false,
+        ) { child -> transformLayoutSchemaModel(child, offerModel, responseContextKey) }
+
+        is LayoutSchemaModel.ScrollableRow -> transformRow(
+            layoutSchemaModel.toRow(),
+            true,
+        ) { child -> transformLayoutSchemaModel(child, offerModel, responseContextKey) }
+
+        is LayoutSchemaModel.ZStack -> transformZStack(
+            layoutSchemaModel,
+        ) { child -> transformLayoutSchemaModel(child, offerModel, responseContextKey) }
+
+        is LayoutSchemaModel.ProgressIndicator -> transformProgressIndicator(layoutSchemaModel) { indicatorText ->
+            bindValue(indicatorText, responseContextKey, offerModel)
+        }
+
+        is LayoutSchemaModel.CreativeResponse -> transformCreativeResponse(
+            layoutSchemaModel,
+            offerModel,
+        ) { child, key -> transformLayoutSchemaModel(child, offerModel, key) }
+
+        is LayoutSchemaModel.CloseButton -> transformCloseButton(
+            layoutSchemaModel,
+        ) { child -> transformLayoutSchemaModel(child, offerModel, responseContextKey) }
+
+        is LayoutSchemaModel.StaticLink -> transformStaticLink(
+            layoutSchemaModel,
+        ) { child -> transformLayoutSchemaModel(child, offerModel, responseContextKey) }
+
+        is LayoutSchemaModel.ToggleButtonStateTrigger -> transformToggleButtonStateTrigger(
+            layoutSchemaModel,
+        ) { child -> transformLayoutSchemaModel(child, offerModel, responseContextKey) }
+
+        is LayoutSchemaModel.ProgressControl -> transformProgressControl(
+            layoutSchemaModel,
+        ) { child -> transformLayoutSchemaModel(child, offerModel, responseContextKey) }
+
+        is LayoutSchemaModel.OneByOneDistribution -> transformOneByOneDistribution(layoutSchemaModel)
+        is LayoutSchemaModel.GroupedDistribution -> transformGroupedDistribution(layoutSchemaModel)
+        is LayoutSchemaModel.CarouselDistribution -> transformCarouselDistribution(layoutSchemaModel)
+        is LayoutSchemaModel.Overlay -> transformOverlay(layoutSchemaModel) { child ->
+            transformLayoutSchemaModel(child, offerModel, responseContextKey)
+        }
+
+        is LayoutSchemaModel.BottomSheet -> transformBottomSheet(layoutSchemaModel) { child ->
+            transformLayoutSchemaModel(child, offerModel, responseContextKey)
+        }
+
+        is LayoutSchemaModel.StaticImage -> transformStaticImage(layoutSchemaModel)
+
+        is LayoutSchemaModel.DataImage -> transformDataImage(layoutSchemaModel, offerModel)
+
+        is LayoutSchemaModel.When -> transformWhen(
+            layoutSchemaModel,
+        ) { child -> transformLayoutSchemaModel(child, offerModel, responseContextKey) }
+
+        is LayoutSchemaModel.DataIcon -> transformDataIcon(layoutSchemaModel, offerModel)
+
+        is LayoutSchemaModel.StaticIcon -> transformStaticIcon(layoutSchemaModel)
+        else -> null
     }
 
     private fun bindValue(value: String, contextKey: String? = null, offerModel: OfferModel? = null): BindData =

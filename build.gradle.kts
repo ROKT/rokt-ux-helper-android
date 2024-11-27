@@ -39,9 +39,8 @@ val localProperties = Properties().apply {
 }
 
 // Helper function to retrieve property with priority to environment variable
-fun getProperty(key: String, defaultValue: String = ""): String {
-    return System.getenv(key) ?: localProperties.getProperty(key, defaultValue)
-}
+fun getProperty(key: String, defaultValue: String = ""): String =
+    System.getenv(key) ?: localProperties.getProperty(key, defaultValue)
 
 // Set extra properties that will be accessible in all modules
 extra["BASE_URL"] = getProperty("BASE_URL", "https://default-url.com")

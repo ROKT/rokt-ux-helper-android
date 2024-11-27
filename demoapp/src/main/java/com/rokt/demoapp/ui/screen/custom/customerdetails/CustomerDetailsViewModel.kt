@@ -46,20 +46,17 @@ class CustomerDetailsViewModel @Inject constructor() : ViewModel() {
         }
     }
 
-    private fun getDefaultAdvancedDetails(): Map<String, String> {
-        return mapOf(
-            "lastname" to "Smith",
-            "mobile" to "(323) 867-5309",
-            "country" to "AU",
-            "noFunctional" to "true",
-            "pageinit" to "${System.currentTimeMillis()}",
-            "sandbox" to "true",
-        )
-    }
+    private fun getDefaultAdvancedDetails(): Map<String, String> = mapOf(
+        "lastname" to "Smith",
+        "mobile" to "(323) 867-5309",
+        "country" to "AU",
+        "noFunctional" to "true",
+        "pageinit" to "${System.currentTimeMillis()}",
+        "sandbox" to "true",
+    )
 
-    private fun getDefaultCustomerDetails(): CustomerDetails {
-        return CustomerDetails("New York", "10001", listOf("US", "UK", "AU"))
-    }
+    private fun getDefaultCustomerDetails(): CustomerDetails =
+        CustomerDetails("New York", "10001", listOf("US", "UK", "AU"))
 
     private fun initState() {
         viewModelScope.launch {
@@ -156,8 +153,4 @@ data class CustomerDetailsScreenState(
     val initialized: Boolean = true,
 )
 
-class CustomerDetails(
-    val state: String,
-    val postcode: String,
-    val country: List<String>,
-)
+class CustomerDetails(val state: String, val postcode: String, val country: List<String>)

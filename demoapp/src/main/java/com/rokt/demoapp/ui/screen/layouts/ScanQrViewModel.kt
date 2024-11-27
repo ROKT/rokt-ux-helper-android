@@ -114,10 +114,7 @@ private fun getDemoConfig(previewData: PreviewData): String? {
     return null
 }
 
-data class ScanQrState(
-    val scannedData: PreviewData? = null,
-    val previewState: PreviewState? = null,
-)
+data class ScanQrState(val scannedData: PreviewData? = null, val previewState: PreviewState? = null)
 
 sealed class PreviewState {
     data class ScannedState(val data: PreviewData) : PreviewState()

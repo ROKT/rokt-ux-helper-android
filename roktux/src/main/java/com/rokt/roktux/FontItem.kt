@@ -6,10 +6,7 @@ package com.rokt.roktux
  * @property weight The weight of the font item.
  * @property style The style of the font item.
  */
-sealed class FontItem(
-    val weight: FontItemWeight,
-    val style: FontItemStyle,
-)
+sealed class FontItem(val weight: FontItemWeight, val style: FontItemStyle)
 
 /**
  * Represents a font item that is loaded from a resource.

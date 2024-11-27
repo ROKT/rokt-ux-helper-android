@@ -93,11 +93,14 @@ internal class ProgressIndicatorComponent(
                     items(totalPages - (startPosition)) { index ->
                         val indicatorIndex = index + startPosition
                         val indicator = when {
-                            indicatorIndex < ceil(offerState.currentOfferIndex.toDouble() / offerState.viewableItems) -> {
+                            indicatorIndex < ceil(
+                                offerState.currentOfferIndex.toDouble() / offerState.viewableItems,
+                            ) -> {
                                 model.seenIndicator ?: model.indicator
                             }
 
-                            indicatorIndex == ceil(offerState.currentOfferIndex.toDouble() / offerState.viewableItems).toInt() -> {
+                            indicatorIndex ==
+                                ceil(offerState.currentOfferIndex.toDouble() / offerState.viewableItems).toInt() -> {
                                 model.activeIndicator ?: model.seenIndicator ?: model.indicator
                             }
 

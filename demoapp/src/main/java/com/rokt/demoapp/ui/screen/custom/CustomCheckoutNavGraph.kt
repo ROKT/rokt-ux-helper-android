@@ -17,10 +17,7 @@ object CustomCheckoutDestinations {
 /**
  * Models the navigation actions in the Custom Checkout Page.
  */
-class CustomCheckoutActions(
-    navController: NavController,
-    backPressed: () -> Unit,
-) {
+class CustomCheckoutActions(navController: NavController, backPressed: () -> Unit) {
 
     val navigateToCustomerDetails: (accountDetails: AccountDetails) -> Unit = {
         val accountDetails = Json.encodeToString(it)

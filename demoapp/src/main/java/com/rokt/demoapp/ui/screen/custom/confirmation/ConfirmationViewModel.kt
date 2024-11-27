@@ -15,8 +15,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class ConfirmationViewModel @Inject constructor() :
-    ViewModel() {
+class ConfirmationViewModel @Inject constructor() : ViewModel() {
 
     private val _state: MutableStateFlow<UiState<ViewState>> =
         MutableStateFlow(UiState(loading = true))
