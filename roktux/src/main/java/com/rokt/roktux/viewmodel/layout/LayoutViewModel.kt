@@ -328,7 +328,12 @@ internal class LayoutViewModel(
             if (newOfferIndex in FIRST_OFFER_INDEX..currentUiState.offerUiState.lastOfferIndex) {
                 currentOffer = newOfferIndex
                 handleNextOfferLoaded(currentOffer)
-                currentUiState.copy(offerUiState = currentUiState.offerUiState.copy(currentOfferIndex = currentOffer))
+                currentUiState.copy(
+                    offerUiState = currentUiState.offerUiState.copy(
+                        currentOfferIndex = currentOffer,
+                        targetOfferIndex = currentOffer,
+                    ),
+                )
             } else {
                 if (pluginModel.settings.closeOnComplete) {
                     uxEvent(RoktUxEvent.LayoutCompleted(pluginId))
