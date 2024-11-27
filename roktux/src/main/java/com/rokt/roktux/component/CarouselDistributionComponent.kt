@@ -10,6 +10,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
@@ -43,6 +44,7 @@ internal class CarouselDistributionComponent(
         onEventSent: (LayoutContract.LayoutEvent) -> Unit,
     ) {
         val pagerState = rememberPagerState { offerState.lastOfferIndex + 1 }
+        var canScroll by remember { mutableStateOf(true) }
         val coroutineScope = rememberCoroutineScope()
         var viewWidth by remember { mutableIntStateOf(0) }
         val viewableItems = getViewableItems(
@@ -68,8 +70,10 @@ internal class CarouselDistributionComponent(
         LaunchedEffect(key1 = offerState.targetOfferIndex) {
             coroutineScope.launch {
                 if (offerState.targetOfferIndex != (pagerState.currentPage)) {
+                    canScroll = false
                     pagerState.animateScrollToPage(offerState.targetOfferIndex)
                     onEventSent(LayoutContract.LayoutEvent.SetCurrentOffer(offerState.targetOfferIndex))
+                    canScroll = true
                 }
             }
         }
@@ -104,6 +108,7 @@ internal class CarouselDistributionComponent(
                 state = pagerState,
                 pagerSnapDistance = PagerSnapDistance.atMost(viewableItems),
             ),
+            userScrollEnabled = canScroll,
         ) { page ->
             factory.CreateComposable(
                 model = LayoutSchemaUiModel.MarketingUiModel(),
@@ -159,7 +164,6 @@ private fun getPeekThroughDimension(
 }
 
 private fun carouselPageSize(viewableItems: Int) = object : PageSize {
-    override fun Density.calculateMainAxisPageSize(availableSpace: Int, pageSpacing: Int): Int {
-        return availableSpace / viewableItems
-    }
+    override fun Density.calculateMainAxisPageSize(availableSpace: Int, pageSpacing: Int): Int =
+        availableSpace / viewableItems
 }
