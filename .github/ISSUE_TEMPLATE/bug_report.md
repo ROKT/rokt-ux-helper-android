@@ -28,13 +28,13 @@ If applicable, add screenshots to help explain your problem.
 
 ## Debug information (please complete the following information)
 
--   UX Helper version
--   Android Studio version
--   Android Gradle Plugin version
--   Gradle version
--   API level
--   Relevant Jetpack Compose library versions or BOM version
--   Where and how are you rendering the layout in the application
+- UX Helper version
+- Android Studio version
+- Android Gradle Plugin version
+- Gradle version
+- API level
+- Relevant Jetpack Compose library versions or BOM version
+- Where and how are you rendering the layout in the application
 
 ## Stacktrace (if applicable)
 

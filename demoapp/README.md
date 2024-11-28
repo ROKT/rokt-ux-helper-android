@@ -13,16 +13,16 @@ dependencies {
 
 ## Resident Experts
 
--   Thomson Thomas - <thomson.thomas@rokt.com>
--   Sahil Suri - <sahil.suri@rokt.com>
--   Lewis Krishnamurti - <lewis.raj.krishnamurti@rokt.com>
+- Thomson Thomas - <thomson.thomas@rokt.com>
+- Sahil Suri - <sahil.suri@rokt.com>
+- Lewis Krishnamurti - <lewis.raj.krishnamurti@rokt.com>
 
 ## Requirements
 
--   The latest version of [Android Studio](https://developer.android.com/studio).
--   Android 5.0 (API level 21) and above
--   Android Gradle Plugin 8.1.2
--   Gradle 8.9+
+- The latest version of [Android Studio](https://developer.android.com/studio).
+- Android 5.0 (API level 21) and above
+- Android Gradle Plugin 8.1.2
+- Gradle 8.9+
 
 ### Configure the app
 
