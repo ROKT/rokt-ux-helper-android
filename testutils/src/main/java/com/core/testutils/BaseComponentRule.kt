@@ -235,28 +235,24 @@ abstract class BaseComponentRule(
         return response
     }
 
-    private fun getJsonString(dcuiNodeJson: DcuiNodeJson): String {
-        return if (dcuiNodeJson.jsonString.isNotBlank()) {
-            dcuiNodeJson.jsonString
-        } else if (dcuiNodeJson.jsonFile.isNotBlank()) {
-            InstrumentationRegistry.getInstrumentation().targetContext.assets.open(dcuiNodeJson.jsonFile).use {
-                it.reader().readText()
-            }
-        } else {
-            throw IllegalArgumentException("Both jsonString and jsonFile parameters are not valid")
+    private fun getJsonString(dcuiNodeJson: DcuiNodeJson): String = if (dcuiNodeJson.jsonString.isNotBlank()) {
+        dcuiNodeJson.jsonString
+    } else if (dcuiNodeJson.jsonFile.isNotBlank()) {
+        InstrumentationRegistry.getInstrumentation().targetContext.assets.open(dcuiNodeJson.jsonFile).use {
+            it.reader().readText()
         }
+    } else {
+        throw IllegalArgumentException("Both jsonString and jsonFile parameters are not valid")
     }
 
-    private fun getJsonString(dcuiNodeJson: DcuiOfferJson): String {
-        return if (dcuiNodeJson.jsonString.isNotBlank()) {
-            dcuiNodeJson.jsonString
-        } else if (dcuiNodeJson.jsonFile.isNotBlank()) {
-            InstrumentationRegistry.getInstrumentation().targetContext.assets.open(dcuiNodeJson.jsonFile).use {
-                it.reader().readText()
-            }
-        } else {
-            throw IllegalArgumentException("Both jsonString and jsonFile parameters are not valid")
+    private fun getJsonString(dcuiNodeJson: DcuiOfferJson): String = if (dcuiNodeJson.jsonString.isNotBlank()) {
+        dcuiNodeJson.jsonString
+    } else if (dcuiNodeJson.jsonFile.isNotBlank()) {
+        InstrumentationRegistry.getInstrumentation().targetContext.assets.open(dcuiNodeJson.jsonFile).use {
+            it.reader().readText()
         }
+    } else {
+        throw IllegalArgumentException("Both jsonString and jsonFile parameters are not valid")
     }
 
     private fun buildBreakpoints(breakpoints: DcuiBreakpoints?): String = breakpoints?.breakpoints?.joinToString {

@@ -31,8 +31,8 @@ internal fun <T : BasicStateStylingBlock<*>> ImmutableList<T>?.transformTextStyl
     }
 }
 
-internal fun BasicStateStylingBlock<InLineTextStyle>.toTextStylingProperties(): BasicStateStylingBlock<TextStylingProperties?> {
-    return this.toBasicStateStylingBlock {
+internal fun BasicStateStylingBlock<InLineTextStyle>.toTextStylingProperties(): BasicStateStylingBlock<TextStylingProperties?> =
+    this.toBasicStateStylingBlock {
         TextStylingProperties(
             textColor = it.text.textColor,
             fontSize = it.text.fontSize,
@@ -45,23 +45,20 @@ internal fun BasicStateStylingBlock<InLineTextStyle>.toTextStylingProperties(): 
             textDecoration = it.text.textDecoration,
         )
     }
-}
 
 private fun transformTextStylesList(
     textStylingProperties: ImmutableList<BasicStateStylingBlock<TextStylingProperties?>>?,
     breakpoints: Int,
-): ImmutableList<StateBlock<TextStylingUiProperties>> {
-    return List(breakpoints) { i ->
-        StateBlock(
-            default = transformTextStylingProperties(
-                textStylingProperties?.getOrNull(i)?.default,
-            ),
-            pressed = transformTextStylingProperties(
-                textStylingProperties?.getOrNull(i)?.pressed,
-            ),
-        )
-    }.toImmutableList()
-}
+): ImmutableList<StateBlock<TextStylingUiProperties>> = List(breakpoints) { i ->
+    StateBlock(
+        default = transformTextStylingProperties(
+            textStylingProperties?.getOrNull(i)?.default,
+        ),
+        pressed = transformTextStylingProperties(
+            textStylingProperties?.getOrNull(i)?.pressed,
+        ),
+    )
+}.toImmutableList()
 
 internal fun transformTextStylingProperties(textStylingProperties: TextStylingProperties?): TextStylingUiProperties =
     textStylingProperties?.run {

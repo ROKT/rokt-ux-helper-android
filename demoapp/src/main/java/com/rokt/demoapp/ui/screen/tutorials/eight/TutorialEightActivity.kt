@@ -4,7 +4,6 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
@@ -17,9 +16,6 @@ import androidx.lifecycle.lifecycleScope
 import com.rokt.demoapp.R
 import com.rokt.demoapp.ui.screen.tutorials.TutorialViewModel
 import com.rokt.modelmapper.uimodel.OpenLinks
-import com.rokt.roktux.FontItemStyle
-import com.rokt.roktux.FontItemWeight
-import com.rokt.roktux.ResourceFontItem
 import com.rokt.roktux.RoktLayoutView
 import com.rokt.roktux.RoktUx
 import com.rokt.roktux.RoktUxConfig

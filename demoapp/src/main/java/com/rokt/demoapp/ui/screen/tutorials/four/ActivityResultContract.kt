@@ -7,8 +7,7 @@ import androidx.browser.customtabs.CustomTabsIntent
 import androidx.core.net.toUri
 import com.rokt.roktux.event.RoktUxEvent
 
-internal class InternalActivityResultContract() :
-    ActivityResultContract<RoktUxEvent.OpenUrl, () -> Unit>() {
+internal class InternalActivityResultContract : ActivityResultContract<RoktUxEvent.OpenUrl, () -> Unit>() {
     private var id: String = ""
     private var onClose: (String) -> Unit = {}
     override fun createIntent(context: Context, input: RoktUxEvent.OpenUrl): Intent {
@@ -24,7 +23,5 @@ internal class InternalActivityResultContract() :
         }
     }
 
-    override fun parseResult(resultCode: Int, intent: Intent?): () -> Unit {
-        return { onClose(id) }
-    }
+    override fun parseResult(resultCode: Int, intent: Intent?): () -> Unit = { onClose(id) }
 }

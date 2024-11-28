@@ -12,10 +12,7 @@ annotation class DcuiConfig(
     val pseudoState: TestPseudoState = TestPseudoState(),
 )
 
-annotation class WindowSize(
-    val width: Int = 100,
-    val height: Int = 100,
-)
+annotation class WindowSize(val width: Int = 100, val height: Int = 100)
 
 annotation class TestPseudoState(
     val isPressed: Boolean = false,

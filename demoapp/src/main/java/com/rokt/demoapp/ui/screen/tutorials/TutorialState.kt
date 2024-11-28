@@ -22,11 +22,7 @@ data class TutorialScreenState(
 )
 
 @Immutable
-sealed class TutorialPageListItem(
-    val title: String,
-    val description: String,
-    val drawableResource: Int,
-) {
+sealed class TutorialPageListItem(val title: String, val description: String, val drawableResource: Int) {
     class ComposablePageListItem(
         title: String,
         description: String,

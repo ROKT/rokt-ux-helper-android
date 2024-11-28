@@ -37,7 +37,5 @@ data class RoktIntegrationConfig(
     @SerialName("metadata")
     val metadata: Map<String, String>,
 ) {
-    fun toJsonString(): String {
-        return Json.encodeToString(this)
-    }
+    fun toJsonString(): String = Json.encodeToString(this)
 }

@@ -18,9 +18,7 @@ import kotlinx.collections.immutable.persistentMapOf
 import kotlin.reflect.KClass
 
 @Immutable
-internal class LayoutUiModelFactory(
-    modifierFactory: ModifierFactory = ModifierFactory(),
-) {
+internal class LayoutUiModelFactory(modifierFactory: ModifierFactory = ModifierFactory()) {
     private val composableMap:
         ImmutableMap<KClass<out LayoutSchemaUiModel>, ComposableComponent<out LayoutSchemaUiModel>> =
         persistentMapOf(

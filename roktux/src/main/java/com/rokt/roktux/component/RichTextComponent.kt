@@ -34,9 +34,8 @@ import com.rokt.roktux.viewmodel.layout.LayoutContract
 import com.rokt.roktux.viewmodel.layout.OfferUiState
 import java.util.Locale
 
-internal class RichTextComponent(
-    private val modifierFactory: ModifierFactory,
-) : ComposableComponent<LayoutSchemaUiModel.RichTextUiModel> {
+internal class RichTextComponent(private val modifierFactory: ModifierFactory) :
+    ComposableComponent<LayoutSchemaUiModel.RichTextUiModel> {
 
     @Composable
     override fun Render(

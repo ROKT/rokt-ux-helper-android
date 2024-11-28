@@ -10,7 +10,4 @@ annotation class DcuiNodeComponentState(
 )
 
 @Target(AnnotationTarget.FIELD)
-annotation class DcuiCreativeCopy(
-    val key: String,
-    val value: String,
-)
+annotation class DcuiCreativeCopy(val key: String, val value: String)

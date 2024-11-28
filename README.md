@@ -4,9 +4,9 @@ The Rokt UX Helper for Android enables partner applications to render tailored u
 
 ## Resident Experts
 
--   Thomson Thomas - thomson.thomas@rokt.com
--   Sahil Suri - sahil.suri@rokt.com
--   Lewis Krishnamurti - lewis.raj.krishnamurti@rokt.com
+- Thomson Thomas - <thomson.thomas@rokt.com>
+- Sahil Suri - <sahil.suri@rokt.com>
+- Lewis Krishnamurti - <lewis.raj.krishnamurti@rokt.com>
 
 | Environment | Build                                                                                               |
 | ----------- | --------------------------------------------------------------------------------------------------- |
@@ -14,11 +14,11 @@ The Rokt UX Helper for Android enables partner applications to render tailored u
 
 ## Requirements
 
--   The latest version of [Android Studio](https://developer.android.com/studio).
--   Android 5.0 (API level 21) and above
--   Android Gradle Plugin 8.1.2
--   Gradle 8.9+
--   JDK 17
+- The latest version of [Android Studio](https://developer.android.com/studio).
+- Android 5.0 (API level 21) and above
+- Android Gradle Plugin 8.1.2
+- Gradle 8.9+
+- JDK 17
 
 ## Installation
 
@@ -47,9 +47,9 @@ When making changes to UX Helper you can utilise the [Demo app](demoapp/README.m
 
 Before submitting changes ensure that:
 
--   Builds succeed with `./gradlew build`
--   Tests pass with `./gradlew test`
--   Lint checks pass with `./gradlew lint`
+- Builds succeed with `./gradlew build`
+- Tests pass with `./gradlew test`
+- Lint checks pass with `./gradlew lint`
 
 Additional checks may be conducted using Buildkite which runs on all pull requests and are required to pass before the changes are merged. You can find the details of the full pipeline [here](.buildkite/pipeline.yml).
 

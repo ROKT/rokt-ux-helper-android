@@ -7,7 +7,7 @@ import androidx.browser.customtabs.CustomTabsIntent
 import androidx.core.net.toUri
 import com.rokt.roktux.viewmodel.layout.LayoutContract
 
-internal class InternalActivityResultContract() :
+internal class InternalActivityResultContract :
     ActivityResultContract<LayoutContract.LayoutEffect.OpenUrlInternal, () -> Unit>() {
     private var id: String = ""
     private var onClose: (String) -> Unit = {}
@@ -24,7 +24,5 @@ internal class InternalActivityResultContract() :
         }
     }
 
-    override fun parseResult(resultCode: Int, intent: Intent?): () -> Unit {
-        return { onClose(id) }
-    }
+    override fun parseResult(resultCode: Int, intent: Intent?): () -> Unit = { onClose(id) }
 }

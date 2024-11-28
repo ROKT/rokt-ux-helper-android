@@ -1,5 +1,4 @@
 # https://editorconfig.org/
-# This configuration is used by ktlint when spotless invokes it
 
 # top-most EditorConfig file
 root = true

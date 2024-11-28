@@ -4,7 +4,4 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class NetworkCreativeLink(
-    @SerialName("url") val url: String,
-    @SerialName("title") val title: String,
-)
+data class NetworkCreativeLink(@SerialName("url") val url: String, @SerialName("title") val title: String)

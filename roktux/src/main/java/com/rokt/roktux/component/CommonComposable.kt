@@ -12,18 +12,16 @@ internal fun evaluateState(
     breakpointIndex: Int,
     isDarkModeEnabled: Boolean,
     offerState: OfferUiState,
-): ConditionalStyleState? {
-    return predicates.takeIf { it?.isNotEmpty() == true }?.let {
-        if (evaluateWhenPredicates(
-                predicates = it,
-                breakpointIndex = breakpointIndex,
-                isDarkModeEnabled = isDarkModeEnabled,
-                offerState = offerState,
-            )
-        ) {
-            ConditionalStyleState.Transition
-        } else {
-            ConditionalStyleState.Normal
-        }
+): ConditionalStyleState? = predicates.takeIf { it?.isNotEmpty() == true }?.let {
+    if (evaluateWhenPredicates(
+            predicates = it,
+            breakpointIndex = breakpointIndex,
+            isDarkModeEnabled = isDarkModeEnabled,
+            offerState = offerState,
+        )
+    ) {
+        ConditionalStyleState.Transition
+    } else {
+        ConditionalStyleState.Normal
     }
 }

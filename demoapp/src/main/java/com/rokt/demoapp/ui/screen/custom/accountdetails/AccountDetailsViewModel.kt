@@ -37,14 +37,12 @@ class AccountDetailsViewModel @Inject constructor() : ViewModel() {
         }
     }
 
-    private fun getDefaultAccountDetails(): AccountDetails {
-        return AccountDetails(
-            accountID = "2754655826098840951",
-            viewName = "readmoreLayout",
-            placementLocation1 = "Location1",
-            placementLocation2 = "Location2",
-        )
-    }
+    private fun getDefaultAccountDetails(): AccountDetails = AccountDetails(
+        accountID = "2754655826098840951",
+        viewName = "readmoreLayout",
+        placementLocation1 = "Location1",
+        placementLocation2 = "Location2",
+    )
 
     private fun initState() {
         viewModelScope.launch {
@@ -101,15 +99,13 @@ class AccountDetailsViewModel @Inject constructor() : ViewModel() {
         accountValidationState.value = ValidationState(ValidationStatus.NONE)
     }
 
-    private fun validateAccountId(accountId: String): ValidationState {
-        return if (accountId.isEmpty()) {
-            ValidationState(
-                fieldStatus = ValidationStatus.INVALID,
-                "Account Id can't be empty",
-            )
-        } else {
-            ValidationState(fieldStatus = ValidationStatus.VALID)
-        }
+    private fun validateAccountId(accountId: String): ValidationState = if (accountId.isEmpty()) {
+        ValidationState(
+            fieldStatus = ValidationStatus.INVALID,
+            "Account Id can't be empty",
+        )
+    } else {
+        ValidationState(fieldStatus = ValidationStatus.VALID)
     }
 }
 
@@ -130,10 +126,7 @@ data class AccountDetailsViewData(
     var password: String,
 )
 
-data class ValidationState(
-    val fieldStatus: ValidationStatus,
-    val fieldErrorMessage: String = "",
-)
+data class ValidationState(val fieldStatus: ValidationStatus, val fieldErrorMessage: String = "")
 
 enum class ValidationStatus {
     NONE,

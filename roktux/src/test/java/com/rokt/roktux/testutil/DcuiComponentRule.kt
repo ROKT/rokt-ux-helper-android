@@ -82,7 +82,8 @@ class DcuiComponentRule(val composeTestRule: ComposeContentTestRule) : BaseCompo
                             ),
                         ) ?: 1,
                         creativeCopy = dcuiNodeComponentState?.creativeCopy?.associateBy(
-                            { it.key }, { it.value },
+                            { it.key },
+                            { it.value },
                         )?.toImmutableMap() ?: persistentMapOf(),
                         breakpoints = breakpoints,
                         customState = persistentMapOf(),

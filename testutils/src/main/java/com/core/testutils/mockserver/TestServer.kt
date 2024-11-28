@@ -31,11 +31,9 @@ class TestServer {
         }
     }
 
-    fun getValidationFailures(): List<String> {
-        return dispatcher.failedHeaderValidations.also {
-            if (dispatcher.failedBodyValidation.isNotBlank()) {
-                it.add(dispatcher.failedBodyValidation)
-            }
+    fun getValidationFailures(): List<String> = dispatcher.failedHeaderValidations.also {
+        if (dispatcher.failedBodyValidation.isNotBlank()) {
+            it.add(dispatcher.failedBodyValidation)
         }
     }
 
@@ -63,22 +61,22 @@ class MockServerDispatcher : Dispatcher() {
             }
     }
 
-    private fun getMatchingMockResponse(path: String?): MockResponse? {
-        return mockServerConfig.routeConfigs.firstOrNull { it.path == path }?.let {
-            val headers = with(Headers.Builder()) {
-                it.responseConfig.headers.forEach { headerItem ->
-                    add(headerItem.key, headerItem.value)
-                }
-                build()
+    private fun getMatchingMockResponse(path: String?): MockResponse? = mockServerConfig.routeConfigs.firstOrNull {
+        it.path == path
+    }?.let {
+        val headers = with(Headers.Builder()) {
+            it.responseConfig.headers.forEach { headerItem ->
+                add(headerItem.key, headerItem.value)
             }
-            MockResponse()
-                .setResponseCode(it.responseConfig.responseCode)
-                .setHeaders(headers)
-                .setBody(
-                    InstrumentationRegistry.getInstrumentation()
-                        .context.classLoader.getResource(it.responseConfig.responseResourceFile).readText(),
-                )
+            build()
         }
+        MockResponse()
+            .setResponseCode(it.responseConfig.responseCode)
+            .setHeaders(headers)
+            .setBody(
+                InstrumentationRegistry.getInstrumentation()
+                    .context.classLoader.getResource(it.responseConfig.responseResourceFile).readText(),
+            )
     }
 
     private fun validateRequest(request: RecordedRequest) {

@@ -20,9 +20,8 @@ import com.rokt.roktux.viewmodel.variants.MarketingViewModel
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.onEach
 
-internal class LayoutVariantMarketingComponent(
-    private val factory: LayoutUiModelFactory,
-) : ComposableComponent<LayoutSchemaUiModel.MarketingUiModel> {
+internal class LayoutVariantMarketingComponent(private val factory: LayoutUiModelFactory) :
+    ComposableComponent<LayoutSchemaUiModel.MarketingUiModel> {
 
     @Composable
     override fun Render(

@@ -137,73 +137,71 @@ class RoktLayoutViewModelTest : BaseViewModelTest() {
     }
 
     @Test
-    fun `SetCurrentOffer Event past the total offers should send not LayoutCompleted UxEvent and SignalDismissal platformEvent when closeOnComplete is false`() =
-        runTest {
-            // Arrange
-            every { mapper.getSavedExperience() } returns mockk(relaxed = true) {
-                every { plugins } returns persistentListOf(
-                    mockk(relaxed = true) {
-                        every { id } returns "pluginId"
-                        every { settings } returns LayoutSettings(closeOnComplete = false)
-                        every { slots } returns persistentListOf(
-                            mockk(relaxed = true) {
-                                every { instanceGuid } returns "slotInstanceGuid"
-                                every { offer } returns mockk(relaxed = true) {
-                                    every { creative } returns mockk(relaxed = true) {
-                                        every { instanceGuid } returns "creativeInstanceGuid"
-                                    }
+    fun `SetCurrentOffer Event past the total offers should send not LayoutCompleted UxEvent and SignalDismissal platformEvent when closeOnComplete is false`() = runTest {
+        // Arrange
+        every { mapper.getSavedExperience() } returns mockk(relaxed = true) {
+            every { plugins } returns persistentListOf(
+                mockk(relaxed = true) {
+                    every { id } returns "pluginId"
+                    every { settings } returns LayoutSettings(closeOnComplete = false)
+                    every { slots } returns persistentListOf(
+                        mockk(relaxed = true) {
+                            every { instanceGuid } returns "slotInstanceGuid"
+                            every { offer } returns mockk(relaxed = true) {
+                                every { creative } returns mockk(relaxed = true) {
+                                    every { instanceGuid } returns "creativeInstanceGuid"
                                 }
-                            },
-                            mockk(relaxed = true) {
-                                every { instanceGuid } returns "slotInstanceGuid1"
-                                every { offer } returns mockk(relaxed = true) {
-                                    every { creative } returns mockk(relaxed = true) {
-                                        every { instanceGuid } returns "creativeInstanceGuid1"
-                                    }
+                            }
+                        },
+                        mockk(relaxed = true) {
+                            every { instanceGuid } returns "slotInstanceGuid1"
+                            every { offer } returns mockk(relaxed = true) {
+                                every { creative } returns mockk(relaxed = true) {
+                                    every { instanceGuid } returns "creativeInstanceGuid1"
                                 }
-                            },
-                        )
-                    },
-                )
-            }
-
-            // Act
-            layoutViewModel.setEvent(LayoutContract.LayoutEvent.LayoutInitialised)
-            layoutViewModel.setEvent(LayoutContract.LayoutEvent.SetCurrentOffer(2))
-
-            // Assert
-            verify(exactly = 0) {
-                uxEvent.invoke(RoktUxEvent.LayoutCompleted("pluginId"))
-                platformEvent.invoke(
-                    match { event ->
-                        event[0].eventType == EventType.SignalDismissal
-                    },
-                )
-            }
+                            }
+                        },
+                    )
+                },
+            )
         }
+
+        // Act
+        layoutViewModel.setEvent(LayoutContract.LayoutEvent.LayoutInitialised)
+        layoutViewModel.setEvent(LayoutContract.LayoutEvent.SetCurrentOffer(2))
+
+        // Assert
+        verify(exactly = 0) {
+            uxEvent.invoke(RoktUxEvent.LayoutCompleted("pluginId"))
+            platformEvent.invoke(
+                match { event ->
+                    event[0].eventType == EventType.SignalDismissal
+                },
+            )
+        }
+    }
 
     @Test
-    fun `LayoutInitialised Event when experienceModel has error should end LayoutFailure UxEvent but not diagnostic event`() =
-        runTest {
-            // Arrange
-            every { mapper.transformResponse() } returns Result.failure(IllegalAccessException("no access"))
+    fun `LayoutInitialised Event when experienceModel has error should end LayoutFailure UxEvent but not diagnostic event`() = runTest {
+        // Arrange
+        every { mapper.transformResponse() } returns Result.failure(IllegalAccessException("no access"))
 
-            // Act
-            layoutViewModel.setEvent(LayoutContract.LayoutEvent.LayoutInitialised)
+        // Act
+        layoutViewModel.setEvent(LayoutContract.LayoutEvent.LayoutInitialised)
 
-            // Assert
-            verify {
-                uxEvent.invoke(RoktUxEvent.LayoutFailure())
-            }
-
-            verify(exactly = 0) {
-                platformEvent.invoke(
-                    match { event ->
-                        event[0].eventType == EventType.SignalSdkDiagnostic
-                    },
-                )
-            }
+        // Assert
+        verify {
+            uxEvent.invoke(RoktUxEvent.LayoutFailure())
         }
+
+        verify(exactly = 0) {
+            platformEvent.invoke(
+                match { event ->
+                    event[0].eventType == EventType.SignalSdkDiagnostic
+                },
+            )
+        }
+    }
 
     @Test
     fun `handleError should not send error if experienceModel is initialized and useDiagnostics is false`() = runTest {

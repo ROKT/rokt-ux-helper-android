@@ -338,66 +338,62 @@ internal fun transformProgressControl(
 internal fun transformWhen(
     whenModel: LayoutSchemaModel.When,
     transformLayoutSchemaChildren: (LayoutSchemaModel) -> LayoutSchemaUiModel?,
-): LayoutSchemaUiModel.WhenUiModel {
-    return LayoutSchemaUiModel.WhenUiModel(
-        predicates = whenModel.node.predicates.map { it.transformWhenPredicate() }.toImmutableList(),
-        children = whenModel.node.children.mapNotNull { child ->
-            transformLayoutSchemaChildren(child)
-        }.toImmutableList(),
-        transition = whenModel.node.transition?.toTransitionUiModel() ?: WhenUiTransition(
-            EnterTransition.None,
-            ExitTransition.None,
-        ),
-        hide = whenModel.node.hide?.toHideUiModel(),
+): LayoutSchemaUiModel.WhenUiModel = LayoutSchemaUiModel.WhenUiModel(
+    predicates = whenModel.node.predicates.map { it.transformWhenPredicate() }.toImmutableList(),
+    children = whenModel.node.children.mapNotNull { child ->
+        transformLayoutSchemaChildren(child)
+    }.toImmutableList(),
+    transition = whenModel.node.transition?.toTransitionUiModel() ?: WhenUiTransition(
+        EnterTransition.None,
+        ExitTransition.None,
+    ),
+    hide = whenModel.node.hide?.toHideUiModel(),
+)
+
+internal fun WhenPredicate.transformWhenPredicate(): WhenUiPredicate = when (this) {
+    is WhenPredicate.Breakpoint -> WhenUiPredicate.Breakpoint(
+        condition = predicate.condition.toUiModel(),
+        value = predicate.value,
     )
-}
 
-internal fun WhenPredicate.transformWhenPredicate(): WhenUiPredicate {
-    return when (this) {
-        is WhenPredicate.Breakpoint -> WhenUiPredicate.Breakpoint(
-            condition = predicate.condition.toUiModel(),
-            value = predicate.value,
-        )
+    is WhenPredicate.Position -> WhenUiPredicate.Position(
+        condition = predicate.condition.toUiModel(),
+        value = predicate.value,
+    )
 
-        is WhenPredicate.Position -> WhenUiPredicate.Position(
-            condition = predicate.condition.toUiModel(),
-            value = predicate.value,
-        )
+    is WhenPredicate.Progression -> WhenUiPredicate.Progression(
+        condition = predicate.condition.toUiModel(),
+        value = predicate.value,
+    )
 
-        is WhenPredicate.Progression -> WhenUiPredicate.Progression(
-            condition = predicate.condition.toUiModel(),
-            value = predicate.value,
-        )
+    is WhenPredicate.DarkMode -> WhenUiPredicate.DarkMode(
+        condition = predicate.condition.toUiModel(),
+        value = predicate.value,
+    )
 
-        is WhenPredicate.DarkMode -> WhenUiPredicate.DarkMode(
-            condition = predicate.condition.toUiModel(),
-            value = predicate.value,
-        )
+    is WhenPredicate.CreativeCopy -> WhenUiPredicate.CreativeCopy(
+        condition = predicate.condition.toUiModel(),
+        value = predicate.value,
+    )
 
-        is WhenPredicate.CreativeCopy -> WhenUiPredicate.CreativeCopy(
-            condition = predicate.condition.toUiModel(),
-            value = predicate.value,
-        )
+    is WhenPredicate.StaticBoolean -> WhenUiPredicate.StaticBoolean(
+        condition = predicate.condition.toUiModel(),
+        value = predicate.value,
+    )
 
-        is WhenPredicate.StaticBoolean -> WhenUiPredicate.StaticBoolean(
-            condition = predicate.condition.toUiModel(),
-            value = predicate.value,
-        )
+    is WhenPredicate.CustomState -> WhenUiPredicate.CustomState(
+        condition = predicate.condition.toUiModel(),
+        value = predicate.value,
+        key = predicate.key,
+    )
 
-        is WhenPredicate.CustomState -> WhenUiPredicate.CustomState(
-            condition = predicate.condition.toUiModel(),
-            value = predicate.value,
-            key = predicate.key,
-        )
+    is WhenPredicate.StaticString -> WhenUiPredicate.StaticString(
+        condition = predicate.condition.toUiModel(),
+        input = predicate.input,
+        value = predicate.value,
+    )
 
-        is WhenPredicate.StaticString -> WhenUiPredicate.StaticString(
-            condition = predicate.condition.toUiModel(),
-            input = predicate.input,
-            value = predicate.value,
-        )
-
-        else -> throw IllegalArgumentException()
-    }
+    else -> throw IllegalArgumentException()
 }
 
 private fun OrderableWhenCondition.toUiModel() = when (this) {

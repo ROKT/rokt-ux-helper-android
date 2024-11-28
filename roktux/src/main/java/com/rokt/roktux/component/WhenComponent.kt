@@ -19,10 +19,8 @@ import com.rokt.roktux.viewmodel.layout.LayoutContract
 import com.rokt.roktux.viewmodel.layout.OfferUiState
 import kotlinx.collections.immutable.ImmutableList
 
-internal class WhenComponent(
-    private val factory: LayoutUiModelFactory,
-    private val modifierFactory: ModifierFactory,
-) : ComposableComponent<LayoutSchemaUiModel.WhenUiModel> {
+internal class WhenComponent(private val factory: LayoutUiModelFactory, private val modifierFactory: ModifierFactory) :
+    ComposableComponent<LayoutSchemaUiModel.WhenUiModel> {
 
     @Composable
     override fun Render(
@@ -183,13 +181,12 @@ internal fun evaluatePredicates(
     return true
 }
 
-internal fun findWrappedChild(child: LayoutSchemaUiModel): LayoutSchemaUiModel {
-    return if (child is LayoutSchemaUiModel.WhenUiModel && child.children.isNotEmpty()) {
+internal fun findWrappedChild(child: LayoutSchemaUiModel): LayoutSchemaUiModel =
+    if (child is LayoutSchemaUiModel.WhenUiModel && child.children.isNotEmpty()) {
         child.children[0]?.let { findWrappedChild(it) } ?: child
     } else {
         child
     }
-}
 
 private fun OrderableWhenUiCondition.evaluate(leftValue: Int?, rightValue: Int?): Boolean {
     if (leftValue == null || rightValue == null) return false
@@ -201,32 +198,24 @@ private fun OrderableWhenUiCondition.evaluate(leftValue: Int?, rightValue: Int?)
     }
 }
 
-private fun EqualityWhenUiCondition.evaluate(leftValue: Boolean, rightValue: Boolean): Boolean {
-    return when (this) {
-        EqualityWhenUiCondition.Is -> leftValue == rightValue
-        EqualityWhenUiCondition.IsNot -> leftValue != rightValue
-    }
+private fun EqualityWhenUiCondition.evaluate(leftValue: Boolean, rightValue: Boolean): Boolean = when (this) {
+    EqualityWhenUiCondition.Is -> leftValue == rightValue
+    EqualityWhenUiCondition.IsNot -> leftValue != rightValue
 }
 
-private fun EqualityWhenUiCondition.evaluate(leftValue: String, rightValue: String): Boolean {
-    return when (this) {
-        EqualityWhenUiCondition.Is -> leftValue == rightValue
-        EqualityWhenUiCondition.IsNot -> leftValue != rightValue
-    }
+private fun EqualityWhenUiCondition.evaluate(leftValue: String, rightValue: String): Boolean = when (this) {
+    EqualityWhenUiCondition.Is -> leftValue == rightValue
+    EqualityWhenUiCondition.IsNot -> leftValue != rightValue
 }
 
-private fun ExistenceWhenUiCondition.evaluate(value: String?): Boolean {
-    return when (this) {
-        ExistenceWhenUiCondition.Exists -> !value.isNullOrEmpty()
-        ExistenceWhenUiCondition.NotExists -> value.isNullOrEmpty()
-    }
+private fun ExistenceWhenUiCondition.evaluate(value: String?): Boolean = when (this) {
+    ExistenceWhenUiCondition.Exists -> !value.isNullOrEmpty()
+    ExistenceWhenUiCondition.NotExists -> value.isNullOrEmpty()
 }
 
-private fun BooleanWhenUiCondition.evaluate(value: Boolean): Boolean {
-    return when (this) {
-        BooleanWhenUiCondition.IsTrue -> value
-        BooleanWhenUiCondition.IsFalse -> !value
-    }
+private fun BooleanWhenUiCondition.evaluate(value: Boolean): Boolean = when (this) {
+    BooleanWhenUiCondition.IsTrue -> value
+    BooleanWhenUiCondition.IsFalse -> !value
 }
 
 private fun getNormalisedPosition(lastOfferIndex: Int, predicateValue: Int): Int = if (predicateValue < 0) {

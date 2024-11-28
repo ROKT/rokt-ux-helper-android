@@ -129,8 +129,6 @@ internal fun transformCarouselDistribution(
     )
 }
 
-private fun Transition.toTransitionUiModel(): TransitionUiModel {
-    return when (this) {
-        is Transition.FadeInOut -> TransitionUiModel.FadeInOutTransition(this.settings.duration)
-    }
+private fun Transition.toTransitionUiModel(): TransitionUiModel = when (this) {
+    is Transition.FadeInOut -> TransitionUiModel.FadeInOutTransition(this.settings.duration)
 }

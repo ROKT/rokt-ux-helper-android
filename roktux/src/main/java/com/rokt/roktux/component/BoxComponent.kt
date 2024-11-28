@@ -8,10 +8,8 @@ import com.rokt.modelmapper.uimodel.LayoutSchemaUiModel
 import com.rokt.roktux.viewmodel.layout.LayoutContract
 import com.rokt.roktux.viewmodel.layout.OfferUiState
 
-internal class BoxComponent(
-    private val factory: LayoutUiModelFactory,
-    private val modifierFactory: ModifierFactory,
-) : ComposableComponent<LayoutSchemaUiModel.BoxUiModel> {
+internal class BoxComponent(private val factory: LayoutUiModelFactory, private val modifierFactory: ModifierFactory) :
+    ComposableComponent<LayoutSchemaUiModel.BoxUiModel> {
 
     @Composable
     override fun Render(

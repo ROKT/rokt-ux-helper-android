@@ -19,22 +19,20 @@ class DataBindingImpl : DataBinding {
         PlaceholderReplacer(value, contextKey, offerModel).bindData()
 }
 
-inline fun <reified T : Any> bindModel(inputKey: String, offerModel: OfferModel?): T? {
-    return when (T::class) {
-        ResponseOptionModel::class -> {
-            offerModel?.creative?.responseOptions?.get(inputKey) as? T
-        }
-
-        CreativeImageModel::class -> {
-            offerModel?.creative?.images?.get(inputKey) as? T
-        }
-
-        CreativeIcon::class -> {
-            offerModel?.creative?.icons?.get(inputKey) as? T
-        }
-
-        else -> null
+inline fun <reified T : Any> bindModel(inputKey: String, offerModel: OfferModel?): T? = when (T::class) {
+    ResponseOptionModel::class -> {
+        offerModel?.creative?.responseOptions?.get(inputKey) as? T
     }
+
+    CreativeImageModel::class -> {
+        offerModel?.creative?.images?.get(inputKey) as? T
+    }
+
+    CreativeIcon::class -> {
+        offerModel?.creative?.icons?.get(inputKey) as? T
+    }
+
+    else -> null
 }
 
 private class PlaceholderReplacer(
@@ -42,16 +40,14 @@ private class PlaceholderReplacer(
     private val contextKey: String?,
     private val offer: OfferModel?,
 ) {
-    fun bindData(): BindData {
-        return try {
-            if (isStateTemplate.matches(value)) {
-                getStateData()
-            } else {
-                BindData.Value(templatePattern.replace(value, ::replacer))
-            }
-        } catch (e: Exception) {
-            BindData.Undefined
+    fun bindData(): BindData = try {
+        if (isStateTemplate.matches(value)) {
+            getStateData()
+        } else {
+            BindData.Value(templatePattern.replace(value, ::replacer))
         }
+    } catch (e: Exception) {
+        BindData.Undefined
     }
 
     private fun getStateData(): BindData {
@@ -136,9 +132,7 @@ private class PlaceholderReplacer(
     private fun getSanitisedDataKey(key: String): String =
         key.removePrefix("${TemplateDataPrefix.DATA}.").substringAfter('.')
 
-    private fun getCreativeCopy(key: String): String? {
-        return offer?.creative?.copy?.get(getSanitisedDataKey(key))
-    }
+    private fun getCreativeCopy(key: String): String? = offer?.creative?.copy?.get(getSanitisedDataKey(key))
 
     private fun getResponseOptionData(key: String): String? {
         offer?.creative?.responseOptions?.get(contextKey.orEmpty())?.let {
