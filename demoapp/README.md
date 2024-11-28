@@ -13,9 +13,9 @@ dependencies {
 
 ## Resident Experts
 
--   Thomson Thomas - thomson.thomas@rokt.com
--   Sahil Suri - sahil.suri@rokt.com
--   Lewis Krishnamurti - lewis.raj.krishnamurti@rokt.com
+-   Thomson Thomas - <thomson.thomas@rokt.com>
+-   Sahil Suri - <sahil.suri@rokt.com>
+-   Lewis Krishnamurti - <lewis.raj.krishnamurti@rokt.com>
 
 ## Requirements
 
@@ -31,7 +31,7 @@ To run the demo app, you'll have to:
 1. Add a file local.properties in the root project (this file should NOT be under version control to protect your keys)
 2. Add below lines to local.properties that looks like
 
-```
+```text
 BASE_URL=YOUR_BASE_URL, where YOUR_BASE_URL is the base url to your or Rokt backend.
 VIEW_NAME=YOUR_VIEW_NAME, where YOUR_VIEW_NAME is the view name you get from Rokt.
 ROKT_TAG_ID=YOUR_TAG_ID, where YOUR_TAG_ID is the tag id you get from Rokt.

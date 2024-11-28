@@ -4,9 +4,9 @@ The Rokt UX Helper for Android enables partner applications to render tailored u
 
 ## Resident Experts
 
--   Thomson Thomas - thomson.thomas@rokt.com
--   Sahil Suri - sahil.suri@rokt.com
--   Lewis Krishnamurti - lewis.raj.krishnamurti@rokt.com
+-   Thomson Thomas - <thomson.thomas@rokt.com>
+-   Sahil Suri - <sahil.suri@rokt.com>
+-   Lewis Krishnamurti - <lewis.raj.krishnamurti@rokt.com>
 
 | Environment | Build                                                                                               |
 | ----------- | --------------------------------------------------------------------------------------------------- |
