@@ -134,9 +134,10 @@ class DataBindingImplTest : MockkUnitTest() {
 
         // Assert
         assertTrue(
-            value is BindData.Value && value.text.equals(
-                "This is test disclaimer and Thank You he \n sd test disclaimer",
-            ),
+            value is BindData.Value &&
+                value.text.equals(
+                    "This is test disclaimer and Thank You he \n sd test disclaimer",
+                ),
         )
     }
 

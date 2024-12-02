@@ -153,7 +153,7 @@ sealed class LayoutSchemaUiModel(
         val peekThroughSizeUiModel: ImmutableList<PeekThroughSizeUiModel>,
     ) : LayoutSchemaUiModel(ownModifiers, containerProperties, conditionalTransitionModifiers)
 
-    class MarketingUiModel() : LayoutSchemaUiModel()
+    class MarketingUiModel : LayoutSchemaUiModel()
 
     class OverlayUiModel(
         ownModifiers: ImmutableList<StateBlock<ModifierProperties>>?,
@@ -227,10 +227,7 @@ interface ConditionalTransition {
 }
 
 @Immutable
-data class StateBlock<T>(
-    val default: T,
-    val pressed: T? = null,
-)
+data class StateBlock<T>(val default: T, val pressed: T? = null)
 
 @Immutable
 interface BaseTextStylingUiProperties {
@@ -327,11 +324,7 @@ sealed class WidthUiModel {
     object WrapContent : WidthUiModel()
 }
 
-data class BackgroundImageUiModel(
-    val url: ThemeColorUiModel,
-    val position: Alignment,
-    val scaleType: ContentScale,
-)
+data class BackgroundImageUiModel(val url: ThemeColorUiModel, val position: Alignment, val scaleType: ContentScale)
 
 @Immutable
 interface BaseModifierProperties {
@@ -482,7 +475,7 @@ sealed class WhenUiPredicate {
         WhenUiPredicate()
 }
 
-enum class OrderableWhenUiCondition() {
+enum class OrderableWhenUiCondition {
     Is,
     IsNot,
     IsBelow,

@@ -1,6 +1,5 @@
 package com.rokt.demoapp.ui.screen.tutorials
 
-import android.os.Build
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.rokt.demoapp.BuildConfig

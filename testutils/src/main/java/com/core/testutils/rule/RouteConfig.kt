@@ -16,14 +16,8 @@ annotation class ResponseConfig(
 )
 
 @Target(AnnotationTarget.ANNOTATION_CLASS)
-annotation class RequestValidation(
-    val headers: Array<HeaderValue> = [],
-    val body: String = "",
-)
+annotation class RequestValidation(val headers: Array<HeaderValue> = [], val body: String = "")
 
 @Target(AnnotationTarget.ANNOTATION_CLASS)
 @Repeatable
-annotation class HeaderValue(
-    val key: String,
-    val value: String,
-)
+annotation class HeaderValue(val key: String, val value: String)

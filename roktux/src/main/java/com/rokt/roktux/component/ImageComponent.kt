@@ -15,9 +15,8 @@ import com.rokt.roktux.di.layout.LocalLayoutComponent
 import com.rokt.roktux.viewmodel.layout.LayoutContract
 import com.rokt.roktux.viewmodel.layout.OfferUiState
 
-internal class ImageComponent(
-    private val modifierFactory: ModifierFactory,
-) : ComposableComponent<LayoutSchemaUiModel.ImageUiModel> {
+internal class ImageComponent(private val modifierFactory: ModifierFactory) :
+    ComposableComponent<LayoutSchemaUiModel.ImageUiModel> {
 
     @Composable
     override fun Render(

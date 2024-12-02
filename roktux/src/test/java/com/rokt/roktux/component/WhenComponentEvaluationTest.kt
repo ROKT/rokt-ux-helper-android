@@ -1235,15 +1235,13 @@ class WhenComponentEvaluationTest {
         assertTrue(evaluationResult)
     }
 
-    private fun createWhenUiModel(vararg predicate: WhenUiPredicate): LayoutSchemaUiModel.WhenUiModel {
-        return LayoutSchemaUiModel.WhenUiModel(
-            predicates = predicate.toList().toImmutableList(),
-            children = persistentListOf(),
-            transition = WhenUiTransition(
-                inTransition = EnterTransition.None,
-                outTransition = ExitTransition.None,
-            ),
-            hide = WhenUiHidden.Visually,
-        )
-    }
+    private fun createWhenUiModel(vararg predicate: WhenUiPredicate): LayoutSchemaUiModel.WhenUiModel = LayoutSchemaUiModel.WhenUiModel(
+        predicates = predicate.toList().toImmutableList(),
+        children = persistentListOf(),
+        transition = WhenUiTransition(
+            inTransition = EnterTransition.None,
+            outTransition = ExitTransition.None,
+        ),
+        hide = WhenUiHidden.Visually,
+    )
 }

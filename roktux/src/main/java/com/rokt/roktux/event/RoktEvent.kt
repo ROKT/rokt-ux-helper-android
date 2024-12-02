@@ -108,10 +108,7 @@ enum class EventType {
 }
 
 @Serializable
-data class EventNameValue(
-    @SerialName("name") val name: String,
-    @SerialName("value") val value: String,
-)
+data class EventNameValue(@SerialName("name") val name: String, @SerialName("value") val value: String)
 
 internal fun SignalType.toEventType(): EventType = when (this) {
     SignalType.SignalResponse -> EventType.SignalResponse
@@ -123,7 +120,5 @@ data class RoktPlatformEventsWrapper(
     @SerialName("integration") val integration: RoktIntegrationConfig,
     @SerialName("events") val events: List<RoktPlatformEvent>,
 ) {
-    fun toJsonString(): String {
-        return Json { encodeDefaults = true }.encodeToString(this)
-    }
+    fun toJsonString(): String = Json { encodeDefaults = true }.encodeToString(this)
 }

@@ -463,25 +463,23 @@ internal class ModifierFactory {
             .then(properties.padding?.let { Modifier.padding(it) } ?: Modifier)
     }
 
-    private fun ModifierProperties.applyProperties(properties: ModifierProperties): ModifierProperties {
-        return copy(
-            margin = margin ?: properties.margin,
-            offset = offset ?: properties.offset,
-            minHeight = minHeight ?: properties.minHeight,
-            minWidth = minWidth ?: properties.minWidth,
-            maxHeight = maxHeight ?: properties.maxHeight,
-            maxWidth = maxWidth ?: properties.maxWidth,
-            width = width ?: properties.width,
-            height = height ?: properties.height,
-            rotateZ = rotateZ ?: properties.rotateZ,
-            shadow = shadow ?: properties.shadow,
-            border = border ?: properties.border,
-            backgroundColor = backgroundColor ?: properties.backgroundColor,
-            backgroundImage = backgroundImage ?: properties.backgroundImage,
-            blurRadius = blurRadius ?: properties.blurRadius,
-            padding = padding ?: properties.padding,
-        )
-    }
+    private fun ModifierProperties.applyProperties(properties: ModifierProperties): ModifierProperties = copy(
+        margin = margin ?: properties.margin,
+        offset = offset ?: properties.offset,
+        minHeight = minHeight ?: properties.minHeight,
+        minWidth = minWidth ?: properties.minWidth,
+        maxHeight = maxHeight ?: properties.maxHeight,
+        maxWidth = maxWidth ?: properties.maxWidth,
+        width = width ?: properties.width,
+        height = height ?: properties.height,
+        rotateZ = rotateZ ?: properties.rotateZ,
+        shadow = shadow ?: properties.shadow,
+        border = border ?: properties.border,
+        backgroundColor = backgroundColor ?: properties.backgroundColor,
+        backgroundImage = backgroundImage ?: properties.backgroundImage,
+        blurRadius = blurRadius ?: properties.blurRadius,
+        padding = padding ?: properties.padding,
+    )
 
     private fun Modifier.coloredShadow(
         color: Color,
@@ -538,19 +536,18 @@ internal class ModifierFactory {
         coroutineScope: CoroutineScope,
         context: Context,
         imageLoader: ImageLoader,
-    ): Modifier {
-        return this then Modifier.clipToBounds() then BackgroundImageElement(
-            url,
-            alignment,
-            scale,
-            coroutineScope,
-            context,
-            imageLoader,
-        )
-    }
+    ): Modifier = this then Modifier.clipToBounds() then BackgroundImageElement(
+        url,
+        alignment,
+        scale,
+        coroutineScope,
+        context,
+        imageLoader,
+    )
 
     private class BackgroundImageNode(var bitmap: Bitmap?, var alignment: Alignment, var scale: ContentScale) :
-        DrawModifierNode, Modifier.Node() {
+        Modifier.Node(),
+        DrawModifierNode {
         override fun ContentDrawScope.draw() {
             var offset = IntOffset.Zero
             bitmap?.let {
@@ -883,9 +880,26 @@ internal class ModifierFactory {
                         properties?.alignSelfVertical?.let {
                             if (selfAlignmentBias == null) selfAlignmentBias = it.bias
                         }
-                        if (arrangementBias != null && gap != null && alignmentBias != null && weight != null && selfAlignmentBias != null) break
+                        if (arrangementBias != null &&
+                            gap != null &&
+                            alignmentBias != null &&
+                            weight != null &&
+                            selfAlignmentBias != null
+                        ) {
+                            break
+                        }
                     }
-                    if (!usePressed || (arrangementBias != null && gap != null && alignmentBias != null && weight != null && selfAlignmentBias != null)) break
+                    if (!usePressed ||
+                        (
+                            arrangementBias != null &&
+                                gap != null &&
+                                alignmentBias != null &&
+                                weight != null &&
+                                selfAlignmentBias != null
+                            )
+                    ) {
+                        break
+                    }
                 }
             }
         }
@@ -1097,8 +1111,8 @@ internal class ModifierFactory {
         )
     }
 
-    private fun TextStylingUiProperties.applyProperties(properties: TextStylingUiProperties): TextStylingUiProperties {
-        return copy(
+    private fun TextStylingUiProperties.applyProperties(properties: TextStylingUiProperties): TextStylingUiProperties =
+        copy(
             textColor = textColor ?: properties.textColor,
             fontSize = fontSize ?: properties.fontSize,
             fontWeight = fontWeight ?: properties.fontWeight,
@@ -1112,7 +1126,6 @@ internal class ModifierFactory {
             textDecoration = textDecoration ?: properties.textDecoration,
             lineLimit = lineLimit ?: properties.lineLimit,
         )
-    }
 
     private val paddingToVector: TwoWayConverter<PaddingValues?, AnimationVector4D> =
         TwoWayConverter(

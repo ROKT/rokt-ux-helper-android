@@ -8,9 +8,8 @@ import com.rokt.modelmapper.utils.ROKT_ICONS_FONT_FAMILY
 import com.rokt.roktux.viewmodel.layout.LayoutContract
 import com.rokt.roktux.viewmodel.layout.OfferUiState
 
-internal class IconComponent(
-    private val modifierFactory: ModifierFactory,
-) : ComposableComponent<LayoutSchemaUiModel.IconUiModel> {
+internal class IconComponent(private val modifierFactory: ModifierFactory) :
+    ComposableComponent<LayoutSchemaUiModel.IconUiModel> {
 
     @Composable
     override fun Render(

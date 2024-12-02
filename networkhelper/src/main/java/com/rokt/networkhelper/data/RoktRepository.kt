@@ -18,24 +18,18 @@ internal interface RoktRepository {
 /**
  * Network Implementation of Repository that communicates with RoktBackend.
  */
-internal class NetworkRoktRepository(
-    private val roktApiService: RoktApiService,
-) : RoktRepository {
+internal class NetworkRoktRepository(private val roktApiService: RoktApiService) : RoktRepository {
 
-    override suspend fun experience(experienceRequest: NetworkExperienceRequest): Result<String> {
-        return retry {
-            roktApiService.experience(
-                experienceRequest,
-            ).string()
-        }
+    override suspend fun experience(experienceRequest: NetworkExperienceRequest): Result<String> = retry {
+        roktApiService.experience(
+            experienceRequest,
+        ).string()
     }
 
-    override suspend fun postEvents(events: String): Result<Unit> {
-        return retry {
-            roktApiService.postEvents(
-                events.toRequestBody("application/json".toMediaTypeOrNull()),
-            )
-        }
+    override suspend fun postEvents(events: String): Result<Unit> = retry {
+        roktApiService.postEvents(
+            events.toRequestBody("application/json".toMediaTypeOrNull()),
+        )
     }
 }
 

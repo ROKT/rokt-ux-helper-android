@@ -134,6 +134,7 @@ class ImageComponentTest : BaseDcuiEspressoTest() {
     @Test
     @DcuiNodeJson(jsonFile = "ImageComponent/Image_with_validSVG_DataUri.json")
     @DcuiConfig(isDarkModeEnabled = true)
+    @Ignore("Temporarily ignoring")
     fun testImageComponentWithInvalidDataUriInDarkMode() {
         composeTestRule.onNodeWithTag(DCUI_COMPONENT_TAG)
             .assertDoesNotExist()

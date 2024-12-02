@@ -17,10 +17,7 @@ import java.io.ByteArrayInputStream
 /**
  * Coil's [Fetcher] component that adds data uri support
  */
-class DataUriFetcher(
-    private val data: Uri,
-    private val options: Options,
-) : Fetcher {
+class DataUriFetcher(private val data: Uri, private val options: Options) : Fetcher {
 
     @OptIn(ExperimentalCoilApi::class)
     override suspend fun fetch(): FetchResult {

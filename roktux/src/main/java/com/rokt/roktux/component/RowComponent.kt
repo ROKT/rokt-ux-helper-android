@@ -17,10 +17,8 @@ import com.rokt.modelmapper.uimodel.LayoutSchemaUiModel
 import com.rokt.roktux.viewmodel.layout.LayoutContract
 import com.rokt.roktux.viewmodel.layout.OfferUiState
 
-internal class RowComponent(
-    private val factory: LayoutUiModelFactory,
-    private val modifierFactory: ModifierFactory,
-) : ComposableComponent<LayoutSchemaUiModel.RowUiModel> {
+internal class RowComponent(private val factory: LayoutUiModelFactory, private val modifierFactory: ModifierFactory) :
+    ComposableComponent<LayoutSchemaUiModel.RowUiModel> {
 
     @Composable
     override fun Render(
@@ -64,7 +62,13 @@ internal class RowComponent(
                     },
                 ),
             verticalAlignment = BiasAlignment.Vertical(
-                if (container.alignmentBias == AlignmentUiModel.Stretch.bias) AlignmentUiModel.Start.bias else container.alignmentBias,
+                if (container.alignmentBias ==
+                    AlignmentUiModel.Stretch.bias
+                ) {
+                    AlignmentUiModel.Start.bias
+                } else {
+                    container.alignmentBias
+                },
             ),
             horizontalArrangement = container.horizontalArrangement,
         ) {

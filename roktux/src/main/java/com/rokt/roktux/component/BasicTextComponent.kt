@@ -9,9 +9,8 @@ import com.rokt.roktux.utils.getValue
 import com.rokt.roktux.viewmodel.layout.LayoutContract
 import com.rokt.roktux.viewmodel.layout.OfferUiState
 
-internal class BasicTextComponent(
-    private val modifierFactory: ModifierFactory,
-) : ComposableComponent<LayoutSchemaUiModel.BasicTextUiModel> {
+internal class BasicTextComponent(private val modifierFactory: ModifierFactory) :
+    ComposableComponent<LayoutSchemaUiModel.BasicTextUiModel> {
 
     @Composable
     override fun Render(
