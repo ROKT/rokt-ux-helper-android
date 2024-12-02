@@ -217,6 +217,7 @@ internal fun Modifier.userInteractionDetector(model: LayoutSchemaUiModel, onTap:
 
 internal suspend fun PointerInputScope.interceptTap(
     pass: PointerEventPass = PointerEventPass.Initial,
+    shouldConsume: Boolean = false,
     onTap: (() -> Unit)? = null,
 ) = coroutineScope {
     if (onTap == null) return@coroutineScope
@@ -229,8 +230,9 @@ internal suspend fun PointerInputScope.interceptTap(
             val change = event.changes[0]
 
             if (change.id == down.id && !change.pressed) {
-                // Purposefully don't consume the change here so it can be used by descendants
-                // change.consume()
+                if (shouldConsume) {
+                    change.consume()
+                }
                 onTap()
             }
         } while (event.changes.any { it.id == down.id && it.pressed })

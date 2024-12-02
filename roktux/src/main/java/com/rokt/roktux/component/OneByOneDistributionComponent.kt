@@ -3,6 +3,7 @@ package com.rokt.roktux.component
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.animateContentSize
+import androidx.compose.foundation.focusable
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -11,6 +12,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -22,6 +27,8 @@ import com.rokt.roktux.utils.fadeInOutAnimationModifier
 import com.rokt.roktux.viewmodel.layout.LayoutContract
 import com.rokt.roktux.viewmodel.layout.OfferUiState
 import kotlinx.serialization.Serializable
+
+private const val ACCESSIBILITY_READOUT_TEXT = "Offer %d of %d"
 
 internal class OneByOneDistributionComponent(
     private val factory: LayoutUiModelFactory,
@@ -47,9 +54,12 @@ internal class OneByOneDistributionComponent(
         var firstRender by rememberSaveable {
             mutableStateOf(true)
         }
+        val focusRequester = remember { FocusRequester() }
         LaunchedEffect(key1 = offerState.targetOfferIndex) {
             if (!firstRender) {
                 animationState = AnimationState.Hide
+                // the NavHost maintains focus so the same workaround as Carousel is not needed
+                focusRequester.requestFocus()
             } else {
                 firstRender = false
             }
@@ -78,7 +88,16 @@ internal class OneByOneDistributionComponent(
                     animationState = AnimationState.Show
                 }
                 .animateContentSize()
-                .then(modifier),
+                .then(modifier)
+                .semantics {
+                    contentDescription =
+                        ACCESSIBILITY_READOUT_TEXT.format(
+                            offerState.currentOfferIndex + 1,
+                            offerState.lastOfferIndex + 1,
+                        )
+                }
+                .focusRequester(focusRequester)
+                .focusable(),
             navController = navController,
             startDestination = startDestination,
             enterTransition = { EnterTransition.None },
