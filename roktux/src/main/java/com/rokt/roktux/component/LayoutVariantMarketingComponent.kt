@@ -6,6 +6,8 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.semantics.isTraversalGroup
+import androidx.compose.ui.semantics.semantics
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.rokt.modelmapper.uimodel.LayoutSchemaUiModel
@@ -20,9 +22,8 @@ import com.rokt.roktux.viewmodel.variants.MarketingViewModel
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.onEach
 
-internal class LayoutVariantMarketingComponent(
-    private val factory: LayoutUiModelFactory,
-) : ComposableComponent<LayoutSchemaUiModel.MarketingUiModel> {
+internal class LayoutVariantMarketingComponent(private val factory: LayoutUiModelFactory) :
+    ComposableComponent<LayoutSchemaUiModel.MarketingUiModel> {
 
     @Composable
     override fun Render(
@@ -51,7 +52,11 @@ internal class LayoutVariantMarketingComponent(
             }
 
             is BaseContract.BaseViewState.Success -> {
-                Column {
+                Column(
+                    modifier = modifier.semantics {
+                        isTraversalGroup = true
+                    },
+                ) {
                     factory.CreateComposable(
                         model = state.value.uiModel,
                         modifier = Modifier.componentVisibilityChange(

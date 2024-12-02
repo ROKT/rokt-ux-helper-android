@@ -1,5 +1,7 @@
 package com.rokt.roktux.component
 
+import androidx.compose.foundation.focusable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PageSize
@@ -17,7 +19,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.BiasAlignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.dp
 import com.rokt.modelmapper.uimodel.LayoutSchemaUiModel
@@ -26,7 +33,11 @@ import com.rokt.modelmapper.utils.DEFAULT_VIEWABLE_ITEMS
 import com.rokt.roktux.viewmodel.layout.LayoutContract
 import com.rokt.roktux.viewmodel.layout.OfferUiState
 import kotlinx.collections.immutable.ImmutableList
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlin.math.ceil
+
+private const val ACCESSIBILITY_READOUT_TEXT = "Page %d of %d"
 
 internal class CarouselDistributionComponent(
     private val factory: LayoutUiModelFactory,
@@ -45,6 +56,8 @@ internal class CarouselDistributionComponent(
     ) {
         val pagerState = rememberPagerState { offerState.lastOfferIndex + 1 }
         var canScroll by remember { mutableStateOf(true) }
+        val focusManager = LocalFocusManager.current
+        val focusRequester = remember { FocusRequester() }
         val coroutineScope = rememberCoroutineScope()
         var viewWidth by remember { mutableIntStateOf(0) }
         val viewableItems = getViewableItems(
@@ -74,65 +87,83 @@ internal class CarouselDistributionComponent(
                     pagerState.animateScrollToPage(offerState.targetOfferIndex)
                     onEventSent(LayoutContract.LayoutEvent.SetCurrentOffer(offerState.targetOfferIndex))
                     canScroll = true
+                    // requestFocus only works a single time so we need to clear focus and request it again after delay
+                    // this is because the focus Active state is maintained and not automatically set to Inactive
+                    // see: androidx.compose.ui.focus.FocusTransactions.kt#64
+                    focusManager.clearFocus(true)
+                    delay(10)
+                    focusRequester.requestFocus()
                 }
             }
         }
 
-        HorizontalPager(
-            modifier = modifierFactory
-                .createModifier(
-                    modifierPropertiesList = model.ownModifiers,
-                    conditionalTransitionModifier = model.conditionalTransitionModifiers,
-                    breakpointIndex = breakpointIndex,
-                    isPressed = isPressed,
-                    isDarkModeEnabled = isDarkModeEnabled,
-                    offerState = offerState,
+        Box(
+            modifier = Modifier
+                .semantics {
+                    contentDescription =
+                        getAccessibilityDescription(offerState)
+                }
+                .focusRequester(
+                    focusRequester,
                 )
-                .then(modifier)
-                .onSizeChanged {
-                    viewWidth = it.width
-                },
-            verticalAlignment = BiasAlignment.Vertical(
-                container.alignmentBias,
-            ),
-            state = pagerState,
-            pageSize = carouselPageSize(viewableItems),
-            contentPadding = getPeekThroughDimension(
-                breakpointIndex = breakpointIndex,
-                viewWidth = viewWidth,
-                peekThroughSizeItems = model.peekThroughSizeUiModel,
-                viewableItems = viewableItems,
-            ),
-            pageSpacing = container.gap ?: 0.dp,
-            flingBehavior = PagerDefaults.flingBehavior(
+                .focusable(),
+        ) {
+            HorizontalPager(
+                modifier = modifierFactory
+                    .createModifier(
+                        modifierPropertiesList = model.ownModifiers,
+                        conditionalTransitionModifier = model.conditionalTransitionModifiers,
+                        breakpointIndex = breakpointIndex,
+                        isPressed = isPressed,
+                        isDarkModeEnabled = isDarkModeEnabled,
+                        offerState = offerState,
+                    )
+                    .then(modifier)
+                    .onSizeChanged {
+                        viewWidth = it.width
+                    },
+                verticalAlignment = BiasAlignment.Vertical(
+                    container.alignmentBias,
+                ),
                 state = pagerState,
-                pagerSnapDistance = PagerSnapDistance.atMost(viewableItems),
-            ),
-            userScrollEnabled = canScroll,
-        ) { page ->
-            factory.CreateComposable(
-                model = LayoutSchemaUiModel.MarketingUiModel(),
-                modifier = modifier,
-                isPressed = isPressed,
-                offerState = offerState.copy(currentOfferIndex = page, viewableItems = viewableItems),
-                isDarkModeEnabled = isDarkModeEnabled,
-                breakpointIndex = breakpointIndex,
-            ) { event ->
-                coroutineScope.launch {
-                    if (event is LayoutContract.LayoutEvent.ResponseOptionSelected) {
-                        // Only progress to next offer if viewableItems is 1
-                        if (viewableItems == DEFAULT_VIEWABLE_ITEMS) {
-                            onEventSent(event.copy(shouldProgress = true))
+                pageSize = carouselPageSize(viewableItems),
+                contentPadding = getPeekThroughDimension(
+                    breakpointIndex = breakpointIndex,
+                    viewWidth = viewWidth,
+                    peekThroughSizeItems = model.peekThroughSizeUiModel,
+                    viewableItems = viewableItems,
+                ),
+                pageSpacing = container.gap ?: 0.dp,
+                flingBehavior = PagerDefaults.flingBehavior(
+                    state = pagerState,
+                    pagerSnapDistance = PagerSnapDistance.atMost(viewableItems),
+                ),
+                userScrollEnabled = canScroll,
+            ) { page ->
+                factory.CreateComposable(
+                    model = LayoutSchemaUiModel.MarketingUiModel(),
+                    modifier = modifier,
+                    isPressed = isPressed,
+                    offerState = offerState.copy(currentOfferIndex = page, viewableItems = viewableItems),
+                    isDarkModeEnabled = isDarkModeEnabled,
+                    breakpointIndex = breakpointIndex,
+                ) { event ->
+                    coroutineScope.launch {
+                        if (event is LayoutContract.LayoutEvent.ResponseOptionSelected) {
+                            // Only progress to next offer if viewableItems is 1
+                            if (viewableItems == DEFAULT_VIEWABLE_ITEMS) {
+                                onEventSent(event.copy(shouldProgress = true))
+                            }
                         }
+                        onEventSent.invoke(event)
                     }
-                    onEventSent.invoke(event)
                 }
             }
-        }
-        LaunchedEffect(key1 = Unit) {
-            onEventSent(
-                LayoutContract.LayoutEvent.FirstOfferLoaded,
-            )
+            LaunchedEffect(key1 = Unit) {
+                onEventSent(
+                    LayoutContract.LayoutEvent.FirstOfferLoaded,
+                )
+            }
         }
     }
 }
@@ -167,3 +198,8 @@ private fun carouselPageSize(viewableItems: Int) = object : PageSize {
     override fun Density.calculateMainAxisPageSize(availableSpace: Int, pageSpacing: Int): Int =
         availableSpace / viewableItems
 }
+
+private fun getAccessibilityDescription(offerState: OfferUiState): String = ACCESSIBILITY_READOUT_TEXT.format(
+    ceil((offerState.currentOfferIndex + 1).toDouble() / offerState.viewableItems).toInt(),
+    ceil((offerState.lastOfferIndex + 1).toDouble() / offerState.viewableItems).toInt(),
+)

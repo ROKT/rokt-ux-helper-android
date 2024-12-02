@@ -3,6 +3,7 @@ package com.rokt.roktux.component
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.animateContentSize
+import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -12,6 +13,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -25,6 +30,9 @@ import com.rokt.roktux.utils.fadeInOutAnimationModifier
 import com.rokt.roktux.viewmodel.layout.LayoutContract
 import com.rokt.roktux.viewmodel.layout.OfferUiState
 import kotlinx.collections.immutable.ImmutableList
+import kotlin.math.ceil
+
+private const val ACCESSIBILITY_READOUT_TEXT = "Page %d of %d"
 
 internal class GroupedDistributionComponent(
     private val factory: LayoutUiModelFactory,
@@ -46,12 +54,15 @@ internal class GroupedDistributionComponent(
             LayoutVariants.MarketingScreen(offerState.currentOfferIndex)
         }
         var animationState by remember { mutableStateOf(AnimationState.Show) }
+        val focusRequester = remember { FocusRequester() }
         var firstRender by rememberSaveable {
             mutableStateOf(true)
         }
         LaunchedEffect(key1 = offerState.targetOfferIndex) {
             if (!firstRender) {
                 animationState = AnimationState.Hide
+                // the NavHost maintains focus so the same workaround as Carousel is not needed
+                focusRequester.requestFocus()
             } else {
                 firstRender = false
             }
@@ -88,7 +99,13 @@ internal class GroupedDistributionComponent(
                     animationState = AnimationState.Show
                 }
                 .animateContentSize()
-                .then(modifier),
+                .then(modifier)
+                .semantics {
+                    contentDescription =
+                        getAccessibilityDescription(offerState)
+                }
+                .focusRequester(focusRequester)
+                .focusable(),
             navController = navController,
             startDestination = startDestination,
             enterTransition = { EnterTransition.None },
@@ -146,3 +163,8 @@ internal fun getViewableItems(breakpointIndex: Int, viewableItemsList: Immutable
             viewableItemsList[viewableItemsBreakpointIndex].coerceIn(DEFAULT_VIEWABLE_ITEMS, lastOfferIndex + 1)
         }
     }
+
+private fun getAccessibilityDescription(offerState: OfferUiState): String = ACCESSIBILITY_READOUT_TEXT.format(
+    ceil((offerState.currentOfferIndex + 1).toDouble() / offerState.viewableItems).toInt(),
+    ceil((offerState.lastOfferIndex + 1).toDouble() / offerState.viewableItems).toInt(),
+)

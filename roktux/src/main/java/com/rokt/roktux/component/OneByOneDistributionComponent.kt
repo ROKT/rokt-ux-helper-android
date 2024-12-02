@@ -58,6 +58,8 @@ internal class OneByOneDistributionComponent(
         LaunchedEffect(key1 = offerState.targetOfferIndex) {
             if (!firstRender) {
                 animationState = AnimationState.Hide
+                // the NavHost maintains focus so the same workaround as Carousel is not needed
+                focusRequester.requestFocus()
             } else {
                 firstRender = false
             }

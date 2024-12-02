@@ -81,33 +81,27 @@ internal fun String.safeCapitalize(): String = replaceFirstChar {
     if (it.isLowerCase()) it.titlecase(Locale.ENGLISH) else it.toString()
 }
 
-internal fun BindData.getValue(offerState: OfferUiState, viewableItems: Int): String? {
-    return when (this) {
-        is BindData.Value -> this.text.replaceStates(
-            offerState.currentOfferIndex,
-            offerState.lastOfferIndex,
-            viewableItems,
-        )
-        is BindData.State -> (offerState.currentOfferIndex + 1).toString()
-        else -> null
-    }
+internal fun BindData.getValue(offerState: OfferUiState, viewableItems: Int): String? = when (this) {
+    is BindData.Value -> this.text.replaceStates(
+        offerState.currentOfferIndex,
+        offerState.lastOfferIndex,
+        viewableItems,
+    )
+    is BindData.State -> (offerState.currentOfferIndex + 1).toString()
+    else -> null
 }
 
-internal fun Context.getDeviceLocale(): String {
-    return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-        resources.configuration.locales[0].toString()
-    } else {
-        @Suppress("DEPRECATION")
-        resources.configuration.locale.toString()
-    }
+internal fun Context.getDeviceLocale(): String = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+    resources.configuration.locales[0].toString()
+} else {
+    @Suppress("DEPRECATION")
+    resources.configuration.locale.toString()
 }
 
-internal fun Context.getPackageVersion(): String {
-    return try {
-        packageManager.getPackageInfo(packageName, 0).versionName.stripNonAscii()
-    } catch (e: Exception) {
-        ""
-    }
+internal fun Context.getPackageVersion(): String = try {
+    packageManager.getPackageInfo(packageName, 0).versionName.stripNonAscii()
+} catch (e: Exception) {
+    ""
 }
 
 /*
@@ -223,6 +217,7 @@ internal fun Modifier.userInteractionDetector(model: LayoutSchemaUiModel, onTap:
 
 internal suspend fun PointerInputScope.interceptTap(
     pass: PointerEventPass = PointerEventPass.Initial,
+    shouldConsume: Boolean = false,
     onTap: (() -> Unit)? = null,
 ) = coroutineScope {
     if (onTap == null) return@coroutineScope
@@ -235,8 +230,9 @@ internal suspend fun PointerInputScope.interceptTap(
             val change = event.changes[0]
 
             if (change.id == down.id && !change.pressed) {
-                // Purposefully don't consume the change here so it can be used by descendants
-                // change.consume()
+                if (shouldConsume) {
+                    change.consume()
+                }
                 onTap()
             }
         } while (event.changes.any { it.id == down.id && it.pressed })
@@ -246,16 +242,14 @@ internal suspend fun PointerInputScope.interceptTap(
 internal fun Modifier.componentVisibilityChange(
     callback: (identifier: Int, visible: Boolean) -> Unit,
     identifier: Int,
-): Modifier {
-    return composed {
-        val view = LocalView.current
-        var visibility = false
-        onGloballyPositioned { coordinates ->
-            val currentVisibility = getVisibilityRatio(coordinates, view) >= COMPONENT_VISIBILITY_THRESHOLD_RATIO
-            if (currentVisibility != visibility) {
-                visibility = currentVisibility
-                callback(identifier, visibility)
-            }
+): Modifier = composed {
+    val view = LocalView.current
+    var visibility = false
+    onGloballyPositioned { coordinates ->
+        val currentVisibility = getVisibilityRatio(coordinates, view) >= COMPONENT_VISIBILITY_THRESHOLD_RATIO
+        if (currentVisibility != visibility) {
+            visibility = currentVisibility
+            callback(identifier, visibility)
         }
     }
 }
@@ -282,13 +276,10 @@ private fun getVisibilityRatio(coordinates: LayoutCoordinates, view: View): Floa
     return visibleArea / totalArea
 }
 
-private fun LayoutSchemaUiModel.isBottomSheet(): Boolean {
-    return this is LayoutSchemaUiModel.BottomSheetUiModel
-}
+private fun LayoutSchemaUiModel.isBottomSheet(): Boolean = this is LayoutSchemaUiModel.BottomSheetUiModel
 
-internal fun LayoutSchemaUiModel.isEmbedded(): Boolean {
-    return (this !is LayoutSchemaUiModel.OverlayUiModel) && (this !is LayoutSchemaUiModel.BottomSheetUiModel)
-}
+internal fun LayoutSchemaUiModel.isEmbedded(): Boolean =
+    (this !is LayoutSchemaUiModel.OverlayUiModel) && (this !is LayoutSchemaUiModel.BottomSheetUiModel)
 
 internal enum class AnimationState {
     Hide,
