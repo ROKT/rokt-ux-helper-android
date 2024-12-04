@@ -20,9 +20,8 @@ import com.rokt.roktux.viewmodel.variants.MarketingViewModel
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.onEach
 
-internal class LayoutVariantMarketingComponent(
-    private val factory: LayoutUiModelFactory,
-) : ComposableComponent<LayoutSchemaUiModel.MarketingUiModel> {
+internal class LayoutVariantMarketingComponent(private val factory: LayoutUiModelFactory) :
+    ComposableComponent<LayoutSchemaUiModel.MarketingUiModel> {
 
     @Composable
     override fun Render(
@@ -36,7 +35,7 @@ internal class LayoutVariantMarketingComponent(
     ) {
         val layoutComponent = LocalLayoutComponent.current
         val component: MarketingComponent = remember {
-            MarketingComponent(layoutComponent, offerState.currentOfferIndex)
+            MarketingComponent(layoutComponent, offerState.currentOfferIndex, emptyMap())
         }
         val viewModel = viewModel<MarketingViewModel>(
             factory = component[MarketingViewModel.MarketingViewModelFactory::class.java],
@@ -57,7 +56,7 @@ internal class LayoutVariantMarketingComponent(
                         modifier = Modifier.componentVisibilityChange(
                             { viewId, visible ->
                                 viewModel.setEvent(
-                                    MarketingVariantContract.LayoutVariantEvent.OfferVisibilityChanged(
+                                    LayoutContract.LayoutEvent.OfferVisibilityChanged(
                                         viewId,
                                         visible,
                                     ),
@@ -66,11 +65,14 @@ internal class LayoutVariantMarketingComponent(
                             viewModel.currentOffer,
                         ),
                         isPressed = isPressed,
-                        offerState = offerState.copy(creativeCopy = state.value.creativeCopy),
+                        offerState = offerState.copy(
+                            creativeCopy = state.value.creativeCopy,
+                            customState = state.value.customState,
+                        ),
                         isDarkModeEnabled = isDarkModeEnabled,
                         breakpointIndex = breakpointIndex,
                     ) { event ->
-                        onEventSent.invoke(event)
+                        viewModel.setEvent(event)
                     }
                 }
             }
@@ -85,6 +87,10 @@ internal class LayoutVariantMarketingComponent(
                                 effect.offerId,
                             ),
                         )
+                    }
+
+                    is MarketingVariantContract.LayoutVariantEffect.PropagateEvent -> {
+                        onEventSent.invoke(effect.event)
                     }
                 }
             }.collect()

@@ -222,6 +222,8 @@ internal class LayoutViewModel(
             is LayoutContract.LayoutEvent.CartItemInstantPurchaseSelected -> {
                 handleCartItemInstancePurchaseSelected(event.catalogItemModel)
             }
+
+            else -> {}
         }
     }
 
