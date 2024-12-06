@@ -41,6 +41,14 @@ internal class MarketingViewModel(
 
             is LayoutContract.LayoutEvent.SetCustomState -> {
                 updateCustomState(event.key, event.value)
+                setEffect {
+                    MarketingVariantContract.LayoutVariantEffect.PropagateEvent(
+                        LayoutContract.LayoutEvent.SetOfferCustomState(
+                            currentOffer,
+                            customState,
+                        ),
+                    )
+                }
             }
 
             else -> {

@@ -73,7 +73,7 @@ fun RoktLayout(
     val context = LocalContext.current
     val imageLoader = roktUxConfig.imageHandlingStrategy.getImageLoader(context)
     var currentOffer by rememberSaveable(key = experienceHash) {
-        mutableIntStateOf(FIRST_OFFER_INDEX)
+        roktUxConfig.viewState?.offerIndex?.let { mutableIntStateOf(it) } ?: mutableIntStateOf(FIRST_OFFER_INDEX)
     }
     var customState by rememberSaveable(
         key = experienceHash,
@@ -86,9 +86,13 @@ fun RoktLayout(
             },
         ),
     ) {
-        mutableStateOf(mapOf<String, Int>())
+        roktUxConfig.viewState?.customStates?.let { mutableStateOf(it) } ?: mutableStateOf(mapOf())
     }
-    if (LocalViewModelStoreOwner.current != null) {
+    val offerCustomStates by remember {
+        roktUxConfig.viewState?.offerCustomStates?.let { mutableStateOf(it) }
+            ?: mutableStateOf(mapOf())
+    }
+    if (LocalViewModelStoreOwner.current != null && roktUxConfig.viewState?.pluginDismissed != true) {
         WithComposableScopedViewModelStoreOwner(key = experienceHash) {
             val viewModel = viewModel<DIComponentViewModel>(
                 factory = DIComponentViewModel.DIComponentViewModelFactory(
@@ -105,9 +109,13 @@ fun RoktLayout(
                             ),
                         )
                     },
+                    viewStateChange = { state ->
+                        roktUxConfig.viewStateChange?.invoke(state)
+                    },
                     imageLoader = imageLoader,
                     currentOffer = currentOffer,
-                    customState = customState,
+                    customStates = customState,
+                    offerCustomStates = offerCustomStates,
                     handleUrlByApp = roktUxConfig.handleUrlByApp,
                 ),
             )

@@ -57,14 +57,16 @@ class DcuiComponentRule(val composeTestRule: ComposeContentTestRule) : BaseCompo
         composeTestRule.setContent {
             CompositionLocalProvider(
                 LocalLayoutComponent provides LayoutComponent(
-                    "",
-                    "",
-                    {},
-                    {},
-                    NetworkStrategy().getImageLoader(LocalContext.current),
-                    true,
-                    0,
-                    mapOf(),
+                    experienceResponse = "",
+                    location = "",
+                    onUxEvent = {},
+                    onPlatformEvent = {},
+                    onViewStateChange = {},
+                    imageLoader = NetworkStrategy().getImageLoader(LocalContext.current),
+                    handleUrlByApp = true,
+                    currentOffer = 0,
+                    customStates = mapOf(),
+                    offerCustomStates = mapOf(),
                 ),
                 LocalFontFamilyProvider provides persistentMapOf("roboto" to FontFamily.Default),
             ) {
@@ -82,7 +84,8 @@ class DcuiComponentRule(val composeTestRule: ComposeContentTestRule) : BaseCompo
                             ),
                         ) ?: 1,
                         creativeCopy = dcuiNodeComponentState?.creativeCopy?.associateBy(
-                            { it.key }, { it.value },
+                            { it.key },
+                            { it.value },
                         )?.toImmutableMap() ?: persistentMapOf(),
                         breakpoints = breakpoints,
                         customState = persistentMapOf(),
