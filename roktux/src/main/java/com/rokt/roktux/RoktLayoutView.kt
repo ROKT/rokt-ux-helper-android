@@ -70,6 +70,8 @@ class RoktLayoutView @JvmOverloads constructor(
                     composeFontMap(composeFontMap)
                     roktUxConfig?.imageHandlingStrategy?.let { imageHandlingStrategy(it) }
                     roktUxConfig?.colorMode?.let { colorMode(it) }
+                    roktUxConfig?.viewState?.let { viewState(it) }
+                    roktUxConfig?.viewStateChange?.let { viewStateChange(it) }
                 }.build()
             }
             RoktLayout(
@@ -132,10 +134,8 @@ class RoktLayoutView @JvmOverloads constructor(
     } ?: FontFamily.Default
 }
 
-private fun FontItemStyle.toFontStyle(): FontStyle {
-    return when (this) {
-        FontItemStyle.Normal -> FontStyle.Normal
-        FontItemStyle.Italic -> FontStyle.Italic
-        else -> FontStyle.Normal
-    }
+private fun FontItemStyle.toFontStyle(): FontStyle = when (this) {
+    FontItemStyle.Normal -> FontStyle.Normal
+    FontItemStyle.Italic -> FontStyle.Italic
+    else -> FontStyle.Normal
 }

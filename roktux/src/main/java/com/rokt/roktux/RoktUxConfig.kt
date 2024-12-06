@@ -19,6 +19,8 @@ class RoktUxConfig private constructor(
     val composeFontMap: Map<String, FontFamily>? = null,
     val imageHandlingStrategy: ImageHandlingStrategy,
     val colorMode: ColorMode,
+    val viewState: RoktViewState? = null,
+    val viewStateChange: ((RoktViewState) -> Unit)? = null,
     val handleUrlByApp: Boolean = true,
 ) {
     /**
@@ -35,6 +37,8 @@ class RoktUxConfig private constructor(
         private var imageHandlingStrategy: ImageHandlingStrategy = NetworkStrategy(),
         private var colorMode: ColorMode = ColorMode.SYSTEM,
         private var handleUrlByApp: Boolean = true,
+        private var viewState: RoktViewState? = null,
+        private var viewStateChange: ((RoktViewState) -> Unit)? = null,
     ) {
         /**
          * Sets the XML font family map.
@@ -73,6 +77,21 @@ class RoktUxConfig private constructor(
         fun colorMode(colorMode: ColorMode) = apply { this.colorMode = colorMode }
 
         /**
+         * Sets the view state.
+         *
+         * @param viewState The view state configuration to use in the UX.
+         */
+        fun viewState(viewState: RoktViewState) = apply { this.viewState = viewState }
+
+        /**
+         * Sets view state change callback.
+         *
+         * @param viewStateChange The callback to be called when the view state changes.
+         */
+        fun viewStateChange(viewStateChange: ((RoktViewState) -> Unit)?) =
+            apply { this.viewStateChange = viewStateChange }
+
+        /**
          * Builds the RoktUxConfig instance.
          *
          * @return The RoktUxConfig instance.
@@ -83,6 +102,8 @@ class RoktUxConfig private constructor(
             imageHandlingStrategy = imageHandlingStrategy,
             colorMode = colorMode,
             handleUrlByApp = handleUrlByApp,
+            viewState = viewState,
+            viewStateChange = viewStateChange,
         )
     }
 

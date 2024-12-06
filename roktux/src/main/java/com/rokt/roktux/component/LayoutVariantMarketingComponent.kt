@@ -35,7 +35,11 @@ internal class LayoutVariantMarketingComponent(private val factory: LayoutUiMode
     ) {
         val layoutComponent = LocalLayoutComponent.current
         val component: MarketingComponent = remember {
-            MarketingComponent(layoutComponent, offerState.currentOfferIndex, emptyMap())
+            MarketingComponent(
+                component = layoutComponent,
+                currentOffer = offerState.currentOfferIndex,
+                customStates = offerState.offerCustomStates[offerState.currentOfferIndex.toString()] ?: emptyMap(),
+            )
         }
         val viewModel = viewModel<MarketingViewModel>(
             factory = component[MarketingViewModel.MarketingViewModelFactory::class.java],
