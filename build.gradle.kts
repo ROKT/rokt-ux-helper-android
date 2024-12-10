@@ -1,3 +1,5 @@
+import com.vanniktech.maven.publish.MavenPublishBaseExtension
+import com.vanniktech.maven.publish.SonatypeHost
 import java.util.Properties
 
 buildscript {
@@ -49,3 +51,45 @@ extra["ROKT_TAG_ID"] = getProperty("ROKT_TAG_ID", "defaultTagId")
 extra["ROKT_PUB_ID"] = getProperty("ROKT_PUB_ID", "defaultPubId")
 extra["ROKT_SECRET"] = getProperty("ROKT_SECRET", "defaultSecretId")
 extra["ROKT_CLIENT_UNIQUE_ID"] = getProperty("ROKT_CLIENT_UNIQUE_ID", "defaultClientId")
+
+configure(subprojects) {
+    pluginManager.withPlugin("com.vanniktech.maven.publish") {
+        val libArtifactId = project.name
+        val libGroupId = findProperty("libGroupId")?.toString()
+        val libDescription = findProperty("libDescription")?.toString()
+
+        extensions.configure<MavenPublishBaseExtension> {
+            println("Configuring Maven publish for project ${project.name}")
+            publishToMavenCentral(SonatypeHost.CENTRAL_PORTAL)
+            coordinates(artifactId = libArtifactId, groupId = libGroupId, version = formattedVersion)
+            signAllPublications()
+
+            pom {
+                name.set(libArtifactId)
+                description.set(libDescription)
+                url.set("https://docs.rokt.com")
+                licenses {
+                    license {
+                        name.set("Copyright 2024 Rokt Pte Ltd")
+                        url.set("https://rokt.com/sdk-license-2-0/")
+                    }
+                }
+                developers {
+                    developer {
+                        organization {
+                            name.set("Rokt Pte Ltd")
+                            url.set("https://rokt.com")
+                        }
+                        name.set("Rokt")
+                        email.set("nativeappsdev@rokt.com")
+                    }
+                }
+                scm {
+                    url.set("https://github.com/ROKT/rokt-ux-helper-android")
+                    connection.set("scm:git:git://github.com/ROKT/rokt-ux-helper-android.git")
+                    developerConnection.set("scm:git:https://github.com/ROKT/rokt-ux-helper-android.git")
+                }
+            }
+        }
+    }
+}
