@@ -11,7 +11,6 @@ androidxNavigation = "2.8.0"
 androidxWindowManager = "1.0.0"
 androidXbrowser = "1.5.0"
 coil = "2.2.2"
-gradleMavenPublishPlugin = "0.30.0"
 junit4 = "4.13.2"
 junitParams = "1.1.1"
 kotlin = "1.8.21"
@@ -38,6 +37,7 @@ activity = "1.9.2"
 constraintlayout = "2.1.4"
 mavenPublish = "0.30.0"
 
+# This is the value used to specify the published version on Maven Central
 roktUxHelper = "0.1.0"
 
 [libraries]
