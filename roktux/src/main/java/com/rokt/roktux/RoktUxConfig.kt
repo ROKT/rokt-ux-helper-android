@@ -19,8 +19,7 @@ class RoktUxConfig private constructor(
     val composeFontMap: Map<String, FontFamily>? = null,
     val imageHandlingStrategy: ImageHandlingStrategy,
     val colorMode: ColorMode,
-    val viewState: RoktViewState? = null,
-    val viewStateChange: ((RoktViewState) -> Unit)? = null,
+    val viewStateConfig: ViewStateConfig? = null,
     val handleUrlByApp: Boolean = true,
 ) {
     /**
@@ -30,6 +29,8 @@ class RoktUxConfig private constructor(
      * @property composeFontMap Map of font families to be used in the Jetpack compose view.
      * @property imageHandlingStrategy Strategy for handling images in the UX.
      * @property colorMode The color mode configuration to use in the UX.
+     * @property handleUrlByApp Flag to determine if the URL should be handled by the app.
+     * @property viewStateConfig The cache configuration to use in the UX.
      */
     data class Builder internal constructor(
         private var xmlFontFamilyMap: Map<String, List<FontItem>>? = null,
@@ -37,8 +38,7 @@ class RoktUxConfig private constructor(
         private var imageHandlingStrategy: ImageHandlingStrategy = NetworkStrategy(),
         private var colorMode: ColorMode = ColorMode.SYSTEM,
         private var handleUrlByApp: Boolean = true,
-        private var viewState: RoktViewState? = null,
-        private var viewStateChange: ((RoktViewState) -> Unit)? = null,
+        private var viewStateConfig: ViewStateConfig? = null,
     ) {
         /**
          * Sets the XML font family map.
@@ -77,19 +77,11 @@ class RoktUxConfig private constructor(
         fun colorMode(colorMode: ColorMode) = apply { this.colorMode = colorMode }
 
         /**
-         * Sets the view state.
+         * Sets the cache configuration.
          *
-         * @param viewState The view state configuration to use in the UX.
+         * @param viewStateConfig The cache configuration to use in the UX.
          */
-        fun viewState(viewState: RoktViewState) = apply { this.viewState = viewState }
-
-        /**
-         * Sets view state change callback.
-         *
-         * @param viewStateChange The callback to be called when the view state changes.
-         */
-        fun viewStateChange(viewStateChange: ((RoktViewState) -> Unit)?) =
-            apply { this.viewStateChange = viewStateChange }
+        fun viewStateConfig(viewStateConfig: ViewStateConfig) = apply { this.viewStateConfig = viewStateConfig }
 
         /**
          * Builds the RoktUxConfig instance.
@@ -102,8 +94,7 @@ class RoktUxConfig private constructor(
             imageHandlingStrategy = imageHandlingStrategy,
             colorMode = colorMode,
             handleUrlByApp = handleUrlByApp,
-            viewState = viewState,
-            viewStateChange = viewStateChange,
+            viewStateConfig = viewStateConfig,
         )
     }
 

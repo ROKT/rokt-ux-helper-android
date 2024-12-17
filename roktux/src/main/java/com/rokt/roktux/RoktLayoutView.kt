@@ -70,8 +70,7 @@ class RoktLayoutView @JvmOverloads constructor(
                     composeFontMap(composeFontMap)
                     roktUxConfig?.imageHandlingStrategy?.let { imageHandlingStrategy(it) }
                     roktUxConfig?.colorMode?.let { colorMode(it) }
-                    roktUxConfig?.viewState?.let { viewState(it) }
-                    roktUxConfig?.viewStateChange?.let { viewStateChange(it) }
+                    roktUxConfig?.viewStateConfig?.let { viewStateConfig(it) }
                 }.build()
             }
             RoktLayout(
