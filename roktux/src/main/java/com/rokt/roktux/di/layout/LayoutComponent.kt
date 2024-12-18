@@ -3,6 +3,7 @@ package com.rokt.roktux.di.layout
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.ui.text.font.FontFamily
 import coil.ImageLoader
+import com.rokt.roktux.RoktViewState
 import com.rokt.roktux.di.core.Component
 import com.rokt.roktux.event.RoktPlatformEvent
 import com.rokt.roktux.event.RoktUxEvent
@@ -13,10 +14,12 @@ internal class LayoutComponent(
     location: String,
     onUxEvent: (event: RoktUxEvent) -> Unit,
     onPlatformEvent: (platformEvents: List<RoktPlatformEvent>) -> Unit,
+    onViewStateChange: (state: RoktViewState) -> Unit,
     imageLoader: ImageLoader,
     handleUrlByApp: Boolean,
     currentOffer: Int,
-    customState: Map<String, Int>,
+    customStates: Map<String, Int>,
+    offerCustomStates: Map<String, Map<String, Int>>,
 ) : Component(
     listOf(
         LayoutModule(
@@ -24,10 +27,12 @@ internal class LayoutComponent(
             location,
             onUxEvent,
             onPlatformEvent,
+            onViewStateChange,
             imageLoader,
             handleUrlByApp,
             currentOffer,
-            customState,
+            customStates,
+            offerCustomStates,
         ),
     ),
 )

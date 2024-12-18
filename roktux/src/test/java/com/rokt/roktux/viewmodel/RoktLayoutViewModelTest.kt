@@ -11,6 +11,7 @@ import com.rokt.modelmapper.uimodel.OpenLinks
 import com.rokt.modelmapper.uimodel.OptionsModel
 import com.rokt.modelmapper.uimodel.PlacementContextModel
 import com.rokt.modelmapper.uimodel.SignalType
+import com.rokt.roktux.RoktViewState
 import com.rokt.roktux.event.EventType
 import com.rokt.roktux.event.RoktPlatformEvent
 import com.rokt.roktux.event.RoktUxEvent
@@ -24,6 +25,9 @@ import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
+import org.assertj.core.api.Assertions.assertThat
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 
@@ -69,7 +73,8 @@ class RoktLayoutViewModelTest : BaseViewModelTest() {
 
     private val uxEvent: (RoktUxEvent) -> Unit = mockk(relaxed = true)
     private val platformEvent: (List<RoktPlatformEvent>) -> Unit = mockk(relaxed = true)
-    internal lateinit var layoutViewModel: LayoutViewModel
+    private val viewStateChange: (RoktViewState) -> Unit = mockk(relaxed = true)
+    private lateinit var layoutViewModel: LayoutViewModel
 
     @Before
     fun setup() {
@@ -87,7 +92,9 @@ class RoktLayoutViewModelTest : BaseViewModelTest() {
             mainDispatcher = ioDispatcher,
             handleUrlByApp = handleUrlByApp,
             currentOffer = 0,
-            customState = mapOf(),
+            viewStateChange = viewStateChange,
+            customStates = mapOf(),
+            offerCustomStates = mapOf(),
         )
     }
 
@@ -137,73 +144,77 @@ class RoktLayoutViewModelTest : BaseViewModelTest() {
     }
 
     @Test
-    fun `SetCurrentOffer Event past the total offers should send not LayoutCompleted UxEvent and SignalDismissal platformEvent when closeOnComplete is false`() =
-        runTest {
-            // Arrange
-            every { mapper.getSavedExperience() } returns mockk(relaxed = true) {
-                every { plugins } returns persistentListOf(
-                    mockk(relaxed = true) {
-                        every { id } returns "pluginId"
-                        every { settings } returns LayoutSettings(closeOnComplete = false)
-                        every { slots } returns persistentListOf(
-                            mockk(relaxed = true) {
-                                every { instanceGuid } returns "slotInstanceGuid"
-                                every { offer } returns mockk(relaxed = true) {
-                                    every { creative } returns mockk(relaxed = true) {
-                                        every { instanceGuid } returns "creativeInstanceGuid"
-                                    }
+    fun `SetCurrentOffer Event past the total offers should send not LayoutCompleted UxEvent and SignalDismissal platformEvent when closeOnComplete is false`() = runTest {
+        // Arrange
+        every { mapper.getSavedExperience() } returns mockk(relaxed = true) {
+            every { plugins } returns persistentListOf(
+                mockk(relaxed = true) {
+                    every { id } returns "pluginId"
+                    every { settings } returns LayoutSettings(closeOnComplete = false)
+                    every { slots } returns persistentListOf(
+                        mockk(relaxed = true) {
+                            every { instanceGuid } returns "slotInstanceGuid"
+                            every { offer } returns mockk(relaxed = true) {
+                                every { creative } returns mockk(relaxed = true) {
+                                    every { instanceGuid } returns "creativeInstanceGuid"
                                 }
-                            },
-                            mockk(relaxed = true) {
-                                every { instanceGuid } returns "slotInstanceGuid1"
-                                every { offer } returns mockk(relaxed = true) {
-                                    every { creative } returns mockk(relaxed = true) {
-                                        every { instanceGuid } returns "creativeInstanceGuid1"
-                                    }
+                            }
+                        },
+                        mockk(relaxed = true) {
+                            every { instanceGuid } returns "slotInstanceGuid1"
+                            every { offer } returns mockk(relaxed = true) {
+                                every { creative } returns mockk(relaxed = true) {
+                                    every { instanceGuid } returns "creativeInstanceGuid1"
                                 }
-                            },
-                        )
-                    },
-                )
-            }
-
-            // Act
-            layoutViewModel.setEvent(LayoutContract.LayoutEvent.LayoutInitialised)
-            layoutViewModel.setEvent(LayoutContract.LayoutEvent.SetCurrentOffer(2))
-
-            // Assert
-            verify(exactly = 0) {
-                uxEvent.invoke(RoktUxEvent.LayoutCompleted("pluginId"))
-                platformEvent.invoke(
-                    match { event ->
-                        event[0].eventType == EventType.SignalDismissal
-                    },
-                )
-            }
+                            }
+                        },
+                    )
+                },
+            )
         }
+
+        // Act
+        layoutViewModel.setEvent(LayoutContract.LayoutEvent.LayoutInitialised)
+        layoutViewModel.setEvent(LayoutContract.LayoutEvent.SetCurrentOffer(2))
+
+        // Assert
+        verify(exactly = 0) {
+            uxEvent.invoke(RoktUxEvent.LayoutCompleted("pluginId"))
+            platformEvent.invoke(
+                match { event ->
+                    event[0].eventType == EventType.SignalDismissal
+                },
+            )
+            viewStateChange.invoke(
+                withArg {
+                    assertEquals(it.offerIndex, 2)
+                    assertTrue(it.pluginDismissed)
+                },
+            )
+        }
+    }
 
     @Test
-    fun `LayoutInitialised Event when experienceModel has error should end LayoutFailure UxEvent but not diagnostic event`() =
-        runTest {
-            // Arrange
-            every { mapper.transformResponse() } returns Result.failure(IllegalAccessException("no access"))
+    fun `LayoutInitialised Event when experienceModel has error should end LayoutFailure UxEvent but not diagnostic event`() = runTest {
+        // Arrange
+        every { mapper.transformResponse() } returns Result.failure(IllegalAccessException("no access"))
 
-            // Act
-            layoutViewModel.setEvent(LayoutContract.LayoutEvent.LayoutInitialised)
+        // Act
+        layoutViewModel.setEvent(LayoutContract.LayoutEvent.LayoutInitialised)
 
-            // Assert
-            verify {
-                uxEvent.invoke(RoktUxEvent.LayoutFailure())
-            }
-
-            verify(exactly = 0) {
-                platformEvent.invoke(
-                    match { event ->
-                        event[0].eventType == EventType.SignalSdkDiagnostic
-                    },
-                )
-            }
+        // Assert
+        verify {
+            uxEvent.invoke(RoktUxEvent.LayoutFailure())
         }
+
+        verify(exactly = 0) {
+            platformEvent.invoke(
+                match { event ->
+                    event[0].eventType == EventType.SignalSdkDiagnostic
+                },
+            )
+        }
+    }
 
     @Test
     fun `handleError should not send error if experienceModel is initialized and useDiagnostics is false`() = runTest {
@@ -233,6 +244,25 @@ class RoktLayoutViewModelTest : BaseViewModelTest() {
                 match { event ->
                     event::class.java == RoktUxEvent.OpenUrl::class.java &&
                         (event as RoktUxEvent.OpenUrl).url == "url"
+                },
+            )
+        }
+    }
+
+    @Test
+    fun `SetOfferCustomState Event should update custom state and propagate the event`() = runTest {
+        // Arrange
+        val key = "key"
+        val value = 1
+
+        // Act
+        layoutViewModel.setEvent(LayoutContract.LayoutEvent.SetOfferCustomState(0, mapOf(key to value)))
+
+        // Assert
+        verify {
+            viewStateChange.invoke(
+                withArg { state ->
+                    assertThat(state.offerCustomStates).containsEntry("0", mapOf(key to value))
                 },
             )
         }

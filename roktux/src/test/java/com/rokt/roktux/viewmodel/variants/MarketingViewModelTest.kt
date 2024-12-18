@@ -53,7 +53,7 @@ class MarketingViewModelTest : BaseViewModelTest() {
     }
 
     @Test
-    fun `SetCustomState event should update the custom state`() = runTest {
+    fun `SetCustomState event should update the custom state and propagate the event`() = runTest {
         // Given
         val key = "key"
         val value = 1
@@ -61,10 +61,19 @@ class MarketingViewModelTest : BaseViewModelTest() {
         // When
         viewModel.setEvent(LayoutContract.LayoutEvent.SetCustomState(key, value))
         val viewState = viewModel.viewState.value
+        val effect = viewModel.effect.first()
 
         // Then
         val successState = viewState as BaseContract.BaseViewState.Success
         assertThat(successState.value.customState).containsEntry(key, value)
+        assertThat(effect).isInstanceOf(MarketingVariantContract.LayoutVariantEffect.PropagateEvent::class.java)
+        val propagateEvent = effect as MarketingVariantContract.LayoutVariantEffect.PropagateEvent
+        assertThat(propagateEvent.event).isEqualTo(
+            LayoutContract.LayoutEvent.SetOfferCustomState(
+                0,
+                mapOf(key to value),
+            ),
+        )
     }
 
     @Test
