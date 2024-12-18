@@ -8,6 +8,7 @@ import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.descriptors.PrimitiveKind
 import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
 import kotlinx.serialization.descriptors.SerialDescriptor
+import kotlinx.serialization.encodeToString
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
 import kotlinx.serialization.json.Json
@@ -33,6 +34,7 @@ object NetworkLayoutSchemaSerializer : KSerializer<LayoutSchemaModel> {
     }
 
     override fun serialize(encoder: Encoder, value: LayoutSchemaModel) {
-        encoder.encodeSerializableValue(LayoutSchemaModel.serializer(), value)
+        val json = Json { ignoreUnknownKeys = true }
+        encoder.encodeString(json.encodeToString(value))
     }
 }
