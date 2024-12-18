@@ -36,6 +36,7 @@ object RootSchemaModelSerializer :
         encoder: Encoder,
         value: RootSchemaModel<LayoutSchemaModel, LayoutDisplayPreset, LayoutSettings>,
     ) {
-        encoder.encodeSerializableValue(strategy, value)
+        val json = Json { ignoreUnknownKeys = true }
+        encoder.encodeString(json.encodeToString(strategy, value))
     }
 }
