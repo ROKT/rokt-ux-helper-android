@@ -52,8 +52,9 @@ extra["ROKT_PUB_ID"] = getProperty("ROKT_PUB_ID", "defaultPubId")
 extra["ROKT_SECRET"] = getProperty("ROKT_SECRET", "defaultSecretId")
 extra["ROKT_CLIENT_UNIQUE_ID"] = getProperty("ROKT_CLIENT_UNIQUE_ID", "defaultClientId")
 
+val mavenPublishPluginId = libs.plugins.maven.publish.get().pluginId
 configure(subprojects) {
-    pluginManager.withPlugin("com.vanniktech.maven.publish") {
+    pluginManager.withPlugin(mavenPublishPluginId) {
         val libArtifactId = project.name
         val libGroupId = findProperty("libGroupId")?.toString()
         val libDescription = findProperty("libDescription")?.toString()
