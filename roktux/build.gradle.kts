@@ -1,4 +1,8 @@
-import com.vanniktech.maven.publish.SonatypeHost
+buildscript {
+    // Used by the Maven Publish plugin to setup the details for Maven central in root build.gradle.kts
+    extra["libGroupId"] = "com.rokt"
+    extra["libDescription"] = "Rokt UX Helper Library"
+}
 
 plugins {
     alias(libs.plugins.android.library)
@@ -9,43 +13,7 @@ plugins {
     alias(libs.plugins.maven.publish)
 }
 
-val libGroupId = "com.rokt"
-val libArtifactId = "roktux"
 val formattedVersion: String by project
-val libDescription = "Rokt UX Helper Library"
-
-mavenPublishing {
-    publishToMavenCentral(SonatypeHost.CENTRAL_PORTAL)
-    coordinates(artifactId = libArtifactId, groupId = libGroupId, version = formattedVersion)
-    signAllPublications()
-
-    pom {
-        name.set(libArtifactId)
-        description.set(libDescription)
-        url.set("https://docs.rokt.com")
-        licenses {
-            license {
-                name.set("Copyright 2024 Rokt Pte Ltd")
-                url.set("https://rokt.com/sdk-license-2-0/")
-            }
-        }
-        developers {
-            developer {
-                organization {
-                    name.set("Rokt Pte Ltd")
-                    url.set("https://rokt.com")
-                }
-                name.set("Rokt")
-                email.set("nativeappsdev@rokt.com")
-            }
-        }
-        scm {
-            url.set("https://github.com/ROKT/rokt-ux-helper-android")
-            connection.set("scm:git:git://github.com/ROKT/rokt-ux-helper-android.git")
-            developerConnection.set("scm:git:https://github.com/ROKT/rokt-ux-helper-android.git")
-        }
-    }
-}
 
 android {
     namespace = "com.rokt.roktux"
