@@ -1,0 +1,14 @@
+name: Setup Java Reusable Workflow
+
+on:
+  workflow_call:
+
+jobs:
+  setup-java:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          java-version: 17
+          distribution: microsoft

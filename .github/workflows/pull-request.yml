@@ -1,0 +1,48 @@
+name: Run tests and lint
+
+on:
+  push:
+    branches:
+      - "**"
+  pull_request:
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set up Java
+        uses: ./.github/workflows/reusable-setup-java.yml
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Assemble debug
+        run: ./gradlew lint
+
+  unit-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set up Java
+        uses: ./.github/workflows/reusable-setup-java.yml
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Assemble debug
+        run: ./gradlew test
+
+  assemble-debug:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set up Java
+        uses: ./.github/workflows/reusable-setup-java.yml
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Assemble debug
+        run: ./gradlew --no-daemon assembleDebug
+      - name: Upload APK artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: apk-files
+          path: "**/*.apk"
+      - name: Upload AAR artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: aar-files
+          path: "**/*.aar"
