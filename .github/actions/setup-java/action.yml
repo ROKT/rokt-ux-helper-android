@@ -1,0 +1,9 @@
+name: Setup Java composite
+runs:
+  using: "composite"
+  steps:
+    - name: Setup Java
+      uses: actions/setup-java@v4
+      with:
+        java-version: 17
+        distribution: microsoft
