@@ -3,6 +3,8 @@ name: Setup Java Reusable Workflow
 on:
   workflow_call:
 
+permissions: read-all
+
 jobs:
   setup-java:
     runs-on: ubuntu-latest
