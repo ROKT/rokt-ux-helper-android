@@ -12,30 +12,30 @@ jobs:
   lint:
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
       - name: Set up Java
         uses: ./.github/workflows/reusable-setup-java.yml
-      - name: Check out repository
-        uses: actions/checkout@v4
       - name: Assemble debug
         run: ./gradlew lint
 
   unit-test:
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
       - name: Set up Java
         uses: ./.github/workflows/reusable-setup-java.yml
-      - name: Check out repository
-        uses: actions/checkout@v4
       - name: Assemble debug
         run: ./gradlew test
 
   assemble-debug:
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
       - name: Set up Java
         uses: ./.github/workflows/reusable-setup-java.yml
-      - name: Check out repository
-        uses: actions/checkout@v4
       - name: Assemble debug
         run: ./gradlew --no-daemon assembleDebug
       - name: Upload APK artifacts
