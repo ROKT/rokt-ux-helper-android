@@ -19,6 +19,8 @@ jobs:
           distribution: microsoft
       - name: Checkout repository
         uses: actions/checkout@v4
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
       - name: Run lint
         run: ./gradlew lint
 
@@ -32,6 +34,8 @@ jobs:
           distribution: microsoft
       - name: Checkout repository
         uses: actions/checkout@v4
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
       - name: Run tests
         run: ./gradlew test
 
@@ -45,6 +49,8 @@ jobs:
           distribution: microsoft
       - name: Checkout repository
         uses: actions/checkout@v4
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
       - name: Assemble debug
         run: ./gradlew --no-daemon assembleDebug
       - name: Upload APK artifacts
