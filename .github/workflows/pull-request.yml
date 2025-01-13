@@ -3,7 +3,7 @@ name: Run tests and lint
 on:
   push:
     branches:
-      - "**"
+      - "main"
   pull_request:
 
 permissions: read-all
@@ -19,7 +19,7 @@ jobs:
           distribution: microsoft
       - name: Checkout repository
         uses: actions/checkout@v4
-      - name: Assemble debug
+      - name: Run lint
         run: ./gradlew lint
 
   unit-test:
@@ -32,7 +32,7 @@ jobs:
           distribution: microsoft
       - name: Checkout repository
         uses: actions/checkout@v4
-      - name: Assemble debug
+      - name: Run tests
         run: ./gradlew test
 
   assemble-debug:
@@ -48,12 +48,12 @@ jobs:
       - name: Assemble debug
         run: ./gradlew --no-daemon assembleDebug
       - name: Upload APK artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: apk-files
           path: "**/*.apk"
       - name: Upload AAR artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: aar-files
           path: "**/*.aar"
