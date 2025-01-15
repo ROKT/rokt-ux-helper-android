@@ -3,7 +3,7 @@ name: Run tests and lint
 on:
   push:
     branches:
-      - "main"
+      - "**"
   pull_request:
 
 permissions: read-all
@@ -38,6 +38,14 @@ jobs:
         uses: gradle/actions/setup-gradle@v4
       - name: Run tests
         run: ./gradlew test
+      - name: Generate coverage
+        run: ./gradlew koverXmlReport
+      - name: Upload Test Report
+        uses: codecov/codecov-action@v2
+        with:
+          files: |
+            roktux/build/reports/kover/report.xml
+            modelmapper/build/reports/kover/report.xml
 
   assemble-debug:
     runs-on: ubuntu-latest
