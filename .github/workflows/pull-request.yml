@@ -44,9 +44,7 @@ jobs:
       - name: Upload Test Report
         uses: codecov/codecov-action@v2
         with:
-          files: |
-            ./roktux/build/reports/kover/report.xml
-            ./modelmapper/build/reports/kover/report.xml
+          files: ./roktux/build/reports/kover/report.xml,./modelmapper/build/reports/kover/report.xml
 
   assemble-debug:
     runs-on: ubuntu-latest
