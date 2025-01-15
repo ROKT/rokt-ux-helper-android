@@ -40,12 +40,13 @@ jobs:
         run: ./gradlew test
       - name: Generate coverage
         run: ./gradlew koverXmlReport
+      - run: find . -type f -name "report.xml"
       - name: Upload Test Report
         uses: codecov/codecov-action@v2
         with:
           files: |
-            ${{ github.workspace }}/roktux/build/reports/kover/report.xml
-            ${{ github.workspace }}/modelmapper/build/reports/kover/report.xml
+            ./roktux/build/reports/kover/report.xml
+            ./modelmapper/build/reports/kover/report.xml
 
   assemble-debug:
     runs-on: ubuntu-latest
