@@ -3,7 +3,7 @@ name: Run tests and lint
 on:
   push:
     branches:
-      - "**"
+      - "main"
   pull_request:
 
 permissions: read-all
