@@ -96,6 +96,8 @@ androidx-constraintlayout = { group = "androidx.constraintlayout", name = "const
 
 
 # Dependencies of the included build-logic
+android-gradlePlugin = { group = "com.android.tools.build", name = "gradle", version.ref = "androidGradlePlugin" }
+kotlin-gradlePlugin = { group = "org.jetbrains.kotlin", name = "kotlin-gradle-plugin", version.ref = "kotlin" }
 compose-lint-checks = { group = "com.slack.lint.compose", name = "compose-lint-checks", version.ref = "composeLint" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junit" }
 material = { group = "com.google.android.material", name = "material", version.ref = "material" }
@@ -114,3 +116,9 @@ kotlinKapt = { id = "org.jetbrains.kotlin.kapt", version.ref = "kotlin" }
 dokka = { id = "org.jetbrains.dokka", version.ref = "dokka" }
 hilt = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
 maven-publish = { id = "com.vanniktech.maven.publish", version.ref = "mavenPublish" }
+
+# Plugins defined by this project
+rokt-android-application = { id = "rokt.android.application" }
+rokt-android-application-compose = { id = "rokt.android.application.compose" } # Plugins defined by this project
+rokt-android-library = { id = "rokt.android.library" }
+rokt-android-library-compose = { id = "rokt.android.library.compose" }
