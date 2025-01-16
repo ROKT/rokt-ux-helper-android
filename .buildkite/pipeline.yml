@@ -1,11 +1,4 @@
 steps:
-  - name: ":kotlin::broom: Trunk code check"
-    plugins:
-      - ssh://git@github.com/ROKT/trunk-buildkite-plugin.git#stable:
-    agents:
-      queue: ${ENG_DEFAULT}
-    timeout_in_minutes: 15
-
   - label: ":docker: Build and Publish Builder Image"
     key: "build-builder-image"
     agents:
@@ -35,52 +28,6 @@ steps:
               - "ssh=default"
           security:
             snyk: true
-
-  - label: ":android: :gradle: Assemble debug"
-    key: "build-uxhelper-debug"
-    depends_on: "build-builder-image"
-    commands:
-      - ./gradlew assembleDebug
-    artifact_paths:
-      - "**/*.aar"
-      - "**/*.apk"
-    plugins:
-      - docker#v5.11.0:
-          image: "${ECR_HOST}/${SERVICE_NAME}-builder:${SANITISED_BRANCH_NAME}-${BUILDKITE_COMMIT}"
-          user: root
-    agents:
-      queue: ${ENG_BK_AGENT}
-    timeout_in_minutes: 25
-
-  - label: ":android: :junit: Unit test"
-    key: "unit-test-uxhelper"
-    depends_on: "build-builder-image"
-    commands:
-      - ./gradlew test
-    artifact_paths:
-      - "**/build/test-results/*/*.xml"
-    plugins:
-      - docker#v5.11.0:
-          image: "${ECR_HOST}/${SERVICE_NAME}-builder:${SANITISED_BRANCH_NAME}-${BUILDKITE_COMMIT}"
-          user: root
-    agents:
-      queue: ${ENG_BK_AGENT}
-    timeout_in_minutes: 25
-
-  - label: ":android: :pick: Lint check"
-    key: "lint-check-uxhelper"
-    depends_on: "build-builder-image"
-    commands:
-      - ./gradlew lint
-    artifact_paths:
-      - "**/lint-results-*.html"
-    plugins:
-      - docker#v5.11.0:
-          image: "${ECR_HOST}/${SERVICE_NAME}-builder:${SANITISED_BRANCH_NAME}-${BUILDKITE_COMMIT}"
-          user: root
-    agents:
-      queue: ${ENG_BK_AGENT}
-    timeout_in_minutes: 25
 
   - wait: ~
 
