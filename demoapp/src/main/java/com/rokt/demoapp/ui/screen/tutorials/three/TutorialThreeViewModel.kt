@@ -4,8 +4,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.rokt.demoapp.BuildConfig
 import com.rokt.demoapp.ui.state.RoktDemoErrorTypes
+import com.rokt.demoapp.ui.state.UiContent
 import com.rokt.demoapp.ui.state.UiState
-import com.rokt.demoapp.ui.state.ViewState
 import com.rokt.networkhelper.data.RoktNetwork
 import com.rokt.networkhelper.model.ExperienceRequest
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -27,9 +27,9 @@ class TutorialThreeViewModel @Inject constructor() : ViewModel() {
         "sandbox" to "true",
     ) // Add your attributes here
     private val location = "Location1" // Add your location here
-    private val _state: MutableStateFlow<UiState<ViewState>> =
+    private val _state: MutableStateFlow<UiState<UiContent>> =
         MutableStateFlow(UiState(loading = true))
-    val state: StateFlow<UiState<ViewState>>
+    val state: StateFlow<UiState<UiContent>>
         get() = _state
 
     private var integrationInfo: String = ""
@@ -43,7 +43,7 @@ class TutorialThreeViewModel @Inject constructor() : ViewModel() {
                 integrationInfo = integrationInfo,
             )
             RoktNetwork.experience(roktTagId, experienceRequest).onSuccess {
-                _state.value = UiState(data = ViewState(it, location))
+                _state.value = UiState(data = UiContent.ExperienceContent(it, location))
             }.onFailure {
                 _state.value = UiState(error = RoktDemoErrorTypes.NETWORK)
             }
