@@ -8,7 +8,6 @@ import com.rokt.demoapp.R
 import com.rokt.demoapp.ui.screen.tutorials.eight.TutorialEightActivity
 import com.rokt.demoapp.ui.screen.tutorials.five.TutorialFiveActivity
 import com.rokt.demoapp.ui.screen.tutorials.four.TutorialFourCompose
-import com.rokt.demoapp.ui.screen.tutorials.nine.TutorialNineCompose
 import com.rokt.demoapp.ui.screen.tutorials.one.TutorialOneCompose
 import com.rokt.demoapp.ui.screen.tutorials.seven.TutorialSevenActivity
 import com.rokt.demoapp.ui.screen.tutorials.six.TutorialSixActivity
@@ -95,13 +94,6 @@ internal fun rememberTutorialPageState(backPressed: () -> Unit): TutorialScreenS
                 description = "Application using XML and handle UrlOpen UX event",
                 drawableResource = R.drawable.ic_primary_button,
                 startActivity = { context -> TutorialEightActivity.startActivity(context) },
-            ),
-            TutorialPageListItem.ComposablePageListItem(
-                title = "Tutorial 9",
-                description = "Application using Compose and handle Thankyou page Ux events",
-                drawableResource = R.drawable.ic_primary_button,
-                navAction = DestinationType.TUTORIAL_NINE_COMPOSE,
-                content = { TutorialNineCompose(backPressed) },
             ),
         ),
     )

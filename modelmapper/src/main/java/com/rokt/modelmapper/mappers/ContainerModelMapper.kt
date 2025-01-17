@@ -3,12 +3,9 @@ package com.rokt.modelmapper.mappers
 import com.rokt.modelmapper.uimodel.ConditionalTransitionModifier
 import com.rokt.modelmapper.uimodel.LayoutSchemaUiModel
 import com.rokt.modelmapper.uimodel.ModifierProperties
-import com.rokt.modelmapper.uimodel.Module
-import com.rokt.modelmapper.uimodel.OfferModel
 import com.rokt.modelmapper.uimodel.StateBlock
 import com.rokt.modelmapper.uimodel.WidthUiModel
 import com.rokt.network.model.BasicStateStylingBlock
-import com.rokt.network.model.CatalogStackedCollectionLayoutSchemaTemplateNode
 import com.rokt.network.model.ColumnElements
 import com.rokt.network.model.ColumnModel
 import com.rokt.network.model.ColumnStyle
@@ -166,61 +163,6 @@ internal fun transformZStack(
             )
         }.toImmutableList(),
     )
-}
-
-internal fun transformCatalogStackedCollection(
-    catalogStackedCollection: LayoutSchemaModel.CatalogStackedCollection,
-    offerModel: OfferModel?,
-    transformLayoutSchemaChildren: (Int, Module, LayoutSchemaModel) -> LayoutSchemaUiModel?,
-): LayoutSchemaUiModel.CatalogStackedCollectionUiModel {
-    val ownStyles = catalogStackedCollection.node.styles?.elements?.own?.toImmutableList().toBasicStateStylingBlock()
-    val ownModifiers = ownStyles.transformModifier(
-        transformSpacing = { ownStyle -> ownStyle.toBasicStateStylingBlock { style -> style.spacing } },
-        transformDimension = { ownStyle -> ownStyle.toBasicStateStylingBlock { style -> style.dimension } },
-        transformBackground = { ownStyle -> ownStyle.toBasicStateStylingBlock { style -> style.background } },
-        transformBorder = { ownStyle -> ownStyle.toBasicStateStylingBlock { style -> style.border } },
-        transformContainer = { ownStyle -> ownStyle.toBasicStateStylingBlock { style -> style.container } },
-    )
-
-    val conditionalStyleTransition = catalogStackedCollection.node.styles?.conditionalTransitions?.let {
-        ConditionalTransitionModifier(
-            modifier = transformModifier(
-                it.value.own?.spacing,
-                it.value.own?.dimension,
-                it.value.own?.background,
-                it.value.own?.border,
-                it.value.own?.container,
-            ),
-            predicates = it.predicates.map { predicate -> predicate.transformWhenPredicate() }.toImmutableList(),
-            duration = it.duration,
-        )
-    }
-    val catalogItemList = mutableListOf<LayoutSchemaUiModel>()
-    offerModel?.catalogItems?.forEachIndexed { i, _ ->
-        transformLayoutSchemaChildren(
-            i,
-            Module.AddToCart,
-            catalogStackedCollection.node.template.toLayoutSchemaModel(),
-        )?.let {
-            catalogItemList.add(i, it)
-        }
-    }
-    return LayoutSchemaUiModel.CatalogStackedCollectionUiModel(
-        ownModifiers = ownModifiers,
-        containerProperties = ownStyles.transformContainer(
-            transformContainer = { ownStyle ->
-                ownStyle.toBasicStateStylingBlock { style -> style.container }
-            },
-            transformFlexChild = { ownStyle -> ownStyle.toBasicStateStylingBlock { style -> style.flexChild } },
-        ),
-        conditionalTransitionModifiers = conditionalStyleTransition,
-        children = catalogItemList.toImmutableList(),
-    )
-}
-
-private fun CatalogStackedCollectionLayoutSchemaTemplateNode.toLayoutSchemaModel(): LayoutSchemaModel = when (this) {
-    is CatalogStackedCollectionLayoutSchemaTemplateNode.Column -> LayoutSchemaModel.Column(node = this.node)
-    is CatalogStackedCollectionLayoutSchemaTemplateNode.Row -> LayoutSchemaModel.Row(node = this.node)
 }
 
 private fun ZStackContainerStylingProperties.toContainerStyling() = ContainerStylingProperties(

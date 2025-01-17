@@ -5,7 +5,6 @@ import androidx.compose.runtime.Immutable
 import androidx.compose.ui.Modifier
 import com.rokt.modelmapper.uimodel.LayoutSchemaUiModel
 import com.rokt.modelmapper.uimodel.LayoutSchemaUiModel.ToggleButtonStateTriggerUiModel
-import com.rokt.roktux.component.button.CatalogResponseComponent
 import com.rokt.roktux.component.button.CloseButtonComponent
 import com.rokt.roktux.component.button.CreativeResponseComponent
 import com.rokt.roktux.component.button.ProgressControlComponent
@@ -40,7 +39,6 @@ internal class LayoutUiModelFactory(modifierFactory: ModifierFactory = ModifierF
                 this,
                 modifierFactory,
             ),
-            LayoutSchemaUiModel.CatalogResponseButtonUiModel::class to CatalogResponseComponent(this, modifierFactory),
             LayoutSchemaUiModel.ProgressControlUiModel::class to ProgressControlComponent(
                 this,
                 modifierFactory,
@@ -73,8 +71,6 @@ internal class LayoutUiModelFactory(modifierFactory: ModifierFactory = ModifierF
                 this,
                 modifierFactory,
             ),
-            LayoutSchemaUiModel.CatalogStackedCollectionUiModel::class to
-                CatalogStackedCollectionComponent(this, modifierFactory),
         )
 
     @Composable
