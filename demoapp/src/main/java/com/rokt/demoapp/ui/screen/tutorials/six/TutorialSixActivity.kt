@@ -12,6 +12,7 @@ import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
 import com.rokt.demoapp.R
 import com.rokt.demoapp.ui.screen.tutorials.TutorialViewModel
+import com.rokt.demoapp.ui.state.UiContent
 import com.rokt.roktux.FontItemStyle
 import com.rokt.roktux.FontItemWeight
 import com.rokt.roktux.ResourceFontItem
@@ -55,17 +56,20 @@ class TutorialSixActivity : AppCompatActivity() {
                 errorMessage.text = state.error?.toString()
 
                 if (state.hasData) {
-                    roktLayoutView.loadLayout(
-                        experienceResponse = state.data!!.experienceResponse,
-                        roktUxConfig = RoktUxConfig.builder().xmlFontFamilyMap(xmlFontFamilyMap = fontFamilyMap)
-                            .build(),
-                        onUxEvent = { event ->
-                            println("RoktEvent: onUxEvent received $event")
-                        },
-                        onPlatformEvent = { platformEvent ->
-                            println("RoktEvent: onPlatformEvent received $platformEvent")
-                        },
-                    )
+                    val content = state.data
+                    if (content is UiContent.ExperienceContent) {
+                        roktLayoutView.loadLayout(
+                            experienceResponse = content.experienceResponse,
+                            roktUxConfig = RoktUxConfig.builder().xmlFontFamilyMap(xmlFontFamilyMap = fontFamilyMap)
+                                .build(),
+                            onUxEvent = { event ->
+                                println("RoktEvent: onUxEvent received $event")
+                            },
+                            onPlatformEvent = { platformEvent ->
+                                println("RoktEvent: onPlatformEvent received $platformEvent")
+                            },
+                        )
+                    }
                 }
             }
         }

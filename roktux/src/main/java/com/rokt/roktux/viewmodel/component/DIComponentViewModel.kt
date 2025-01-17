@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.CreationExtras
 import coil.ImageLoader
+import com.rokt.roktux.RoktViewState
 import com.rokt.roktux.di.layout.LayoutComponent
 import com.rokt.roktux.event.RoktPlatformEvent
 import com.rokt.roktux.event.RoktUxEvent
@@ -13,9 +14,11 @@ internal class DIComponentViewModel(
     private val location: String,
     private val onUxEvent: (uxEvent: RoktUxEvent) -> Unit,
     private val onPlatformEvent: (platformEvents: List<RoktPlatformEvent>) -> Unit,
+    private val onViewStateChange: (state: RoktViewState) -> Unit,
     private val imageLoader: ImageLoader,
     private val currentOffer: Int,
-    private val customState: Map<String, Int>,
+    private val customStates: Map<String, Int>,
+    private val offerCustomStates: Map<String, Map<String, Int>>,
     private val handleUrlByApp: Boolean,
 ) : ViewModel() {
 
@@ -24,10 +27,12 @@ internal class DIComponentViewModel(
         location,
         onUxEvent,
         onPlatformEvent,
+        onViewStateChange,
         imageLoader,
         handleUrlByApp,
         currentOffer,
-        customState,
+        customStates,
+        offerCustomStates,
     )
 
     class DIComponentViewModelFactory(
@@ -35,9 +40,11 @@ internal class DIComponentViewModel(
         private val location: String,
         private val uxEvent: (uxEvent: RoktUxEvent) -> Unit,
         private val platformEvent: (platformEvents: List<RoktPlatformEvent>) -> Unit,
+        private val viewStateChange: (state: RoktViewState) -> Unit,
         private val imageLoader: ImageLoader,
         private val currentOffer: Int,
-        private val customState: Map<String, Int>,
+        private val customStates: Map<String, Int>,
+        private val offerCustomStates: Map<String, Map<String, Int>>,
         private val handleUrlByApp: Boolean,
     ) : ViewModelProvider.Factory {
         @Suppress("UNCHECKED_CAST")
@@ -48,9 +55,11 @@ internal class DIComponentViewModel(
                     location = location,
                     onUxEvent = uxEvent,
                     onPlatformEvent = platformEvent,
+                    onViewStateChange = viewStateChange,
                     imageLoader = imageLoader,
                     currentOffer = currentOffer,
-                    customState = customState,
+                    customStates = customStates,
+                    offerCustomStates = offerCustomStates,
                     handleUrlByApp = handleUrlByApp,
                 ) as T
             }

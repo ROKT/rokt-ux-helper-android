@@ -37,7 +37,11 @@ internal class LayoutVariantMarketingComponent(private val factory: LayoutUiMode
     ) {
         val layoutComponent = LocalLayoutComponent.current
         val component: MarketingComponent = remember {
-            MarketingComponent(layoutComponent, offerState.currentOfferIndex)
+            MarketingComponent(
+                component = layoutComponent,
+                currentOffer = offerState.currentOfferIndex,
+                customStates = offerState.offerCustomStates[offerState.currentOfferIndex.toString()] ?: emptyMap(),
+            )
         }
         val viewModel = viewModel<MarketingViewModel>(
             factory = component[MarketingViewModel.MarketingViewModelFactory::class.java],
@@ -62,7 +66,7 @@ internal class LayoutVariantMarketingComponent(private val factory: LayoutUiMode
                         modifier = Modifier.componentVisibilityChange(
                             { viewId, visible ->
                                 viewModel.setEvent(
-                                    MarketingVariantContract.LayoutVariantEvent.OfferVisibilityChanged(
+                                    LayoutContract.LayoutEvent.OfferVisibilityChanged(
                                         viewId,
                                         visible,
                                     ),
@@ -71,11 +75,14 @@ internal class LayoutVariantMarketingComponent(private val factory: LayoutUiMode
                             viewModel.currentOffer,
                         ),
                         isPressed = isPressed,
-                        offerState = offerState.copy(creativeCopy = state.value.creativeCopy),
+                        offerState = offerState.copy(
+                            creativeCopy = state.value.creativeCopy,
+                            customState = state.value.customState,
+                        ),
                         isDarkModeEnabled = isDarkModeEnabled,
                         breakpointIndex = breakpointIndex,
                     ) { event ->
-                        onEventSent.invoke(event)
+                        viewModel.setEvent(event)
                     }
                 }
             }
@@ -90,6 +97,10 @@ internal class LayoutVariantMarketingComponent(private val factory: LayoutUiMode
                                 effect.offerId,
                             ),
                         )
+                    }
+
+                    is MarketingVariantContract.LayoutVariantEffect.PropagateEvent -> {
+                        onEventSent.invoke(effect.event)
                     }
                 }
             }.collect()

@@ -1,7 +1,6 @@
 package com.rokt.modelmapper.uimodel
 
 import com.rokt.modelmapper.hmap.HMap
-import com.rokt.modelmapper.hmap.get
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.ImmutableMap
 
@@ -39,7 +38,11 @@ data class SlotModel(
     val layoutVariant: LayoutVariantModel?,
 )
 
-data class OfferModel(val campaignId: String, val creative: CreativeModel)
+data class OfferModel(
+    val campaignId: String,
+    val creative: CreativeModel,
+    val catalogItems: ImmutableList<CatalogItemModel>,
+)
 
 data class CreativeModel(
     val referralCreativeId: String,
@@ -47,18 +50,22 @@ data class CreativeModel(
     val token: String,
     val responseOptions: ImmutableMap<String, ResponseOptionModel>,
     val copy: ImmutableMap<String, String>,
-    val images: ImmutableMap<String, CreativeImageModel>,
+    val images: ImmutableMap<String, OfferImageModel>,
     val links: ImmutableMap<String, CreativeLink>,
     val icons: ImmutableMap<String, CreativeIcon>,
 )
 
-data class CreativeImageModel(val light: String, val dark: String, val alt: String, val title: String)
+data class OfferImageModel(val light: String, val dark: String, val alt: String, val title: String)
 
 data class CreativeLink(val url: String, val title: String)
 
 data class CreativeIcon(val name: String)
 
 data class ResponseOptionModel(val properties: HMap)
+
+data class CatalogItemModel(val properties: HMap, val imageWrapper: CatalogImageWrapperModel)
+
+data class CatalogImageWrapperModel(val properties: HMap)
 
 data class LayoutVariantModel(
     val layoutVariantId: String,
@@ -76,4 +83,15 @@ enum class SignalType {
     SignalResponse,
 
     SignalGatedResponse,
+}
+
+enum class Module(val value: String) {
+    StandardMarketing("standard-marketing"),
+    AddToCart("add-to-cart"),
+    ;
+
+    companion object {
+        fun fromString(value: String): Module =
+            values().associateBy(Module::value)[value.lowercase()] ?: StandardMarketing
+    }
 }
