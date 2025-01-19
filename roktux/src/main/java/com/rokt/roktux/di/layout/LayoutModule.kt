@@ -5,6 +5,7 @@ import com.rokt.modelmapper.data.DataBinding
 import com.rokt.modelmapper.data.DataBindingImpl
 import com.rokt.modelmapper.mappers.ExperienceModelMapperImpl
 import com.rokt.modelmapper.mappers.ModelMapper
+import com.rokt.roktux.RoktViewState
 import com.rokt.roktux.component.LayoutUiModelFactory
 import com.rokt.roktux.di.core.Module
 import com.rokt.roktux.di.core.get
@@ -19,10 +20,12 @@ internal class LayoutModule(
     private val location: String,
     private val uxEvent: (uxEvent: RoktUxEvent) -> Unit,
     private val platformEvent: (platformEvents: List<RoktPlatformEvent>) -> Unit,
+    private val viewStateChange: (state: RoktViewState) -> Unit,
     private val imageLoader: ImageLoader,
     private val handleUrlByApp: Boolean,
     private val currentOffer: Int,
-    private val customState: Map<String, Int>,
+    private val customStates: Map<String, Int>,
+    private val offerCustomStates: Map<String, Map<String, Int>>,
 ) : Module() {
     init {
         this.bind<DataBinding, DataBindingImpl>()
@@ -40,12 +43,14 @@ internal class LayoutModule(
                 location = get(LOCATION),
                 uxEvent = uxEvent,
                 platformEvent = platformEvent,
+                viewStateChange = viewStateChange,
                 modelMapper = get(),
                 ioDispatcher = get(IO),
                 mainDispatcher = get(MAIN),
                 handleUrlByApp = handleUrlByApp,
                 currentOffer = currentOffer,
-                customState = customState,
+                customStates = customStates,
+                offerCustomStates = offerCustomStates,
             )
         }
         this.provideModuleScoped {

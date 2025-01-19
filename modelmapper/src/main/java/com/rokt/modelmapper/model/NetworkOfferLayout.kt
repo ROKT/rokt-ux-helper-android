@@ -7,4 +7,5 @@ import kotlinx.serialization.Serializable
 data class NetworkOfferLayout(
     @SerialName("campaignId") val campaignId: String,
     @SerialName("creative") val creative: NetworkCreativeLayout,
+    @SerialName("catalogItems") val catalogItems: List<NetworkCatalogItem> = emptyList(),
 )

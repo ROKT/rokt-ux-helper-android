@@ -19,6 +19,7 @@ class RoktUxConfig private constructor(
     val composeFontMap: Map<String, FontFamily>? = null,
     val imageHandlingStrategy: ImageHandlingStrategy,
     val colorMode: ColorMode,
+    val viewStateConfig: ViewStateConfig? = null,
     val handleUrlByApp: Boolean = true,
 ) {
     /**
@@ -28,6 +29,8 @@ class RoktUxConfig private constructor(
      * @property composeFontMap Map of font families to be used in the Jetpack compose view.
      * @property imageHandlingStrategy Strategy for handling images in the UX.
      * @property colorMode The color mode configuration to use in the UX.
+     * @property handleUrlByApp Flag to determine if the URL should be handled by the app.
+     * @property viewStateConfig The cache configuration to use in the UX.
      */
     data class Builder internal constructor(
         private var xmlFontFamilyMap: Map<String, List<FontItem>>? = null,
@@ -35,6 +38,7 @@ class RoktUxConfig private constructor(
         private var imageHandlingStrategy: ImageHandlingStrategy = NetworkStrategy(),
         private var colorMode: ColorMode = ColorMode.SYSTEM,
         private var handleUrlByApp: Boolean = true,
+        private var viewStateConfig: ViewStateConfig? = null,
     ) {
         /**
          * Sets the XML font family map.
@@ -73,6 +77,13 @@ class RoktUxConfig private constructor(
         fun colorMode(colorMode: ColorMode) = apply { this.colorMode = colorMode }
 
         /**
+         * Sets the cache configuration.
+         *
+         * @param viewStateConfig The cache configuration to use in the UX.
+         */
+        fun viewStateConfig(viewStateConfig: ViewStateConfig) = apply { this.viewStateConfig = viewStateConfig }
+
+        /**
          * Builds the RoktUxConfig instance.
          *
          * @return The RoktUxConfig instance.
@@ -83,6 +94,7 @@ class RoktUxConfig private constructor(
             imageHandlingStrategy = imageHandlingStrategy,
             colorMode = colorMode,
             handleUrlByApp = handleUrlByApp,
+            viewStateConfig = viewStateConfig,
         )
     }
 

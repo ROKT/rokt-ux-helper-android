@@ -11,6 +11,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
 import com.rokt.demoapp.R
+import com.rokt.demoapp.ui.state.UiContent
 import com.rokt.roktux.RoktLayoutView
 import com.rokt.roktux.RoktUx
 import com.rokt.roktux.RoktUxConfig
@@ -37,21 +38,24 @@ class TutorialSevenActivity : AppCompatActivity() {
                 errorMessage.text = state.error?.toString()
 
                 if (state.hasData) {
-                    roktLayoutView.loadLayout(
-                        experienceResponse = state.data!!.experienceResponse,
-                        roktUxConfig = RoktUxConfig.builder().build(),
-                        onUxEvent = { event ->
-                            println("RoktEvent: onUxEvent received $event")
-                        },
-                        onPlatformEvent = { platformEvents ->
-                            println(
-                                "RoktEvent: onPlatformEvent received ${
-                                    platformEvents.toJsonString()
-                                }",
-                            )
-                            viewModel.handlePlatformEvent(platformEvents.toJsonString())
-                        },
-                    )
+                    val content = state.data
+                    if (content is UiContent.ExperienceContent) {
+                        roktLayoutView.loadLayout(
+                            experienceResponse = content.experienceResponse,
+                            roktUxConfig = RoktUxConfig.builder().build(),
+                            onUxEvent = { event ->
+                                println("RoktEvent: onUxEvent received $event")
+                            },
+                            onPlatformEvent = { platformEvents ->
+                                println(
+                                    "RoktEvent: onPlatformEvent received ${
+                                        platformEvents.toJsonString()
+                                    }",
+                                )
+                                viewModel.handlePlatformEvent(platformEvents.toJsonString())
+                            },
+                        )
+                    }
                 }
             }
         }

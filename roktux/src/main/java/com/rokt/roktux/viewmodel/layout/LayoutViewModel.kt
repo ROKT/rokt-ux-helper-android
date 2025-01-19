@@ -20,6 +20,7 @@ import com.rokt.modelmapper.uimodel.PluginModel
 import com.rokt.modelmapper.uimodel.SignalType
 import com.rokt.modelmapper.utils.DEFAULT_VIEWABLE_ITEMS
 import com.rokt.modelmapper.utils.FIRST_OFFER_INDEX
+import com.rokt.roktux.RoktViewState
 import com.rokt.roktux.event.EventNameValue
 import com.rokt.roktux.event.EventType
 import com.rokt.roktux.event.RoktPlatformEvent
@@ -45,17 +46,20 @@ internal class LayoutViewModel(
     private val location: String,
     private val uxEvent: (uxEvent: RoktUxEvent) -> Unit,
     private val platformEvent: (platformEvents: List<RoktPlatformEvent>) -> Unit,
+    private val viewStateChange: (state: RoktViewState) -> Unit,
     private val modelMapper: ModelMapper,
     private val ioDispatcher: CoroutineDispatcher,
     private val mainDispatcher: CoroutineDispatcher,
     private val handleUrlByApp: Boolean,
     private var currentOffer: Int,
-    private var customState: Map<String, Int>,
+    private var customStates: Map<String, Int>,
+    private var offerCustomStates: Map<String, Map<String, Int>>,
 ) : BaseViewModel<LayoutContract.LayoutEvent, LayoutUiState, LayoutContract.LayoutEffect>() {
 
     private lateinit var pluginId: String
     private lateinit var experienceModel: ExperienceModel
     private lateinit var pluginModel: PluginModel
+    private lateinit var pluginViewState: RoktViewState
     private var viewableItems: AtomicReference<Int> = AtomicReference(DEFAULT_VIEWABLE_ITEMS)
 
     // SDK's internal thread-safe structure to track URL states
@@ -107,7 +111,11 @@ internal class LayoutViewModel(
         experienceModel = modelMapper.getSavedExperience() ?: return
         pluginModel = experienceModel.plugins.firstOrNull() ?: return
         val layoutSchema = pluginModel.outerLayoutSchema
-        if (layoutSchema?.isEmbedded() == true && !location.equals(pluginModel.targetElementSelector, ignoreCase = true)
+        if (layoutSchema?.isEmbedded() == true &&
+            !location.equals(
+                pluginModel.targetElementSelector,
+                ignoreCase = true,
+            )
         ) {
             handleError(IllegalArgumentException(LOCATION_TARGET_ELEMENT_DOES_NOT_MATCH))
             return
@@ -117,6 +125,7 @@ internal class LayoutViewModel(
 
         if (layoutSchema != null && lastOfferIndex >= FIRST_OFFER_INDEX) {
             handleSignalInitialise()
+            sendViewState(currentOffer)
             setSuccessState(
                 LayoutUiState(
                     layoutSchema,
@@ -127,7 +136,8 @@ internal class LayoutViewModel(
                         targetOfferIndex = currentOffer,
                         creativeCopy = persistentMapOf(),
                         breakpoints = pluginModel.breakpoint,
-                        customState = customState.toImmutableMap(),
+                        customState = customStates.toImmutableMap(),
+                        offerCustomStates = offerCustomStates.mapValues { it.value.toImmutableMap() }.toImmutableMap(),
                     ),
                 ),
             )
@@ -192,6 +202,7 @@ internal class LayoutViewModel(
                 setEffect {
                     LayoutContract.LayoutEffect.CloseLayout
                 }
+                sendViewState(isDismissed = true)
             }
 
             is LayoutContract.LayoutEvent.UrlSelected -> {
@@ -209,11 +220,19 @@ internal class LayoutViewModel(
 
             is LayoutContract.LayoutEvent.SetCustomState -> {
                 updateCustomState(event.key, event.value)
+                sendViewState()
             }
 
             is LayoutContract.LayoutEvent.SignalViewed -> {
                 handleSignalViewed(event.offerId)
             }
+
+            is LayoutContract.LayoutEvent.SetOfferCustomState -> {
+                offerCustomStates += (event.offerId.toString() to event.customState)
+                sendViewState()
+            }
+
+            else -> {}
         }
     }
 
@@ -307,12 +326,14 @@ internal class LayoutViewModel(
     private fun updateTargetOffer(targetOfferIndex: Int) {
         updateState { currentUiState ->
             if (targetOfferIndex in FIRST_OFFER_INDEX..currentUiState.offerUiState.lastOfferIndex) {
+                sendViewState(targetOfferIndex)
                 currentUiState.copy(
                     offerUiState = currentUiState.offerUiState.copy(targetOfferIndex = targetOfferIndex),
                 )
             } else {
                 if (pluginModel.settings.closeOnComplete) {
                     uxEvent(RoktUxEvent.LayoutCompleted(pluginId))
+                    sendViewState(isDismissed = true)
                     sendDismissEvent(NO_MORE_OFFERS_TO_SHOW)
                     setEffect {
                         LayoutContract.LayoutEffect.CloseLayout
@@ -327,6 +348,7 @@ internal class LayoutViewModel(
         updateState { currentUiState ->
             if (newOfferIndex in FIRST_OFFER_INDEX..currentUiState.offerUiState.lastOfferIndex) {
                 currentOffer = newOfferIndex
+                sendViewState(newOfferIndex)
                 handleNextOfferLoaded(currentOffer)
                 currentUiState.copy(
                     offerUiState = currentUiState.offerUiState.copy(
@@ -337,6 +359,7 @@ internal class LayoutViewModel(
             } else {
                 if (pluginModel.settings.closeOnComplete) {
                     uxEvent(RoktUxEvent.LayoutCompleted(pluginId))
+                    sendViewState(isDismissed = true)
                     sendDismissEvent(NO_MORE_OFFERS_TO_SHOW)
                     setEffect {
                         LayoutContract.LayoutEffect.CloseLayout
@@ -357,10 +380,10 @@ internal class LayoutViewModel(
     }
 
     private fun updateCustomState(key: String, value: Int) {
-        customState += (key to value)
+        customStates += (key to value)
         updateState { currentUiState ->
             currentUiState.copy(
-                offerUiState = currentUiState.offerUiState.copy(customState = customState.toImmutableMap()),
+                offerUiState = currentUiState.offerUiState.copy(customState = customStates.toImmutableMap()),
             )
         }
     }
@@ -473,6 +496,17 @@ internal class LayoutViewModel(
         }
     }
 
+    private fun sendViewState(currentOffer: Int = this.currentOffer, isDismissed: Boolean = false) {
+        pluginViewState = RoktViewState(
+            pluginId = pluginId,
+            customStates = customStates.toImmutableMap(),
+            offerCustomStates = offerCustomStates.toImmutableMap(),
+            offerIndex = currentOffer,
+            pluginDismissed = isDismissed,
+        )
+        viewStateChange(pluginViewState)
+    }
+
     companion object {
         private const val KEY_INITIATOR = "initiator"
         private const val NO_MORE_OFFERS_TO_SHOW = "NO_MORE_OFFERS_TO_SHOW"
@@ -488,12 +522,14 @@ internal class LayoutViewModel(
         private val location: String,
         private val uxEvent: (uxEvent: RoktUxEvent) -> Unit,
         private val platformEvent: (platformEvents: List<RoktPlatformEvent>) -> Unit,
+        private val viewStateChange: (state: RoktViewState) -> Unit,
         private val modelMapper: ModelMapper,
         private val ioDispatcher: CoroutineDispatcher,
         private val mainDispatcher: CoroutineDispatcher,
         private val handleUrlByApp: Boolean,
         private val currentOffer: Int,
-        private val customState: Map<String, Int>,
+        private val customStates: Map<String, Int>,
+        private val offerCustomStates: Map<String, Map<String, Int>>,
     ) : ViewModelProvider.Factory {
         @Suppress("UNCHECKED_CAST")
         override fun <T : ViewModel> create(modelClass: Class<T>, extras: CreationExtras): T {
@@ -502,12 +538,14 @@ internal class LayoutViewModel(
                     location = location,
                     uxEvent = uxEvent,
                     platformEvent = platformEvent,
+                    viewStateChange = viewStateChange,
                     modelMapper = modelMapper,
                     ioDispatcher = ioDispatcher,
                     mainDispatcher = mainDispatcher,
                     handleUrlByApp = handleUrlByApp,
                     currentOffer = currentOffer,
-                    customState = customState,
+                    customStates = customStates,
+                    offerCustomStates = offerCustomStates,
                 ) as T
             }
             throw IllegalArgumentException("Unknown ViewModel type")

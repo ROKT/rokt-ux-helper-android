@@ -40,6 +40,7 @@ import com.rokt.demoapp.ui.common.SubHeading
 import com.rokt.demoapp.ui.common.XSmallSpace
 import com.rokt.demoapp.ui.common.error.RoktError
 import com.rokt.demoapp.ui.screen.custom.accountdetails.AccountDetails
+import com.rokt.demoapp.ui.state.UiContent
 import com.rokt.demoapp.ui.theme.BorderColor
 import com.rokt.demoapp.ui.theme.DefaultFontFamily
 import com.rokt.demoapp.ui.theme.TextLight
@@ -83,14 +84,17 @@ fun ConfirmationScreen(
             }
 
             state.value.hasData -> {
-                RoktLayout(
-                    experienceResponse = state.value.data!!.experienceResponse,
-                    location = state.value.data!!.location,
-                    onUxEvent = { println("RoktEvent: UxEvent Received $it") },
-                    onPlatformEvent = { println("RoktEvent: onPlatformEvent received $it") },
-                    roktUxConfig = RoktUxConfig.builder()
-                        .imageHandlingStrategy(NetworkStrategy()).build(),
-                )
+                val content = state.value.data
+                if (content is UiContent.ExperienceContent) {
+                    RoktLayout(
+                        experienceResponse = content.experienceResponse,
+                        location = content.location,
+                        onUxEvent = { println("RoktEvent: UxEvent Received $it") },
+                        onPlatformEvent = { println("RoktEvent: onPlatformEvent received $it") },
+                        roktUxConfig = RoktUxConfig.builder()
+                            .imageHandlingStrategy(NetworkStrategy()).build(),
+                    )
+                }
             }
 
             else -> {

@@ -6,4 +6,5 @@ import kotlinx.collections.immutable.ImmutableMap
 internal data class MarketingVariantUiState(
     val uiModel: LayoutSchemaUiModel,
     val creativeCopy: ImmutableMap<String, String>,
+    val customState: ImmutableMap<String, Int>,
 )
