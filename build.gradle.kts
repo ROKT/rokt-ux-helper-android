@@ -30,7 +30,9 @@ subprojects {
 }
 
 val formattedVersion by extra {
-    "${libs.versions.roktUxHelper.get()}${System.getenv("VERSION_SUFFIX").takeIf { !it.isNullOrBlank() } ?: ""}"
+    val versionFromProperty = project.findProperty("VERSION")?.toString()
+    val versionSuffix = project.findProperty("VERSION_SUFFIX")?.toString().takeIf { !it.isNullOrBlank() } ?: ""
+    versionFromProperty + versionSuffix
 }
 
 val localProperties = Properties().apply {
