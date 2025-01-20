@@ -37,8 +37,6 @@ activity = "1.9.2"
 constraintlayout = "2.1.4"
 mavenPublish = "0.30.0"
 
-roktUxHelper = "0.2.0"
-
 [libraries]
 androidx-activity-compose = { group = "androidx.activity", name = "activity-compose", version.ref = "androidxActivity" }
 androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "androidxAppCompat" }
