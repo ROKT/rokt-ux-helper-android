@@ -19,6 +19,7 @@ plugins {
     alias(libs.plugins.dokka) apply false
     alias(libs.plugins.hilt) apply false
     alias(libs.plugins.maven.publish) apply false
+    alias(libs.plugins.kover) apply false
 }
 
 subprojects {

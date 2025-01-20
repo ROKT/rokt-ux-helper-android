@@ -8,9 +8,9 @@ The Rokt UX Helper for Android enables partner applications to render tailored u
 - Sahil Suri - <sahil.suri@rokt.com>
 - Lewis Krishnamurti - <lewis.raj.krishnamurti@rokt.com>
 
-| Environment | Build                                                                                               |
-| ----------- | --------------------------------------------------------------------------------------------------- |
-| main        | ![Build status](https://badge.buildkite.com/923371345b3dcc70e1ce4927a4bb937ef7134e2ae30498965b.svg) |
+| Environment | Build                                                                                               | Coverage                                                                                                                                            |
+| ----------- | --------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
+| main        | ![Build status](https://badge.buildkite.com/923371345b3dcc70e1ce4927a4bb937ef7134e2ae30498965b.svg) | [![codecov](https://codecov.io/gh/ROKT/rokt-ux-helper-android/graph/badge.svg?token=inV3Xb1tK9)](https://codecov.io/gh/ROKT/rokt-ux-helper-android) |
 
 ## Requirements
 
