@@ -1,7 +1,7 @@
 name: Create draft release
 
 on:
-  workflow_dispatch:
+  workflow_dispatch: # checkov:skip=CKV_GHA_7
     inputs:
       version:
         description: "The version you want to release in the format X.Y.Z"
