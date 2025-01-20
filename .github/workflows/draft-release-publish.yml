@@ -1,0 +1,47 @@
+name: Create draft release
+
+on:
+  pull_request:
+    paths:
+      - VERSION
+    branches:
+      - main
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  publish-draft-release:
+    runs-on: ubuntu-latest
+    env:
+      ORG_GRADLE_PROJECT_signingInMemoryKey: ${{ secrets.MAVEN_SIGNING_KEY }}
+      ORG_GRADLE_PROJECT_signingInMemoryKeyPassword: ${{ secrets.MAVEN_SIGNING_PASSWORD }}
+      ORG_GRADLE_PROJECT_mavenCentralUsername: ${{ secrets.SONATYPE_USERNAME }}
+      ORG_GRADLE_PROJECT_mavenCentralPassword: ${{ secrets.SONATYPE_PASSWORD }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Setup JDK
+        uses: ./.github/actions/setup-java
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+      - name: Get version name
+        id: version
+        run: |
+          version_from_file=$(head -n 1 VERSION)
+          echo "release-version=$version_from_file" >> $GITHUB_OUTPUT
+      - name: RC version name
+        id: version-suffix
+        run: |
+          version_suffix="-RC-$(date +'%Y%m%d%H%M')"
+          echo "version-suffix=version_suffix" >> $GITHUB_OUTPUT
+      - name: Publish to Maven local
+        run: ./gradlew publishMavenPublicationToMavenLocal -PVERSION=${{ steps.version.outputs.release-version }} -PVERSION_SUFFIX=${{ steps.version-suffix.outputs.version-suffix }}
+      - name: Publish to Maven Central
+        run: ./gradlew publishMavenPublicationToMavenCentralRepository -PVERSION=${{ steps.version.outputs.release-version }} -PVERSION_SUFFIX=${{ steps.version-suffix.outputs.version-suffix }} --no-configuration-cache
+      - name: Upload AAR artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: aar-files
+          path: "**/*.aar"
