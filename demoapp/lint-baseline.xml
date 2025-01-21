@@ -1,0 +1,1146 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<issues format="6" by="lint 8.1.2" type="baseline" client="gradle" dependencies="false" name="AGP (8.1.2)" variant="all" version="8.1.2">
+
+    <issue
+        id="NewApi"
+        message="`android:windowLightStatusBar` requires API level 23 (current min is 21)"
+        errorLine1="        &lt;item name=&quot;android:windowLightStatusBar&quot;>true&lt;/item>"
+        errorLine2="              ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/themes.xml"
+            line="14"
+            column="15"/>
+    </issue>
+
+    <issue
+        id="NewApi"
+        message="`android:windowLightStatusBar` requires API level 23 (current min is 21)"
+        errorLine1="        &lt;item name=&quot;android:windowLightStatusBar&quot;>true&lt;/item>"
+        errorLine2="              ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/themes.xml"
+            line="36"
+            column="15"/>
+    </issue>
+
+    <issue
+        id="UnusedAttribute"
+        message="Attribute `networkSecurityConfig` is only used in API level 24 and higher (current min is 21)"
+        errorLine1="        android:networkSecurityConfig=&quot;@xml/network_security_config&quot;"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/AndroidManifest.xml"
+            line="16"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="VectorRaster"
+        message="Limit vector icons sizes to 200×200 to keep icon drawing fast; see https://developer.android.com/studio/write/vector-asset-studio#when for more"
+        errorLine1="    android:width=&quot;414dp&quot;"
+        errorLine2="                   ~~~~~">
+        <location
+            file="src/main/res/drawable/ic_home_background.xml"
+            line="2"
+            column="20"/>
+    </issue>
+
+    <issue
+        id="VectorRaster"
+        message="Limit vector icons sizes to 200×200 to keep icon drawing fast; see https://developer.android.com/studio/write/vector-asset-studio#when for more"
+        errorLine1="    android:width=&quot;288dp&quot;"
+        errorLine2="                   ~~~~~">
+        <location
+            file="src/main/res/drawable/ic_rokt_connector_filled.xml"
+            line="2"
+            column="20"/>
+    </issue>
+
+    <issue
+        id="VectorRaster"
+        message="Limit vector icons sizes to 200×200 to keep icon drawing fast; see https://developer.android.com/studio/write/vector-asset-studio#when for more"
+        errorLine1="    android:width=&quot;240dp&quot;"
+        errorLine2="                   ~~~~~">
+        <location
+            file="src/main/res/drawable/ic_rokt_logo.xml"
+            line="2"
+            column="20"/>
+    </issue>
+
+    <issue
+        id="AndroidGradlePluginVersion"
+        message="A newer version of com.android.tools.build:gradle than 8.1.2 is available: 8.8.0. (There is also a newer version of 8.1.𝑥 available, if upgrading to 8.8.0 is difficult: 8.1.4)"
+        errorLine1="androidGradlePlugin = &quot;8.1.2&quot;"
+        errorLine2="                      ~~~~~~~">
+        <location
+            file="$HOME/dev/sdk-android-source/ux-helper/gradle/libs.versions.toml"
+            line="2"
+            column="23"/>
+    </issue>
+
+    <issue
+        id="GradleDependency"
+        message="A newer version of com.android.tools:desugar_jdk_libs than 1.2.0 is available: 2.1.4"
+        errorLine1="androidDesugarJdkLibs = &quot;1.2.0&quot;"
+        errorLine2="                        ~~~~~~~">
+        <location
+            file="$HOME/dev/sdk-android-source/ux-helper/gradle/libs.versions.toml"
+            line="3"
+            column="25"/>
+    </issue>
+
+    <issue
+        id="GradleDependency"
+        message="A newer version of androidx.activity:activity-compose than 1.6.1 is available: 1.10.0"
+        errorLine1="androidxActivity = &quot;1.6.1&quot;"
+        errorLine2="                   ~~~~~~~">
+        <location
+            file="$HOME/dev/sdk-android-source/ux-helper/gradle/libs.versions.toml"
+            line="4"
+            column="20"/>
+    </issue>
+
+    <issue
+        id="GradleDependency"
+        message="A newer version of androidx.appcompat:appcompat than 1.5.1 is available: 1.7.0"
+        errorLine1="androidxAppCompat = &quot;1.5.1&quot;"
+        errorLine2="                    ~~~~~~~">
+        <location
+            file="$HOME/dev/sdk-android-source/ux-helper/gradle/libs.versions.toml"
+            line="5"
+            column="21"/>
+    </issue>
+
+    <issue
+        id="GradleDependency"
+        message="A newer version of androidx.compose:compose-bom than 2024.09.02 is available: 2025.01.00"
+        errorLine1="androidxComposeBom = &quot;2024.09.02&quot;"
+        errorLine2="                     ~~~~~~~~~~~~">
+        <location
+            file="$HOME/dev/sdk-android-source/ux-helper/gradle/libs.versions.toml"
+            line="6"
+            column="22"/>
+    </issue>
+
+    <issue
+        id="GradleDependency"
+        message="A newer version of androidx.core:core-ktx than 1.9.0 is available: 1.15.0"
+        errorLine1="androidxCore = &quot;1.9.0&quot;"
+        errorLine2="               ~~~~~~~">
+        <location
+            file="$HOME/dev/sdk-android-source/ux-helper/gradle/libs.versions.toml"
+            line="8"
+            column="16"/>
+    </issue>
+
+    <issue
+        id="GradleDependency"
+        message="A newer version of androidx.core:core-splashscreen than 1.0.0 is available: 1.0.1"
+        errorLine1="androidxCoreSplashscreen = &quot;1.0.0&quot;"
+        errorLine2="                           ~~~~~~~">
+        <location
+            file="$HOME/dev/sdk-android-source/ux-helper/gradle/libs.versions.toml"
+            line="9"
+            column="28"/>
+    </issue>
+
+    <issue
+        id="GradleDependency"
+        message="A newer version of androidx.test.espresso:espresso-core than 3.5.0 is available: 3.6.1"
+        errorLine1="androidxEspresso = &quot;3.5.0&quot;"
+        errorLine2="                   ~~~~~~~">
+        <location
+            file="$HOME/dev/sdk-android-source/ux-helper/gradle/libs.versions.toml"
+            line="10"
+            column="20"/>
+    </issue>
+
+    <issue
+        id="GradleDependency"
+        message="A newer version of androidx.lifecycle:lifecycle-viewmodel-compose than 2.6.1 is available: 2.8.7"
+        errorLine1="androidxLifecycle = &quot;2.6.1&quot;"
+        errorLine2="                    ~~~~~~~">
+        <location
+            file="$HOME/dev/sdk-android-source/ux-helper/gradle/libs.versions.toml"
+            line="11"
+            column="21"/>
+    </issue>
+
+    <issue
+        id="GradleDependency"
+        message="A newer version of androidx.navigation:navigation-compose than 2.8.0 is available: 2.8.5"
+        errorLine1="androidxNavigation = &quot;2.8.0&quot;"
+        errorLine2="                     ~~~~~~~">
+        <location
+            file="$HOME/dev/sdk-android-source/ux-helper/gradle/libs.versions.toml"
+            line="12"
+            column="22"/>
+    </issue>
+
+    <issue
+        id="GradleDependency"
+        message="A newer version of androidx.window:window than 1.0.0 is available: 1.3.0"
+        errorLine1="androidxWindowManager = &quot;1.0.0&quot;"
+        errorLine2="                        ~~~~~~~">
+        <location
+            file="$HOME/dev/sdk-android-source/ux-helper/gradle/libs.versions.toml"
+            line="13"
+            column="25"/>
+    </issue>
+
+    <issue
+        id="GradleDependency"
+        message="A newer version of androidx.browser:browser than 1.5.0 is available: 1.8.0"
+        errorLine1="androidXbrowser = &quot;1.5.0&quot;"
+        errorLine2="                  ~~~~~~~">
+        <location
+            file="$HOME/dev/sdk-android-source/ux-helper/gradle/libs.versions.toml"
+            line="14"
+            column="19"/>
+    </issue>
+
+    <issue
+        id="GradleDependency"
+        message="A newer version of io.coil-kt:coil than 2.2.2 is available: 2.7.0"
+        errorLine1="coil = &quot;2.2.2&quot;"
+        errorLine2="       ~~~~~~~">
+        <location
+            file="$HOME/dev/sdk-android-source/ux-helper/gradle/libs.versions.toml"
+            line="15"
+            column="8"/>
+    </issue>
+
+    <issue
+        id="GradleDependency"
+        message="A newer version of io.coil-kt:coil-compose than 2.2.2 is available: 2.7.0"
+        errorLine1="coil = &quot;2.2.2&quot;"
+        errorLine2="       ~~~~~~~">
+        <location
+            file="$HOME/dev/sdk-android-source/ux-helper/gradle/libs.versions.toml"
+            line="15"
+            column="8"/>
+    </issue>
+
+    <issue
+        id="GradleDependency"
+        message="A newer version of io.coil-kt:coil-svg than 2.2.2 is available: 2.7.0"
+        errorLine1="coil = &quot;2.2.2&quot;"
+        errorLine2="       ~~~~~~~">
+        <location
+            file="$HOME/dev/sdk-android-source/ux-helper/gradle/libs.versions.toml"
+            line="15"
+            column="8"/>
+    </issue>
+
+    <issue
+        id="GradleDependency"
+        message="A newer version of org.jetbrains.kotlin:kotlin-reflect than 1.8.21 is available: 2.1.0"
+        errorLine1="kotlin = &quot;1.8.21&quot;"
+        errorLine2="         ~~~~~~~~">
+        <location
+            file="$HOME/dev/sdk-android-source/ux-helper/gradle/libs.versions.toml"
+            line="18"
+            column="10"/>
+    </issue>
+
+    <issue
+        id="GradleDependency"
+        message="A newer version of org.jetbrains.kotlinx:kotlinx-coroutines-android than 1.6.4 is available: 1.10.1"
+        errorLine1="kotlinxCoroutines = &quot;1.6.4&quot;"
+        errorLine2="                    ~~~~~~~">
+        <location
+            file="$HOME/dev/sdk-android-source/ux-helper/gradle/libs.versions.toml"
+            line="19"
+            column="21"/>
+    </issue>
+
+    <issue
+        id="GradleDependency"
+        message="A newer version of org.jetbrains.kotlinx:kotlinx-coroutines-test than 1.6.4 is available: 1.10.1"
+        errorLine1="kotlinxCoroutines = &quot;1.6.4&quot;"
+        errorLine2="                    ~~~~~~~">
+        <location
+            file="$HOME/dev/sdk-android-source/ux-helper/gradle/libs.versions.toml"
+            line="19"
+            column="21"/>
+    </issue>
+
+    <issue
+        id="GradleDependency"
+        message="A newer version of org.jetbrains.kotlinx:kotlinx-serialization-json than 1.5.0 is available: 1.8.0"
+        errorLine1="kotlinxSerializationJson = &quot;1.5.0&quot;"
+        errorLine2="                           ~~~~~~~">
+        <location
+            file="$HOME/dev/sdk-android-source/ux-helper/gradle/libs.versions.toml"
+            line="20"
+            column="28"/>
+    </issue>
+
+    <issue
+        id="GradleDependency"
+        message="A newer version of com.squareup.retrofit2:retrofit than 2.9.0 is available: 2.11.0"
+        errorLine1="retrofit = &quot;2.9.0&quot;"
+        errorLine2="           ~~~~~~~">
+        <location
+            file="$HOME/dev/sdk-android-source/ux-helper/gradle/libs.versions.toml"
+            line="24"
+            column="12"/>
+    </issue>
+
+    <issue
+        id="GradleDependency"
+        message="A newer version of org.robolectric:robolectric than 4.10 is available: 4.14.1"
+        errorLine1="robolectric = &quot;4.10&quot;"
+        errorLine2="              ~~~~~~">
+        <location
+            file="$HOME/dev/sdk-android-source/ux-helper/gradle/libs.versions.toml"
+            line="29"
+            column="15"/>
+    </issue>
+
+    <issue
+        id="GradleDependency"
+        message="A newer version of androidx.lifecycle:lifecycle-runtime-ktx than 2.8.4 is available: 2.8.7"
+        errorLine1="lifecycleRuntimeKtx = &quot;2.8.4&quot;"
+        errorLine2="                      ~~~~~~~">
+        <location
+            file="$HOME/dev/sdk-android-source/ux-helper/gradle/libs.versions.toml"
+            line="31"
+            column="23"/>
+    </issue>
+
+    <issue
+        id="GradleDependency"
+        message="A newer version of com.google.android.material:material than 1.10.0 is available: 1.12.0"
+        errorLine1="material = &quot;1.10.0&quot;"
+        errorLine2="           ~~~~~~~~">
+        <location
+            file="$HOME/dev/sdk-android-source/ux-helper/gradle/libs.versions.toml"
+            line="33"
+            column="12"/>
+    </issue>
+
+    <issue
+        id="GradleDependency"
+        message="A newer version of androidx.hilt:hilt-navigation-compose than 1.0.0 is available: 1.2.0"
+        errorLine1="androidxHiltNavigationCompose = &quot;1.0.0&quot;"
+        errorLine2="                                ~~~~~~~">
+        <location
+            file="$HOME/dev/sdk-android-source/ux-helper/gradle/libs.versions.toml"
+            line="36"
+            column="33"/>
+    </issue>
+
+    <issue
+        id="GradleDependency"
+        message="A newer version of com.google.dagger:hilt-android than 2.51.1 is available: 2.54"
+        errorLine1="hilt = &quot;2.51.1&quot;"
+        errorLine2="       ~~~~~~~~">
+        <location
+            file="$HOME/dev/sdk-android-source/ux-helper/gradle/libs.versions.toml"
+            line="37"
+            column="8"/>
+    </issue>
+
+    <issue
+        id="GradleDependency"
+        message="A newer version of androidx.activity:activity than 1.9.2 is available: 1.10.0"
+        errorLine1="activity = &quot;1.9.2&quot;"
+        errorLine2="           ~~~~~~~">
+        <location
+            file="$HOME/dev/sdk-android-source/ux-helper/gradle/libs.versions.toml"
+            line="38"
+            column="12"/>
+    </issue>
+
+    <issue
+        id="GradleDependency"
+        message="A newer version of androidx.constraintlayout:constraintlayout than 2.1.4 is available: 2.2.0"
+        errorLine1="constraintlayout = &quot;2.1.4&quot;"
+        errorLine2="                   ~~~~~~~">
+        <location
+            file="$HOME/dev/sdk-android-source/ux-helper/gradle/libs.versions.toml"
+            line="39"
+            column="20"/>
+    </issue>
+
+    <issue
+        id="AcceptsUserCertificates"
+        message="The Network Security Configuration allows the use of user certificates in the release version of your app"
+        errorLine1="            &lt;certificates src=&quot;user&quot; />"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/xml/network_security_config.xml"
+            line="6"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="InsecureBaseConfiguration"
+        message="Insecure Base Configuration"
+        errorLine1="    &lt;base-config cleartextTrafficPermitted=&quot;true&quot;>"
+        errorLine2="                                            ~~~~">
+        <location
+            file="src/main/res/xml/network_security_config.xml"
+            line="3"
+            column="45"/>
+    </issue>
+
+    <issue
+        id="VectorPath"
+        message="Very long vector path (861 characters), which is bad for performance. Considering reducing precision, removing minor details or rasterizing vector."
+        errorLine1="      android:pathData=&quot;M7.9866,0.8613C8.0128,1.1643 8.084,1.9858 7.2213,2.8876C6.5971,3.5291 5.8393,3.9049 5.0094,3.849C4.9391,3.0747 5.2666,2.388 5.8239,1.8326C6.3297,1.3148 7.2178,0.8937 7.986,0.8545L7.9866,0.8613ZM9.6896,5.0377C8.7969,5.5766 8.3548,6.3073 8.3605,7.2769C8.3605,7.2782 8.3604,7.2807 8.3603,7.2843C8.3568,7.4117 8.3149,8.9141 10,9.7036C9.6767,10.676 8.5665,12.8356 7.2747,12.854C6.9129,12.854 6.6236,12.7432 6.3253,12.629C6.008,12.5075 5.6805,12.382 5.2446,12.382C4.7734,12.382 4.4186,12.5155 4.0861,12.6406C3.8038,12.7468 3.5378,12.8469 3.2303,12.854C1.9499,12.8924 0.7225,10.5168 0.382,9.5472C0.1273,8.8108 0,8.0957 0,7.4034C0,5.0605 1.5751,3.909 3.0572,3.8862C3.4687,3.8862 3.944,4.057 4.35,4.2029C4.6526,4.3116 4.9168,4.4065 5.0873,4.4065C5.2251,4.4065 5.4499,4.324 5.7258,4.2228C6.2059,4.0465 6.8404,3.8137 7.4392,3.8606C8.4349,3.936 9.1903,4.3269 9.6896,5.0377Z&quot;"
+        errorLine2="                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/drawable/ic_apple.xml"
+            line="7"
+            column="25"/>
+    </issue>
+
+    <issue
+        id="Overdraw"
+        message="Possible overdraw: Root element paints background `@color/white` with a theme that also paints a background (inferred theme is `@style/Theme_RoktDemoView`)"
+        errorLine1="    android:background=&quot;@color/white&quot;>"
+        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/activity_tutorial.xml"
+            line="6"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.color.purple_200` appears to be unused"
+        errorLine1="    &lt;color name=&quot;purple_200&quot;>#FFBB86FC&lt;/color>"
+        errorLine2="           ~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/colors.xml"
+            line="3"
+            column="12"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.color.secondary_color` appears to be unused"
+        errorLine1="    &lt;color name=&quot;secondary_color&quot;>#292422&lt;/color>"
+        errorLine2="           ~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/colors.xml"
+            line="10"
+            column="12"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.dimen.space_x` appears to be unused"
+        errorLine1="    &lt;dimen name=&quot;space_x&quot;>8dp&lt;/dimen>"
+        errorLine2="           ~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/dimens.xml"
+            line="3"
+            column="12"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.dimen.space_3x` appears to be unused"
+        errorLine1="    &lt;dimen name=&quot;space_3x&quot;>24dp&lt;/dimen>"
+        errorLine2="           ~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/dimens.xml"
+            line="5"
+            column="12"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.dimen.space_5x` appears to be unused"
+        errorLine1="    &lt;dimen name=&quot;space_5x&quot;>40dp&lt;/dimen>"
+        errorLine2="           ~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/dimens.xml"
+            line="7"
+            column="12"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.dimen.space_6x` appears to be unused"
+        errorLine1="    &lt;dimen name=&quot;space_6x&quot;>48dp&lt;/dimen>"
+        errorLine2="           ~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/dimens.xml"
+            line="8"
+            column="12"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.dimen.space_7x` appears to be unused"
+        errorLine1="    &lt;dimen name=&quot;space_7x&quot;>56dp&lt;/dimen>"
+        errorLine2="           ~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/dimens.xml"
+            line="9"
+            column="12"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.dimen.space_8x` appears to be unused"
+        errorLine1="    &lt;dimen name=&quot;space_8x&quot;>64dp&lt;/dimen>"
+        errorLine2="           ~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/dimens.xml"
+            line="10"
+            column="12"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.mipmap.ic_launcher` appears to be unused"
+        errorLine1="&lt;adaptive-icon xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;>"
+        errorLine2="^">
+        <location
+            file="src/main/res/mipmap-anydpi-v26/ic_launcher.xml"
+            line="2"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.menu_button_about` appears to be unused"
+        errorLine1="    &lt;string name=&quot;menu_button_about&quot;>About this app&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="6"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.content_description_about_header` appears to be unused"
+        errorLine1="    &lt;string name=&quot;content_description_about_header&quot;>About Rokt Header Image&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="14"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.content_description_connector` appears to be unused"
+        errorLine1="    &lt;string name=&quot;content_description_connector&quot;>Rokt Connector Image&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="15"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.content_description_header_about_text` appears to be unused"
+        errorLine1="    &lt;string name=&quot;content_description_header_about_text&quot;>About this app&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="16"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.content_description_top_bar_background` appears to be unused"
+        errorLine1="    &lt;string name=&quot;content_description_top_bar_background&quot;>About Rokt Header Image&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="18"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.content_description_gradient` appears to be unused"
+        errorLine1="    &lt;string name=&quot;content_description_gradient&quot;>Gradient background&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="19"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.content_description_walkrough_icon` appears to be unused"
+        errorLine1="    &lt;string name=&quot;content_description_walkrough_icon&quot;>Feature Walkthrough Icon&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="22"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.summary_page_button_text` appears to be unused"
+        errorLine1="    &lt;string name=&quot;summary_page_button_text&quot;>Let\&apos;s begin&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="23"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.text_disclaimer` appears to be unused"
+        errorLine1="    &lt;string name=&quot;text_disclaimer&quot;>Disclaimer&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="24"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.summary_dialog_btn_negative` appears to be unused"
+        errorLine1="    &lt;string name=&quot;summary_dialog_btn_negative&quot;>No thanks&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="25"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.summary_dialog_btn_positive` appears to be unused"
+        errorLine1="    &lt;string name=&quot;summary_dialog_btn_positive&quot;>Continue&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="26"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.text_preview` appears to be unused"
+        errorLine1="    &lt;string name=&quot;text_preview&quot;>Preview&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="27"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.button_view_example_text` appears to be unused"
+        errorLine1="    &lt;string name=&quot;button_view_example_text&quot;>View example&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="28"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.button_view_example_icon` appears to be unused"
+        errorLine1="    &lt;string name=&quot;button_view_example_icon&quot;>Icon eye&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="29"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.label_password` appears to be unused"
+        errorLine1="    &lt;string name=&quot;label_password&quot;>Password&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="37"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.text_amazing_deal` appears to be unused"
+        errorLine1="    &lt;string name=&quot;text_amazing_deal&quot;>You just got an amazing deal!&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="53"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.text_done` appears to be unused"
+        errorLine1="    &lt;string name=&quot;text_done&quot;>Done&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="56"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.text_share` appears to be unused"
+        errorLine1="    &lt;string name=&quot;text_share&quot;>Share&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="59"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.text_thank_you` appears to be unused"
+        errorLine1="    &lt;string name=&quot;text_thank_you&quot;>Thank You&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="62"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.text_receipt` appears to be unused"
+        errorLine1="    &lt;string name=&quot;text_receipt&quot;>We sent a receipt to\nyour email&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="72"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.text_order_details` appears to be unused"
+        errorLine1="    &lt;string name=&quot;text_order_details&quot;>Order Details&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="84"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.text_total_0` appears to be unused"
+        errorLine1="    &lt;string name=&quot;text_total_0&quot;>Total: $0&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="85"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.text_arrow_up` appears to be unused"
+        errorLine1="    &lt;string name=&quot;text_arrow_up&quot;>arrow up&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="86"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.text_two_month` appears to be unused"
+        errorLine1="    &lt;string name=&quot;text_two_month&quot;>Two-Month Subscription to Adventure Academy - Adventure Academy&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="87"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.text_view_your` appears to be unused"
+        errorLine1="    &lt;string name=&quot;text_view_your&quot;>View your Groupons&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="88"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.text_order_number` appears to be unused"
+        errorLine1="    &lt;string name=&quot;text_order_number&quot;>Order number&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="89"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.text_numbers` appears to be unused"
+        errorLine1="    &lt;string name=&quot;text_numbers&quot;>123456789&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="90"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.text_find_more_events` appears to be unused"
+        errorLine1="    &lt;string name=&quot;text_find_more_events&quot;>Find more events&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="91"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.text_view_order` appears to be unused"
+        errorLine1="    &lt;string name=&quot;text_view_order&quot;>View order&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="92"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.text_whats_next` appears to be unused"
+        errorLine1="    &lt;string name=&quot;text_whats_next&quot;>Whats next?&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="93"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.text_have_great_time` appears to be unused"
+        errorLine1="    &lt;string name=&quot;text_have_great_time&quot;>Have a great time!&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="94"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.text_event_info` appears to be unused"
+        errorLine1="    &lt;string name=&quot;text_event_info&quot;>Event info&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="95"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.text_parking_info` appears to be unused"
+        errorLine1="    &lt;string name=&quot;text_parking_info&quot;>PARKING PASSES ONLY Gardner-Webb at Floria State Seminoles Basketball Tickets&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="96"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.text_event_time` appears to be unused"
+        errorLine1="    &lt;string name=&quot;text_event_time&quot;>Mon, Dec 21, 2020 - 08:01 pm - Donald L. Tucket Center Parking Lots - Tallahassee, FL&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="97"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.text_add_to_calender` appears to be unused"
+        errorLine1="    &lt;string name=&quot;text_add_to_calender&quot;>Add to calender&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="98"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.text_predefined2_unbranded` appears to be unused"
+        errorLine1="    &lt;string name=&quot;text_predefined2_unbranded&quot;>Just scan your phone and you’re in. Your tickets will be ready for you in the app and your account in a few minutes.&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="99"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.text_predefined2_branded` appears to be unused"
+        errorLine1="    &lt;string name=&quot;text_predefined2_branded&quot;>Just scan your phone and you’re in. Your tickets will be ready for you in the Stubhub app and your StubHub account in a few minutes.&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="100"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.text_congratulations` appears to be unused"
+        errorLine1="    &lt;string name=&quot;text_congratulations&quot;>Congratulations!&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="101"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.text_your_ad_created` appears to be unused"
+        errorLine1="    &lt;string name=&quot;text_your_ad_created&quot;>Your ad has been created! Please note, ads and features may take a moment to go to live. Any payment confirmation and invoices will be sent to you by email.&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="102"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.text_post_your_ad` appears to be unused"
+        errorLine1="    &lt;string name=&quot;text_post_your_ad&quot;>Post your ad on eBay for FREE&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="103"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.text_increase_your_changes` appears to be unused"
+        errorLine1="    &lt;string name=&quot;text_increase_your_changes&quot;>Increase your changes of selling with access to up to 11 million Aussies each month.&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="104"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.text_limited_items` appears to be unused"
+        errorLine1="    &lt;string name=&quot;text_limited_items&quot;>&lt;![CDATA[*Limited to 2 items per month. T&amp;C’s Apply.]]&gt;&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="105"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.text_ebay` appears to be unused"
+        errorLine1="    &lt;string name=&quot;text_ebay&quot;>ebay logo&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="106"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.text_scan_prompt` appears to be unused"
+        errorLine1="    &lt;string name=&quot;text_scan_prompt&quot;>Scan Rokt preview QR code&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="109"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.button_execute` appears to be unused"
+        errorLine1="    &lt;string name=&quot;button_execute&quot;>Refresh preview&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="110"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.settings_stage_env` appears to be unused"
+        errorLine1="    &lt;string name=&quot;settings_stage_env&quot;>Stage environment&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="113"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.settings_debug_logs` appears to be unused"
+        errorLine1="    &lt;string name=&quot;settings_debug_logs&quot;>Enable debug logs&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="114"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.button_uxhelper` appears to be unused"
+        errorLine1="    &lt;string name=&quot;button_uxhelper&quot;>UX Helper SDK&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="115"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.button_legacysdk` appears to be unused"
+        errorLine1="    &lt;string name=&quot;button_legacysdk&quot;>Legacy SDK&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="116"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.text_select_sdk_title` appears to be unused"
+        errorLine1="    &lt;string name=&quot;text_select_sdk_title&quot;>Select SDK&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="117"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.text_select_sdk_description` appears to be unused"
+        errorLine1="    &lt;string name=&quot;text_select_sdk_description&quot;>Select which SDK to be used for rendering the preview&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="118"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="TypographyDashes"
+        message="Replace &quot;-&quot; with an &quot;en dash&quot; character (–, &amp;#8211;) ?"
+        errorLine1="    &lt;string name=&quot;text_shipping_duration&quot;>Economy (4-6 Business Days)&lt;/string>"
+        errorLine2="                                          ~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="74"
+            column="43"/>
+    </issue>
+
+    <issue
+        id="TypographyDashes"
+        message="Replace &quot;-&quot; with an &quot;en dash&quot; character (–, &amp;#8211;) ?"
+        errorLine1="    &lt;string name=&quot;text_event_time&quot;>Mon, Dec 21, 2020 - 08:01 pm - Donald L. Tucket Center Parking Lots - Tallahassee, FL&lt;/string>"
+        errorLine2="                                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="97"
+            column="36"/>
+    </issue>
+
+    <issue
+        id="TypographyFractions"
+        message="Use fraction character ½ (&amp;#189;) instead of 1/2?"
+        errorLine1="    &lt;string name=&quot;account_details_step_count_text&quot;>Step 1/2&lt;/string>"
+        errorLine2="                                                   ~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="31"
+            column="52"/>
+    </issue>
+
+    <issue
+        id="IconLauncherShape"
+        message="Launcher icons should not fill every pixel of their square region; see the design guide for details">
+        <location
+            file="src/main/res/mipmap-hdpi/rokt.png"/>
+    </issue>
+
+    <issue
+        id="IconLauncherShape"
+        message="Launcher icons should not fill every pixel of their square region; see the design guide for details">
+        <location
+            file="src/main/res/mipmap-mdpi/rokt.png"/>
+    </issue>
+
+    <issue
+        id="IconLauncherShape"
+        message="Launcher icons should not fill every pixel of their square region; see the design guide for details">
+        <location
+            file="src/main/res/mipmap-xhdpi/rokt.png"/>
+    </issue>
+
+    <issue
+        id="IconLauncherShape"
+        message="Launcher icons should not fill every pixel of their square region; see the design guide for details">
+        <location
+            file="src/main/res/mipmap-xxhdpi/rokt.png"/>
+    </issue>
+
+    <issue
+        id="IconLauncherShape"
+        message="Launcher icons should not fill every pixel of their square region; see the design guide for details">
+        <location
+            file="src/main/res/mipmap-xxxhdpi/rokt.png"/>
+    </issue>
+
+    <issue
+        id="IconLocation"
+        message="Found bitmap drawable `res/drawable/image_map.png` in densityless folder">
+        <location
+            file="src/main/res/drawable/image_map.png"/>
+    </issue>
+
+</issues>

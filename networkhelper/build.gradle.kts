@@ -1,12 +1,11 @@
 plugins {
-    alias(libs.plugins.android.library)
+    alias(libs.plugins.rokt.android.library)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.serialization)
 }
 
 android {
     namespace = "com.rokt.networkhelper"
-    compileSdk = 34
 
     defaultConfig {
         minSdk = 21
@@ -28,13 +27,6 @@ android {
             isMinifyEnabled = false
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
-    }
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
-    }
-    kotlinOptions {
-        jvmTarget = "1.8"
     }
 }
 

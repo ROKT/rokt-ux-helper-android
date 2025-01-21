@@ -125,7 +125,7 @@ class ImageComponentTest : BaseDcuiEspressoTest() {
 
     @Test
     @DcuiNodeJson(jsonFile = "ImageComponent/Image_with_invalid_DataUri.json")
-    @Ignore
+    @Ignore("Temporarily ignoring")
     fun testImageComponentWithInvalidDataUri() {
         composeTestRule.onNodeWithTag(DCUI_COMPONENT_TAG)
             .assertDoesNotExist()

@@ -1,8 +1,10 @@
 [versions]
 androidGradlePlugin = "8.1.2"
+androidDesugarJdkLibs = "1.2.0"
 androidxActivity = "1.6.1"
 androidxAppCompat = "1.5.1"
 androidxComposeBom = "2024.09.02"
+androidxComposeCompiler = "1.4.7"
 androidxCore = "1.9.0"
 androidxCoreSplashscreen = "1.0.0"
 androidxEspresso = "3.5.0"
@@ -39,10 +41,12 @@ mavenPublish = "0.30.0"
 kover = "0.9.1"
 
 roktUxHelper = "0.2.0"
+sdkVersionCode = "79"
 
 [libraries]
 androidx-activity-compose = { group = "androidx.activity", name = "activity-compose", version.ref = "androidxActivity" }
 androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "androidxAppCompat" }
+android-desugarJdkLibs = { group = "com.android.tools", name = "desugar_jdk_libs", version.ref = "androidDesugarJdkLibs" }
 androidx-compose-bom = { group = "androidx.compose", name = "compose-bom", version.ref = "androidxComposeBom" }
 androidx-compose-foundation = { group = "androidx.compose.foundation", name = "foundation" }
 androidx-compose-foundation-layout = { group = "androidx.compose.foundation", name = "foundation-layout" }
@@ -101,6 +105,7 @@ kotlin-gradlePlugin = { group = "org.jetbrains.kotlin", name = "kotlin-gradle-pl
 compose-lint-checks = { group = "com.slack.lint.compose", name = "compose-lint-checks", version.ref = "composeLint" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junit" }
 material = { group = "com.google.android.material", name = "material", version.ref = "material" }
+maven-publishPlugin = { group = "com.vanniktech", name = "gradle-maven-publish-plugin", version.ref = "mavenPublish" }
 
 [bundles]
 retrofit = ["retrofit-core", "retrofit-kotlin-serialization"]
@@ -120,6 +125,7 @@ kover = { id = "org.jetbrains.kotlinx.kover", version.ref = "kover" }
 
 # Plugins defined by this project
 rokt-android-application = { id = "rokt.android.application" }
-rokt-android-application-compose = { id = "rokt.android.application.compose" } # Plugins defined by this project
+rokt-android-application-compose = { id = "rokt.android.application.compose" }
 rokt-android-library = { id = "rokt.android.library" }
 rokt-android-library-compose = { id = "rokt.android.library.compose" }
+rokt-android-library-publish = { id = "rokt.android.library.publish" }
