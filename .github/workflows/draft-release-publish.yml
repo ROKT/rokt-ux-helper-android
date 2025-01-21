@@ -7,7 +7,7 @@ on:
         description: "The version you want to release in the format X.Y.Z"
         required: true
       version-suffix:
-        description: "The suffix to apply to the version e.g. -beta.1, -SNAPSHOT"
+        description: "If not provided defaults to -alpha.{build-number}. The suffix to apply to the version e.g. -beta.1, -SNAPSHOT"
         required: false
 
 concurrency:
@@ -59,7 +59,7 @@ jobs:
           if [ -n "${{ github.event.inputs.version-suffix }}" ]; then
             version_suffix="${{ github.event.inputs.version-suffix }}"
           else
-            version_suffix="-RC-$(date +'%Y%m%d%H%M')"
+            version_suffix="-alpha.${{ github.run_attempt }}"
           fi
           echo "version-suffix=$version_suffix" >> $GITHUB_OUTPUT
       - name: Update changelog
