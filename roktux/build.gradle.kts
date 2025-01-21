@@ -1,19 +1,25 @@
-buildscript {
-    // Used by the Maven Publish plugin to setup the details for Maven central in root build.gradle.kts
-    extra["libGroupId"] = "com.rokt"
-    extra["libDescription"] = "Rokt UX Helper Library"
-}
-
 plugins {
-    alias(libs.plugins.android.library)
-    alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.rokt.android.library)
+    alias(libs.plugins.rokt.android.library.compose)
     alias(libs.plugins.kotlinKapt)
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.dokka)
-    alias(libs.plugins.maven.publish)
+    alias(libs.plugins.kover)
+    alias(libs.plugins.rokt.android.library.publish)
 }
 
-val formattedVersion: String by project
+val libGroupId = "com.rokt"
+val libArtifactId = "roktux"
+val formattedVersion =
+    "${libs.versions.roktUxHelper.get()}${System.getenv("VERSION_SUFFIX").takeIf { !it.isNullOrBlank() } ?: ""}"
+val libDescription = "Rokt UX Helper Library"
+
+roktMavenPublish {
+    version.set(formattedVersion)
+    groupId.set(libGroupId)
+    artifactId.set(libArtifactId)
+    description.set(libDescription)
+}
 
 android {
     namespace = "com.rokt.roktux"
@@ -35,19 +41,6 @@ android {
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
     }
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
-    }
-    kotlinOptions {
-        jvmTarget = "17"
-    }
-    composeOptions {
-        kotlinCompilerExtensionVersion = "1.4.7"
-    }
-    buildFeatures {
-        compose = true
-    }
     testOptions {
         unitTests {
             isIncludeAndroidResources = true
@@ -59,32 +52,9 @@ tasks.withType(Test::class.java) {
     systemProperty("robolectric.logging", "stdout")
 }
 
-tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
-    val enableMetricsProvider = project.localGradleProperty("enableComposeCompilerMetrics")
-    if (enableMetricsProvider.orNull == "true") {
-        val metricsFolder = File(project.buildDir, "compose-metrics")
-        compilerOptions.freeCompilerArgs.addAll(
-            "-P",
-            "plugin:androidx.compose.compiler.plugins.kotlin:metricsDestination=" + metricsFolder.absolutePath,
-        )
-    }
-}
-
-tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
-    val enableReportsProvider = project.localGradleProperty("enableComposeCompilerReports")
-    if (enableReportsProvider.orNull == "true") {
-        val reportsFolder = File(project.buildDir, "compose-reports")
-        compilerOptions.freeCompilerArgs.addAll(
-            "-P",
-            "plugin:androidx.compose.compiler.plugins.kotlin:reportsDestination=" + reportsFolder.absolutePath,
-        )
-    }
-}
-
 dependencies {
 
     api(projects.uxHelper.modelmapper)
-    testImplementation(projects.uxHelper.testutils)
     implementation(libs.coil.kt)
     implementation(libs.coil.kt.compose)
     implementation(libs.coil.kt.svg)

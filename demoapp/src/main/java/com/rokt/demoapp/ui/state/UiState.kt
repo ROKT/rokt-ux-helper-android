@@ -14,4 +14,6 @@ enum class RoktDemoErrorTypes {
     QRCODE,
 }
 
-data class ViewState(val experienceResponse: String, val location: String)
+sealed interface UiContent {
+    data class ExperienceContent(val experienceResponse: String, val location: String) : UiContent
+}

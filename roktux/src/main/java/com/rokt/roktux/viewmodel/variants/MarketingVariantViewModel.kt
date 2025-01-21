@@ -6,6 +6,8 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.CreationExtras
 import com.rokt.modelmapper.mappers.ModelMapper
 import com.rokt.roktux.viewmodel.base.BaseViewModel
+import com.rokt.roktux.viewmodel.layout.LayoutContract
+import kotlinx.collections.immutable.toImmutableMap
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancelChildren
@@ -16,7 +18,8 @@ internal class MarketingViewModel(
     val currentOffer: Int,
     modelMapper: ModelMapper,
     private val ioDispatcher: CoroutineDispatcher,
-) : BaseViewModel<MarketingVariantContract.LayoutVariantEvent, MarketingVariantUiState, MarketingVariantContract.LayoutVariantEffect>() {
+    private var customState: Map<String, Int>,
+) : BaseViewModel<LayoutContract.LayoutEvent, MarketingVariantUiState, MarketingVariantContract.LayoutVariantEffect>() {
     private var offerViewedJob: Job? = null
 
     init {
@@ -26,21 +29,35 @@ internal class MarketingViewModel(
         val layoutVariantSchema = slot?.layoutVariant?.layoutVariantSchema
         val creativeCopy = slot?.offer?.creative?.copy
         if (layoutVariantSchema != null && creativeCopy != null) {
-            setSuccessState(MarketingVariantUiState(layoutVariantSchema, creativeCopy))
+            setSuccessState(MarketingVariantUiState(layoutVariantSchema, creativeCopy, customState.toImmutableMap()))
         }
     }
 
-    override suspend fun handleEvents(event: MarketingVariantContract.LayoutVariantEvent) {
+    override suspend fun handleEvents(event: LayoutContract.LayoutEvent) {
         when (event) {
-            is MarketingVariantContract.LayoutVariantEvent.OfferVisibilityChanged -> {
+            is LayoutContract.LayoutEvent.OfferVisibilityChanged -> {
                 handleOfferVisibilityChanged(event)
+            }
+
+            is LayoutContract.LayoutEvent.SetCustomState -> {
+                updateCustomState(event.key, event.value)
+                setEffect {
+                    MarketingVariantContract.LayoutVariantEffect.PropagateEvent(
+                        LayoutContract.LayoutEvent.SetOfferCustomState(
+                            currentOffer,
+                            customState,
+                        ),
+                    )
+                }
+            }
+
+            else -> {
+                setEffect { MarketingVariantContract.LayoutVariantEffect.PropagateEvent(event) }
             }
         }
     }
 
-    private fun handleOfferVisibilityChanged(
-        event: MarketingVariantContract.LayoutVariantEvent.OfferVisibilityChanged,
-    ) {
+    private fun handleOfferVisibilityChanged(event: LayoutContract.LayoutEvent.OfferVisibilityChanged) {
         offerViewedJob?.takeIf { !event.visible && it.isActive }?.cancel()
         if (event.visible && offerViewedJob == null) {
             offerViewedJob = viewModelScope.launch(ioDispatcher) {
@@ -55,15 +72,25 @@ internal class MarketingViewModel(
         viewModelScope.coroutineContext.cancelChildren()
     }
 
+    private fun updateCustomState(key: String, value: Int) {
+        customState += (key to value)
+        updateState { currentUiState ->
+            currentUiState.copy(
+                customState = customState.toImmutableMap(),
+            )
+        }
+    }
+
     class MarketingViewModelFactory(
         private val currentOffer: Int,
         private val modelMapper: ModelMapper,
         private val ioDispatcher: CoroutineDispatcher,
+        private var customState: Map<String, Int>,
     ) : ViewModelProvider.Factory {
         @Suppress("UNCHECKED_CAST")
         override fun <T : ViewModel> create(modelClass: Class<T>, extras: CreationExtras): T {
             if (modelClass.isAssignableFrom(MarketingViewModel::class.java)) {
-                return MarketingViewModel(currentOffer, modelMapper, ioDispatcher) as T
+                return MarketingViewModel(currentOffer, modelMapper, ioDispatcher, customState) as T
             }
             throw IllegalArgumentException("Unknown ViewModel type")
         }
