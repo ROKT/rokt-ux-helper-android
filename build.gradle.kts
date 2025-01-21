@@ -30,7 +30,7 @@ subprojects {
 }
 
 val formattedVersion by extra {
-    val versionFromProperty = project.findProperty("VERSION")?.toString()
+    val versionFromProperty = project.findProperty("VERSION")?.toString().takeIf { !it.isNullOrBlank() } ?: "0.0.0"
     val versionSuffix = project.findProperty("VERSION_SUFFIX")?.toString().takeIf { !it.isNullOrBlank() } ?: ""
     versionFromProperty + versionSuffix
 }
