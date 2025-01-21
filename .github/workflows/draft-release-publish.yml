@@ -6,6 +6,9 @@ on:
       version:
         description: "The version you want to release in the format X.Y.Z"
         required: true
+      version-suffix:
+        description: "The suffix to apply to the version e.g. -beta.1, -SNAPSHOT"
+        required: false
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
@@ -33,6 +36,14 @@ jobs:
           fi
           echo "Valid version: ${{ github.event.inputs.version }}"
           echo "validated-version=${{ github.event.inputs.version }}" >> $GITHUB_OUTPUT
+      - name: Validate version suffix
+        run: |
+          if [ -n "${{ github.event.inputs.version-suffix }}" ]; then
+            if [[ ! "${{ github.event.inputs.version-suffix }}" =~ ^-[A-Za-z0-9]+([.-][A-Za-z0-9]+)*$ ]]; then
+              echo "Error: Invalid version-suffix. It must start with '-' and can include periods or hyphens followed by alphanumeric characters, e.g., '-SNAPSHOT', '-alpha.3'." >&2
+              exit 1
+            fi
+          fi
       - name: Checkout repository
         uses: actions/checkout@v4
       - name: Setup JDK
@@ -45,8 +56,12 @@ jobs:
       - name: RC version name
         id: version-suffix
         run: |
-          version_suffix="-RC-$(date +'%Y%m%d%H%M')"
-          echo "version-suffix=version_suffix" >> $GITHUB_OUTPUT
+          if [ -n "${{ github.event.inputs.version-suffix }}" ]; then
+            version_suffix="${{ github.event.inputs.version-suffix }}"
+          else
+            version_suffix="-RC-$(date +'%Y%m%d%H%M')"
+          fi
+          echo "version-suffix=$version_suffix" >> $GITHUB_OUTPUT
       - name: Update changelog
         uses: thomaseizinger/keep-a-changelog-new-release@v2
         with:
