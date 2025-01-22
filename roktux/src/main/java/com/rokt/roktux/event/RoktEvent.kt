@@ -82,6 +82,9 @@ data class RoktPlatformEvent(
 }
 
 enum class EventType {
+    @SerialName("SignalLoadComplete")
+    SignalLoadComplete,
+
     @SerialName("SignalImpression")
     SignalImpression,
 

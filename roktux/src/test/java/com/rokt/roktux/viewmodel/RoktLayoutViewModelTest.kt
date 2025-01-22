@@ -99,12 +99,19 @@ class RoktLayoutViewModelTest : BaseViewModelTest() {
     }
 
     @Test
-    fun `LayoutReady Event should send LayoutReady UxEvent`() = runTest {
+    fun `LayoutReady Event should send LayoutReady UxEvent and SignalLoadComplete platform event`() = runTest {
         // Act
         layoutViewModel.setEvent(LayoutContract.LayoutEvent.LayoutReady)
         // Assert
         verify {
             uxEvent.invoke(RoktUxEvent.LayoutReady("pluginId"))
+        }
+        verify(timeout = 2000) {
+            platformEvent.invoke(
+                withArg { events ->
+                    assertThat(events).anyMatch { it.eventType == EventType.SignalLoadComplete }
+                },
+            )
         }
     }
 
@@ -263,6 +270,50 @@ class RoktLayoutViewModelTest : BaseViewModelTest() {
             viewStateChange.invoke(
                 withArg { state ->
                     assertThat(state.offerCustomStates).containsEntry("0", mapOf(key to value))
+                },
+            )
+        }
+    }
+
+    @Test
+    fun `LayoutInitialised event should send the RoktPlatformEvent with SignalInitialize`() = runTest {
+        // Arrange
+        every { mapper.getSavedExperience() } returns mockk(relaxed = true) {
+            every { plugins } returns persistentListOf(
+                mockk(relaxed = true) {
+                    every { instanceGuid } returns "pluginInstanceGuid"
+                    every { id } returns "pluginId"
+                    every { settings } returns LayoutSettings(closeOnComplete = false)
+                    every { slots } returns persistentListOf(
+                        mockk(relaxed = true) {
+                            every { instanceGuid } returns "slotInstanceGuid"
+                            every { offer } returns mockk(relaxed = true) {
+                                every { creative } returns mockk(relaxed = true) {
+                                    every { instanceGuid } returns "creativeInstanceGuid"
+                                }
+                            }
+                        },
+                        mockk(relaxed = true) {
+                            every { instanceGuid } returns "slotInstanceGuid1"
+                            every { offer } returns mockk(relaxed = true) {
+                                every { creative } returns mockk(relaxed = true) {
+                                    every { instanceGuid } returns "creativeInstanceGuid1"
+                                }
+                            }
+                        },
+                    )
+                },
+            )
+        }
+
+        // Act
+        layoutViewModel.setEvent(LayoutContract.LayoutEvent.LayoutInitialised)
+
+        // Assert
+        verify(timeout = 2000) {
+            platformEvent.invoke(
+                match { event ->
+                    event[0].eventType == EventType.SignalInitialize && event[0].parentGuid == "pluginInstanceGuid"
                 },
             )
         }
