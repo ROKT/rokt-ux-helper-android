@@ -67,7 +67,7 @@ tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
 }
 
 dependencies {
-    api(libs.dcui.schema)
+    //api(libs.dcui.schema)
     api(libs.kotlinx.serialization.json)
     implementation(libs.kotlinx.collections.immutable)
     implementation(platform(libs.androidx.compose.bom))

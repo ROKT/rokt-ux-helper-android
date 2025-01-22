@@ -335,6 +335,16 @@ internal fun transformProgressControl(
     )
 }
 
+internal fun transformEscapeHatch(
+    escapeHatchModel: LayoutSchemaModel.EscapeHatch,
+    transformLayoutSchemaChildren: (LayoutSchemaModel) -> LayoutSchemaUiModel?,
+): LayoutSchemaUiModel.EscapeHatchUiModel {
+    return LayoutSchemaUiModel.EscapeHatchUiModel(
+        data = escapeHatchModel.node.data,
+        backupElement = escapeHatchModel.node.backupElement?.let { transformLayoutSchemaChildren(it) },
+    )
+}
+
 internal fun transformWhen(
     whenModel: LayoutSchemaModel.When,
     transformLayoutSchemaChildren: (LayoutSchemaModel) -> LayoutSchemaUiModel?,

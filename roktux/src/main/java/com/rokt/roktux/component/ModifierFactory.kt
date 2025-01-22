@@ -815,30 +815,6 @@ internal class ModifierFactory {
         }
     } ?: ""
 
-    private val String.color
-        get() = try {
-            Color(parseColor(this))
-        } catch (e: RuntimeException) {
-            Color.Unspecified
-        }
-
-    private fun parseColor(hexColor: String): Int {
-        if (hexColor.isEmpty() || hexColor[0] != '#') {
-            throw IllegalArgumentException("Invalid hex color format: $hexColor")
-        }
-
-        val hex = hexColor.substring(1)
-        val normalizedHex = when (hex.length) {
-            3 -> hex.map { "$it$it" }.joinToString(separator = "", prefix = "ff") // RGB -> AARRGGBB
-            4 -> hex.map { "$it$it" }.joinToString(separator = "") // ARGB -> AARRGGBB
-            6 -> "ff$hex" // RRGGBB -> AARRGGBB
-            8 -> hex // AARRGGBB (already correct)
-            else -> throw IllegalArgumentException("Invalid hex color length: ${hex.length}")
-        }
-
-        return normalizedHex.toLong(16).toInt()
-    }
-
     private fun blurRadiusToAlpha(radius: Float): Float {
         // Arbitrary decay function
         return 1 * (1 - 0.25).pow(radius.toDouble()).toFloat()
@@ -1430,4 +1406,28 @@ internal class ModifierFactory {
         private const val WRAP_CONTENT = -2f
         private const val MATCH_PARENT = -1f
     }
+}
+
+internal val String.color
+    get() = try {
+        Color(parseColor(this))
+    } catch (e: RuntimeException) {
+        Color.Unspecified
+    }
+
+private fun parseColor(hexColor: String): Int {
+    if (hexColor.isEmpty() || hexColor[0] != '#') {
+        throw IllegalArgumentException("Invalid hex color format: $hexColor")
+    }
+
+    val hex = hexColor.substring(1)
+    val normalizedHex = when (hex.length) {
+        3 -> hex.map { "$it$it" }.joinToString(separator = "", prefix = "ff") // RGB -> AARRGGBB
+        4 -> hex.map { "$it$it" }.joinToString(separator = "") // ARGB -> AARRGGBB
+        6 -> "ff$hex" // RRGGBB -> AARRGGBB
+        8 -> hex // AARRGGBB (already correct)
+        else -> throw IllegalArgumentException("Invalid hex color length: ${hex.length}")
+    }
+
+    return normalizedHex.toLong(16).toInt()
 }

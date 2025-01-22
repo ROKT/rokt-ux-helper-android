@@ -5,7 +5,6 @@ import com.rokt.network.model.LayoutSchemaModel
 import com.rokt.network.model.LayoutSettings
 import com.rokt.network.model.RootSchemaModel
 import kotlinx.serialization.KSerializer
-import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.descriptors.PrimitiveKind
 import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
 import kotlinx.serialization.descriptors.SerialDescriptor

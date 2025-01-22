@@ -319,6 +319,13 @@ class ExperienceModelMapperImpl(private val experienceResponse: String, private 
         is LayoutSchemaModel.DataIcon -> transformDataIcon(layoutSchemaModel, offerModel, module, itemIndex)
 
         is LayoutSchemaModel.StaticIcon -> transformStaticIcon(layoutSchemaModel)
+
+        is LayoutSchemaModel.EscapeHatch -> {
+            transformEscapeHatch(layoutSchemaModel) { child ->
+                transformLayoutSchemaModel(child, offerModel, responseContextKey, itemIndex, module)
+            }
+        }
+
         else -> null
     }
 
