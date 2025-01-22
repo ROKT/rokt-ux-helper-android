@@ -155,6 +155,13 @@ internal class LayoutViewModel(
 
             is LayoutContract.LayoutEvent.LayoutReady -> {
                 uxEvent(RoktUxEvent.LayoutReady(pluginId))
+                handlePlatformEvent(
+                    RoktPlatformEvent(
+                        eventType = EventType.SignalLoadComplete,
+                        sessionId = experienceModel.sessionId,
+                        parentGuid = pluginModel.instanceGuid,
+                    ),
+                )
             }
 
             is LayoutContract.LayoutEvent.LayoutInteractive -> {
@@ -252,7 +259,7 @@ internal class LayoutViewModel(
             RoktPlatformEvent(
                 eventType = EventType.SignalInitialize,
                 sessionId = experienceModel.sessionId,
-                parentGuid = experienceModel.placementContext.pageInstanceGuid,
+                parentGuid = pluginModel.instanceGuid,
             ),
         )
     }
