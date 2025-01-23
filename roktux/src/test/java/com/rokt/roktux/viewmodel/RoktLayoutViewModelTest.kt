@@ -85,6 +85,7 @@ class RoktLayoutViewModelTest : BaseViewModelTest() {
     private fun initialize(handleUrlByApp: Boolean = true) {
         layoutViewModel = LayoutViewModel(
             location = "location1",
+            startTimeStamp = System.currentTimeMillis(),
             uxEvent = uxEvent,
             platformEvent = platformEvent,
             modelMapper = mapper,
@@ -314,6 +315,28 @@ class RoktLayoutViewModelTest : BaseViewModelTest() {
             platformEvent.invoke(
                 match { event ->
                     event[0].eventType == EventType.SignalInitialize && event[0].parentGuid == "pluginInstanceGuid"
+                },
+            )
+        }
+    }
+
+    @Test
+    fun `FirstOfferLoaded should send the RoktPlatformEvent with SignalImpression for the layout and required metadata`() {
+        // Act
+        layoutViewModel.setEvent(LayoutContract.LayoutEvent.FirstOfferLoaded)
+
+        // Assert
+        verify(timeout = 2000) {
+            platformEvent.invoke(
+                withArg { events ->
+                    assertThat(events).anyMatch {
+                        it.eventType == EventType.SignalImpression &&
+                            it.parentGuid == "pluginInstanceGuid" &&
+                            it.metadata.size == 3 &&
+                            it.metadata.any { data -> data.name == "pageRenderEngine" && data.value == "Layouts" } &&
+                            it.metadata.any { data -> data.name == "pageSignalLoadStart" } &&
+                            it.metadata.any { data -> data.name == "pageSignalLoadComplete" }
+                    }
                 },
             )
         }

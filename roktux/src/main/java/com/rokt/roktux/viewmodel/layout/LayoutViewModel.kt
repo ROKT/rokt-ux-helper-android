@@ -20,6 +20,7 @@ import com.rokt.modelmapper.uimodel.PluginModel
 import com.rokt.modelmapper.uimodel.SignalType
 import com.rokt.modelmapper.utils.DEFAULT_VIEWABLE_ITEMS
 import com.rokt.modelmapper.utils.FIRST_OFFER_INDEX
+import com.rokt.modelmapper.utils.roktDateFormat
 import com.rokt.roktux.RoktViewState
 import com.rokt.roktux.event.EventNameValue
 import com.rokt.roktux.event.EventType
@@ -39,11 +40,13 @@ import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.util.Date
 import java.util.UUID
 import java.util.concurrent.ConcurrentHashMap
 
 internal class LayoutViewModel(
     private val location: String,
+    private val startTimeStamp: Long,
     private val uxEvent: (uxEvent: RoktUxEvent) -> Unit,
     private val platformEvent: (platformEvents: List<RoktPlatformEvent>) -> Unit,
     private val viewStateChange: (state: RoktViewState) -> Unit,
@@ -271,6 +274,14 @@ internal class LayoutViewModel(
                 eventType = EventType.SignalImpression,
                 sessionId = experienceModel.sessionId,
                 parentGuid = pluginModel.instanceGuid,
+                metadata = listOf(
+                    EventNameValue(KEY_PAGE_SIGNAL_LOAD_START, roktDateFormat.format(Date(startTimeStamp))),
+                    EventNameValue(KEY_PAGE_RENDER_ENGINE, LAYOUTS_RENDER_ENGINE),
+                    EventNameValue(
+                        KEY_PAGE_SIGNAL_LOAD_COMPLETE,
+                        roktDateFormat.format(Date(System.currentTimeMillis())),
+                    ),
+                ),
             ),
         )
         handleNextOfferLoaded(FIRST_OFFER_INDEX)
@@ -516,6 +527,10 @@ internal class LayoutViewModel(
 
     companion object {
         private const val KEY_INITIATOR = "initiator"
+        private const val KEY_PAGE_RENDER_ENGINE = "pageRenderEngine"
+        private const val KEY_PAGE_SIGNAL_LOAD_START = "pageSignalLoadStart"
+        private const val KEY_PAGE_SIGNAL_LOAD_COMPLETE = "pageSignalLoadComplete"
+        private const val LAYOUTS_RENDER_ENGINE = "Layouts"
         private const val NO_MORE_OFFERS_TO_SHOW = "NO_MORE_OFFERS_TO_SHOW"
         private const val DISMISSED = "DISMISSED"
         private const val CLOSE_BUTTON = "CLOSE_BUTTON"
@@ -527,6 +542,7 @@ internal class LayoutViewModel(
 
     class RoktViewModelFactory(
         private val location: String,
+        private val startTimeStamp: Long,
         private val uxEvent: (uxEvent: RoktUxEvent) -> Unit,
         private val platformEvent: (platformEvents: List<RoktPlatformEvent>) -> Unit,
         private val viewStateChange: (state: RoktViewState) -> Unit,
@@ -543,6 +559,7 @@ internal class LayoutViewModel(
             if (modelClass.isAssignableFrom(LayoutViewModel::class.java)) {
                 return LayoutViewModel(
                     location = location,
+                    startTimeStamp = startTimeStamp,
                     uxEvent = uxEvent,
                     platformEvent = platformEvent,
                     viewStateChange = viewStateChange,

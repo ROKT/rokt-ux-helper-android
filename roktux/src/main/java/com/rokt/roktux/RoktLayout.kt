@@ -57,6 +57,7 @@ import kotlinx.coroutines.flow.onEach
  * @param location The location identifier for the layout.
  * @param modifier The modifier to be applied to the layout.
  * @param roktUxConfig The configuration for the Rokt UX.
+ * @param startTimeStamp Optional - The start timestamp of the layout request.
  * @param onUxEvent Callback for UX events.
  * @param onPlatformEvent Callback for platform events.
  */
@@ -66,6 +67,7 @@ fun RoktLayout(
     location: String,
     modifier: Modifier = Modifier,
     roktUxConfig: RoktUxConfig,
+    startTimeStamp: Long = System.currentTimeMillis(),
     onUxEvent: (event: RoktUxEvent) -> Unit = { },
     onPlatformEvent: (platformEvents: RoktPlatformEventsWrapper) -> Unit = { },
 ) {
@@ -101,6 +103,7 @@ fun RoktLayout(
                     experienceResponse = experienceResponse,
                     location = location,
                     uxEvent = onUxEvent,
+                    startTimeStamp = startTimeStamp,
                     platformEvent = { events ->
                         onPlatformEvent(
                             RoktPlatformEventsWrapper(
