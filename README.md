@@ -31,6 +31,11 @@ dependencies {
 }
 ```
 
+## Releases
+
+- You can find a summary of changes in the [Changelog](CHANGELOG.md)
+- If there are any migrations between versions you will find instructions in the [migration guide](MIGRATING.md)
+
 ## Jetpack Compose Compatibility
 
 As `roktux` uses Jetpack Compose, consuming projects should use Compose libraries with compatible versions:

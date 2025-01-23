@@ -6,19 +6,30 @@ on:
       - "main"
   pull_request:
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 permissions: read-all
 
 jobs:
+  trunk-check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Trunk Check
+        uses: trunk-io/trunk-action@v1
+        with:
+          check-mode: all
+
   lint:
     runs-on: ubuntu-latest
     steps:
-      - name: Setup Java
-        uses: actions/setup-java@v4
-        with:
-          java-version: 17
-          distribution: microsoft
       - name: Checkout repository
         uses: actions/checkout@v4
+      - name: Setup JDK
+        uses: ./.github/actions/setup-java
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
       - name: Run lint
@@ -27,13 +38,10 @@ jobs:
   unit-test:
     runs-on: ubuntu-latest
     steps:
-      - name: Setup Java
-        uses: actions/setup-java@v4
-        with:
-          java-version: 17
-          distribution: microsoft
       - name: Checkout repository
         uses: actions/checkout@v4
+      - name: Setup JDK
+        uses: ./.github/actions/setup-java
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
       - name: Run tests
@@ -49,13 +57,10 @@ jobs:
   assemble-debug:
     runs-on: ubuntu-latest
     steps:
-      - name: Setup Java
-        uses: actions/setup-java@v4
-        with:
-          java-version: 17
-          distribution: microsoft
       - name: Checkout repository
         uses: actions/checkout@v4
+      - name: Setup JDK
+        uses: ./.github/actions/setup-java
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
       - name: Assemble debug

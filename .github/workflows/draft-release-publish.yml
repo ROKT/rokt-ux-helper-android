@@ -1,0 +1,91 @@
+name: Create draft release
+
+on:
+  workflow_dispatch: # checkov:skip=CKV_GHA_7
+    inputs:
+      version:
+        description: "The version you want to release in the format X.Y.Z"
+        required: true
+      version-suffix:
+        description: "If not provided defaults to -alpha.{build-number}. The suffix to apply to the version e.g. -beta.1, -SNAPSHOT"
+        required: false
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  publish-draft-release:
+    runs-on: ubuntu-latest
+    env:
+      ORG_GRADLE_PROJECT_signingInMemoryKey: ${{ secrets.MAVEN_SIGNING_KEY }}
+      ORG_GRADLE_PROJECT_signingInMemoryKeyPassword: ${{ secrets.MAVEN_SIGNING_PASSWORD }}
+      ORG_GRADLE_PROJECT_mavenCentralUsername: ${{ secrets.SONATYPE_USERNAME }}
+      ORG_GRADLE_PROJECT_mavenCentralPassword: ${{ secrets.SONATYPE_PASSWORD }}
+    steps:
+      - name: Validate version format
+        id: validate_version
+        run: |
+          if [[ ! "${{ github.event.inputs.version }}" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "Error: Invalid version format. Please provide a version in the format X.Y.Z where X, Y, and Z are numbers."
+            exit 1
+          fi
+          echo "Valid version: ${{ github.event.inputs.version }}"
+          echo "validated-version=${{ github.event.inputs.version }}" >> $GITHUB_OUTPUT
+      - name: Validate version suffix
+        run: |
+          if [ -n "${{ github.event.inputs.version-suffix }}" ]; then
+            if [[ ! "${{ github.event.inputs.version-suffix }}" =~ ^-[A-Za-z0-9]+([.-][A-Za-z0-9]+)*$ ]]; then
+              echo "Error: Invalid version-suffix. It must start with '-' and can include periods or hyphens followed by alphanumeric characters, e.g., '-SNAPSHOT', '-alpha.3'." >&2
+              exit 1
+            fi
+          fi
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Setup JDK
+        uses: ./.github/actions/setup-java
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+      - name: Save validated version to file
+        run: |
+          echo "${{ steps.validate_version.outputs.validated-version }}" > VERSION
+      - name: Release version name
+        id: version-suffix
+        run: |
+          if [ -n "${{ github.event.inputs.version-suffix }}" ]; then
+            version_suffix="${{ github.event.inputs.version-suffix }}"
+          else
+            version_suffix="-alpha.${{ github.run_attempt }}"
+          fi
+          echo "version-suffix=$version_suffix" >> $GITHUB_OUTPUT
+      - name: Update changelog
+        uses: thomaseizinger/keep-a-changelog-new-release@v2
+        with:
+          tag: ${{ steps.validate_version.outputs.validated-version }}
+      - name: Publish to Maven local
+        run: ./gradlew publishMavenPublicationToMavenLocal -PVERSION=${{ steps.validate_version.outputs.validated-version }} -PVERSION_SUFFIX=${{ steps.version-suffix.outputs.version-suffix }}
+      - name: Publish to Maven Central
+        run: ./gradlew publishMavenPublicationToMavenCentralRepository -PVERSION=${{ steps.validate_version.outputs.validated-version }} -PVERSION_SUFFIX=${{ steps.version-suffix.outputs.version-suffix }} --no-configuration-cache
+      - name: Upload AAR artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: aar-files
+          path: "**/*.aar"
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v7
+        with:
+          commit-message: Create ${{ steps.validate_version.outputs.validated-version }}${{ steps.version-suffix.outputs.version-suffix }}
+          branch: release/${{ steps.validate_version.outputs.validated-version }}
+          title: Prepare release ${{ steps.validate_version.outputs.validated-version }}
+          base: main
+          body: |
+            Preparing for release ${{ steps.validate_version.outputs.validated-version }}
+            - Bumped version
+            - Updated changelog
+            - Generated release build ${{ steps.validate_version.outputs.validated-version }}${{ steps.version-suffix.outputs.version-suffix }}
+          labels: |
+            release
