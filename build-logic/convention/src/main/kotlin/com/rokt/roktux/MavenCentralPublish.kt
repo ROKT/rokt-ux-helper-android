@@ -1,20 +1,12 @@
 package com.rokt.roktux
 
 import com.rokt.roktux.publish.RoktMavenPublishExtension
-import com.vanniktech.maven.publish.AndroidSingleVariantLibrary
 import com.vanniktech.maven.publish.MavenPublishBaseExtension
 import com.vanniktech.maven.publish.SonatypeHost
 import org.gradle.api.Project
 
 fun Project.configureMavenPublishing(roktMavenPublish: RoktMavenPublishExtension) {
     extensions.configure<MavenPublishBaseExtension>("mavenPublishing") {
-        configure(
-            AndroidSingleVariantLibrary(
-                variant = "devRelease",
-                sourcesJar = true,
-                publishJavadocJar = true,
-            ),
-        )
         afterEvaluate {
             publishToMavenCentral(SonatypeHost.CENTRAL_PORTAL)
             coordinates(

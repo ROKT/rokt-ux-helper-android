@@ -35,16 +35,18 @@ class AndroidLibraryConventionPlugin : Plugin<Project> {
             val sdkVersionName = libs.findVersion(versionParam).get().toString()
             val sdkVersionCode = libs.findVersion("sdkVersionCode").get().toString().toInt()
             val dcuiVersion = libs.findVersion("dcui").get().toString()
+            val buildConfigs = BuildConfigs(
+                versionName = sdkVersionName,
+                dcuiVersion = formatDcuiVersion(dcuiVersion).orEmpty(),
+            )
             extensions.configure<LibraryExtension> {
                 configureKotlinAndroid(this)
                 defaultConfig.targetSdk = 33
                 defaultConfig.versionName = sdkVersionName
                 defaultConfig.versionCode = sdkVersionCode
-                val buildConfigs = BuildConfigs(
-                    versionName = sdkVersionName,
-                    dcuiVersion = formatDcuiVersion(dcuiVersion).orEmpty(),
-                )
-                configureFlavors(this, buildConfigs)
+                if (target.findProperty("useProductFlavours") as? String == "true") {
+                    configureFlavors(this, buildConfigs)
+                }
             }
             extensions.configure<LibraryAndroidComponentsExtension> {
                 configurePrintApksTask(this)
