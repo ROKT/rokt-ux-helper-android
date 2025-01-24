@@ -12,6 +12,7 @@ import com.rokt.roktux.event.RoktUxEvent
 internal class DIComponentViewModel(
     private val experienceResponse: String,
     private val location: String,
+    private val startTimeStamp: Long,
     private val onUxEvent: (uxEvent: RoktUxEvent) -> Unit,
     private val onPlatformEvent: (platformEvents: List<RoktPlatformEvent>) -> Unit,
     private val onViewStateChange: (state: RoktViewState) -> Unit,
@@ -25,6 +26,7 @@ internal class DIComponentViewModel(
     val component = LayoutComponent(
         experienceResponse,
         location,
+        startTimeStamp,
         onUxEvent,
         onPlatformEvent,
         onViewStateChange,
@@ -38,6 +40,7 @@ internal class DIComponentViewModel(
     class DIComponentViewModelFactory(
         private val experienceResponse: String,
         private val location: String,
+        private val startTimeStamp: Long,
         private val uxEvent: (uxEvent: RoktUxEvent) -> Unit,
         private val platformEvent: (platformEvents: List<RoktPlatformEvent>) -> Unit,
         private val viewStateChange: (state: RoktViewState) -> Unit,
@@ -53,6 +56,7 @@ internal class DIComponentViewModel(
                 return DIComponentViewModel(
                     experienceResponse = experienceResponse,
                     location = location,
+                    startTimeStamp = startTimeStamp,
                     onUxEvent = uxEvent,
                     onPlatformEvent = platformEvent,
                     onViewStateChange = viewStateChange,

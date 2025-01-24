@@ -59,6 +59,7 @@ class DcuiComponentRule(val composeTestRule: ComposeContentTestRule) : BaseCompo
                 LocalLayoutComponent provides LayoutComponent(
                     experienceResponse = "",
                     location = "",
+                    startTimeStamp = System.currentTimeMillis(),
                     onUxEvent = {},
                     onPlatformEvent = {},
                     onViewStateChange = {},

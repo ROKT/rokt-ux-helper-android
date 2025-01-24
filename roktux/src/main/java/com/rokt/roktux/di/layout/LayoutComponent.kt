@@ -12,6 +12,7 @@ import kotlinx.collections.immutable.ImmutableMap
 internal class LayoutComponent(
     experienceResponse: String,
     location: String,
+    startTimeStamp: Long,
     onUxEvent: (event: RoktUxEvent) -> Unit,
     onPlatformEvent: (platformEvents: List<RoktPlatformEvent>) -> Unit,
     onViewStateChange: (state: RoktViewState) -> Unit,
@@ -25,6 +26,7 @@ internal class LayoutComponent(
         LayoutModule(
             experienceResponse,
             location,
+            startTimeStamp,
             onUxEvent,
             onPlatformEvent,
             onViewStateChange,

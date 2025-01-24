@@ -18,6 +18,7 @@ import kotlinx.coroutines.Dispatchers
 internal class LayoutModule(
     private val experience: String,
     private val location: String,
+    private val startTimeStamp: Long,
     private val uxEvent: (uxEvent: RoktUxEvent) -> Unit,
     private val platformEvent: (platformEvents: List<RoktPlatformEvent>) -> Unit,
     private val viewStateChange: (state: RoktViewState) -> Unit,
@@ -41,6 +42,7 @@ internal class LayoutModule(
         this.provideModuleScoped {
             LayoutViewModel.RoktViewModelFactory(
                 location = get(LOCATION),
+                startTimeStamp = startTimeStamp,
                 uxEvent = uxEvent,
                 platformEvent = platformEvent,
                 viewStateChange = viewStateChange,
