@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.0] - 2025-01-29
+
 ### Added
 
 - Support for Add to Cart nodes
@@ -30,3 +32,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Initial implementation of UX Helper
+
+[unreleased]: https://github.com/ROKT/rokt-ux-helper-android/compare/0.3.0...HEAD
+[0.3.0]: https://github.com/ROKT/rokt-ux-helper-android/compare/8a9c5f1e413c56d49a69a8af9c6423e1f33b56bd...0.3.0
