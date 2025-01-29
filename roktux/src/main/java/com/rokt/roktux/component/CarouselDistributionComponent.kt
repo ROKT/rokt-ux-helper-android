@@ -153,9 +153,12 @@ internal class CarouselDistributionComponent(
                             // Only progress to next offer if viewableItems is 1
                             if (viewableItems == DEFAULT_VIEWABLE_ITEMS) {
                                 onEventSent(event.copy(shouldProgress = true))
+                            } else {
+                                onEventSent(event)
                             }
+                        } else {
+                            onEventSent(event)
                         }
-                        onEventSent.invoke(event)
                     }
                 }
             }
