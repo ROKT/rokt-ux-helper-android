@@ -73,8 +73,16 @@ data class RoktPlatformEvent(
     @SerialName("pageInstanceGuid") val pageInstanceGuid: String = "",
     @SerialName("eventTime") val eventTime: String = roktDateFormat.format(Date()),
     @SerialName("eventData") val eventData: Map<String, String>? = null,
-    @SerialName("metadata") val metadata: List<EventNameValue> = emptyList(),
+    @SerialName("metadata") var metadata: List<EventNameValue> = emptyList(),
 ) : RoktEvent {
+    init {
+        val fixedMetadata = listOf(
+            EventNameValue(KEY_CAPTURE_METHOD, CLIENT_PROVIDED),
+            EventNameValue(KEY_CLIENT_TIMESTAMP, eventTime),
+        )
+        this.metadata += fixedMetadata
+    }
+
     fun toJsonString(): String {
         val json = Json { encodeDefaults = true }
         return json.encodeToString(this)
@@ -125,3 +133,7 @@ data class RoktPlatformEventsWrapper(
 ) {
     fun toJsonString(): String = Json { encodeDefaults = true }.encodeToString(this)
 }
+
+private const val KEY_CAPTURE_METHOD = "captureMethod"
+private const val KEY_CLIENT_TIMESTAMP = "clientTimeStamp"
+private const val CLIENT_PROVIDED = "ClientProvided"
