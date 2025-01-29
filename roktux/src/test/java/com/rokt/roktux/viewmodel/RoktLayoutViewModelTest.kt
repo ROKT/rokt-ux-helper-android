@@ -277,50 +277,6 @@ class RoktLayoutViewModelTest : BaseViewModelTest() {
     }
 
     @Test
-    fun `LayoutInitialised event should send the RoktPlatformEvent with SignalInitialize`() = runTest {
-        // Arrange
-        every { mapper.getSavedExperience() } returns mockk(relaxed = true) {
-            every { plugins } returns persistentListOf(
-                mockk(relaxed = true) {
-                    every { instanceGuid } returns "pluginInstanceGuid"
-                    every { id } returns "pluginId"
-                    every { settings } returns LayoutSettings(closeOnComplete = false)
-                    every { slots } returns persistentListOf(
-                        mockk(relaxed = true) {
-                            every { instanceGuid } returns "slotInstanceGuid"
-                            every { offer } returns mockk(relaxed = true) {
-                                every { creative } returns mockk(relaxed = true) {
-                                    every { instanceGuid } returns "creativeInstanceGuid"
-                                }
-                            }
-                        },
-                        mockk(relaxed = true) {
-                            every { instanceGuid } returns "slotInstanceGuid1"
-                            every { offer } returns mockk(relaxed = true) {
-                                every { creative } returns mockk(relaxed = true) {
-                                    every { instanceGuid } returns "creativeInstanceGuid1"
-                                }
-                            }
-                        },
-                    )
-                },
-            )
-        }
-
-        // Act
-        layoutViewModel.setEvent(LayoutContract.LayoutEvent.LayoutInitialised)
-
-        // Assert
-        verify(timeout = 2000) {
-            platformEvent.invoke(
-                match { event ->
-                    event[0].eventType == EventType.SignalInitialize && event[0].parentGuid == "pluginInstanceGuid"
-                },
-            )
-        }
-    }
-
-    @Test
     fun `FirstOfferLoaded should send the RoktPlatformEvent with SignalImpression for the layout and required metadata`() {
         // Act
         layoutViewModel.setEvent(LayoutContract.LayoutEvent.FirstOfferLoaded)
@@ -332,7 +288,7 @@ class RoktLayoutViewModelTest : BaseViewModelTest() {
                     assertThat(events).anyMatch {
                         it.eventType == EventType.SignalImpression &&
                             it.parentGuid == "pluginInstanceGuid" &&
-                            it.metadata.size == 3 &&
+                            it.metadata.size == 5 &&
                             it.metadata.any { data -> data.name == "pageRenderEngine" && data.value == "Layouts" } &&
                             it.metadata.any { data -> data.name == "pageSignalLoadStart" } &&
                             it.metadata.any { data -> data.name == "pageSignalLoadComplete" }

@@ -127,7 +127,6 @@ internal class LayoutViewModel(
         pluginId = pluginModel.id
 
         if (layoutSchema != null && lastOfferIndex >= FIRST_OFFER_INDEX) {
-            handleSignalInitialise()
             sendViewState(currentOffer)
             setSuccessState(
                 LayoutUiState(
@@ -253,16 +252,6 @@ internal class LayoutViewModel(
                 sessionId = experienceModel.sessionId,
                 parentGuid = pluginModel.slots[offerId].offer?.creative?.instanceGuid.orEmpty(),
                 pageInstanceGuid = experienceModel.placementContext.pageInstanceGuid,
-            ),
-        )
-    }
-
-    private fun handleSignalInitialise() {
-        handlePlatformEvent(
-            RoktPlatformEvent(
-                eventType = EventType.SignalInitialize,
-                sessionId = experienceModel.sessionId,
-                parentGuid = pluginModel.instanceGuid,
             ),
         )
     }
