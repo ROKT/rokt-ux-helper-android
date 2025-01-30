@@ -37,7 +37,7 @@ private fun rememberComposableScopedViewModelStoreOwner(key: Any?): ViewModelSto
 }
 
 @Composable
-internal fun WithComposableScopedViewModelStoreOwner(key: Any?, content: @Composable () -> Unit) {
+fun WithComposableScopedViewModelStoreOwner(key: Any?, content: @Composable () -> Unit) {
     CompositionLocalProvider(
         value = LocalViewModelStoreOwner provides rememberComposableScopedViewModelStoreOwner(key),
         content = content,
