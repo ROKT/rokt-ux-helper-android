@@ -3,7 +3,7 @@ package com.rokt.roktux.di.core
 import java.util.concurrent.locks.ReentrantLock
 import kotlin.concurrent.withLock
 
-internal abstract class Module {
+abstract class Module {
     private val typeFactories = mutableMapOf<Pair<Class<out Any?>, String?>, Factory<out Any?>>()
     private val lock = ReentrantLock()
 
