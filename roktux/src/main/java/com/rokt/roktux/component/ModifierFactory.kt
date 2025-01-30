@@ -114,6 +114,7 @@ import com.rokt.modelmapper.uimodel.TransitionTextStylingUiProperties
 import com.rokt.modelmapper.uimodel.WidthUiModel
 import com.rokt.roktux.di.layout.LocalFontFamilyProvider
 import com.rokt.roktux.di.layout.LocalLayoutComponent
+import com.rokt.roktux.viewmodel.layout.LayoutContract
 import com.rokt.roktux.viewmodel.layout.OfferUiState
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.ImmutableMap
@@ -977,6 +978,7 @@ internal class ModifierFactory {
         defaultFontFamily: String? = null,
         conditionalTransitionTextStyling: ConditionalTransitionTextStyling? = null,
         baseStyles: ImmutableList<StateBlock<TextStylingUiProperties>>? = null,
+        onEventSent: (LayoutContract.LayoutEvent) -> Unit,
     ): TextStyleUiState {
         val transitionStyleState = evaluateState(
             predicates = conditionalTransitionTextStyling?.predicates,
@@ -1002,6 +1004,7 @@ internal class ModifierFactory {
                 fontFamilyMap,
                 defaultFontFamily,
                 resolver,
+                onEventSent,
             )
         } else {
             remember(text, textStyles, breakpointIndex, isPressed, isDarkModeEnabled, baseStyles) {
@@ -1018,6 +1021,7 @@ internal class ModifierFactory {
                     fontFamilyMap,
                     defaultFontFamily,
                     resolver,
+                    onEventSent,
                 )
             }
         }
@@ -1056,6 +1060,7 @@ internal class ModifierFactory {
         fontFamilyMap: ImmutableMap<String, FontFamily>,
         defaultFontFamily: String?,
         resolver: FontFamily.Resolver,
+        onEventSent: (LayoutContract.LayoutEvent) -> Unit,
     ): TextStyleUiState {
         val transformedText = stylingUiProperties.textTransform?.run {
             when (this) {
@@ -1077,13 +1082,18 @@ internal class ModifierFactory {
             }
         } ?: text
         val fontFamily = try {
+            val family = fontFamilyMap[stylingUiProperties.fontFamily ?: defaultFontFamily]
+            if (family == null) {
+                throw IllegalStateException("Could not load font ${stylingUiProperties.fontFamily}")
+            }
             resolver.resolve(
-                fontFamilyMap[stylingUiProperties.fontFamily ?: defaultFontFamily] ?: FontFamily.Default,
+                family,
                 stylingUiProperties.fontWeight?.let { FontWeight(it) } ?: FontWeight.Normal,
                 stylingUiProperties.fontStyle ?: FontStyle.Normal,
             )
             fontFamilyMap[stylingUiProperties.fontFamily ?: defaultFontFamily] ?: FontFamily.Default
         } catch (e: Exception) {
+            onEventSent(LayoutContract.LayoutEvent.UiException(e))
             FontFamily.Default
         }
         return TextStyleUiState(

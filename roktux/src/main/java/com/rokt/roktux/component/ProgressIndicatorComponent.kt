@@ -116,6 +116,7 @@ internal class ProgressIndicatorComponent(
                             isDarkModeEnabled = isDarkModeEnabled,
                             breakpointIndex = breakpointIndex,
                             offerState = offerState,
+                            onEventSent = onEventSent,
                         )
                     }
                 }
@@ -132,6 +133,7 @@ internal class ProgressIndicatorComponent(
         isDarkModeEnabled: Boolean,
         breakpointIndex: Int,
         offerState: OfferUiState,
+        onEventSent: (LayoutContract.LayoutEvent) -> Unit,
     ) {
         val container = modifierFactory.createContainerUiProperties(
             containerProperties = model.containerProperties,
@@ -162,6 +164,7 @@ internal class ProgressIndicatorComponent(
                     isDarkModeEnabled = false,
                     baseStyles = baseModel.textStyles,
                     offerState = offerState,
+                    onEventSent = onEventSent,
                 )
                 Text(
                     text = textStyleUiState.value,

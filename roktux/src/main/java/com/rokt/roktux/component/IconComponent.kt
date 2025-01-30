@@ -30,6 +30,7 @@ internal class IconComponent(private val modifierFactory: ModifierFactory) :
                 isDarkModeEnabled = false,
                 defaultFontFamily = ROKT_ICONS_FONT_FAMILY,
                 offerState = offerState,
+                onEventSent = onEventSent,
             )
             Text(
                 text = textStyleUiState.value,
