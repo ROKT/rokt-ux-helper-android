@@ -68,7 +68,20 @@ internal fun transformBottomSheet(
         transformContainer = { ownStyle ->
             ownStyle.toBasicStateStylingBlock { style -> style.container }
         },
-    )
+    )?.map {
+        it.copy(
+            default = it.default.copy(
+                border = it.default.border?.copy(
+                    useTopCornerRadius = true,
+                ),
+            ),
+            pressed = it.pressed?.copy(
+                border = it.pressed.border?.copy(
+                    useTopCornerRadius = true,
+                ),
+            ),
+        )
+    }?.toImmutableList()
     val wrapperStyles = bottomSheetModel.node.styles?.elements?.wrapper?.toImmutableList()
     val wrapperModifiers = wrapperStyles.transformModifier(
         transformBackground = { wrapperStyle -> wrapperStyle.toBasicStateStylingBlock { style -> style.background } },
