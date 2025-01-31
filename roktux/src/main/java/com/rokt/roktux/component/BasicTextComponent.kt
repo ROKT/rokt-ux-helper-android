@@ -31,6 +31,7 @@ internal class BasicTextComponent(private val modifierFactory: ModifierFactory) 
             isDarkModeEnabled = false,
             conditionalTransitionTextStyling = model.conditionalTransitionTextStyling,
             offerState = offerState,
+            onEventSent = onEventSent,
         )
         if (value.isNotEmpty()) {
             Text(

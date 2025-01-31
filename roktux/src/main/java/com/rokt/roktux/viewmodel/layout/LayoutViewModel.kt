@@ -241,6 +241,22 @@ internal class LayoutViewModel(
                 sendViewState()
             }
 
+            is LayoutContract.LayoutEvent.UiException -> {
+                if (!(::experienceModel.isInitialized && experienceModel.options.useDiagnosticEvents)) {
+                    return
+                }
+                handlePlatformEvent(
+                    RoktPlatformEvent(
+                        eventType = EventType.SignalSdkDiagnostic,
+                        sessionId = experienceModel.sessionId,
+                        parentGuid = pluginModel.instanceGuid,
+                        eventData = mapOf(
+                            KEY_STACKTRACE to event.throwable.toString(),
+                        ),
+                    ),
+                )
+            }
+
             else -> {}
         }
     }
@@ -519,6 +535,7 @@ internal class LayoutViewModel(
         private const val KEY_PAGE_RENDER_ENGINE = "pageRenderEngine"
         private const val KEY_PAGE_SIGNAL_LOAD_START = "pageSignalLoadStart"
         private const val KEY_PAGE_SIGNAL_LOAD_COMPLETE = "pageSignalLoadComplete"
+        private const val KEY_STACKTRACE = "stacktrace"
         private const val LAYOUTS_RENDER_ENGINE = "Layouts"
         private const val NO_MORE_OFFERS_TO_SHOW = "NO_MORE_OFFERS_TO_SHOW"
         private const val DISMISSED = "DISMISSED"

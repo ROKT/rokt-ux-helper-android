@@ -56,6 +56,7 @@ internal class RichTextComponent(private val modifierFactory: ModifierFactory) :
             isDarkModeEnabled = isDarkModeEnabled,
             conditionalTransitionTextStyling = model.conditionalTransitionTextStyling,
             offerState = offerState,
+            onEventSent = onEventSent,
         )
         val linkStyleUiState = modifierFactory.createTextStyle(
             text = value,
@@ -65,6 +66,7 @@ internal class RichTextComponent(private val modifierFactory: ModifierFactory) :
             isDarkModeEnabled = isDarkModeEnabled,
             baseStyles = model.textStyles,
             offerState = offerState,
+            onEventSent = onEventSent,
         )
 
         if (value.isNotEmpty()) {
