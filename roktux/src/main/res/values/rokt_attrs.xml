@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <declare-styleable name="RoktLayoutView">
         <!-- Sets the location for the RoktLayout View -->
-        <attr name="location" format="string" />
+        <attr name="location" format="string" tools:ignore="ResourceName" />
     </declare-styleable>
 </resources>
