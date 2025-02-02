@@ -44,6 +44,7 @@ class AndroidLibraryConventionPlugin : Plugin<Project> {
                 defaultConfig.targetSdk = 33
                 defaultConfig.versionName = sdkVersionName
                 defaultConfig.versionCode = sdkVersionCode
+                resourcePrefix = "rokt_" // Prefix for all resources
                 if (target.findProperty("useProductFlavours") as? String == "true") {
                     configureFlavors(this, buildConfigs)
                 }
