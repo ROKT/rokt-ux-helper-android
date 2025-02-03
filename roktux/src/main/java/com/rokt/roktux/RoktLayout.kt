@@ -135,6 +135,8 @@ fun RoktLayout(
                 },
             )
         }
+    } else {
+        onUxEvent(RoktUxEvent.LayoutCompleted(roktUxConfig.viewStateConfig?.viewState?.pluginId ?: ""))
     }
 }
 
