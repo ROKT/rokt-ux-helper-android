@@ -1083,7 +1083,7 @@ internal class ModifierFactory {
         } ?: text
         val fontFamily = try {
             val family = fontFamilyMap[stylingUiProperties.fontFamily ?: defaultFontFamily]
-            if (family == null) {
+            if (family == null && stylingUiProperties.fontFamily != null) {
                 throw IllegalStateException("Could not load font ${stylingUiProperties.fontFamily}")
             }
             resolver.resolve(
