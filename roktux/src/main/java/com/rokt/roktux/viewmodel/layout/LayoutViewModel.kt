@@ -208,10 +208,13 @@ internal class LayoutViewModel(
             is LayoutContract.LayoutEvent.CloseSelected -> {
                 sendDismissEvent(if (event.isDismissed) DISMISSED else CLOSE_BUTTON)
                 setEffect {
-                    LayoutContract.LayoutEffect.CloseLayout
+                    LayoutContract.LayoutEffect.CloseLayout(
+                        onClose = {
+                            uxEvent(RoktUxEvent.LayoutClosed(pluginId))
+                        },
+                    )
                 }
                 sendViewState(isDismissed = true)
-                uxEvent(RoktUxEvent.LayoutClosed(pluginId))
             }
 
             is LayoutContract.LayoutEvent.UrlSelected -> {
@@ -358,9 +361,12 @@ internal class LayoutViewModel(
                     sendViewState(isDismissed = true)
                     sendDismissEvent(NO_MORE_OFFERS_TO_SHOW)
                     setEffect {
-                        LayoutContract.LayoutEffect.CloseLayout
+                        LayoutContract.LayoutEffect.CloseLayout(
+                            onClose = {
+                                uxEvent(RoktUxEvent.LayoutCompleted(pluginId))
+                            },
+                        )
                     }
-                    uxEvent(RoktUxEvent.LayoutCompleted(pluginId))
                 }
                 currentUiState
             }
@@ -384,9 +390,12 @@ internal class LayoutViewModel(
                     sendViewState(isDismissed = true)
                     sendDismissEvent(NO_MORE_OFFERS_TO_SHOW)
                     setEffect {
-                        LayoutContract.LayoutEffect.CloseLayout
+                        LayoutContract.LayoutEffect.CloseLayout(
+                            onClose = {
+                                uxEvent(RoktUxEvent.LayoutCompleted(pluginId))
+                            },
+                        )
                     }
-                    uxEvent(RoktUxEvent.LayoutCompleted(pluginId))
                 }
                 currentUiState
             }

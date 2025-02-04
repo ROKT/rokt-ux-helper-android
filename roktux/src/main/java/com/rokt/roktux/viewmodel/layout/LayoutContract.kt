@@ -33,7 +33,8 @@ internal class LayoutContract {
     }
 
     sealed interface LayoutEffect : BaseContract.BaseEffect {
-        object CloseLayout : LayoutEffect
+        class CloseLayout(val onClose: () -> Unit) : LayoutEffect
+
         class OpenUrlExternal(
             val url: String,
             val id: String,
