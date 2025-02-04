@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.rokt.roktux.viewmodel.base.BaseContract.BaseViewState
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -62,7 +63,7 @@ internal abstract class BaseViewModel<Event, UiState, Effect> : ViewModel() {
 
     protected fun setEffect(builder: () -> Effect) {
         val effectValue = builder()
-        viewModelScope.launch { _effect.send(effectValue) }
+        viewModelScope.launch(Dispatchers.Main.immediate) { _effect.send(effectValue) }
     }
 
     open fun handleError(exception: Throwable) {
