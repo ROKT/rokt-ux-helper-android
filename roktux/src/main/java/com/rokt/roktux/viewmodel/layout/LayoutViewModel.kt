@@ -206,10 +206,13 @@ internal class LayoutViewModel(
             }
 
             is LayoutContract.LayoutEvent.CloseSelected -> {
-                uxEvent(RoktUxEvent.LayoutClosed(pluginId))
                 sendDismissEvent(if (event.isDismissed) DISMISSED else CLOSE_BUTTON)
                 setEffect {
-                    LayoutContract.LayoutEffect.CloseLayout
+                    LayoutContract.LayoutEffect.CloseLayout(
+                        onClose = {
+                            uxEvent(RoktUxEvent.LayoutClosed(pluginId))
+                        },
+                    )
                 }
                 sendViewState(isDismissed = true)
             }
@@ -355,11 +358,14 @@ internal class LayoutViewModel(
                 )
             } else {
                 if (pluginModel.settings.closeOnComplete) {
-                    uxEvent(RoktUxEvent.LayoutCompleted(pluginId))
                     sendViewState(isDismissed = true)
                     sendDismissEvent(NO_MORE_OFFERS_TO_SHOW)
                     setEffect {
-                        LayoutContract.LayoutEffect.CloseLayout
+                        LayoutContract.LayoutEffect.CloseLayout(
+                            onClose = {
+                                uxEvent(RoktUxEvent.LayoutCompleted(pluginId))
+                            },
+                        )
                     }
                 }
                 currentUiState
@@ -381,11 +387,14 @@ internal class LayoutViewModel(
                 )
             } else {
                 if (pluginModel.settings.closeOnComplete) {
-                    uxEvent(RoktUxEvent.LayoutCompleted(pluginId))
                     sendViewState(isDismissed = true)
                     sendDismissEvent(NO_MORE_OFFERS_TO_SHOW)
                     setEffect {
-                        LayoutContract.LayoutEffect.CloseLayout
+                        LayoutContract.LayoutEffect.CloseLayout(
+                            onClose = {
+                                uxEvent(RoktUxEvent.LayoutCompleted(pluginId))
+                            },
+                        )
                     }
                 }
                 currentUiState

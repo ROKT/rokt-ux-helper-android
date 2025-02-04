@@ -14,6 +14,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Support for Add to Cart nodes
 - View state caching
 
+### Fixed
+
+- Exit animation not firing prior to closure-related UX events
+
 ## [0.2.0] - 2024-12-17
 
 ### Added
