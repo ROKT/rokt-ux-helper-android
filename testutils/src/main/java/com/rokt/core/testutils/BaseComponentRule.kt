@@ -1,15 +1,15 @@
-package com.core.testutils
+package com.rokt.core.testutils
 
 import androidx.compose.ui.test.junit4.ComposeContentTestRule
 import androidx.test.platform.app.InstrumentationRegistry
-import com.core.testutils.annotations.DCUI_COMPONENT_TAG
-import com.core.testutils.annotations.DcuiBreakpoints
-import com.core.testutils.annotations.DcuiConfig
-import com.core.testutils.annotations.DcuiNodeComponentState
-import com.core.testutils.annotations.DcuiNodeJson
-import com.core.testutils.annotations.DcuiOfferJson
-import com.core.testutils.annotations.TestPseudoState
-import com.core.testutils.annotations.WindowSize
+import com.rokt.core.testutils.annotations.DCUI_COMPONENT_TAG
+import com.rokt.core.testutils.annotations.DcuiBreakpoints
+import com.rokt.core.testutils.annotations.DcuiConfig
+import com.rokt.core.testutils.annotations.DcuiNodeComponentState
+import com.rokt.core.testutils.annotations.DcuiNodeJson
+import com.rokt.core.testutils.annotations.DcuiOfferJson
+import com.rokt.core.testutils.annotations.TestPseudoState
+import com.rokt.core.testutils.annotations.WindowSize
 import org.json.JSONObject
 import org.junit.rules.TestRule
 import org.junit.runner.Description

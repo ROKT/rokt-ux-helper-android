@@ -1,6 +1,6 @@
-package com.core.testutils.rule
+package com.rokt.core.testutils.rule
 
-import com.core.testutils.mockserver.TestServer
+import com.rokt.core.testutils.mockserver.TestServer
 import org.junit.rules.ExternalResource
 import org.junit.runner.Description
 import org.junit.runners.model.Statement

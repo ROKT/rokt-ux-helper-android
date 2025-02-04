@@ -1,4 +1,4 @@
-package com.core.testutils.assertion
+package com.rokt.core.testutils.assertion
 
 import android.graphics.Color
 import androidx.compose.ui.graphics.toArgb
