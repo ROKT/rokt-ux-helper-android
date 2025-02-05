@@ -11,11 +11,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Support for Add to Cart nodes
 - View state caching
 
 ### Fixed
 
+- Handle dismissed state when loaded from cache
+- Font diagnostics not being sent
+- Conflict with resource names. Added resource prefix
+- Fix signal issues
+- Bottom sheet rounded corner styling
 - Exit animation not firing prior to closure-related UX events
 
 ## [0.2.0] - 2024-12-17
