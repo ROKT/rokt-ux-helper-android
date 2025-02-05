@@ -100,7 +100,7 @@ jobs:
         with:
           artifacts: ${{ steps.concat-files.outputs.concatenated_files }}
           makeLatest: true
-          tag: ${{ steps.version.outputs.version }}
+          tag: ${{ steps.version.outputs.release-version }}
           body: |
             ## Release notes:
             ${{ steps.extract-release-notes.outputs.release_notes }}
