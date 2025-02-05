@@ -184,6 +184,9 @@ private fun RoktLayout(
     var visible by rememberSaveable {
         mutableStateOf(true)
     }
+    var onLayoutExit by remember {
+        mutableStateOf({ })
+    }
     val customTabContract = remember {
         InternalActivityResultContract()
     }
@@ -210,8 +213,9 @@ private fun RoktLayout(
     LaunchedEffect(viewModel.effect) {
         viewModel.effect.onEach { effect ->
             when (effect) {
-                LayoutContract.LayoutEffect.CloseLayout -> {
+                is LayoutContract.LayoutEffect.CloseLayout -> {
                     animateLayoutExit = AnimationState.Hide
+                    onLayoutExit = effect.onClose
                 }
 
                 is LayoutContract.LayoutEffect.OpenUrlExternal -> {
@@ -273,6 +277,7 @@ private fun RoktLayout(
                                 (LocalContext.current.findActivity()).getScreenHeightInPixels(),
                             ) {
                                 visible = false
+                                onLayoutExit()
                             }
                             .then(modifier),
                         isPressed = false,

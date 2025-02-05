@@ -18,6 +18,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Package name of test utils changed from com.core.testutils to com.rokt.core.testutils
 
+### Fixed
+
+- Exit animation not firing prior to closure-related UX events
+
 ## [0.2.0] - 2024-12-17
 
 ### Added
