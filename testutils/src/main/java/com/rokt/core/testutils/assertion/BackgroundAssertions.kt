@@ -1,4 +1,4 @@
-package com.core.testutils.assertion
+package com.rokt.core.testutils.assertion
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.shape.RoundedCornerShape

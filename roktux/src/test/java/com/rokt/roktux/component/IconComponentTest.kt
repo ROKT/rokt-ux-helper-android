@@ -4,11 +4,11 @@ import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.core.testutils.annotations.DCUI_COMPONENT_TAG
-import com.core.testutils.annotations.DcuiConfig
-import com.core.testutils.annotations.DcuiNodeJson
-import com.core.testutils.annotations.DcuiOfferJson
-import com.core.testutils.assertion.assertBackgroundColor
+import com.rokt.core.testutils.annotations.DCUI_COMPONENT_TAG
+import com.rokt.core.testutils.annotations.DcuiConfig
+import com.rokt.core.testutils.annotations.DcuiNodeJson
+import com.rokt.core.testutils.annotations.DcuiOfferJson
+import com.rokt.core.testutils.assertion.assertBackgroundColor
 import com.rokt.roktux.testutil.BaseDcuiEspressoTest
 import org.junit.Test
 import org.junit.runner.RunWith

@@ -6,11 +6,11 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.junit4.ComposeContentTestRule
 import androidx.compose.ui.text.font.FontFamily
-import com.core.testutils.BaseComponentRule
-import com.core.testutils.annotations.DcuiBreakpoint
-import com.core.testutils.annotations.DcuiNodeComponentState
-import com.core.testutils.annotations.TestPseudoState
-import com.core.testutils.annotations.WindowSize
+import com.rokt.core.testutils.BaseComponentRule
+import com.rokt.core.testutils.annotations.DcuiBreakpoint
+import com.rokt.core.testutils.annotations.DcuiNodeComponentState
+import com.rokt.core.testutils.annotations.TestPseudoState
+import com.rokt.core.testutils.annotations.WindowSize
 import com.rokt.modelmapper.data.DataBindingImpl
 import com.rokt.modelmapper.mappers.ExperienceModelMapperImpl
 import com.rokt.modelmapper.uimodel.LayoutSchemaUiModel

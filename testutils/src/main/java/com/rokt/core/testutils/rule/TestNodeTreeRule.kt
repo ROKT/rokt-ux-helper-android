@@ -1,4 +1,4 @@
-package com.core.testutils.rule
+package com.rokt.core.testutils.rule
 
 import androidx.compose.ui.test.junit4.ComposeContentTestRule
 import androidx.compose.ui.test.onRoot

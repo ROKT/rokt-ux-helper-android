@@ -1,4 +1,4 @@
-package com.core.testutils.rule
+package com.rokt.core.testutils.rule
 
 @Target(AnnotationTarget.ANNOTATION_CLASS)
 @Repeatable

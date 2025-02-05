@@ -1,6 +1,6 @@
 package com.rokt.roktux.viewmodel
 
-import com.core.testutils.BaseViewModelTest
+import com.rokt.core.testutils.BaseViewModelTest
 import com.rokt.modelmapper.hmap.HMap
 import com.rokt.modelmapper.hmap.TypedKey
 import com.rokt.modelmapper.hmap.set

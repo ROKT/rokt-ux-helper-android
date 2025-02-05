@@ -1,7 +1,7 @@
-package com.core.testutils.mockserver
+package com.rokt.core.testutils.mockserver
 
 import androidx.test.platform.app.InstrumentationRegistry
-import com.core.testutils.rule.MockServerConfig
+import com.rokt.core.testutils.rule.MockServerConfig
 import okhttp3.Headers
 import okhttp3.mockwebserver.Dispatcher
 import okhttp3.mockwebserver.MockResponse

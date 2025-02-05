@@ -1,4 +1,4 @@
-package com.core.testutils.annotations
+package com.rokt.core.testutils.annotations
 
 const val DCUI_COMPONENT_TAG = "TestComponent"
 

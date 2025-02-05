@@ -1,4 +1,4 @@
-package com.core.testutils.assertion
+package com.rokt.core.testutils.assertion
 
 import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.test.SemanticsNodeInteraction
