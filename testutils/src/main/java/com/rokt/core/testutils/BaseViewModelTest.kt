@@ -1,4 +1,4 @@
-package com.core.testutils
+package com.rokt.core.testutils
 
 import org.junit.Rule
 

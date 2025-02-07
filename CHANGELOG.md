@@ -15,6 +15,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - View state caching
 
+### Changed
+
+- Package name of test utils changed from com.core.testutils to com.rokt.core.testutils
+
 ### Fixed
 
 - Handle dismissed state when loaded from cache

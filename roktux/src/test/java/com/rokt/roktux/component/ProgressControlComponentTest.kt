@@ -7,9 +7,9 @@ import androidx.compose.ui.test.onChildAt
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.core.testutils.annotations.DCUI_COMPONENT_TAG
-import com.core.testutils.annotations.DcuiNodeComponentState
-import com.core.testutils.annotations.DcuiNodeJson
+import com.rokt.core.testutils.annotations.DCUI_COMPONENT_TAG
+import com.rokt.core.testutils.annotations.DcuiNodeComponentState
+import com.rokt.core.testutils.annotations.DcuiNodeJson
 import com.rokt.roktux.testutil.BaseDcuiEspressoTest
 import com.rokt.roktux.viewmodel.layout.LayoutContract
 import org.junit.Assert

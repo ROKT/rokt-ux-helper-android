@@ -1,4 +1,4 @@
-package com.core.testutils.annotations
+package com.rokt.core.testutils.annotations
 
 @Target(AnnotationTarget.FUNCTION)
 annotation class DcuiNodeComponentState(

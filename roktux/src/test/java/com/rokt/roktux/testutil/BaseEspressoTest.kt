@@ -1,8 +1,8 @@
 package com.rokt.roktux.testutil
 
 import androidx.compose.ui.test.junit4.createComposeRule
-import com.core.testutils.rule.TestNodeTreeRule
-import com.core.testutils.rule.TestScreenshotCaptureRule
+import com.rokt.core.testutils.rule.TestNodeTreeRule
+import com.rokt.core.testutils.rule.TestScreenshotCaptureRule
 import com.rokt.roktux.viewmodel.base.BaseContract
 import org.junit.Before
 import org.junit.Rule
