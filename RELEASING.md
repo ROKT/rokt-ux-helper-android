@@ -44,7 +44,7 @@ gitGraph
     - Release made on Github with relevant build files
     - Commit tagged with version number
 
-## Hotfix
+## Hotfix / patch release
 
 1. Find and create a working branch from the tagged commit you need to patch either:
     - On the main branch for the first patch commit
