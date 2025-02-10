@@ -4,14 +4,47 @@ on:
   push:
     branches:
       - main
-    paths:
-      - VERSION
 
 permissions:
   contents: write
 
 jobs:
+  setup-and-version:
+    runs-on: ubuntu-latest
+    outputs:
+      final_version: ${{ steps.final-version.outputs.final-version }}
+      version_changed: ${{ steps.version-changed.outputs.only_changed }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Check if VERSION file changed
+        id: version-changed
+        uses: tj-actions/changed-files@v45
+        with:
+          files: VERSION
+      - name: Get current version
+        id: version-file
+        run: |
+          version_from_file=$(head -n 1 VERSION)
+          echo "release-version=$version_from_file" >> $GITHUB_OUTPUT
+      - name: Bump version if necessary
+        id: bump-semver
+        if: steps.version-changed.outputs.only_changed == 'false'
+        uses: actions-ecosystem/action-bump-semver@v1
+        with:
+          current_version: ${{ steps.version-file.outputs.release-version }}
+          level: minor
+      - name: Determine final version
+        id: final-version
+        run: |
+          if [[ "${{ steps.version-changed.outputs.only_changed }}" == "true" ]]; then
+            echo "final-version=${{ steps.version-file.outputs.release-version }}" >> $GITHUB_OUTPUT
+          else
+            echo "final-version=${{ steps.bump-semver.outputs.new_version }}-SNAPSHOT" >> $GITHUB_OUTPUT
+          fi
+
   build-and-release:
+    needs: setup-and-version
     runs-on: ubuntu-latest
     env:
       ORG_GRADLE_PROJECT_signingInMemoryKey: ${{ secrets.MAVEN_SIGNING_KEY }}
@@ -25,15 +58,11 @@ jobs:
         uses: ./.github/actions/setup-java
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
-      - name: Get version name
-        id: version
-        run: |
-          version_from_file=$(head -n 1 VERSION)
-          echo "release-version=$version_from_file" >> $GITHUB_OUTPUT
       - name: Publish to Maven local
-        run: ./gradlew publishMavenPublicationToMavenLocal -PVERSION=${{ steps.version.outputs.release-version }}
+        run: ./gradlew publishMavenPublicationToMavenLocal -PVERSION=${{ needs.setup-and-version.outputs.final_version }}
       - name: Publish to Maven Central
-        run: ./gradlew publishMavenPublicationToMavenCentralRepository -PVERSION=${{ steps.version.outputs.release-version }} --no-configuration-cache
+        run: ./gradlew publishMavenPublicationToMavenCentralRepository -PVERSION=${{ needs.setup-and-version.outputs.final_version }} --no-configuration-cache
+
       - name: Find release AAR Files
         id: find-aar
         run: |
@@ -48,7 +77,7 @@ jobs:
           for file in "${aar_files[@]}"; do
             dir=$(dirname "$file")
             base=$(basename "$file" -release.aar)
-            new_file="$dir/$base-${{ steps.version.outputs.release-version }}.aar"
+            new_file="$dir/$base-${{ needs.setup-and-version.outputs.final_version }}.aar"
             mv "$file" "$new_file"
             new_files+=("$new_file")
           done
@@ -56,27 +85,23 @@ jobs:
       - name: Print Renamed AAR Files
         run: |
           echo "Renamed AAR Files: ${{ steps.rename-aar.outputs.renamed_aar_files }}"
-      - uses: ffurrer2/extract-release-notes@v2
-        id: extract-release-notes
+      - name: Upload AAR artifacts
+        uses: actions/upload-artifact@v4
         with:
-          changelog_file: CHANGELOG.md
-      - name: Changelog
-        run: echo "${{ steps.extract-release-notes.outputs.release_notes }}"
+          name: aar-files
+          path: "**/*.aar"
+
       - name: Find POM Files
         id: find-pom
         run: |
           pom_files=$(find . -path "*/build/publications/maven/pom-default.xml" | paste -sd "," -)
           echo "pom_files=$pom_files" >> $GITHUB_OUTPUT
-      - name: Find pom files
-        run: |
-          echo "POM files ${{ steps.find-pom.outputs.pom_files }}"
       - name: Rename POM files
         id: rename-pom
         run: |
-          RELEASE_VERSION=${{ steps.version.outputs.release-version }}
+          RELEASE_VERSION=${{ needs.setup-and-version.outputs.final_version }}
           POM_FILES=${{ steps.find-pom.outputs.pom_files }}
           IFS="," read -r -a FILES <<< "$POM_FILES"
-
           RENAMED_FILES=()
           for file in "${FILES[@]}"; do
               PROJECT_NAME=$(basename $(dirname $(dirname $(dirname $(dirname $file)))))
@@ -86,6 +111,12 @@ jobs:
               echo "Renamed $file to $(dirname $file)/$NEW_FILE_NAME"
           done
           echo "renamed_pom_files=$(IFS=","; echo "${RENAMED_FILES[*]}")" >> $GITHUB_OUTPUT
+      - name: Upload POM artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: pom-files
+          path: "**/*.pom"
+
       - name: Concatenate Renamed Files
         id: concat-files
         run: |
@@ -93,14 +124,21 @@ jobs:
           pom_files="${{ steps.rename-pom.outputs.renamed_pom_files }}"
           concatenated_files="${aar_files},${pom_files}"
           echo "concatenated_files=$concatenated_files" >> $GITHUB_OUTPUT
-      - name: Print artifact paths
-        run: echo "Artifact paths ${{ steps.concat-files.outputs.concatenated_files }}"
+
+      - uses: ffurrer2/extract-release-notes@v2
+        id: extract-release-notes
+        with:
+          changelog_file: CHANGELOG.md
+      - name: Changelog
+        run: echo "${{ steps.extract-release-notes.outputs.release_notes }}"
+
       - name: Create Github release
         uses: ncipollo/release-action@v1
+        if: needs.setup-and-version.outputs.version_changed == 'true'
         with:
           artifacts: ${{ steps.concat-files.outputs.concatenated_files }}
           makeLatest: true
-          tag: ${{ steps.version.outputs.release-version }}
+          tag: ${{ needs.setup-and-version.outputs.final_version }}
           body: |
             ## Release notes:
             ${{ steps.extract-release-notes.outputs.release_notes }}
