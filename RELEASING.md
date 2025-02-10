@@ -29,9 +29,9 @@ gitGraph
 
 - For pre-release testing or verifying functionality of the latest version -SNAPSHOT builds can be used
 - Every commit on main:
-    - Finds the last tag e.g. 4.7.0 bumps the minor version e.g. 4.8.0
+    - Finds the last version from the VERSION file e.g. 4.7.0 bumps the minor version e.g. 4.8.0
     - Generates a build for Maven Central in the format 4.8.0-SNAPSHOT
-    - Tags the latest commit on main with the snapshot version e.g. 4.8.0-SNAPSHOT
+    - (TODO) Tags the latest commit on main with the snapshot version e.g. 4.8.0-SNAPSHOT
 
 ## Major / Minor version release
 
