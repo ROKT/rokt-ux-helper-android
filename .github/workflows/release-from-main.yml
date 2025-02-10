@@ -114,7 +114,7 @@ jobs:
       - name: Upload POM artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: aar-files
+          name: pom-files
           path: "**/*.pom"
 
       - name: Concatenate Renamed Files
