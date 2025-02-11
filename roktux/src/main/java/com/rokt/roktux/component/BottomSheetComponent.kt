@@ -16,6 +16,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.input.pointer.pointerInput
 import com.rokt.modelmapper.uimodel.LayoutSchemaUiModel
 import com.rokt.roktux.utils.interceptTap
@@ -55,6 +56,10 @@ internal class BottomSheetComponent(
                 },
             )
 
+        val bottomSheetShape =
+            model.child.ownModifiers?.getOrNull(breakpointIndex)?.default?.let {
+                modifierFactory.createBackgroundShape(it)
+            } ?: RectangleShape
         var hasUserInteracted by remember { mutableStateOf(false) }
         ModalBottomSheet(
             onDismissRequest = {
@@ -63,6 +68,7 @@ internal class BottomSheetComponent(
                 }
                 onEventSent(LayoutContract.LayoutEvent.CloseSelected(isDismissed = true))
             },
+            shape = bottomSheetShape,
             sheetState = modalBottomSheetState,
             scrimColor = scrimColor ?: BottomSheetDefaults.ScrimColor,
             dragHandle = {},
