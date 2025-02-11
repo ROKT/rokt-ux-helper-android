@@ -1,4 +1,4 @@
-package com.rokt.roktux.di.core
+package com.rokt.core.di
 
 abstract class Component(
     internal val modules: List<Module>,

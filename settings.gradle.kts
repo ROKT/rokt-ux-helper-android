@@ -24,6 +24,7 @@ dependencyResolutionManagement {
 
 rootProject.name = "UxHelper"
 include(":modelmapper")
+include(":core")
 include(":networkhelper")
 include(":roktux")
 include(":testutils")

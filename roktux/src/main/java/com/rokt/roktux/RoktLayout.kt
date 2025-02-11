@@ -23,6 +23,7 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.rokt.core.composablescoped.WithComposableScopedViewModelStoreOwner
 import com.rokt.modelmapper.utils.FIRST_OFFER_INDEX
 import com.rokt.modelmapper.utils.ROKT_ICONS_FONT_FAMILY
 import com.rokt.roktux.component.LayoutUiModelFactory
@@ -41,7 +42,6 @@ import com.rokt.roktux.utils.openUrl
 import com.rokt.roktux.utils.userInteractionDetector
 import com.rokt.roktux.viewmodel.base.BaseContract
 import com.rokt.roktux.viewmodel.component.DIComponentViewModel
-import com.rokt.roktux.viewmodel.composablescoped.WithComposableScopedViewModelStoreOwner
 import com.rokt.roktux.viewmodel.layout.LayoutContract
 import com.rokt.roktux.viewmodel.layout.LayoutViewModel
 import kotlinx.collections.immutable.ImmutableMap

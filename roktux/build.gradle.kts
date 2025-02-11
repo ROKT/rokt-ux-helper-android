@@ -56,8 +56,8 @@ tasks.withType(Test::class.java) {
 }
 
 dependencies {
-
     api(projects.uxHelper.modelmapper)
+    implementation(projects.uxHelper.core)
     implementation(libs.coil.kt)
     implementation(libs.coil.kt.compose)
     implementation(libs.coil.kt.svg)

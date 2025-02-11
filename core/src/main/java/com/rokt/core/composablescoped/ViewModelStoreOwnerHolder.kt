@@ -1,4 +1,4 @@
-package com.rokt.roktux.viewmodel.composablescoped
+package com.rokt.core.composablescoped
 
 import androidx.compose.runtime.Stable
 import androidx.lifecycle.Lifecycle
