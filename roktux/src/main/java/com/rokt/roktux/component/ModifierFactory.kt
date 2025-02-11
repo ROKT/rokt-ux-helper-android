@@ -363,17 +363,7 @@ internal class ModifierFactory {
         context: Context,
         imageLoader: ImageLoader,
     ): Modifier {
-        val shape = properties.border?.let {
-            if (it.borderRadius > 0.dp) {
-                if (it.useTopCornerRadius) {
-                    RoundedCornerShape(topStart = it.borderRadius, topEnd = it.borderRadius)
-                } else {
-                    RoundedCornerShape(it.borderRadius)
-                }
-            } else {
-                RectangleShape
-            }
-        } ?: RectangleShape
+        val shape = createBackgroundShape(properties = properties)
         return this
             .then(properties.margin?.let { Modifier.padding(it) } ?: Modifier)
             .then(properties.offset?.let { Modifier.offset(it.x, it.y) } ?: Modifier)
@@ -1026,6 +1016,18 @@ internal class ModifierFactory {
             }
         }
     }
+
+    fun createBackgroundShape(properties: BaseModifierProperties): Shape = properties.border?.let {
+        if (it.borderRadius > 0.dp) {
+            if (it.useTopCornerRadius) {
+                RoundedCornerShape(topStart = it.borderRadius, topEnd = it.borderRadius)
+            } else {
+                RoundedCornerShape(it.borderRadius)
+            }
+        } else {
+            RectangleShape
+        }
+    } ?: RectangleShape
 
     private fun createTextProperties(
         isPressed: Boolean,
