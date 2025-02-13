@@ -1,4 +1,4 @@
-package com.rokt.roktux.di.core
+package com.rokt.core.di
 
 import java.util.concurrent.locks.ReentrantLock
 import kotlin.concurrent.withLock

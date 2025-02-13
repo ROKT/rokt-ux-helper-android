@@ -1,4 +1,4 @@
-package com.rokt.roktux.di.core
+package com.rokt.core.di
 
 fun interface Factory<T> {
     fun get(component: Component): T
