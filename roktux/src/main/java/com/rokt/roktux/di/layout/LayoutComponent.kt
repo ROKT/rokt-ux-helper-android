@@ -21,6 +21,7 @@ internal class LayoutComponent(
     currentOffer: Int,
     customStates: Map<String, Int>,
     offerCustomStates: Map<String, Map<String, Int>>,
+    edgeToEdgeDisplay: Boolean,
 ) : Component(
     listOf(
         LayoutModule(
@@ -35,6 +36,7 @@ internal class LayoutComponent(
             currentOffer,
             customStates,
             offerCustomStates,
+            edgeToEdgeDisplay,
         ),
     ),
 )

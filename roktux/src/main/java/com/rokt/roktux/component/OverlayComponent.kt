@@ -4,15 +4,13 @@ import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.safeDrawingPadding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.BiasAlignment
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.pointerInput
@@ -28,7 +26,6 @@ internal class OverlayComponent(
     private val modifierFactory: ModifierFactory,
 ) : ComposableComponent<LayoutSchemaUiModel.OverlayUiModel> {
 
-    @OptIn(ExperimentalComposeUiApi::class)
     @Composable
     override fun Render(
         model: LayoutSchemaUiModel.OverlayUiModel,
@@ -46,48 +43,55 @@ internal class OverlayComponent(
             isPressed = isPressed,
         )
 
-        Popup(
-            alignment = Alignment.TopStart,
-            properties = PopupProperties(
-                dismissOnBackPress = true,
-                // This is handled by the clickable modifier on the Box
-                dismissOnClickOutside = false,
-                focusable = true,
-            ),
-            onDismissRequest = {
-                // Avoiding double sending event when using close gestures
-                if (!isClosedByBackdrop) {
-                    isClosedByBackdrop = true
-                    onEventSent(LayoutContract.LayoutEvent.CloseSelected(isDismissed = true))
-                }
-            },
-        ) {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .then(
-                        modifierFactory
-                            .createModifier(
-                                modifierPropertiesList = model.ownModifiers,
-                                conditionalTransitionModifier = model.conditionalTransitionModifiers,
-                                breakpointIndex = breakpointIndex,
-                                isPressed = isPressed,
-                                isDarkModeEnabled = isDarkModeEnabled,
-                                offerState = offerState,
-                            ),
-                    )
-                    .pointerInput(Unit) {
-                        detectTapGestures {
-                            if (model.allowBackdropToClose) {
-                                isClosedByBackdrop = true
-                                onEventSent(LayoutContract.LayoutEvent.CloseSelected(isDismissed = true))
-                            }
+        val insetsPadding = remember {
+            if (!model.edgeToEdgeDisplay) {
+                Modifier.statusBarsPadding()
+            } else {
+                Modifier
+            }
+        }
+
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .then(insetsPadding)
+                .then(
+                    modifierFactory
+                        .createModifier(
+                            modifierPropertiesList = model.ownModifiers,
+                            conditionalTransitionModifier = model.conditionalTransitionModifiers,
+                            breakpointIndex = breakpointIndex,
+                            isPressed = isPressed,
+                            isDarkModeEnabled = isDarkModeEnabled,
+                            offerState = offerState,
+                        ),
+                )
+                .pointerInput(Unit) {
+                    detectTapGestures {
+                        if (model.allowBackdropToClose) {
+                            isClosedByBackdrop = true
+                            onEventSent(LayoutContract.LayoutEvent.CloseSelected(isDismissed = true))
                         }
                     }
-                    .safeDrawingPadding()
-                    .animateContentSize()
-                    .then(modifier),
-                contentAlignment = BiasAlignment(container.arrangementBias, container.alignmentBias),
+                }
+                .animateContentSize()
+                .then(modifier),
+        ) {
+            Popup(
+                alignment = BiasAlignment(container.arrangementBias, container.alignmentBias),
+                properties = PopupProperties(
+                    dismissOnBackPress = true,
+                    // This is handled by the clickable modifier on the Box
+                    dismissOnClickOutside = false,
+                    focusable = true,
+                ),
+                onDismissRequest = {
+                    // Avoiding double sending event when using close gestures
+                    if (!isClosedByBackdrop) {
+                        isClosedByBackdrop = true
+                        onEventSent(LayoutContract.LayoutEvent.CloseSelected(isDismissed = true))
+                    }
+                },
             ) {
                 factory.CreateComposable(
                     model = model.child,

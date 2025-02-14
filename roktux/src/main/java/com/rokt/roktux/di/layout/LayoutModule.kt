@@ -26,6 +26,7 @@ internal class LayoutModule(
     private val currentOffer: Int,
     private val customStates: Map<String, Int>,
     private val offerCustomStates: Map<String, Map<String, Int>>,
+    private val edgeToEdgeDisplay: Boolean,
 ) : Module() {
     init {
         this.bind<DataBinding, DataBindingImpl>()
@@ -52,6 +53,7 @@ internal class LayoutModule(
                 currentOffer = currentOffer,
                 customStates = customStates,
                 offerCustomStates = offerCustomStates,
+                edgeToEdgeDisplay = edgeToEdgeDisplay,
             )
         }
         this.provideModuleScoped {

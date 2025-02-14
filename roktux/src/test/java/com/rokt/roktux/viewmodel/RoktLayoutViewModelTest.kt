@@ -96,6 +96,7 @@ class RoktLayoutViewModelTest : BaseViewModelTest() {
             viewStateChange = viewStateChange,
             customStates = mapOf(),
             offerCustomStates = mapOf(),
+            edgeToEdgeDisplay = false,
         )
     }
 

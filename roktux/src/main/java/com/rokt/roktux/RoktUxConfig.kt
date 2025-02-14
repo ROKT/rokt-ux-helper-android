@@ -21,6 +21,7 @@ class RoktUxConfig private constructor(
     val colorMode: ColorMode,
     val viewStateConfig: ViewStateConfig? = null,
     val handleUrlByApp: Boolean = true,
+    val edgeToEdgeDisplay: Boolean = true,
 ) {
     /**
      * Builder class for RoktUxConfig.
@@ -39,6 +40,7 @@ class RoktUxConfig private constructor(
         private var colorMode: ColorMode = ColorMode.SYSTEM,
         private var handleUrlByApp: Boolean = true,
         private var viewStateConfig: ViewStateConfig? = null,
+        private var edgeToEdgeDisplay: Boolean = true,
     ) {
         /**
          * Sets the XML font family map.
@@ -84,6 +86,13 @@ class RoktUxConfig private constructor(
         fun viewStateConfig(viewStateConfig: ViewStateConfig) = apply { this.viewStateConfig = viewStateConfig }
 
         /**
+         * Sets the edgeToEdgeDisplay.
+         *
+         * @param edgeToEdgeDisplay The edgeToEdgeDisplay configuration to use in the UX.
+         */
+        fun edgeToEdgeDisplay(edgeToEdgeDisplay: Boolean) = apply { this.edgeToEdgeDisplay = edgeToEdgeDisplay }
+
+        /**
          * Builds the RoktUxConfig instance.
          *
          * @return The RoktUxConfig instance.
@@ -95,6 +104,7 @@ class RoktUxConfig private constructor(
             colorMode = colorMode,
             handleUrlByApp = handleUrlByApp,
             viewStateConfig = viewStateConfig,
+            edgeToEdgeDisplay = edgeToEdgeDisplay,
         )
     }
 
