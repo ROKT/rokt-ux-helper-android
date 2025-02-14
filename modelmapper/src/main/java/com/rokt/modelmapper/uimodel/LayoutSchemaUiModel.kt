@@ -337,8 +337,15 @@ interface BaseModifierProperties {
     val maxWidth: Dp?
     val width: WidthUiModel?
     val height: HeightUiModel?
-    val shadow: ShadowUiModel?
-    val border: BorderUiModel?
+    val shadowColor: ThemeColorUiModel?
+    val shadowBlurRadius: Dp?
+    val shadowSpreadRadius: Float?
+    val shadowOffset: DpOffset?
+    val borderColor: ThemeColorUiModel?
+    val borderRadius: Dp?
+    val borderWidth: ImmutableList<Float>?
+    val borderStyle: BorderStyleUiModel?
+    val borderUseTopCornerRadius: Boolean?
     val blurRadius: Float?
     val backgroundColor: ThemeColorUiModel?
     val backgroundColorState: Color?
@@ -357,8 +364,15 @@ data class ModifierProperties(
     override val maxWidth: Dp? = null,
     override val width: WidthUiModel? = null,
     override val height: HeightUiModel? = null,
-    override val shadow: ShadowUiModel? = null,
-    override val border: BorderUiModel? = null,
+    override val shadowColor: ThemeColorUiModel? = null,
+    override val shadowBlurRadius: Dp? = null,
+    override val shadowSpreadRadius: Float? = null,
+    override val shadowOffset: DpOffset? = null,
+    override val borderColor: ThemeColorUiModel? = null,
+    override val borderRadius: Dp? = null,
+    override val borderWidth: ImmutableList<Float>? = null,
+    override val borderStyle: BorderStyleUiModel? = null,
+    override val borderUseTopCornerRadius: Boolean? = null,
     override val blurRadius: Float? = null,
     override val backgroundColor: ThemeColorUiModel? = null,
     override val backgroundColorState: Color? = null,
@@ -387,8 +401,15 @@ class TransitionModifierProperties(
     maxWidth: State<Dp?>,
     width: State<WidthUiModel?>,
     height: State<HeightUiModel?>,
-    override val shadow: ShadowUiModel?,
-    override val border: BorderUiModel?,
+    override val shadowColor: ThemeColorUiModel?,
+    override val shadowBlurRadius: Dp?,
+    override val shadowSpreadRadius: Float?,
+    override val shadowOffset: DpOffset?,
+    override val borderColor: ThemeColorUiModel?,
+    override val borderRadius: Dp?,
+    override val borderWidth: ImmutableList<Float>?,
+    override val borderStyle: BorderStyleUiModel?,
+    override val borderUseTopCornerRadius: Boolean?,
     override val backgroundColor: ThemeColorUiModel? = null,
     override var backgroundImage: BackgroundImageUiModel? = null,
     blurRadius: State<Float?>,
@@ -420,23 +441,6 @@ data class ContainerUiProperties(
     val horizontalArrangement: Arrangement.Horizontal,
     val verticalArrangement: Arrangement.Vertical,
     val gap: Dp? = null,
-)
-
-@Immutable
-data class ShadowUiModel(
-    val color: ThemeColorUiModel? = null,
-    val blurRadius: Dp,
-    val spreadRadius: Float,
-    val offset: DpOffset,
-)
-
-@Immutable
-data class BorderUiModel(
-    val borderColor: ThemeColorUiModel? = null,
-    val borderRadius: Dp,
-    val borderWidth: ImmutableList<Float>,
-    val borderStyle: BorderStyleUiModel,
-    val useTopCornerRadius: Boolean = false,
 )
 
 @Immutable

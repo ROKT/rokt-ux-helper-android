@@ -298,14 +298,46 @@ internal class ModifierFactory {
             } ?: Float.MIN_VALUE
         }
 
-        val shadow = when (transitionStyleState) {
-            ConditionalStyleState.Normal -> modifierProperty.shadow
-            ConditionalStyleState.Transition -> transitionModifier.shadow ?: modifierProperty.shadow
+        val shadowColor = when (transitionStyleState) {
+            ConditionalStyleState.Normal -> modifierProperty.shadowColor
+            ConditionalStyleState.Transition -> transitionModifier.shadowColor ?: modifierProperty.shadowColor
         }
 
-        val border = when (transitionStyleState) {
-            ConditionalStyleState.Normal -> modifierProperty.border
-            ConditionalStyleState.Transition -> transitionModifier.border ?: modifierProperty.border
+        val shadowOffset = when (transitionStyleState) {
+            ConditionalStyleState.Normal -> modifierProperty.shadowOffset
+            ConditionalStyleState.Transition -> transitionModifier.shadowOffset ?: modifierProperty.shadowOffset
+        }
+
+        val shadowBlurRadius = when (transitionStyleState) {
+            ConditionalStyleState.Normal -> modifierProperty.shadowBlurRadius
+            ConditionalStyleState.Transition -> transitionModifier.shadowBlurRadius ?: modifierProperty.shadowBlurRadius
+        }
+
+        val shadowSpreadRadius = when (transitionStyleState) {
+            ConditionalStyleState.Normal -> modifierProperty.shadowSpreadRadius
+            ConditionalStyleState.Transition ->
+                transitionModifier.shadowSpreadRadius
+                    ?: modifierProperty.shadowSpreadRadius
+        }
+
+        val borderColor = when (transitionStyleState) {
+            ConditionalStyleState.Normal -> modifierProperty.borderColor
+            ConditionalStyleState.Transition -> transitionModifier.borderColor ?: modifierProperty.borderColor
+        }
+
+        val borderRadius = when (transitionStyleState) {
+            ConditionalStyleState.Normal -> modifierProperty.borderRadius
+            ConditionalStyleState.Transition -> transitionModifier.borderRadius ?: modifierProperty.borderRadius
+        }
+
+        val borderWidth = when (transitionStyleState) {
+            ConditionalStyleState.Normal -> modifierProperty.borderWidth
+            ConditionalStyleState.Transition -> transitionModifier.borderWidth ?: modifierProperty.borderWidth
+        }
+
+        val borderStyle = when (transitionStyleState) {
+            ConditionalStyleState.Normal -> modifierProperty.borderStyle
+            ConditionalStyleState.Transition -> transitionModifier.borderStyle ?: modifierProperty.borderStyle
         }
 
         return remember(transition) {
@@ -317,8 +349,15 @@ internal class ModifierFactory {
                 maxWidth = maxWidth,
                 width = width,
                 height = height,
-                shadow = shadow,
-                border = border,
+                shadowColor = shadowColor,
+                shadowOffset = shadowOffset,
+                shadowBlurRadius = shadowBlurRadius,
+                shadowSpreadRadius = shadowSpreadRadius,
+                borderColor = borderColor,
+                borderRadius = borderRadius,
+                borderWidth = borderWidth,
+                borderStyle = borderStyle,
+                borderUseTopCornerRadius = modifierProperty.borderUseTopCornerRadius,
                 blurRadius = blurRadius,
                 backgroundColorState = backgroundColor,
                 padding = padding,
@@ -344,6 +383,9 @@ internal class ModifierFactory {
                         val properties = if (usePressed) stateBlock.pressed else stateBlock.default
                         properties?.let {
                             modifierProperty = modifierProperty.applyProperties(it)
+                            if (usePressed && i == 0) {
+                                modifierProperty = modifierProperty.applyProperties(stateBlock.default)
+                            }
                         }
                     }
                 }
@@ -401,24 +443,24 @@ internal class ModifierFactory {
             )
             .then(properties.rotateZ?.let { Modifier.rotate(it) } ?: Modifier)
             .then(
-                properties.shadow?.let {
+                properties.shadowColor?.let {
                     Modifier.coloredShadow(
-                        color = getUiThemeColor(it.color, isDarkModeEnabled),
-                        blurRadius = it.blurRadius,
-                        spread = it.spreadRadius,
-                        offsetX = it.offset.x,
-                        offsetY = it.offset.y,
-                        cornerRadiusDp = properties.border?.borderRadius ?: 0.dp,
+                        color = getUiThemeColor(it, isDarkModeEnabled),
+                        blurRadius = properties.shadowBlurRadius ?: 0.dp,
+                        spread = properties.shadowSpreadRadius ?: 0f,
+                        offsetX = properties.shadowOffset?.x ?: 0.dp,
+                        offsetY = properties.shadowOffset?.y ?: 0.dp,
+                        cornerRadiusDp = properties.borderRadius ?: 0.dp,
                     )
                 } ?: Modifier,
             )
             .then(
-                properties.border?.let {
+                properties.borderWidth?.let {
                     Modifier.multiDimensionalBorder(
-                        it.borderWidth,
-                        getUiThemeColor(it.borderColor, isDarkModeEnabled),
-                        it.borderRadius,
-                        it.borderStyle,
+                        it,
+                        getUiThemeColor(properties.borderColor, isDarkModeEnabled),
+                        properties.borderRadius ?: 0.dp,
+                        properties.borderStyle ?: BorderStyleUiModel.Solid,
                         shape,
                     )
                 } ?: Modifier,
@@ -464,8 +506,15 @@ internal class ModifierFactory {
         width = width ?: properties.width,
         height = height ?: properties.height,
         rotateZ = rotateZ ?: properties.rotateZ,
-        shadow = shadow ?: properties.shadow,
-        border = border ?: properties.border,
+        shadowColor = shadowColor ?: properties.shadowColor,
+        shadowBlurRadius = shadowBlurRadius ?: properties.shadowBlurRadius,
+        shadowOffset = shadowOffset ?: properties.shadowOffset,
+        shadowSpreadRadius = shadowSpreadRadius ?: properties.shadowSpreadRadius,
+        borderColor = borderColor ?: properties.borderColor,
+        borderRadius = borderRadius ?: properties.borderRadius,
+        borderWidth = borderWidth ?: properties.borderWidth,
+        borderStyle = borderStyle ?: properties.borderStyle,
+        borderUseTopCornerRadius = borderUseTopCornerRadius ?: properties.borderUseTopCornerRadius,
         backgroundColor = backgroundColor ?: properties.backgroundColor,
         backgroundImage = backgroundImage ?: properties.backgroundImage,
         blurRadius = blurRadius ?: properties.blurRadius,
@@ -1017,12 +1066,12 @@ internal class ModifierFactory {
         }
     }
 
-    fun createBackgroundShape(properties: BaseModifierProperties): Shape = properties.border?.let {
-        if (it.borderRadius > 0.dp) {
-            if (it.useTopCornerRadius) {
-                RoundedCornerShape(topStart = it.borderRadius, topEnd = it.borderRadius)
+    fun createBackgroundShape(properties: BaseModifierProperties): Shape = properties.borderRadius?.let {
+        if (it > 0.dp) {
+            if (properties.borderUseTopCornerRadius == true) {
+                RoundedCornerShape(topStart = it, topEnd = it)
             } else {
-                RoundedCornerShape(it.borderRadius)
+                RoundedCornerShape(it)
             }
         } else {
             RectangleShape

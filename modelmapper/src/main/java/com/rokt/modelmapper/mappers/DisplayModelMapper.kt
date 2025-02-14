@@ -70,16 +70,8 @@ internal fun transformBottomSheet(
         },
     )?.map {
         it.copy(
-            default = it.default.copy(
-                border = it.default.border?.copy(
-                    useTopCornerRadius = true,
-                ),
-            ),
-            pressed = it.pressed?.copy(
-                border = it.pressed.border?.copy(
-                    useTopCornerRadius = true,
-                ),
-            ),
+            default = it.default.copy(borderUseTopCornerRadius = true),
+            pressed = it.pressed?.copy(borderUseTopCornerRadius = true),
         )
     }?.toImmutableList()
     val wrapperStyles = bottomSheetModel.node.styles?.elements?.wrapper?.toImmutableList()

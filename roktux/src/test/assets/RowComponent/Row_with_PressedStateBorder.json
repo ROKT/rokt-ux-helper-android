@@ -1,0 +1,39 @@
+{
+  "type": "Row",
+  "node": {
+    "styles": {
+      "elements": {
+        "own": [
+          {
+            "default": {
+              "border": {
+                "borderColor": {
+                  "light": "#ff0000"
+                },
+                "borderStyle": "solid",
+                "borderWidth": "1",
+                "borderRadius": 40
+              }
+            },
+            "pressed": {
+              "border": {
+                "borderColor": {
+                  "dark": null,
+                  "light": "#ff2222"
+                }
+              }
+            }
+          }
+        ]
+      }
+    },
+    "children": [
+      {
+        "type": "BasicText",
+        "node": {
+          "value": "Test1"
+        }
+      }
+    ]
+  }
+}
