@@ -161,6 +161,7 @@ sealed class LayoutSchemaUiModel(
         conditionalTransitionModifiers: ConditionalTransitionModifier?,
         val allowBackdropToClose: Boolean,
         val child: ColumnUiModel,
+        val edgeToEdgeDisplay: Boolean = true,
     ) : LayoutSchemaUiModel(ownModifiers, containerProperties, conditionalTransitionModifiers)
 
     class BottomSheetUiModel(
@@ -169,6 +170,7 @@ sealed class LayoutSchemaUiModel(
         conditionalTransitionModifiers: ConditionalTransitionModifier?,
         val allowBackdropToClose: Boolean,
         val child: ColumnUiModel,
+        val edgeToEdgeDisplay: Boolean = true,
     ) : LayoutSchemaUiModel(ownModifiers, containerProperties, conditionalTransitionModifiers)
 
     class ImageUiModel(

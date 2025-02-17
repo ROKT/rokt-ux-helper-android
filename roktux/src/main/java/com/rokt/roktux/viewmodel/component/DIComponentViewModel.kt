@@ -21,6 +21,7 @@ internal class DIComponentViewModel(
     private val customStates: Map<String, Int>,
     private val offerCustomStates: Map<String, Map<String, Int>>,
     private val handleUrlByApp: Boolean,
+    private val edgeToEdgeDisplay: Boolean,
 ) : ViewModel() {
 
     val component = LayoutComponent(
@@ -35,6 +36,7 @@ internal class DIComponentViewModel(
         currentOffer,
         customStates,
         offerCustomStates,
+        edgeToEdgeDisplay,
     )
 
     class DIComponentViewModelFactory(
@@ -49,6 +51,7 @@ internal class DIComponentViewModel(
         private val customStates: Map<String, Int>,
         private val offerCustomStates: Map<String, Map<String, Int>>,
         private val handleUrlByApp: Boolean,
+        private val edgeToEdgeDisplay: Boolean,
     ) : ViewModelProvider.Factory {
         @Suppress("UNCHECKED_CAST")
         override fun <T : ViewModel> create(modelClass: Class<T>, extras: CreationExtras): T {
@@ -65,6 +68,7 @@ internal class DIComponentViewModel(
                     customStates = customStates,
                     offerCustomStates = offerCustomStates,
                     handleUrlByApp = handleUrlByApp,
+                    edgeToEdgeDisplay = edgeToEdgeDisplay,
                 ) as T
             }
             throw IllegalArgumentException("Unknown ViewModel type")

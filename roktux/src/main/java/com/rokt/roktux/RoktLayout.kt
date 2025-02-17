@@ -122,6 +122,7 @@ fun RoktLayout(
                     customStates = customState,
                     offerCustomStates = offerCustomStates,
                     handleUrlByApp = roktUxConfig.handleUrlByApp,
+                    edgeToEdgeDisplay = roktUxConfig.edgeToEdgeDisplay,
                 ),
             )
             DIComponentInjector(

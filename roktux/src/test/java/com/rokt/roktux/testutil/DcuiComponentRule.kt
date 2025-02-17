@@ -68,6 +68,7 @@ class DcuiComponentRule(val composeTestRule: ComposeContentTestRule) : BaseCompo
                     currentOffer = 0,
                     customStates = mapOf(),
                     offerCustomStates = mapOf(),
+                    edgeToEdgeDisplay = false,
                 ),
                 LocalFontFamilyProvider provides persistentMapOf("roboto" to FontFamily.Default),
             ) {
