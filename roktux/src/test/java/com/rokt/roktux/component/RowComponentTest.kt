@@ -17,6 +17,7 @@ import com.rokt.core.testutils.annotations.DcuiOfferJson
 import com.rokt.core.testutils.annotations.TestPseudoState
 import com.rokt.core.testutils.annotations.WindowSize
 import com.rokt.core.testutils.assertion.assertBackgroundColor
+import com.rokt.core.testutils.assertion.assertBorderProperties
 import com.rokt.core.testutils.assertion.assertHeightFit
 import com.rokt.core.testutils.assertion.assertHeightWrapContent
 import com.rokt.core.testutils.assertion.assertOffsetValues
@@ -435,5 +436,21 @@ class RowComponentTest : BaseDcuiEspressoTest() {
     fun testRowBackgroundColorWithStatePressed() {
         composeTestRule.onNodeWithTag(DCUI_COMPONENT_TAG)
             .assertBackgroundColor("#00ff00")
+    }
+
+    @Test
+    @DcuiNodeJson(jsonFile = "RowComponent/Row_with_PressedStateBorder.json")
+    @DcuiConfig(pseudoState = TestPseudoState(isPressed = true))
+    fun testRowBorderWithStatePressed() {
+        composeTestRule.onNodeWithTag(DCUI_COMPONENT_TAG)
+            .assertBorderProperties(borderWidth = 1f, borderColor = "#ff2222", borderRadius = 40f)
+    }
+
+    @Test
+    @DcuiNodeJson(jsonFile = "RowComponent/Row_with_PressedStateBorder.json")
+    @DcuiConfig(pseudoState = TestPseudoState(isPressed = false))
+    fun testRowBorderWithStateDefault() {
+        composeTestRule.onNodeWithTag(DCUI_COMPONENT_TAG)
+            .assertBorderProperties(borderWidth = 1f, borderColor = "#ff0000", borderRadius = 40f)
     }
 }

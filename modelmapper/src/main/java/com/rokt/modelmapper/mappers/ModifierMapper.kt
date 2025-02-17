@@ -10,12 +10,10 @@ import com.rokt.modelmapper.uimodel.AlignmentUiModel
 import com.rokt.modelmapper.uimodel.ArrangementUiModel
 import com.rokt.modelmapper.uimodel.BackgroundImageUiModel
 import com.rokt.modelmapper.uimodel.BorderStyleUiModel
-import com.rokt.modelmapper.uimodel.BorderUiModel
 import com.rokt.modelmapper.uimodel.ContainerProperties
 import com.rokt.modelmapper.uimodel.HeightUiModel
 import com.rokt.modelmapper.uimodel.ModifierProperties
 import com.rokt.modelmapper.uimodel.OpenLinks
-import com.rokt.modelmapper.uimodel.ShadowUiModel
 import com.rokt.modelmapper.uimodel.StateBlock
 import com.rokt.modelmapper.uimodel.ThemeColorUiModel
 import com.rokt.modelmapper.uimodel.WidthUiModel
@@ -117,22 +115,21 @@ internal fun transformModifier(
     margin = spacingProperties?.margin?.let { transformPadding(it) },
     offset = spacingProperties?.offset?.let { transformOffset(it) },
     rotateZ = dimensionProperties?.rotateZ,
-    shadow = containerProperties?.shadow?.let {
-        ShadowUiModel(
-            ThemeColorUiModel(it.color.light, it.color.dark),
-            it.blurRadius?.dp ?: 0.dp,
-            it.spreadRadius ?: 0F,
-            DpOffset(it.offsetX?.dp ?: 0.dp, it.offsetY?.dp ?: 0.dp),
-        )
+    shadowColor = containerProperties?.shadow?.color?.let { ThemeColorUiModel(it.light, it.dark) },
+    shadowOffset = containerProperties?.shadow?.let { DpOffset(it.offsetX?.dp ?: 0.dp, it.offsetY?.dp ?: 0.dp) },
+    shadowBlurRadius = containerProperties?.shadow?.blurRadius?.dp,
+    shadowSpreadRadius = containerProperties?.shadow?.spreadRadius,
+    borderColor = borderProperties?.borderColor?.let { ThemeColorUiModel(it.light, it.dark) },
+    borderRadius = borderProperties?.borderRadius?.dp,
+    borderWidth = borderProperties?.borderWidth?.let { transformBorderWidth(it) },
+    borderStyle = if (borderProperties?.borderStyle ==
+        BorderStyle.Dashed
+    ) {
+        BorderStyleUiModel.Dashed
+    } else {
+        BorderStyleUiModel.Solid
     },
-    border = borderProperties?.let {
-        BorderUiModel(
-            ThemeColorUiModel(it.borderColor?.light, it.borderColor?.dark),
-            it.borderRadius?.dp ?: 0.dp,
-            transformBorderWidth(it.borderWidth ?: "0"),
-            if (it.borderStyle == BorderStyle.Dashed) BorderStyleUiModel.Dashed else BorderStyleUiModel.Solid,
-        )
-    },
+    borderUseTopCornerRadius = false,
     blurRadius = containerProperties?.blur,
     backgroundColor = backgroundProperties?.backgroundColor?.let { ThemeColorUiModel(it.light, it.dark) },
     backgroundImage = transformBackgroundImage(backgroundProperties?.backgroundImage),

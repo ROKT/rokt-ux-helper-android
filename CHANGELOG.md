@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - BottomSheet border radius value is not applied correctly
+- Button pressed state not being applied
 
 ## [0.3.0] - 2025-02-05
 
