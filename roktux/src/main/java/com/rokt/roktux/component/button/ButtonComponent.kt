@@ -2,6 +2,7 @@ package com.rokt.roktux.component.button
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsFocusedAsState
 import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Row
 import androidx.compose.runtime.Composable
@@ -36,6 +37,7 @@ internal fun ButtonComponent(
 ) {
     val interactionSource = remember { MutableInteractionSource() }
     val isPressed by interactionSource.collectIsPressedAsState()
+    interactionSource.collectIsFocusedAsState()
     val container = modifierFactory.createContainerUiProperties(
         containerProperties = model.containerProperties,
         index = breakpointIndex,

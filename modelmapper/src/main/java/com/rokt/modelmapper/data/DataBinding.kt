@@ -11,6 +11,7 @@ import com.rokt.modelmapper.uimodel.ResponseOptionModel
 import com.rokt.modelmapper.utils.CURRENT_POSITION_PLACEHOLDER
 import com.rokt.modelmapper.utils.TOTAL_OFFERS_PLACEHOLDER
 import com.rokt.modelmapper.utils.transformToAnchorTag
+import java.util.TreeMap
 
 interface DataBinding {
     fun bindValue(value: String, contextKey: String? = null, offerModel: OfferModel?, itemIndex: Int = 0): BindData
@@ -47,7 +48,20 @@ internal inline fun <reified T : Any> bindModel(
 
     CatalogItemModel::class -> {
         offerModel?.catalogItems?.getOrNull(itemIndex) as? T
-    } else -> null
+    }
+
+    else -> null
+}
+
+internal fun getOfferImages(inputKey: String = "", offerModel: OfferModel?): Map<Int, OfferImageModel> {
+    val result = TreeMap<Int, OfferImageModel>()
+    for ((key, value) in offerModel?.creative?.images ?: emptyMap()) {
+        if (key.startsWith(inputKey)) {
+            val suffix = key.substring(inputKey.length + 1) // Extract the number after the prefix
+            result[suffix.toInt()] = value
+        }
+    }
+    return result
 }
 
 private class PlaceholderReplacer(
@@ -112,6 +126,17 @@ private class PlaceholderReplacer(
                             val responseVal = getResponseOptionData(key)
                             if (responseVal != null) {
                                 result = responseVal
+                            }
+                        }
+
+                        CREATIVE_IMAGE_NAMESPACE -> {
+                            val sanitisedKey = getSanitisedDataKey(key)
+                            val imageVal = offer?.creative?.images?.get(sanitisedKey.substringBeforeLast('.'))
+                            if (imageVal != null) {
+                                result =
+                                    imageVal.properties.get<String>(
+                                        TypedKey<String>(sanitisedKey.substringAfterLast('.')),
+                                    )
                             }
                         }
 
@@ -190,5 +215,6 @@ private const val CREATIVE_RESPONSE_NAMESPACE = "creativeResponse"
 private const val CREATIVE_COPY_NAMESPACE = "creativeCopy"
 private const val CREATIVE_LINKS_NAMESPACE = "creativeLink"
 private const val CATALOG_ITEM_NAMESPACE = "catalogItem"
+private const val CREATIVE_IMAGE_NAMESPACE = "creativeImage"
 private val INDICATOR_POSITION = listOf("IndicatorPosition", "indicatorPosition")
 private val TOTAL_OFFERS = listOf("TotalOffers", "totalOffers")

@@ -7,6 +7,13 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import com.rokt.modelmapper.data.BindData
 import com.rokt.modelmapper.data.bindModel
+import com.rokt.modelmapper.data.getOfferImages
+import com.rokt.modelmapper.hmap.TypedKey
+import com.rokt.modelmapper.hmap.get
+import com.rokt.modelmapper.mappers.ExperienceModelMapperImpl.Companion.KEY_ALT
+import com.rokt.modelmapper.mappers.ExperienceModelMapperImpl.Companion.KEY_DARK
+import com.rokt.modelmapper.mappers.ExperienceModelMapperImpl.Companion.KEY_LIGHT
+import com.rokt.modelmapper.mappers.ExperienceModelMapperImpl.Companion.KEY_TITLE
 import com.rokt.modelmapper.uimodel.BooleanWhenUiCondition
 import com.rokt.modelmapper.uimodel.ConditionalTransitionModifier
 import com.rokt.modelmapper.uimodel.EqualityWhenUiCondition
@@ -21,6 +28,7 @@ import com.rokt.modelmapper.uimodel.WhenUiPredicate
 import com.rokt.modelmapper.uimodel.WhenUiTransition
 import com.rokt.network.model.BasicStateStylingBlock
 import com.rokt.network.model.BooleanWhenCondition
+import com.rokt.network.model.DataImageCarouselIndicatorStyles
 import com.rokt.network.model.EqualityWhenCondition
 import com.rokt.network.model.ExistenceWhenCondition
 import com.rokt.network.model.InTransition
@@ -38,6 +46,7 @@ import kotlinx.collections.immutable.toImmutableList
 
 private const val defaultStartPosition = 1
 private const val defaultAccessibilityHidden = true
+private const val dataImageCarouselCustomKeyPrefix = "DataImageCarousel."
 
 internal fun transformProgressIndicator(
     progressIndicatorModel: LayoutSchemaModel.ProgressIndicator,
@@ -332,6 +341,92 @@ internal fun transformProgressControl(
             )
         }.toImmutableList(),
         progressionDirection = progressControlModel.node.direction.toProgressionUiModel(),
+    )
+}
+
+internal fun transformDataImageCarousel(
+    dataImageCarousel: LayoutSchemaModel.DataImageCarousel,
+    offerModel: OfferModel?,
+): LayoutSchemaUiModel.DataImageCarouselUiModel {
+    val ownStyles = dataImageCarousel.node.styles?.elements?.own?.toImmutableList()
+    val ownModifiers = ownStyles.transformModifier(
+        transformSpacing = { ownStyle -> ownStyle.toBasicStateStylingBlock { style -> style.spacing } },
+        transformDimension = { ownStyle -> ownStyle.toBasicStateStylingBlock { style -> style.dimension } },
+        transformBackground = { ownStyle -> ownStyle.toBasicStateStylingBlock { style -> style.background } },
+        transformBorder = { ownStyle -> ownStyle.toBasicStateStylingBlock { style -> style.border } },
+        transformContainer = { ownStyle -> ownStyle.toBasicStateStylingBlock { style -> style.container } },
+    )
+
+    val conditionalStyleTransition = dataImageCarousel.node.styles?.conditionalTransitions?.let {
+        ConditionalTransitionModifier(
+            modifier = transformModifier(
+                it.value.own?.spacing,
+                it.value.own?.dimension,
+                it.value.own?.background,
+                it.value.own?.border,
+                it.value.own?.container,
+            ),
+            predicates = it.predicates.map { predicate -> predicate.transformWhenPredicate() }.toImmutableList(),
+            duration = it.duration,
+        )
+    }
+
+    return LayoutSchemaUiModel.DataImageCarouselUiModel(
+        ownModifiers = ownModifiers,
+        containerProperties = ownStyles.transformContainer(
+            transformContainer = { ownStyle -> ownStyle.toBasicStateStylingBlock { style -> style.container } },
+            transformFlexChild = { ownStyle -> ownStyle.toBasicStateStylingBlock { style -> style.flexChild } },
+        ),
+        conditionalTransitionModifiers = conditionalStyleTransition,
+        duration = dataImageCarousel.node.duration.toLong(),
+        activeIndicator = dataImageCarousel.node.styles?.elements?.activeIndicator?.let {
+            transformCarouselProgressIndicatorItem(it)
+        },
+        indicator = dataImageCarousel.node.styles?.elements?.indicator?.let {
+            transformCarouselProgressIndicatorItem(it)
+        },
+        seenIndicator = dataImageCarousel.node.styles?.elements?.seenIndicator?.let {
+            transformCarouselProgressIndicatorItem(it)
+        },
+        wrapperIndicator = dataImageCarousel.node.styles?.elements?.indicatorWrapper?.let {
+            transformCarouselProgressIndicatorItem(it)
+        },
+        images = getOfferImages(
+            inputKey = dataImageCarousel.node.imageKey,
+            offerModel = offerModel,
+        ).mapValues { entry ->
+            entry.value.properties.get<String>(TypedKey<String>("alt"))
+            LayoutSchemaUiModel.ImageUiModel(
+                ownModifiers = null,
+                containerProperties = null,
+                conditionalTransitionModifiers = null,
+                alt = entry.value.properties.get<String>(TypedKey<String>(KEY_ALT)),
+                darkUrl = entry.value.properties.get<String>(TypedKey<String>(KEY_DARK)),
+                lightUrl = entry.value.properties.get<String>(TypedKey<String>(KEY_LIGHT)).orEmpty(),
+                title = entry.value.properties.get<String>(TypedKey<String>(KEY_TITLE)),
+            )
+        },
+        customStateKey = "$dataImageCarouselCustomKeyPrefix${dataImageCarousel.node.imageKey}",
+    )
+}
+
+internal fun transformCarouselProgressIndicatorItem(
+    indicator: List<BasicStateStylingBlock<DataImageCarouselIndicatorStyles>>?,
+): LayoutSchemaUiModel.ProgressIndicatorItemUiModel {
+    val ownModifiers = indicator?.toImmutableList().transformModifier(
+        transformSpacing = { ownStyle -> ownStyle.toBasicStateStylingBlock { style -> style.spacing } },
+        transformDimension = { ownStyle -> ownStyle.toBasicStateStylingBlock { style -> style.dimension } },
+        transformBackground = { ownStyle -> ownStyle.toBasicStateStylingBlock { style -> style.background } },
+        transformBorder = { ownStyle -> ownStyle.toBasicStateStylingBlock { style -> style.border } },
+        transformContainer = { ownStyle -> ownStyle.toBasicStateStylingBlock { style -> style.container } },
+    )
+
+    return LayoutSchemaUiModel.ProgressIndicatorItemUiModel(
+        ownModifiers = ownModifiers,
+        containerProperties = indicator?.toImmutableList().transformContainer(
+            transformContainer = { ownStyle -> ownStyle.toBasicStateStylingBlock { style -> style.container } },
+            transformFlexChild = { ownStyle -> ownStyle.toBasicStateStylingBlock { style -> style.flexChild } },
+        ),
     )
 }
 

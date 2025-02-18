@@ -36,6 +36,7 @@ internal class RowComponent(private val factory: LayoutUiModelFactory, private v
             isPressed = isPressed,
         )
         var anyStretchChild by remember { mutableStateOf(false) }
+
         Row(
             modifier = modifierFactory
                 .createModifier(

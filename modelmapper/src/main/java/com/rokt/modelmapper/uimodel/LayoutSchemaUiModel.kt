@@ -84,8 +84,8 @@ sealed class LayoutSchemaUiModel(
     class ProgressIndicatorItemUiModel(
         ownModifiers: ImmutableList<StateBlock<ModifierProperties>>?,
         containerProperties: ImmutableList<StateBlock<ContainerProperties>>?,
-        conditionalTransitionModifiers: ConditionalTransitionModifier?,
-        val textStyles: ImmutableList<StateBlock<TextStylingUiProperties>>?,
+        conditionalTransitionModifiers: ConditionalTransitionModifier? = null,
+        val textStyles: ImmutableList<StateBlock<TextStylingUiProperties>>? = null,
     ) : LayoutSchemaUiModel(ownModifiers, containerProperties, conditionalTransitionModifiers)
 
     class CreativeResponseUiModel(
@@ -199,6 +199,19 @@ sealed class LayoutSchemaUiModel(
         val transition: WhenUiTransition,
         val hide: WhenUiHidden?,
     ) : LayoutSchemaUiModel()
+
+    class DataImageCarouselUiModel(
+        ownModifiers: ImmutableList<StateBlock<ModifierProperties>>?,
+        containerProperties: ImmutableList<StateBlock<ContainerProperties>>?,
+        conditionalTransitionModifiers: ConditionalTransitionModifier?,
+        val images: Map<Int, ImageUiModel>,
+        val duration: Long,
+        val indicator: ProgressIndicatorItemUiModel?,
+        val activeIndicator: ProgressIndicatorItemUiModel?,
+        val seenIndicator: ProgressIndicatorItemUiModel?,
+        val wrapperIndicator: ProgressIndicatorItemUiModel?,
+        val customStateKey: String,
+    ) : LayoutSchemaUiModel(ownModifiers, containerProperties, conditionalTransitionModifiers)
 }
 
 sealed class ButtonUiModel(
@@ -292,6 +305,9 @@ class TransitionTextStylingUiProperties(
     override val textDecoration by textDecoration
     override val lineLimit by lineLimit
 }
+
+@Immutable
+data class ImageProperties(val lightUrl: String, val darkUrl: String?, val title: String?, val alt: String?)
 
 data class TextStyleUiState(
     val textStyle: TextStyle,
