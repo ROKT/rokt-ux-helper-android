@@ -52,7 +52,7 @@ abstract class Module {
         name: String? = null,
         lazy: Boolean = false,
         noinline factory: Component.() -> T,
-    ) = provideModuleScoped(T::class.java, name, false, factory)
+    ) = provideModuleScoped(T::class.java, name, lazy, factory)
 }
 
 /**

@@ -1,5 +1,6 @@
 package com.rokt.roktux.viewmodel.variants
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
@@ -40,6 +41,7 @@ internal class MarketingViewModel(
             }
 
             is LayoutContract.LayoutEvent.SetCustomState -> {
+                Log.d("Sahil", "MarketingVariantViewModel ${event.key} && ${event.value}")
                 updateCustomState(event.key, event.value)
                 setEffect {
                     MarketingVariantContract.LayoutVariantEffect.PropagateEvent(

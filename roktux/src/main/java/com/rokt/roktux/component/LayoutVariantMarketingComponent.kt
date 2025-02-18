@@ -1,5 +1,6 @@
 package com.rokt.roktux.component
 
+import android.util.Log
 import androidx.compose.foundation.layout.Column
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -56,6 +57,7 @@ internal class LayoutVariantMarketingComponent(private val factory: LayoutUiMode
             }
 
             is BaseContract.BaseViewState.Success -> {
+                Log.d("Sahil", "LayoutVariantMarketingComponent BaseViewState.Success ${state.value.customState}")
                 Column(
                     modifier = modifier.semantics {
                         isTraversalGroup = true
