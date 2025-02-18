@@ -9,6 +9,7 @@ import com.rokt.core.testutils.annotations.DcuiConfig
 import com.rokt.core.testutils.annotations.DcuiNodeJson
 import com.rokt.core.testutils.annotations.DcuiOfferJson
 import com.rokt.core.testutils.assertion.assertBackgroundColor
+import com.rokt.core.testutils.assertion.assertTextColor
 import com.rokt.roktux.testutil.BaseDcuiEspressoTest
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -100,5 +101,25 @@ class IconComponentTest : BaseDcuiEspressoTest() {
             .assertIsDisplayed()
             .assertTextEquals("PercentIcon")
             .assertBackgroundColor("#bb1010")
+    }
+
+    @Test
+    @DcuiNodeJson(jsonFile = "IconComponent/StaticIcon_with_TextColor.json")
+    @DcuiConfig(isDarkModeEnabled = true)
+    fun testStaticIconRendersWithDarkTextColor() {
+        composeTestRule.onNodeWithTag(DCUI_COMPONENT_TAG)
+            .assertIsDisplayed()
+            .assertTextEquals("Car")
+            .assertTextColor("#0000FF")
+    }
+
+    @Test
+    @DcuiNodeJson(jsonFile = "IconComponent/StaticIcon_with_TextColor.json")
+    @DcuiConfig(isDarkModeEnabled = false)
+    fun testStaticIconRendersWithLightTextColor() {
+        composeTestRule.onNodeWithTag(DCUI_COMPONENT_TAG)
+            .assertIsDisplayed()
+            .assertTextEquals("Car")
+            .assertTextColor("#FF0000")
     }
 }

@@ -18,6 +18,7 @@ import com.rokt.core.testutils.annotations.DcuiNodeComponentState
 import com.rokt.core.testutils.annotations.DcuiNodeJson
 import com.rokt.core.testutils.annotations.WindowSize
 import com.rokt.core.testutils.assertion.assertHeightWrapContent
+import com.rokt.core.testutils.assertion.assertTextColor
 import com.rokt.core.testutils.assertion.assertWidthWrapContent
 import com.rokt.core.testutils.assertion.hasBackgroundColor
 import com.rokt.roktux.testutil.BaseDcuiEspressoTest
@@ -384,5 +385,25 @@ class ProgressIndicatorComponentTest : BaseDcuiEspressoTest() {
         composeTestRule.onNodeWithText("1", useUnmergedTree = true).assertIsDisplayed()
         composeTestRule.onNodeWithText("2", useUnmergedTree = true).assertIsDisplayed()
         composeTestRule.onNodeWithText("3", useUnmergedTree = true).assertIsDisplayed()
+    }
+
+    @Test
+    @DcuiNodeJson(jsonFile = "ProgressIndicatorComponent/ProgressIndicator.json")
+    @DcuiConfig(isDarkModeEnabled = true)
+    @DcuiNodeComponentState(currentOffer = 1, totalOffer = 3)
+    fun testProgressIndicatorRendersWithDarkModeTextColor() {
+        composeTestRule.onNodeWithText("1", useUnmergedTree = true).assertTextColor("#ff0000")
+        composeTestRule.onNodeWithText("2", useUnmergedTree = true).assertTextColor("#ffff00")
+        composeTestRule.onNodeWithText("3", useUnmergedTree = true).assertTextColor("#ff0000")
+    }
+
+    @Test
+    @DcuiNodeJson(jsonFile = "ProgressIndicatorComponent/ProgressIndicator.json")
+    @DcuiConfig(isDarkModeEnabled = false)
+    @DcuiNodeComponentState(currentOffer = 1, totalOffer = 3)
+    fun testProgressIndicatorRendersWithLightModeTextColor() {
+        composeTestRule.onNodeWithText("1", useUnmergedTree = true).assertTextColor("#000000")
+        composeTestRule.onNodeWithText("2", useUnmergedTree = true).assertTextColor("#aa0000")
+        composeTestRule.onNodeWithText("3", useUnmergedTree = true).assertTextColor("#000000")
     }
 }

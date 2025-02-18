@@ -17,6 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - BottomSheet border radius value is not applied correctly
 - Button pressed state not being applied
+- Fix text color in dark mode for `BasicText` `Icons` and `ProgressIndicator` nodes
 
 ## [0.3.0] - 2025-02-05
 
