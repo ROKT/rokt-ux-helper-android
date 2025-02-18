@@ -197,6 +197,24 @@ class TextComponentTest : BaseDcuiEspressoTest() {
     }
 
     @Test
+    @DcuiNodeJson(jsonFile = "TextComponent/BasicText_with_TextColor.json")
+    @DcuiConfig(isDarkModeEnabled = true)
+    fun testBasicTextComponentWithDarkModeTextColor() {
+        composeTestRule.onNodeWithTag(DCUI_COMPONENT_TAG)
+            .assertIsDisplayed()
+            .assertTextColor("#0000ff")
+    }
+
+    @Test
+    @DcuiNodeJson(jsonFile = "TextComponent/BasicText_with_TextColor.json")
+    @DcuiConfig(isDarkModeEnabled = false)
+    fun testBasicTextComponentWithLightModeTextColor() {
+        composeTestRule.onNodeWithTag(DCUI_COMPONENT_TAG)
+            .assertIsDisplayed()
+            .assertTextColor("#ff0000")
+    }
+
+    @Test
     @DcuiNodeJson(
         jsonString = """
             {

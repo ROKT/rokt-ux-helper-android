@@ -161,7 +161,7 @@ internal class ProgressIndicatorComponent(
                     textStyles = model.textStyles,
                     breakpointIndex = breakpointIndex,
                     isPressed = isPressed,
-                    isDarkModeEnabled = false,
+                    isDarkModeEnabled = isDarkModeEnabled,
                     baseStyles = baseModel.textStyles,
                     offerState = offerState,
                     onEventSent = onEventSent,
