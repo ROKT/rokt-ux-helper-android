@@ -1,14 +1,13 @@
 package com.rokt.roktux.di.layout
 
 import coil.ImageLoader
+import com.rokt.core.di.Module
 import com.rokt.modelmapper.data.DataBinding
 import com.rokt.modelmapper.data.DataBindingImpl
 import com.rokt.modelmapper.mappers.ExperienceModelMapperImpl
 import com.rokt.modelmapper.mappers.ModelMapper
 import com.rokt.roktux.RoktViewState
 import com.rokt.roktux.component.LayoutUiModelFactory
-import com.rokt.roktux.di.core.Module
-import com.rokt.roktux.di.core.get
 import com.rokt.roktux.event.RoktPlatformEvent
 import com.rokt.roktux.event.RoktUxEvent
 import com.rokt.roktux.viewmodel.layout.LayoutViewModel
@@ -27,6 +26,7 @@ internal class LayoutModule(
     private val currentOffer: Int,
     private val customStates: Map<String, Int>,
     private val offerCustomStates: Map<String, Map<String, Int>>,
+    private val edgeToEdgeDisplay: Boolean,
 ) : Module() {
     init {
         this.bind<DataBinding, DataBindingImpl>()
@@ -53,6 +53,7 @@ internal class LayoutModule(
                 currentOffer = currentOffer,
                 customStates = customStates,
                 offerCustomStates = offerCustomStates,
+                edgeToEdgeDisplay = edgeToEdgeDisplay,
             )
         }
         this.provideModuleScoped {

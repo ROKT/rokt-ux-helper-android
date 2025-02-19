@@ -2,6 +2,9 @@ package com.rokt.roktux.component
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.animateContentSize
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.waterfall
 import androidx.compose.material3.BottomSheetDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ModalBottomSheet
@@ -16,6 +19,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.input.pointer.pointerInput
 import com.rokt.modelmapper.uimodel.LayoutSchemaUiModel
 import com.rokt.roktux.utils.interceptTap
@@ -55,6 +59,10 @@ internal class BottomSheetComponent(
                 },
             )
 
+        val bottomSheetShape =
+            model.child.ownModifiers?.getOrNull(breakpointIndex)?.default?.let {
+                modifierFactory.createBackgroundShape(it)
+            } ?: RectangleShape
         var hasUserInteracted by remember { mutableStateOf(false) }
         ModalBottomSheet(
             onDismissRequest = {
@@ -63,6 +71,7 @@ internal class BottomSheetComponent(
                 }
                 onEventSent(LayoutContract.LayoutEvent.CloseSelected(isDismissed = true))
             },
+            shape = bottomSheetShape,
             sheetState = modalBottomSheetState,
             scrimColor = scrimColor ?: BottomSheetDefaults.ScrimColor,
             dragHandle = {},
@@ -71,9 +80,23 @@ internal class BottomSheetComponent(
                 shouldDismissOnBackPress = false,
             ),
             modifier = modifier,
+            contentWindowInsets = {
+                if (model.edgeToEdgeDisplay) {
+                    WindowInsets.waterfall
+                } else {
+                    BottomSheetDefaults.windowInsets
+                }
+            },
         ) {
             BackHandler {
                 onEventSent(LayoutContract.LayoutEvent.CloseSelected(isDismissed = true))
+            }
+            val insetsPadding = remember {
+                if (model.edgeToEdgeDisplay) {
+                    Modifier.navigationBarsPadding()
+                } else {
+                    Modifier
+                }
             }
             factory.CreateComposable(
                 model = model.child,
@@ -81,7 +104,8 @@ internal class BottomSheetComponent(
                     .animateContentSize()
                     .pointerInput(Unit) {
                         interceptTap { hasUserInteracted = true }
-                    },
+                    }
+                    .then(insetsPadding),
                 isPressed = isPressed,
                 offerState = offerState,
                 isDarkModeEnabled = isDarkModeEnabled,

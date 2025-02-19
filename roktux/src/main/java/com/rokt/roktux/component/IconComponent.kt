@@ -27,7 +27,7 @@ internal class IconComponent(private val modifierFactory: ModifierFactory) :
                 textStyles = model.textStyles,
                 breakpointIndex = breakpointIndex,
                 isPressed = isPressed,
-                isDarkModeEnabled = false,
+                isDarkModeEnabled = isDarkModeEnabled,
                 defaultFontFamily = ROKT_ICONS_FONT_FAMILY,
                 offerState = offerState,
                 onEventSent = onEventSent,

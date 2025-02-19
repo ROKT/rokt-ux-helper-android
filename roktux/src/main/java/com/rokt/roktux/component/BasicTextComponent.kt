@@ -28,7 +28,7 @@ internal class BasicTextComponent(private val modifierFactory: ModifierFactory) 
             textStyles = model.textStyles,
             breakpointIndex = breakpointIndex,
             isPressed = isPressed,
-            isDarkModeEnabled = false,
+            isDarkModeEnabled = isDarkModeEnabled,
             conditionalTransitionTextStyling = model.conditionalTransitionTextStyling,
             offerState = offerState,
             onEventSent = onEventSent,

@@ -71,6 +71,7 @@ class RoktLayoutView @JvmOverloads constructor(
                     roktUxConfig?.imageHandlingStrategy?.let { imageHandlingStrategy(it) }
                     roktUxConfig?.colorMode?.let { colorMode(it) }
                     roktUxConfig?.viewStateConfig?.let { viewStateConfig(it) }
+                    roktUxConfig?.edgeToEdgeDisplay?.let { edgeToEdgeDisplay(it) }
                 }.build()
             }
             RoktLayout(

@@ -51,7 +51,8 @@
               },
               "text": {
                 "textColor": {
-                  "light": "#000000"
+                  "light": "#aa0000",
+                  "dark": "#ffff00"
                 },
                 "horizontalTextAlign": "center",
                 "fontSize": 10,
@@ -88,7 +89,8 @@
               },
               "text": {
                 "textColor": {
-                  "light": "#000000"
+                  "light": "#000000",
+                  "dark": "#ff0000"
                 },
                 "horizontalTextAlign": "center",
                 "fontSize": 10,

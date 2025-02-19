@@ -15,6 +15,7 @@ import com.rokt.modelmapper.mappers.ExperienceModelMapperImpl.Companion.KEY_URL
 import com.rokt.modelmapper.mappers.ModelMapper
 import com.rokt.modelmapper.uimodel.Action
 import com.rokt.modelmapper.uimodel.ExperienceModel
+import com.rokt.modelmapper.uimodel.LayoutSchemaUiModel
 import com.rokt.modelmapper.uimodel.OpenLinks
 import com.rokt.modelmapper.uimodel.PluginModel
 import com.rokt.modelmapper.uimodel.SignalType
@@ -57,6 +58,7 @@ internal class LayoutViewModel(
     private var currentOffer: Int,
     private var customStates: Map<String, Int>,
     private var offerCustomStates: Map<String, Map<String, Int>>,
+    private var edgeToEdgeDisplay: Boolean,
 ) : BaseViewModel<LayoutContract.LayoutEvent, LayoutUiState, LayoutContract.LayoutEffect>() {
 
     private lateinit var pluginId: String
@@ -113,7 +115,7 @@ internal class LayoutViewModel(
     private fun createLayoutState(currentOffer: Int = FIRST_OFFER_INDEX, viewableItems: Int = DEFAULT_VIEWABLE_ITEMS) {
         experienceModel = modelMapper.getSavedExperience() ?: return
         pluginModel = experienceModel.plugins.firstOrNull() ?: return
-        val layoutSchema = pluginModel.outerLayoutSchema
+        var layoutSchema = pluginModel.outerLayoutSchema
         if (layoutSchema?.isEmbedded() == true &&
             !location.equals(
                 pluginModel.targetElementSelector,
@@ -122,6 +124,26 @@ internal class LayoutViewModel(
         ) {
             handleError(IllegalArgumentException(LOCATION_TARGET_ELEMENT_DOES_NOT_MATCH))
             return
+        } else if (!edgeToEdgeDisplay) {
+            if (layoutSchema is LayoutSchemaUiModel.OverlayUiModel) {
+                layoutSchema = LayoutSchemaUiModel.OverlayUiModel(
+                    layoutSchema.ownModifiers,
+                    layoutSchema.containerProperties,
+                    layoutSchema.conditionalTransitionModifiers,
+                    layoutSchema.allowBackdropToClose,
+                    layoutSchema.child,
+                    edgeToEdgeDisplay,
+                )
+            } else if (layoutSchema is LayoutSchemaUiModel.BottomSheetUiModel) {
+                layoutSchema = LayoutSchemaUiModel.BottomSheetUiModel(
+                    layoutSchema.ownModifiers,
+                    layoutSchema.containerProperties,
+                    layoutSchema.conditionalTransitionModifiers,
+                    layoutSchema.allowBackdropToClose,
+                    layoutSchema.child,
+                    edgeToEdgeDisplay,
+                )
+            }
         }
         val lastOfferIndex = pluginModel.slots.size - 1
         pluginId = pluginModel.id
@@ -568,6 +590,7 @@ internal class LayoutViewModel(
         private val currentOffer: Int,
         private val customStates: Map<String, Int>,
         private val offerCustomStates: Map<String, Map<String, Int>>,
+        private val edgeToEdgeDisplay: Boolean,
     ) : ViewModelProvider.Factory {
         @Suppress("UNCHECKED_CAST")
         override fun <T : ViewModel> create(modelClass: Class<T>, extras: CreationExtras): T {
@@ -585,6 +608,7 @@ internal class LayoutViewModel(
                     currentOffer = currentOffer,
                     customStates = customStates,
                     offerCustomStates = offerCustomStates,
+                    edgeToEdgeDisplay = edgeToEdgeDisplay,
                 ) as T
             }
             throw IllegalArgumentException("Unknown ViewModel type")

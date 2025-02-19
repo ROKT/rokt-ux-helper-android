@@ -1,0 +1,22 @@
+{
+  "type": "BasicText",
+  "node": {
+    "value": "Test",
+    "styles": {
+      "elements": {
+        "own": [
+          {
+            "default": {
+              "text": {
+                "textColor": {
+                  "light": "#ff0000",
+                  "dark": "#0000ff"
+                }
+              }
+            }
+          }
+        ]
+      }
+    }
+  }
+}

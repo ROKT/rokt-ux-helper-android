@@ -1,0 +1,85 @@
+{
+  "type": "BottomSheet",
+  "node": {
+    "allowBackdropToClose": true,
+    "styles": {
+      "elements": {
+        "own": [
+          {
+            "default": {
+              "background": {
+                "backgroundColor": {
+                  "light": "#ffffff",
+                  "dark": "#ffffff"
+                }
+              },
+              "border": {
+                "borderRadius": 4.0,
+                "borderWidth": "4",
+                "borderColor": {
+                  "light": "#ffff00"
+                }
+              },
+              "dimension": {
+                "height": {
+                  "type": "fixed",
+                  "value": 20
+                }
+              },
+              "spacing": {
+                "padding": "16 0 0 0",
+                "margin": "0 0 0 0"
+              }
+            }
+          }
+        ],
+        "wrapper": [
+          {
+            "default": {
+              "background": {
+                "backgroundColor": {
+                  "light": "#520E0A13",
+                  "dark": "#520E0A13"
+                }
+              }
+            }
+          }
+        ]
+      }
+    },
+    "children": [
+      {
+        "type": "RichText",
+        "node": {
+          "styles": {
+            "elements": {
+              "own": [
+                {
+                  "default": {
+                    "dimension": {
+                      "width": {
+                        "type": "fit",
+                        "value": "fit-width"
+                      }
+                    },
+                    "text": {
+                      "textColor": {
+                        "light": "#171717",
+                        "dark": "#171717"
+                      },
+                      "fontSize": 16.0,
+                      "fontWeight": "500",
+                      "lineHeight": 22.0,
+                      "horizontalTextAlign": "center"
+                    }
+                  }
+                }
+              ]
+            }
+          },
+          "value": "Purchase successful"
+        }
+      }
+    ]
+  }
+}

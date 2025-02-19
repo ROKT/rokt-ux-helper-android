@@ -9,11 +9,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.1] - 2025-02-20
+
+### Added
+
+- Edge to Edge Display Support configuration
+
+### Fixed
+
+- BottomSheet border radius value is not applied correctly
+- Button pressed state not being applied
+- Fix text color in dark mode for `BasicText` `Icons` and `ProgressIndicator` nodes
+
 ## [0.3.0] - 2025-02-05
 
 ### Added
 
 - View state caching
+
+### Changed
+
+- Package name of test utils changed from com.core.testutils to com.rokt.core.testutils
 
 ### Fixed
 

@@ -1,0 +1,22 @@
+{
+  "type": "StaticIcon",
+  "node": {
+    "name": "Car",
+    "styles": {
+      "elements": {
+        "own": [
+          {
+            "default": {
+              "text": {
+                "textColor": {
+                  "light": "#FF0000",
+                  "dark": "#0000FF"
+                }
+              }
+            }
+          }
+        ]
+      }
+    }
+  }
+}
