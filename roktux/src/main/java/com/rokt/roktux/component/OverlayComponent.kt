@@ -104,6 +104,16 @@ internal class OverlayComponent(
                         .then(modifier),
                     contentAlignment = BiasAlignment(container.arrangementBias, container.alignmentBias),
                 ) {
+                    var childModifier: Modifier = Modifier
+                    modifierFactory.createContainerUiProperties(
+                        containerProperties = model.child.containerProperties,
+                        index = breakpointIndex,
+                        isPressed = isPressed,
+                    ).also { container ->
+                        container.selfAlignmentBias?.let {
+                            childModifier = childModifier.then(Modifier.align(BiasAlignment(0F, it)))
+                        }
+                    }
                     factory.CreateComposable(
                         model = model.child,
                         modifier = Modifier.pointerInput(Unit) {
@@ -112,7 +122,7 @@ internal class OverlayComponent(
                                 pass = PointerEventPass.Main,
                                 shouldConsume = true,
                             ) {}
-                        },
+                        }.then(childModifier),
                         isPressed = isPressed,
                         offerState = offerState,
                         isDarkModeEnabled = isDarkModeEnabled,
