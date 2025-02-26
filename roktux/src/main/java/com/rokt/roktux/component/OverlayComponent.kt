@@ -92,17 +92,6 @@ internal class OverlayComponent(
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
-                        .then(
-                            modifierFactory
-                                .createModifier(
-                                    modifierPropertiesList = model.ownModifiers,
-                                    conditionalTransitionModifier = model.conditionalTransitionModifiers,
-                                    breakpointIndex = breakpointIndex,
-                                    isPressed = isPressed,
-                                    isDarkModeEnabled = isDarkModeEnabled,
-                                    offerState = offerState,
-                                ),
-                        )
                         .pointerInput(Unit) {
                             detectTapGestures {
                                 if (model.allowBackdropToClose) {
