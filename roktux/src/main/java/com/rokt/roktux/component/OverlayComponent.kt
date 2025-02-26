@@ -1,5 +1,6 @@
 package com.rokt.roktux.component
 
+import android.util.Log
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
@@ -7,6 +8,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -53,6 +55,7 @@ internal class OverlayComponent(
                 Modifier
             }
         }
+        var hasUserInteracted by remember { mutableStateOf(false) }
 
         // This box is draw edge to edge on the screen as Popup does not draw edge to edge
         Box(
@@ -82,6 +85,7 @@ internal class OverlayComponent(
                 ),
                 onDismissRequest = {
                     // Avoiding double sending event when using close gestures
+                    Log.d("Sahil", "onDismissRequest $isClosedByBackdrop")
                     if (!isClosedByBackdrop) {
                         isClosedByBackdrop = true
                         onEventSent(LayoutContract.LayoutEvent.CloseSelected(isDismissed = true))
@@ -111,7 +115,9 @@ internal class OverlayComponent(
                             interceptTap(
                                 pass = PointerEventPass.Main,
                                 shouldConsume = true,
-                            ) {}
+                            ) {
+                                hasUserInteracted = true
+                            }
                         },
                         isPressed = isPressed,
                         offerState = offerState,
@@ -119,6 +125,12 @@ internal class OverlayComponent(
                         breakpointIndex = breakpointIndex,
                         onEventSent = onEventSent,
                     )
+
+                    if (hasUserInteracted) {
+                        LaunchedEffect(Unit) {
+                            onEventSent(LayoutContract.LayoutEvent.UserInteracted)
+                        }
+                    }
                 }
             }
         }

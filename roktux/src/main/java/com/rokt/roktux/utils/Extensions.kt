@@ -204,14 +204,14 @@ internal fun Modifier.layoutExitAnimationModifier(
 
 internal fun Modifier.userInteractionDetector(model: LayoutSchemaUiModel, onTap: (() -> Unit)?): Modifier {
     // We apply this logic directly in BottomSheet as the pointerInput modifier is incompatible with ModalBottomSheet
-    return if (model.isBottomSheet()) {
-        this
-    } else {
+    return if (model.isEmbedded()) {
         this then Modifier.pointerInput(Unit) {
             interceptTap {
                 onTap?.invoke()
             }
         }
+    } else {
+        this
     }
 }
 
