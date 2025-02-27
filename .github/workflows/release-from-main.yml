@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       final_version: ${{ steps.final-version.outputs.final-version }}
-      version_changed: ${{ steps.version-changed.outputs.only_changed }}
+      version_changed: ${{ steps.version-changed.outputs.any_changed }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -29,7 +29,7 @@ jobs:
           echo "release-version=$version_from_file" >> $GITHUB_OUTPUT
       - name: Bump version if necessary
         id: bump-semver
-        if: steps.version-changed.outputs.only_changed == 'false'
+        if: steps.version-changed.outputs.any_changed == 'false'
         uses: actions-ecosystem/action-bump-semver@v1
         with:
           current_version: ${{ steps.version-file.outputs.release-version }}
@@ -37,7 +37,7 @@ jobs:
       - name: Determine final version
         id: final-version
         run: |
-          if [[ "${{ steps.version-changed.outputs.only_changed }}" == "true" ]]; then
+          if [[ "${{ steps.version-changed.outputs.any_changed }}" == "true" ]]; then
             echo "final-version=${{ steps.version-file.outputs.release-version }}" >> $GITHUB_OUTPUT
           else
             echo "final-version=${{ steps.bump-semver.outputs.new_version }}-SNAPSHOT" >> $GITHUB_OUTPUT
