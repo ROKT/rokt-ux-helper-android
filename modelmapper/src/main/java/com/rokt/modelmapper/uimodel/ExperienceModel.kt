@@ -55,7 +55,7 @@ data class CreativeModel(
     val icons: ImmutableMap<String, CreativeIcon>,
 )
 
-data class OfferImageModel(val light: String, val dark: String, val alt: String, val title: String)
+data class OfferImageModel(val properties: HMap)
 
 data class CreativeLink(val url: String, val title: String)
 

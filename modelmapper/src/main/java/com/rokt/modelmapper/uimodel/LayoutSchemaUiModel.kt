@@ -199,6 +199,19 @@ sealed class LayoutSchemaUiModel(
         val transition: WhenUiTransition,
         val hide: WhenUiHidden?,
     ) : LayoutSchemaUiModel()
+
+    class DataImageCarouselUiModel(
+        ownModifiers: ImmutableList<StateBlock<ModifierProperties>>?,
+        containerProperties: ImmutableList<StateBlock<ContainerProperties>>?,
+        conditionalTransitionModifiers: ConditionalTransitionModifier?,
+        val images: Map<Int, ImageUiModel>,
+        val duration: Long,
+        val indicator: ProgressIndicatorItemUiModel?,
+        val activeIndicator: ProgressIndicatorItemUiModel?,
+        val seenIndicator: ProgressIndicatorItemUiModel?,
+        val progressIndicatorContainer: ProgressIndicatorItemUiModel?,
+        val customStateKey: String,
+    ) : LayoutSchemaUiModel(ownModifiers, containerProperties, conditionalTransitionModifiers)
 }
 
 sealed class ButtonUiModel(

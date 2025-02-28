@@ -58,9 +58,29 @@ class DataBindingImplTest : MockkUnitTest() {
             every { copy } returns persistentMapOf(
                 Pair("disclaimer", "test disclaimer"),
                 Pair("title", "test title"),
+                Pair("carousel.image.horizontal.1.title", "horizontal 1"),
+                Pair("carousel.image.vertical.3.title", "vertical 3"),
             )
             every { links } returns persistentMapOf(
                 "termsCondition" to CreativeLink("https://rokt.com", "Terms"),
+            )
+            every { images } returns persistentMapOf(
+                Pair(
+                    "creativeCarouselImageHorizontal.1",
+                    OfferImageModel(
+                        properties = mockk(relaxed = true) {
+                            every { get(TypedKey<String>("title")) } returns "creativeImage 1 !!!"
+                        },
+                    ),
+                ),
+                Pair(
+                    "creativeCarouselImageVertical.3",
+                    OfferImageModel(
+                        properties = mockk(relaxed = true) {
+                            every { get(TypedKey<String>("title")) } returns "creativeImage 3 !!!"
+                        },
+                    ),
+                ),
             )
         }
         every { catalogItems } returns listOf<CatalogItemModel>(
@@ -74,12 +94,14 @@ class DataBindingImplTest : MockkUnitTest() {
                 every { imageWrapper } returns mockk(relaxed = false) {
                     every { properties } returns mockk(relaxed = false) {
                         every { get(key = any<TypedKey<Any>>()) } returns null
-                        every { get(TypedKey<OfferImageModel>("catalogItemImage1")) } returns OfferImageModel(
-                            light = "light1",
-                            dark = "dark1",
-                            alt = "alt1",
-                            title = "title1",
-                        )
+                        every { get(TypedKey<OfferImageModel>("catalogItemImage1")) } returns mockk(relaxed = false) {
+                            every { properties } returns mockk(relaxed = false) {
+                                every { get(TypedKey<String>("light")) } returns "light1"
+                                every { get(TypedKey<String>("dark")) } returns "dark1"
+                                every { get(TypedKey<String>("alt")) } returns "alt1"
+                                every { get(TypedKey<String>("title")) } returns "title1"
+                            }
+                        }
                     }
                 }
             },
@@ -93,12 +115,14 @@ class DataBindingImplTest : MockkUnitTest() {
                 every { imageWrapper } returns mockk(relaxed = false) {
                     every { properties } returns mockk(relaxed = false) {
                         every { get(key = any<TypedKey<Any>>()) } returns null
-                        every { get(TypedKey<OfferImageModel>("catalogItemImage2")) } returns OfferImageModel(
-                            light = "light2",
-                            dark = "dark2",
-                            alt = "alt2",
-                            title = "title2",
-                        )
+                        every { get(TypedKey<OfferImageModel>("catalogItemImage2")) } returns mockk(relaxed = false) {
+                            every { properties } returns mockk(relaxed = false) {
+                                every { get(TypedKey<String>("light")) } returns "light2"
+                                every { get(TypedKey<String>("dark")) } returns "dark2"
+                                every { get(TypedKey<String>("alt")) } returns "alt2"
+                                every { get(TypedKey<String>("title")) } returns "title2"
+                            }
+                        }
                     }
                 }
             },
@@ -115,7 +139,7 @@ class DataBindingImplTest : MockkUnitTest() {
             )
 
         // Assert
-        assertTrue(value is BindData.Value && value.text.equals("defaultValue"))
+        assertTrue(value is BindData.Value && value.text == "defaultValue")
     }
 
     @Test
@@ -134,7 +158,7 @@ class DataBindingImplTest : MockkUnitTest() {
             dataBinding.bindValue("%^DATA.creativeResponse.shortLabel|defaultValue^%", "positive", offer)
 
         // Assert
-        assertTrue(value is BindData.Value && value.text.equals("Thank You"))
+        assertTrue(value is BindData.Value && value.text == "Thank You")
     }
 
     @Test
@@ -153,7 +177,7 @@ class DataBindingImplTest : MockkUnitTest() {
             dataBinding.bindValue("%^DATA.creativeResponse.shortLabel|defaultValue^%", "neutral", offer)
 
         // Assert
-        assertTrue(value is BindData.Value && value.text.equals("defaultValue"))
+        assertTrue(value is BindData.Value && value.text == "defaultValue")
     }
 
     @Test
@@ -163,7 +187,7 @@ class DataBindingImplTest : MockkUnitTest() {
             dataBinding.bindValue("%^DATA.creativeCopy.disclaimer|defaultValue^%", offerModel = offer)
 
         // Assert
-        assertTrue(value is BindData.Value && value.text.equals("test disclaimer"))
+        assertTrue(value is BindData.Value && value.text == "test disclaimer")
     }
 
     @Test
@@ -179,9 +203,7 @@ class DataBindingImplTest : MockkUnitTest() {
         // Assert
         assertTrue(
             value is BindData.Value &&
-                value.text.equals(
-                    "This is test disclaimer and Thank You he \n sd test disclaimer",
-                ),
+                value.text == "This is test disclaimer and Thank You he \n sd test disclaimer",
         )
     }
 
@@ -195,7 +217,7 @@ class DataBindingImplTest : MockkUnitTest() {
             )
 
         // Assert
-        assertTrue(value is BindData.Value && value.text.equals("test disclaimer"))
+        assertTrue(value is BindData.Value && value.text == "test disclaimer")
     }
 
     @Test
@@ -249,7 +271,10 @@ class DataBindingImplTest : MockkUnitTest() {
         // Assert
         assertThat(value, `is`(notNullValue()))
         assertThat(value, `is`(instanceOf(OfferImageModel::class.java)))
-        assertThat(value, `is`(OfferImageModel("light1", "dark1", "alt1", "title1")))
+        assertThat((value as OfferImageModel).properties[TypedKey<String>("light")], `is`("light1"))
+        assertThat((value).properties[TypedKey<String>("dark")], `is`("dark1"))
+        assertThat((value).properties[TypedKey<String>("alt")], `is`("alt1"))
+        assertThat((value).properties[TypedKey<String>("title")], `is`("title1"))
     }
 
     @Test
@@ -320,6 +345,20 @@ class DataBindingImplTest : MockkUnitTest() {
             "%^DATA.creativeResponse.shortLabel^%",
             "Thank You",
             "positive",
+            BindData.Value::class.java,
+            0,
+        ),
+        arrayOf(
+            "%^DATA.creativeCopy.carousel.image.horizontal.1.title^%",
+            "horizontal 1",
+            null,
+            BindData.Value::class.java,
+            0,
+        ),
+        arrayOf(
+            "%^DATA.creativeCopy.carousel.image.vertical.3.title^%",
+            "vertical 3",
+            null,
             BindData.Value::class.java,
             0,
         ),
@@ -424,6 +463,20 @@ class DataBindingImplTest : MockkUnitTest() {
         arrayOf(
             "%^DATA.catalogItem.wrongKey|something^%",
             "something",
+            null,
+            BindData.Value::class.java,
+            1,
+        ),
+        arrayOf(
+            "%^DATA.creativeImage.creativeCarouselImageHorizontal.1.title^%",
+            "creativeImage 1 !!!",
+            null,
+            BindData.Value::class.java,
+            1,
+        ),
+        arrayOf(
+            "%^DATA.creativeImage.creativeCarouselImageVertical.3.title^%",
+            "creativeImage 3 !!!",
             null,
             BindData.Value::class.java,
             1,

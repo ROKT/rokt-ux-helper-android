@@ -2,6 +2,12 @@ package com.rokt.modelmapper.mappers
 
 import com.rokt.modelmapper.data.BindData
 import com.rokt.modelmapper.data.bindModel
+import com.rokt.modelmapper.hmap.TypedKey
+import com.rokt.modelmapper.hmap.get
+import com.rokt.modelmapper.mappers.ExperienceModelMapperImpl.Companion.KEY_ALT
+import com.rokt.modelmapper.mappers.ExperienceModelMapperImpl.Companion.KEY_DARK
+import com.rokt.modelmapper.mappers.ExperienceModelMapperImpl.Companion.KEY_LIGHT
+import com.rokt.modelmapper.mappers.ExperienceModelMapperImpl.Companion.KEY_TITLE
 import com.rokt.modelmapper.uimodel.ConditionalTransitionModifier
 import com.rokt.modelmapper.uimodel.ConditionalTransitionTextStyling
 import com.rokt.modelmapper.uimodel.CreativeIcon
@@ -152,10 +158,10 @@ internal fun transformDataImage(
             transformFlexChild = { ownStyle -> ownStyle.toBasicStateStylingBlock { style -> style.flexChild } },
         ),
         conditionalTransitionModifiers = conditionalStyleTransition,
-        lightUrl = boundModel?.light ?: "",
-        darkUrl = boundModel?.dark,
-        title = boundModel?.title,
-        alt = boundModel?.alt,
+        lightUrl = boundModel?.properties?.get<String>(TypedKey<String>(KEY_LIGHT)).orEmpty(),
+        darkUrl = boundModel?.properties?.get<String>(TypedKey<String>(KEY_DARK)),
+        title = boundModel?.properties?.get<String>(TypedKey<String>(KEY_TITLE)),
+        alt = boundModel?.properties?.get<String>(TypedKey<String>(KEY_ALT)),
     )
 }
 
