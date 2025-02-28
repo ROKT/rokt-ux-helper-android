@@ -71,6 +71,7 @@ internal class LayoutUiModelFactory(modifierFactory: ModifierFactory = ModifierF
                 this,
                 modifierFactory,
             ),
+            LayoutSchemaUiModel.DataImageCarouselUiModel::class to DataImageCarouselComponent(this, modifierFactory),
         )
 
     @Composable
