@@ -1144,7 +1144,7 @@ internal class ModifierFactory {
             )
             fontFamilyMap[stylingUiProperties.fontFamily ?: defaultFontFamily] ?: FontFamily.Default
         } catch (e: Exception) {
-            onEventSent(LayoutContract.LayoutEvent.UiException(e))
+            onEventSent(LayoutContract.LayoutEvent.UiException(e, false))
             FontFamily.Default
         }
         return TextStyleUiState(

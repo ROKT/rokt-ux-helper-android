@@ -29,7 +29,7 @@ internal class LayoutContract {
         data class SetCurrentOffer(val currentOffer: Int) : LayoutEvent
         data class SignalViewed(val offerId: Int) : LayoutEvent
         data class OfferVisibilityChanged(val offerId: Int, val visible: Boolean) : LayoutEvent
-        data class UiException(val throwable: Throwable) : LayoutEvent
+        data class UiException(val throwable: Throwable, val closeLayout: Boolean) : LayoutEvent
     }
 
     sealed interface LayoutEffect : BaseContract.BaseEffect {
