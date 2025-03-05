@@ -298,4 +298,19 @@ class RoktLayoutViewModelTest : BaseViewModelTest() {
             )
         }
     }
+
+    @Test
+    fun `UiException Event should send SignalSdkDiagnostic PlatformEvent`() = runTest {
+        // Act
+        layoutViewModel.setEvent(LayoutContract.LayoutEvent.UiException(IllegalAccessException("no access"), true))
+
+        // Assert
+        verify(exactly = 0) {
+            platformEvent.invoke(
+                match { event ->
+                    event[0].eventType == EventType.SignalSdkDiagnostic
+                },
+            )
+        }
+    }
 }

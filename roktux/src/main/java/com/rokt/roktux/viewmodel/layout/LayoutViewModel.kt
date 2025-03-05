@@ -267,6 +267,15 @@ internal class LayoutViewModel(
             }
 
             is LayoutContract.LayoutEvent.UiException -> {
+                if (::experienceModel.isInitialized && event.closeLayout) {
+                    setEffect {
+                        LayoutContract.LayoutEffect.CloseLayout(
+                            onClose = {
+                                uxEvent(RoktUxEvent.LayoutClosed(pluginId))
+                            },
+                        )
+                    }
+                }
                 if (!(::experienceModel.isInitialized && experienceModel.options.useDiagnosticEvents)) {
                     return
                 }
