@@ -2,7 +2,7 @@ name: PR Notification
 
 on:
   pull_request:
-    types: [opened]
+    types: [opened, reopened]
 
 jobs:
   pr-notifiy:
