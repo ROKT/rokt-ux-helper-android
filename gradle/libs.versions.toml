@@ -37,7 +37,7 @@ androidxHiltNavigationCompose = "1.0.0"
 hilt = "2.51.1"
 activity = "1.9.2"
 constraintlayout = "2.1.4"
-mavenPublish = "0.31.0-rc1"
+mavenPublish = "0.31.0-rc2"
 kover = "0.9.1"
 
 roktUxHelper = "0.2.0"
