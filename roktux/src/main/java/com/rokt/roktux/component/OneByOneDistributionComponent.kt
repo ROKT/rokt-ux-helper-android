@@ -16,6 +16,7 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
+import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -63,6 +64,17 @@ internal class OneByOneDistributionComponent(
             } else {
                 firstRender = false
             }
+        }
+
+        val viewModelStoreOwner = LocalViewModelStoreOwner.current
+        try {
+            checkNotNull(viewModelStoreOwner) {
+                "NavHost requires a ViewModelStoreOwner to be provided via LocalViewModelStoreOwner"
+            }
+            navController.setViewModelStore(viewModelStoreOwner.viewModelStore)
+        } catch (e: Exception) {
+            onEventSent(LayoutContract.LayoutEvent.UiException(e, true))
+            return
         }
 
         NavHost(
