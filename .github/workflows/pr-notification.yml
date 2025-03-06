@@ -4,6 +4,10 @@ on:
   pull_request:
     types: [opened, reopened]
 
+permissions:
+  contents: 'read'
+  id-token: 'write'
+
 jobs:
   pr-notifiy:
     name: "Notify GChat"
