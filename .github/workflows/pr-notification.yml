@@ -5,8 +5,8 @@ on:
     types: [opened, reopened]
 
 permissions:
-  contents: 'read'
-  id-token: 'write'
+  contents: "read"
+  id-token: "write"
 
 jobs:
   pr-notifiy:
