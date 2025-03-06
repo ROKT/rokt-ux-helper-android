@@ -271,7 +271,7 @@ internal class LayoutViewModel(
                     setEffect {
                         LayoutContract.LayoutEffect.CloseLayout(
                             onClose = {
-                                uxEvent(RoktUxEvent.LayoutClosed(pluginId))
+                                uxEvent(RoktUxEvent.LayoutFailure())
                             },
                         )
                     }
