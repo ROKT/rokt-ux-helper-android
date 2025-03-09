@@ -10,6 +10,7 @@ import com.rokt.roktux.component.button.CreativeResponseComponent
 import com.rokt.roktux.component.button.ProgressControlComponent
 import com.rokt.roktux.component.button.StaticLinkComponent
 import com.rokt.roktux.component.button.ToggleButtonStateTriggerComponent
+import com.rokt.roktux.component.extensions.EscapeHatchComponent
 import com.rokt.roktux.utils.tryCast
 import com.rokt.roktux.viewmodel.layout.LayoutContract
 import com.rokt.roktux.viewmodel.layout.OfferUiState
@@ -71,6 +72,7 @@ internal class LayoutUiModelFactory(modifierFactory: ModifierFactory = ModifierF
                 this,
                 modifierFactory,
             ),
+            LayoutSchemaUiModel.EscapeHatchUiModel::class to EscapeHatchComponent(this, modifierFactory),
         )
 
     @Composable

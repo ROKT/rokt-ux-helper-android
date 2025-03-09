@@ -199,6 +199,8 @@ sealed class LayoutSchemaUiModel(
         val transition: WhenUiTransition,
         val hide: WhenUiHidden?,
     ) : LayoutSchemaUiModel()
+
+    class EscapeHatchUiModel(val data: String) : LayoutSchemaUiModel()
 }
 
 sealed class ButtonUiModel(
