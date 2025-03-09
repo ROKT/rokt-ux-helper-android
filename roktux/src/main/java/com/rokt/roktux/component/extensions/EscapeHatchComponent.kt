@@ -7,6 +7,7 @@ import com.rokt.modelmapper.uimodel.LayoutSchemaUiModel
 import com.rokt.roktux.component.ComposableComponent
 import com.rokt.roktux.component.LayoutUiModelFactory
 import com.rokt.roktux.component.ModifierFactory
+import com.rokt.roktux.component.extensions.countdowntimer.CountDownTimerComponent
 import com.rokt.roktux.viewmodel.layout.LayoutContract
 import com.rokt.roktux.viewmodel.layout.OfferUiState
 import kotlinx.collections.immutable.persistentMapOf
@@ -19,7 +20,7 @@ internal class EscapeHatchComponent(
 ) : ComposableComponent<LayoutSchemaUiModel.EscapeHatchUiModel> {
 
     private val escapeHatchExtensionComponents = persistentMapOf<String, ExtensionComposableComponent<*>>(
-        // "count-down-timer" to CountDownTimerComponent(factory, modifierFactory),
+        "count-down-timer" to CountDownTimerComponent(factory, modifierFactory),
     )
 
     @Composable
