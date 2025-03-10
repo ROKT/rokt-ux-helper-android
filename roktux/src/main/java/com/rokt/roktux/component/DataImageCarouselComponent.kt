@@ -65,129 +65,132 @@ internal class DataImageCarouselComponent(
             }
         }
 
-        Box(
-            modifier = modifierFactory
-                .createModifier(
-                    modifierPropertiesList = model.ownModifiers,
-                    conditionalTransitionModifier = model.conditionalTransitionModifiers,
-                    breakpointIndex = breakpointIndex,
-                    isPressed = isPressed,
-                    isDarkModeEnabled = isDarkModeEnabled,
-                    offerState = offerState,
-                )
-                .then(modifier),
-            contentAlignment = BiasAlignment(container.arrangementBias, container.alignmentBias),
-        ) {
-            val pagerState = rememberPagerState { model.images.size }
-            LaunchedEffect(Unit) {
-                onEventSent(
-                    LayoutContract.LayoutEvent.SetCustomState(
-                        model.customStateKey,
-                        carouselPosition + 1,
-                    ),
-                )
-                while (true) {
-                    delay(model.duration)
-                    val pagePosition = if (pagerState.currentPage == pagerState.pageCount - 1) {
-                        0
-                    } else {
-                        pagerState.currentPage + 1
-                    }
-                    pagerState.scrollToPage(pagePosition)
+        if (model.images.isNotEmpty()) {
+            Box(
+                modifier = modifierFactory
+                    .createModifier(
+                        modifierPropertiesList = model.ownModifiers,
+                        conditionalTransitionModifier = model.conditionalTransitionModifiers,
+                        breakpointIndex = breakpointIndex,
+                        isPressed = isPressed,
+                        isDarkModeEnabled = isDarkModeEnabled,
+                        offerState = offerState,
+                    )
+                    .then(modifier),
+                contentAlignment = BiasAlignment(container.arrangementBias, container.alignmentBias),
+            ) {
+                val pagerState = rememberPagerState { model.images.size }
+                LaunchedEffect(Unit) {
                     onEventSent(
                         LayoutContract.LayoutEvent.SetCustomState(
                             model.customStateKey,
-                            pagePosition + 1,
+                            carouselPosition + 1,
                         ),
                     )
-                }
-            }
-            HorizontalPager(
-                state = pagerState,
-                flingBehavior = PagerDefaults.flingBehavior(
-                    state = pagerState,
-                    snapAnimationSpec = tween(),
-                ),
-            ) { page ->
-                val image: LayoutSchemaUiModel.ImageUiModel? = model.images[page + 1]
-                image?.let {
-                    factory.CreateComposable(
-                        model = image,
-                        modifier = Modifier,
-                        isPressed = isPressed,
-                        offerState = offerState,
-                        isDarkModeEnabled = isDarkModeEnabled,
-                        breakpointIndex = breakpointIndex,
-                        onEventSent = onEventSent,
-                    )
-                }
-            }
-            val wrapperContainer = modifierFactory.createContainerUiProperties(
-                containerProperties = model.progressIndicatorContainer?.containerProperties,
-                index = breakpointIndex,
-                isPressed = isPressed,
-            )
-            val selfAlignment =
-                wrapperContainer.selfAlignmentBias?.let { Modifier.align(BiasAlignment(0f, it)) } ?: Modifier
-            Row(
-                modifier = modifierFactory
-                    .createModifier(
-                        modifierPropertiesList = model.progressIndicatorContainer?.ownModifiers,
-                        conditionalTransitionModifier = model.progressIndicatorContainer?.conditionalTransitionModifiers,
-                        breakpointIndex = breakpointIndex,
-                        isPressed = isPressed,
-                        isDarkModeEnabled = isDarkModeEnabled,
-                        offerState = offerState,
-                    )
-                    .then(selfAlignment)
-                    .semantics(mergeDescendants = true) {}
-                    .clearAndSetSemantics {
-                        invisibleToUser()
-                    },
-                horizontalArrangement = wrapperContainer.horizontalArrangement,
-                verticalAlignment = BiasAlignment.Vertical(
-                    wrapperContainer.alignmentBias,
-                ),
-            ) {
-                for (index in 0 until pagerState.pageCount) {
-                    var needsAnimation = false
-                    val defaultIndicator = model.indicator
-                    if (defaultIndicator != null) {
-                        val indicator: LayoutSchemaUiModel.ProgressIndicatorItemUiModel = when {
-                            index < carouselPosition -> {
-                                model.seenIndicator ?: defaultIndicator
-                            }
-
-                            index == carouselPosition -> {
-                                needsAnimation = true
-                                model.activeIndicator ?: model.seenIndicator ?: defaultIndicator
-                            }
-
-                            else -> {
-                                defaultIndicator
-                            }
+                    while (true) {
+                        delay(model.duration)
+                        val pagePosition = if (pagerState.currentPage == pagerState.pageCount - 1) {
+                            0
+                        } else {
+                            pagerState.currentPage + 1
                         }
-                        val indicatorContainerProperty = modifierFactory.createContainerUiProperties(
-                            containerProperties = indicator.containerProperties,
-                            index = breakpointIndex,
-                            isPressed = isPressed,
-                            baseProperties = defaultIndicator.containerProperties,
+                        pagerState.scrollToPage(pagePosition)
+                        onEventSent(
+                            LayoutContract.LayoutEvent.SetCustomState(
+                                model.customStateKey,
+                                pagePosition + 1,
+                            ),
                         )
-                        var childModifier: Modifier = Modifier
-                        indicatorContainerProperty.weight?.let {
-                            childModifier = childModifier.then(Modifier.weight(it))
-                        }
-                        CarouselIndicatorItemComponent(
-                            modifier = childModifier,
-                            model = indicator,
-                            baseModel = model.indicator!!, // Safe to unwrap as we have already checked for null
+                    }
+                }
+                HorizontalPager(
+                    state = pagerState,
+                    flingBehavior = PagerDefaults.flingBehavior(
+                        state = pagerState,
+                        snapAnimationSpec = tween(),
+                    ),
+                    userScrollEnabled = false,
+                ) { page ->
+                    val image: LayoutSchemaUiModel.ImageUiModel? = model.images[page + 1]
+                    image?.let {
+                        factory.CreateComposable(
+                            model = image,
+                            modifier = Modifier,
                             isPressed = isPressed,
+                            offerState = offerState,
                             isDarkModeEnabled = isDarkModeEnabled,
                             breakpointIndex = breakpointIndex,
-                            needsAnimation = needsAnimation,
-                            offerState = offerState,
-                            duration = model.duration.toInt(),
+                            onEventSent = onEventSent,
                         )
+                    }
+                }
+                val wrapperContainer = modifierFactory.createContainerUiProperties(
+                    containerProperties = model.progressIndicatorContainer?.containerProperties,
+                    index = breakpointIndex,
+                    isPressed = isPressed,
+                )
+                val selfAlignment =
+                    wrapperContainer.selfAlignmentBias?.let { Modifier.align(BiasAlignment(0f, it)) } ?: Modifier
+                Row(
+                    modifier = modifierFactory
+                        .createModifier(
+                            modifierPropertiesList = model.progressIndicatorContainer?.ownModifiers,
+                            conditionalTransitionModifier = model.progressIndicatorContainer?.conditionalTransitionModifiers,
+                            breakpointIndex = breakpointIndex,
+                            isPressed = isPressed,
+                            isDarkModeEnabled = isDarkModeEnabled,
+                            offerState = offerState,
+                        )
+                        .then(selfAlignment)
+                        .semantics(mergeDescendants = true) {}
+                        .clearAndSetSemantics {
+                            invisibleToUser()
+                        },
+                    horizontalArrangement = wrapperContainer.horizontalArrangement,
+                    verticalAlignment = BiasAlignment.Vertical(
+                        wrapperContainer.alignmentBias,
+                    ),
+                ) {
+                    for (index in 0 until pagerState.pageCount) {
+                        var needsAnimation = false
+                        val defaultIndicator = model.indicator
+                        if (defaultIndicator != null) {
+                            val indicator: LayoutSchemaUiModel.ProgressIndicatorItemUiModel = when {
+                                index < carouselPosition -> {
+                                    model.seenIndicator ?: defaultIndicator
+                                }
+
+                                index == carouselPosition -> {
+                                    needsAnimation = true
+                                    model.activeIndicator ?: model.seenIndicator ?: defaultIndicator
+                                }
+
+                                else -> {
+                                    defaultIndicator
+                                }
+                            }
+                            val indicatorContainerProperty = modifierFactory.createContainerUiProperties(
+                                containerProperties = indicator.containerProperties,
+                                index = breakpointIndex,
+                                isPressed = isPressed,
+                                baseProperties = defaultIndicator.containerProperties,
+                            )
+                            var childModifier: Modifier = Modifier
+                            indicatorContainerProperty.weight?.let {
+                                childModifier = childModifier.then(Modifier.weight(it))
+                            }
+                            CarouselIndicatorItemComponent(
+                                modifier = childModifier,
+                                model = indicator,
+                                baseModel = model.indicator!!, // Safe to unwrap as we have already checked for null
+                                isPressed = isPressed,
+                                isDarkModeEnabled = isDarkModeEnabled,
+                                breakpointIndex = breakpointIndex,
+                                needsAnimation = needsAnimation,
+                                offerState = offerState,
+                                duration = model.duration.toInt(),
+                            )
+                        }
                     }
                 }
             }
@@ -196,7 +199,7 @@ internal class DataImageCarouselComponent(
 
     @Composable
     fun CarouselIndicatorItemComponent(
-        modifier: Modifier,
+        modifier: Modifier = Modifier,
         model: LayoutSchemaUiModel.ProgressIndicatorItemUiModel?,
         baseModel: LayoutSchemaUiModel.ProgressIndicatorItemUiModel,
         offerState: OfferUiState,
