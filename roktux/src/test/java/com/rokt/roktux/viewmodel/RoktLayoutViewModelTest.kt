@@ -23,6 +23,7 @@ import io.mockk.mockk
 import io.mockk.verify
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import org.assertj.core.api.Assertions.assertThat
@@ -256,6 +257,73 @@ class RoktLayoutViewModelTest : BaseViewModelTest() {
                 },
             )
         }
+    }
+
+    @Test
+    fun `UrlSelected Event should send OpenUrl Passthrough UxEvent when no value set for handleUrlByApp`() = runTest {
+        // Act
+        layoutViewModel.setEvent(LayoutContract.LayoutEvent.UrlSelected("url", OpenLinks.Passthrough))
+
+        // Assert
+        verify {
+            uxEvent.invoke(
+                match { event ->
+                    event::class.java == RoktUxEvent.OpenUrl::class.java &&
+                        (event as RoktUxEvent.OpenUrl).url == "url" &&
+                        event.type == OpenLinks.Passthrough
+                },
+            )
+        }
+    }
+
+    @Test
+    fun `UrlSelected Event should send OpenUrl Passthrough UxEvent when handleUrlByApp set to false`() = runTest {
+        // Arrange
+        initialize(handleUrlByApp = false)
+
+        // Act
+        layoutViewModel.setEvent(LayoutContract.LayoutEvent.UrlSelected("url", OpenLinks.Passthrough))
+
+        // Assert
+        verify {
+            uxEvent.invoke(
+                match { event ->
+                    event::class.java == RoktUxEvent.OpenUrl::class.java &&
+                        (event as RoktUxEvent.OpenUrl).url == "url" &&
+                        event.type == OpenLinks.Passthrough
+                },
+            )
+        }
+    }
+
+    @Test
+    fun `UrlSelected Event should set effect OpenUrlInternal when UrlSelected event is passed with Internally and  handleUrlByApp set to false`() = runTest {
+        // Arrange
+        initialize(handleUrlByApp = false)
+
+        // Act
+        layoutViewModel.setEvent(LayoutContract.LayoutEvent.UrlSelected("url", OpenLinks.Internally))
+
+        // Assert
+
+        val effect = layoutViewModel.effect.first()
+        assertThat(effect)
+            .matches { (it as LayoutContract.LayoutEffect.OpenUrlInternal).url == "url" }
+    }
+
+    @Test
+    fun `UrlSelected Event should set effect OpenUrlExternally when UrlSelected event is passed with Externally and  handleUrlByApp set to false`() = runTest {
+        // Arrange
+        initialize(handleUrlByApp = false)
+
+        // Act
+        layoutViewModel.setEvent(LayoutContract.LayoutEvent.UrlSelected("url", OpenLinks.Externally))
+
+        // Assert
+
+        val effect = layoutViewModel.effect.first()
+        assertThat(effect)
+            .matches { (it as LayoutContract.LayoutEffect.OpenUrlExternal).url == "url" }
     }
 
     @Test
