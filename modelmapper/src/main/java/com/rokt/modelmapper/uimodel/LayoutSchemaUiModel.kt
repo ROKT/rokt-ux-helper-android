@@ -519,6 +519,7 @@ enum class BooleanWhenUiCondition {
 enum class OpenLinks {
     Internally,
     Externally,
+    Passthrough,
 }
 
 data class WhenUiTransition(

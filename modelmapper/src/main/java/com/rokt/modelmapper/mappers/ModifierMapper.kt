@@ -297,6 +297,7 @@ private fun transformPadding(padding: String?): PaddingValues {
 
 internal fun transformOpenLinks(openTarget: LinkOpenTarget?): OpenLinks = when (openTarget) {
     LinkOpenTarget.Internally -> OpenLinks.Internally
+    LinkOpenTarget.Passthrough -> OpenLinks.Passthrough
     else -> OpenLinks.Externally
 }
 
