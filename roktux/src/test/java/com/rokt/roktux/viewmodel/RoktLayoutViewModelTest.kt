@@ -280,6 +280,7 @@ class RoktLayoutViewModelTest : BaseViewModelTest() {
     fun `UrlSelected Event should send OpenUrl Passthrough UxEvent when handleUrlByApp set to false`() = runTest {
         // Arrange
         initialize(handleUrlByApp = false)
+        layoutViewModel.setEvent(LayoutContract.LayoutEvent.LayoutInitialised)
 
         // Act
         layoutViewModel.setEvent(LayoutContract.LayoutEvent.UrlSelected("url", OpenLinks.Passthrough))
@@ -290,7 +291,8 @@ class RoktLayoutViewModelTest : BaseViewModelTest() {
                 match { event ->
                     event::class.java == RoktUxEvent.OpenUrl::class.java &&
                         (event as RoktUxEvent.OpenUrl).url == "url" &&
-                        event.type == OpenLinks.Passthrough
+                        event.type == OpenLinks.Passthrough &&
+                        event.layoutId == "pluginId"
                 },
             )
         }

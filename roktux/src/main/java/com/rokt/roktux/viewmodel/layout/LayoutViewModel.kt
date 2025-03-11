@@ -495,6 +495,7 @@ internal class LayoutViewModel(
             val openUrlEvent = RoktUxEvent.OpenUrl(
                 url = url,
                 id = id,
+                layoutId = pluginId,
                 type = openLinks,
                 onClose = { urlId -> onUrlClosed(urlId, shouldProgress) }, // Pass the id to handle closure
                 onError = { _, throwable ->
@@ -523,6 +524,7 @@ internal class LayoutViewModel(
                     val openUrlEvent = RoktUxEvent.OpenUrl(
                         url = url,
                         id = id,
+                        layoutId = pluginId,
                         type = openLinks,
                         onClose = { urlId -> onUrlClosed(urlId, shouldProgress) }, // Pass the id to handle closure
                         onError = { _, throwable ->
