@@ -56,9 +56,19 @@ sealed interface RoktUxEvent {
      */
     data class LayoutFailure(val layoutId: String? = null) : RoktUxEvent
 
+    /**
+     * OpenUrl event will be triggered when user clicks on a link or button with a Url action
+     * @param url - url to open
+     * @param id - internal identifier of the url
+     * @param layoutId - layout identifier
+     * @param type - type of the url. internal(internal web browser), external(external web browser), passthrough
+     * @param onClose - callback when url is closed
+     * @param onError - callback when url fails to open
+     */
     data class OpenUrl(
         val url: String,
         val id: String,
+        val layoutId: String,
         val type: OpenLinks,
         val onClose: (id: String) -> Unit,
         val onError: (id: String, throwable: Throwable) -> Unit,
