@@ -12,7 +12,7 @@ androidxLifecycle = "2.6.1"
 androidxNavigation = "2.8.0"
 androidxWindowManager = "1.0.0"
 androidXbrowser = "1.5.0"
-coil = "2.2.2"
+coil = "2.3.0"
 junit4 = "4.13.2"
 junitParams = "1.1.1"
 kotlin = "1.8.21"
@@ -26,7 +26,7 @@ retrofitKotlinxSerializationJson = "0.8.0"
 mockk = "1.13.16"
 assertj-core = "3.15.0"
 dcui = "2.1.0"
-robolectric = "4.10"
+robolectric = "4.14.1"
 composeLint = "1.4.1"
 lifecycleRuntimeKtx = "2.8.4"
 junit = "1.2.1"
@@ -42,6 +42,7 @@ kover = "0.9.1"
 
 roktUxHelper = "0.2.0"
 sdkVersionCode = "79"
+roborazzi = "1.43.0"
 
 [libraries]
 androidx-activity-compose = { group = "androidx.activity", name = "activity-compose", version.ref = "androidxActivity" }
@@ -71,6 +72,7 @@ androidx-browser = { group = "androidx.browser", name = "browser", version.ref =
 coil-kt = { group = "io.coil-kt", name = "coil", version.ref = "coil" }
 coil-kt-compose = { group = "io.coil-kt", name = "coil-compose", version.ref = "coil" }
 coil-kt-svg = { group = "io.coil-kt", name = "coil-svg", version.ref = "coil" }
+coil-test = { group = "io.coil-kt", name = "coil-test", version.ref = "coil" }
 junit4 = { group = "junit", name = "junit", version.ref = "junit4" }
 junit-params = { group = "pl.pragmatists", name = "JUnitParams", version.ref = "junitParams" }
 kotlin-reflect = { module = "org.jetbrains.kotlin:kotlin-reflect", version.ref = "kotlin" }
@@ -106,6 +108,9 @@ kotlin-gradlePlugin = { group = "org.jetbrains.kotlin", name = "kotlin-gradle-pl
 compose-lint-checks = { group = "com.slack.lint.compose", name = "compose-lint-checks", version.ref = "composeLint" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junit" }
 maven-publishPlugin = { group = "com.vanniktech", name = "gradle-maven-publish-plugin", version.ref = "mavenPublish" }
+roborazzi = { group = "io.github.takahirom.roborazzi", name = "roborazzi", version.ref = "roborazzi" }
+roborazzi-compose = { group = "io.github.takahirom.roborazzi", name = "roborazzi-compose", version.ref = "roborazzi" }
+roborazzi-junit-rule = { group = "io.github.takahirom.roborazzi", name = "roborazzi-junit-rule", version.ref = "roborazzi" }
 
 [bundles]
 retrofit = ["retrofit-core", "retrofit-kotlin-serialization"]
@@ -129,3 +134,4 @@ rokt-android-application-compose = { id = "rokt.android.application.compose" }
 rokt-android-library = { id = "rokt.android.library" }
 rokt-android-library-compose = { id = "rokt.android.library.compose" }
 rokt-android-library-publish = { id = "rokt.android.library.publish" }
+roborazzi = { id = "io.github.takahirom.roborazzi", version.ref = "roborazzi" }

@@ -8,6 +8,7 @@ import com.rokt.roktux.RoktViewState
 import com.rokt.roktux.event.RoktPlatformEvent
 import com.rokt.roktux.event.RoktUxEvent
 import kotlinx.collections.immutable.ImmutableMap
+import kotlinx.coroutines.CoroutineDispatcher
 
 internal class LayoutComponent(
     experienceResponse: String,
@@ -22,6 +23,8 @@ internal class LayoutComponent(
     customStates: Map<String, Int>,
     offerCustomStates: Map<String, Map<String, Int>>,
     edgeToEdgeDisplay: Boolean,
+    mainDispatcher: CoroutineDispatcher,
+    ioDispatcher: CoroutineDispatcher,
 ) : Component(
     listOf(
         LayoutModule(
@@ -37,6 +40,8 @@ internal class LayoutComponent(
             customStates,
             offerCustomStates,
             edgeToEdgeDisplay,
+            mainDispatcher,
+            ioDispatcher,
         ),
     ),
 )

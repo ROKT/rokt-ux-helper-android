@@ -1,5 +1,6 @@
 package com.rokt.roktux
 
+import android.annotation.SuppressLint
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -47,6 +48,8 @@ import com.rokt.roktux.viewmodel.layout.LayoutViewModel
 import kotlinx.collections.immutable.ImmutableMap
 import kotlinx.collections.immutable.persistentMapOf
 import kotlinx.collections.immutable.toImmutableMap
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.onEach
 
@@ -67,6 +70,31 @@ fun RoktLayout(
     location: String,
     modifier: Modifier = Modifier,
     roktUxConfig: RoktUxConfig,
+    startTimeStamp: Long = System.currentTimeMillis(),
+    onUxEvent: (event: RoktUxEvent) -> Unit = { },
+    onPlatformEvent: (platformEvents: RoktPlatformEventsWrapper) -> Unit = { },
+) {
+    RoktLayout(
+        experienceResponse = experienceResponse,
+        location = location,
+        roktUxConfig = roktUxConfig,
+        mainDispatcher = Dispatchers.Main,
+        ioDispatcher = Dispatchers.IO,
+        modifier = modifier,
+        startTimeStamp = startTimeStamp,
+        onUxEvent = onUxEvent,
+        onPlatformEvent = onPlatformEvent,
+    )
+}
+
+@Composable
+internal fun RoktLayout(
+    experienceResponse: String,
+    location: String,
+    roktUxConfig: RoktUxConfig,
+    mainDispatcher: CoroutineDispatcher,
+    ioDispatcher: CoroutineDispatcher,
+    modifier: Modifier = Modifier,
     startTimeStamp: Long = System.currentTimeMillis(),
     onUxEvent: (event: RoktUxEvent) -> Unit = { },
     onPlatformEvent: (platformEvents: RoktPlatformEventsWrapper) -> Unit = { },
@@ -123,8 +151,11 @@ fun RoktLayout(
                     offerCustomStates = offerCustomStates,
                     handleUrlByApp = roktUxConfig.handleUrlByApp,
                     edgeToEdgeDisplay = roktUxConfig.edgeToEdgeDisplay,
+                    mainDispatcher = mainDispatcher,
+                    ioDispatcher = ioDispatcher,
                 ),
             )
+
             DIComponentInjector(
                 viewModel = viewModel,
                 modifier = modifier,
@@ -141,11 +172,12 @@ fun RoktLayout(
     }
 }
 
+@SuppressLint("ComposeViewModelInjection")
 @Composable
 private fun DIComponentInjector(
     viewModel: DIComponentViewModel,
-    modifier: Modifier = Modifier,
     fontMap: ImmutableMap<String, FontFamily>,
+    modifier: Modifier = Modifier,
     colorMode: ColorMode? = null,
     updateSavedState: (currentOffer: Int, customState: Map<String, Int>) -> Unit,
 ) {
@@ -170,8 +202,8 @@ private fun DIComponentInjector(
 @Composable
 private fun RoktLayout(
     viewModel: LayoutViewModel,
-    modifier: Modifier = Modifier,
     fontMap: ImmutableMap<String, FontFamily>,
+    modifier: Modifier = Modifier,
     colorMode: ColorMode? = null,
     updateSavedState: (currentOffer: Int, customState: Map<String, Int>) -> Unit,
 ) {
