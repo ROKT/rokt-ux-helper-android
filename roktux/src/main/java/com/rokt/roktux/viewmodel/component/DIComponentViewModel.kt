@@ -8,6 +8,7 @@ import com.rokt.roktux.RoktViewState
 import com.rokt.roktux.di.layout.LayoutComponent
 import com.rokt.roktux.event.RoktPlatformEvent
 import com.rokt.roktux.event.RoktUxEvent
+import kotlinx.coroutines.CoroutineDispatcher
 
 internal class DIComponentViewModel(
     private val experienceResponse: String,
@@ -22,6 +23,8 @@ internal class DIComponentViewModel(
     private val offerCustomStates: Map<String, Map<String, Int>>,
     private val handleUrlByApp: Boolean,
     private val edgeToEdgeDisplay: Boolean,
+    private val mainDispatcher: CoroutineDispatcher,
+    private val ioDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
 
     val component = LayoutComponent(
@@ -37,6 +40,8 @@ internal class DIComponentViewModel(
         customStates,
         offerCustomStates,
         edgeToEdgeDisplay,
+        mainDispatcher,
+        ioDispatcher,
     )
 
     class DIComponentViewModelFactory(
@@ -52,6 +57,8 @@ internal class DIComponentViewModel(
         private val offerCustomStates: Map<String, Map<String, Int>>,
         private val handleUrlByApp: Boolean,
         private val edgeToEdgeDisplay: Boolean,
+        private val mainDispatcher: CoroutineDispatcher,
+        private val ioDispatcher: CoroutineDispatcher,
     ) : ViewModelProvider.Factory {
         @Suppress("UNCHECKED_CAST")
         override fun <T : ViewModel> create(modelClass: Class<T>, extras: CreationExtras): T {
@@ -69,6 +76,8 @@ internal class DIComponentViewModel(
                     offerCustomStates = offerCustomStates,
                     handleUrlByApp = handleUrlByApp,
                     edgeToEdgeDisplay = edgeToEdgeDisplay,
+                    mainDispatcher = mainDispatcher,
+                    ioDispatcher = ioDispatcher,
                 ) as T
             }
             throw IllegalArgumentException("Unknown ViewModel type")

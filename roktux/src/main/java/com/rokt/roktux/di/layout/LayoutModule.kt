@@ -12,7 +12,6 @@ import com.rokt.roktux.event.RoktPlatformEvent
 import com.rokt.roktux.event.RoktUxEvent
 import com.rokt.roktux.viewmodel.layout.LayoutViewModel
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.Dispatchers
 
 internal class LayoutModule(
     private val experience: String,
@@ -27,6 +26,8 @@ internal class LayoutModule(
     private val customStates: Map<String, Int>,
     private val offerCustomStates: Map<String, Map<String, Int>>,
     private val edgeToEdgeDisplay: Boolean,
+    private val mainDispatcher: CoroutineDispatcher,
+    private val ioDispatcher: CoroutineDispatcher,
 ) : Module() {
     init {
         this.bind<DataBinding, DataBindingImpl>()
@@ -37,8 +38,8 @@ internal class LayoutModule(
         this.provideModuleScoped { ExperienceModelMapperImpl(get(EXPERIENCE), get()) }
         this.provideModuleScoped(EXPERIENCE) { experience }
         this.provideModuleScoped(LOCATION) { location }
-        this.provideModuleScoped<CoroutineDispatcher>(IO) { Dispatchers.IO }
-        this.provideModuleScoped<CoroutineDispatcher>(MAIN) { Dispatchers.Main }
+        this.provideModuleScoped<CoroutineDispatcher>(IO) { ioDispatcher }
+        this.provideModuleScoped<CoroutineDispatcher>(MAIN) { mainDispatcher }
         this.provideModuleScoped {
             LayoutViewModel.RoktViewModelFactory(
                 location = get(LOCATION),
