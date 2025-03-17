@@ -19,7 +19,7 @@ jobs:
         uses: actions/checkout@v4
       - name: Check if VERSION file changed
         id: version-changed
-        uses: tj-actions/changed-files@v45
+        uses: tj-actions/changed-files@v46
         with:
           files: VERSION
       - name: Get current version
