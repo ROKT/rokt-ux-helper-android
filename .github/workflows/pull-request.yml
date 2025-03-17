@@ -86,6 +86,11 @@ jobs:
       - name: Setup JDK
         uses: ./.github/actions/setup-java
 
+      - name: Move screenshots
+        run: |
+          mkdir -p roktux/build/outputs/roborazzi
+          mv roktux/src/test/snapshots/images/* roktux/build/outputs/roborazzi || true
+
       - name: Compare screenshots
         id: compare-screenshots
         run: |
