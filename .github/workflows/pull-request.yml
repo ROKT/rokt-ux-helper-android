@@ -86,10 +86,10 @@ jobs:
       - name: Setup JDK
         uses: ./.github/actions/setup-java
 
-      - name: Record screenshots
-        id: record-screenshots
+      - name: Compare screenshots
+        id: compare-screenshots
         run: |
-          ./gradlew recordRoborazziRelease -PenableScreenshotTests --tests "com.rokt.roktux.screenshot.BasicScreenshotTest"
+          ./gradlew compareRoborazziRelease -PenableScreenshotTests --tests "com.rokt.roktux.screenshot.BasicScreenshotTest"
 
       - name: Upload screenshots
         uses: actions/upload-artifact@v4
