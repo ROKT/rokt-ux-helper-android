@@ -81,7 +81,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
 
       - name: Setup JDK
         uses: ./.github/actions/setup-java
@@ -91,13 +91,13 @@ jobs:
           mkdir -p roktux/build/outputs/roborazzi
           mv roktux/src/test/snapshots/images/* roktux/build/outputs/roborazzi || true
 
-      - name: Compare screenshots
-        id: compare-screenshots
+      - name: Verify screenshots
+        id: verify-screenshots
         run: |
-          ./gradlew compareRoborazziRelease -PenableScreenshotTests --tests "com.rokt.roktux.screenshot.BasicScreenshotTest"
+          ./gradlew verifyRoborazziRelease -PenableScreenshotTests --tests "com.rokt.roktux.screenshot.BasicScreenshotTest"
 
       - name: Upload screenshots
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@4cec3d8aa04e39d1a68397de0c4cd6fb9dce8ec1 # v4.6.1
         if: always()
         with:
           name: screenshots
@@ -106,7 +106,7 @@ jobs:
           retention-days: 30
 
       - name: Upload screenshot report
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@4cec3d8aa04e39d1a68397de0c4cd6fb9dce8ec1 # v4.6.1
         if: always()
         with:
           name: screenshots-report
@@ -115,7 +115,7 @@ jobs:
           retention-days: 30
 
       - name: Upload screenshot test results
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@4cec3d8aa04e39d1a68397de0c4cd6fb9dce8ec1 # v4.6.1
         if: always()
         with:
           name: screenshot-test-results
