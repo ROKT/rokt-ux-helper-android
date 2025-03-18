@@ -23,6 +23,10 @@ def validate_action_version(uses: str) -> bool:
     if uses.startswith('.'):
         return True
         
+    # Skip actions from ROKT/rokt-workflows
+    if uses.startswith('ROKT/rokt-workflows/'):
+        return True
+        
     # Check if it's a GitHub action (contains @)
     if '@' not in uses:
         return False
@@ -49,8 +53,15 @@ def validate_workflow(workflow: Dict[str, Any]) -> bool:
     is_valid = True
     
     # Check jobs
-    for job in workflow.get('jobs', {}).values():
-        # Check steps in each job
+    for job_name, job in workflow.get('jobs', {}).items():
+        # Check if job directly uses a reusable workflow
+        if 'uses' in job:
+            if not validate_action_version(job['uses']):
+                print(f"Error: Job '{job_name}' uses workflow '{job['uses']}' which is not pinned to a commit SHA")
+                is_valid = False
+            continue
+
+        # Check steps in job if present
         steps = job.get('steps', [])
         actions = find_actions_in_steps(steps)
         
