@@ -1,4 +1,4 @@
-package com.rokt.roktux.screenshot
+package com.rokt.roktux.snapshot
 
 import android.graphics.drawable.ColorDrawable
 import android.os.Looper
@@ -17,6 +17,7 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import org.junit.Rule
 import org.junit.Test
+import org.junit.experimental.categories.Category
 import org.junit.runner.RunWith
 import org.robolectric.RuntimeEnvironment
 import org.robolectric.Shadows
@@ -24,12 +25,13 @@ import org.robolectric.annotation.Config
 import org.robolectric.annotation.GraphicsMode
 
 @RunWith(AndroidJUnit4::class)
+@Category(SnapshotTest::class)
 @GraphicsMode(GraphicsMode.Mode.NATIVE)
 @Config(
     sdk = [33],
     qualifiers = "xxhdpi",
 )
-class BasicScreenshotTest {
+class BasicSnapshotTest {
 
     private val testDispatcher = UnconfinedTestDispatcher()
 
@@ -39,7 +41,7 @@ class BasicScreenshotTest {
     @OptIn(ExperimentalRoborazziApi::class, ExperimentalCoilApi::class)
     @Test
     fun testOverlay() = runTest(testDispatcher) {
-        val experienceResponse = TestJsonLoader.loadJsonFromAssetsDirectory("Screenshot", "Overlay.json")
+        val experienceResponse = TestJsonLoader.loadJsonFromAssetsDirectory("Snapshot", "Overlay.json")
 
         val engine = FakeImageLoaderEngine.Builder()
             .intercept(true, ColorDrawable(android.graphics.Color.RED))

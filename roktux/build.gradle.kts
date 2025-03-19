@@ -48,6 +48,14 @@ android {
     testOptions {
         unitTests {
             isIncludeAndroidResources = true
+            all {
+                it.useJUnit {
+                    // Run screenshot tests by using -PrunSnapshotTests
+                    if (project.hasProperty("runSnapshotTests")) {
+                        includeCategories("com.rokt.roktux.snapshot.SnapshotTest")
+                    }
+                }
+            }
         }
     }
 }
