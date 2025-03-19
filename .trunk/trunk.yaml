@@ -12,6 +12,9 @@ cli:
 # Trunk provides extensibility via plugins. (https://docs.trunk.io/plugins)
 plugins:
   sources:
+    - id: rokt-trunk-plugin
+      ref: main
+      uri: https://github.com/ROKT/rokt-workflows
     - id: trunk
       ref: v1.6.7
       uri: https://github.com/trunk-io/plugins
@@ -24,28 +27,6 @@ runtimes:
     - python@3.10.8
 # This is the section where you manage your linters. (https://docs.trunk.io/check/configuration)
 lint:
-  files:
-    - name: github-actions
-      regexes:
-        - .github/workflows/.+\.yaml
-        - .github/workflows/.+\.yml
-        - .github/actions/.+\.yaml
-        - .github/actions/.+\.yml
-      comments:
-        - hash
-
-  definitions:
-    - name: validate-actions-versions
-      files: [github-actions]
-      runtime: python
-      extra_packages:
-        - pyyaml@6.0.2
-      commands:
-        - name: validate-actions-versions
-          run: python3 ${workspace}/.trunk/custom/validate-action-versions.py ${target}
-          output: pass_fail
-          success_codes: [0, 1]
-
   enabled:
     - checkov@3.2.386
     - git-diff-check
@@ -58,7 +39,7 @@ lint:
     - taplo@0.9.3
     - trufflehog@3.88.17
     - actionlint@1.7.7
-    - validate-actions-versions@SYSTEM
+    - validate-actions-versions
   disabled:
     - yamllint
     - osv-scanner
