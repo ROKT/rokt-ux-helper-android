@@ -77,7 +77,7 @@ jobs:
           name: aar-files
           path: "**/*.aar"
 
-  screenshot-test:
+  snapshot-test:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -86,39 +86,39 @@ jobs:
       - name: Setup JDK
         uses: ./.github/actions/setup-java
 
-      - name: Move screenshots
+      - name: Move snapshots
         run: |
           mkdir -p roktux/build/outputs/roborazzi
           mv roktux/src/test/snapshots/images/* roktux/build/outputs/roborazzi || true
 
-      - name: Verify screenshots
-        id: verify-screenshots
+      - name: Verify snapshots
+        id: verify-snapshots
         run: |
-          ./gradlew verifyRoborazziRelease -PenableScreenshotTests --tests "com.rokt.roktux.screenshot.BasicScreenshotTest"
+          ./gradlew verifyRoborazziRelease -PenableSnapshotTests --tests "com.rokt.roktux.snapshot.BasicSnapshotTest"
 
-      - name: Upload screenshots
+      - name: Upload snapshots
         uses: actions/upload-artifact@4cec3d8aa04e39d1a68397de0c4cd6fb9dce8ec1 # v4.6.1
         if: always()
         with:
-          name: screenshots
+          name: snapshot
           path: |
             **/build/outputs/roborazzi
           retention-days: 30
 
-      - name: Upload screenshot report
+      - name: Upload snapshot report
         uses: actions/upload-artifact@4cec3d8aa04e39d1a68397de0c4cd6fb9dce8ec1 # v4.6.1
         if: always()
         with:
-          name: screenshots-report
+          name: snapshots-report
           path: |
             **/build/reports
           retention-days: 30
 
-      - name: Upload screenshot test results
+      - name: Upload snapshot test results
         uses: actions/upload-artifact@4cec3d8aa04e39d1a68397de0c4cd6fb9dce8ec1 # v4.6.1
         if: always()
         with:
-          name: screenshot-test-results
+          name: snapshot-test-results
           path: |
             **/build/test-results
           retention-days: 30
