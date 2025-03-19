@@ -8,9 +8,9 @@ The Rokt UX Helper for Android enables partner applications to render tailored u
 - Sahil Suri - <sahil.suri@rokt.com>
 - Lewis Krishnamurti - <lewis.raj.krishnamurti@rokt.com>
 
-| Environment | Build                                                                                               | Coverage                                                                                                                                            |
-| ----------- | --------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
-| main        | ![Build status](https://badge.buildkite.com/923371345b3dcc70e1ce4927a4bb937ef7134e2ae30498965b.svg) | [![codecov](https://codecov.io/gh/ROKT/rokt-ux-helper-android/graph/badge.svg?token=inV3Xb1tK9)](https://codecov.io/gh/ROKT/rokt-ux-helper-android) |
+| Environment | Build                                                                                                        | Coverage                                                                                                                                            |
+| ----------- | ------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------- |
+| main        | ![Build status](https://github.com/ROKT/rokt-ux-helper-android/actions/workflows/pull-request.yml/badge.svg) | [![codecov](https://codecov.io/gh/ROKT/rokt-ux-helper-android/graph/badge.svg?token=inV3Xb1tK9)](https://codecov.io/gh/ROKT/rokt-ux-helper-android) |
 
 ## Requirements
 
@@ -56,7 +56,13 @@ Before submitting changes ensure that:
 - Tests pass with `./gradlew test`
 - Lint checks pass with `./gradlew lint`
 
-Additional checks may be conducted using Buildkite which runs on all pull requests and are required to pass before the changes are merged. You can find the details of the full pipeline [here](.buildkite/pipeline.yml).
+Additional checks are conducted using GitHub Actions which run on all pull requests and are required to pass before the changes are merged. You can find the details of the full pipeline [here](.github/workflows/pull-request.yml).
+
+## Modules
+
+| Module | Docs                                 |
+| ------ | ------------------------------------ |
+| roktux | [Testing](roktux/src/test/README.md) |
 
 ## FAQ
 
