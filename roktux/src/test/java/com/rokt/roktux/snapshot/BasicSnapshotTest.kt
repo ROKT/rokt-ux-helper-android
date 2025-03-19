@@ -2,7 +2,6 @@ package com.rokt.roktux.snapshot
 
 import android.graphics.drawable.ColorDrawable
 import android.os.Looper
-import androidx.compose.material3.Text
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import coil.ImageLoader
@@ -54,7 +53,6 @@ class BasicSnapshotTest {
             .build()
 
         composeTestRule.setContent {
-            Text("Some random text")
             RoktLayout(
                 experienceResponse = experienceResponse,
                 location = "Location1",
