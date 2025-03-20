@@ -50,6 +50,7 @@ class OkHttpInterceptorStrategy(private val interceptor: Interceptor) : ImageHan
 class ImageLoaderStrategy(private val imageLoader: ImageLoader) : ImageHandlingStrategy {
     override fun getImageLoader(context: Context): ImageLoader = imageLoader.newBuilder()
         .components {
+            imageLoader.components.interceptors.forEach { add(it) }
             add(SvgDecoder.Factory())
             add(DataUriFetcher.Factory())
         }.build()
