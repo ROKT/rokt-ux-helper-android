@@ -32,8 +32,7 @@ internal class ImageComponent(private val modifierFactory: ModifierFactory) :
         if (!onImageError) {
             val url = if (isDarkModeEnabled) model.darkUrl ?: model.lightUrl else model.lightUrl
             AsyncImage(
-                model = ImageRequest.Builder(LocalContext.current).data(url).crossfade(true)
-                    .build(),
+                model = ImageRequest.Builder(LocalContext.current).data(url).build(),
                 contentDescription = model.alt,
                 imageLoader = LocalLayoutComponent.current[ImageLoader::class.java],
                 modifier = modifier.then(
