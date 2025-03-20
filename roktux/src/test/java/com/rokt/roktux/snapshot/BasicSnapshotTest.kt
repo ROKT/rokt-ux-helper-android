@@ -1,7 +1,6 @@
 package com.rokt.roktux.snapshot
 
 import android.graphics.drawable.ColorDrawable
-import android.os.Looper
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import coil.ImageLoader
@@ -20,7 +19,6 @@ import org.junit.Test
 import org.junit.experimental.categories.Category
 import org.junit.runner.RunWith
 import org.robolectric.RuntimeEnvironment
-import org.robolectric.Shadows
 import org.robolectric.annotation.Config
 import org.robolectric.annotation.GraphicsMode
 
@@ -44,12 +42,11 @@ class BasicSnapshotTest {
         val experienceResponse = TestJsonLoader.loadJsonFromAssetsDirectory("Snapshot", "Overlay.json")
 
         val engine = FakeImageLoaderEngine.Builder()
-            .intercept(true, ColorDrawable(android.graphics.Color.RED))
+            .default(ColorDrawable(android.graphics.Color.RED))
             .build()
 
         val imageLoader = ImageLoader.Builder(RuntimeEnvironment.getApplication())
             .components { add(engine) }
-            .dispatcher(testDispatcher)
             .build()
 
         composeTestRule.setContent {
@@ -64,9 +61,6 @@ class BasicSnapshotTest {
                     .build(),
             )
         }
-
-        composeTestRule.waitForIdle()
-        Shadows.shadowOf(Looper.getMainLooper()).idle()
         captureScreenRoboImage()
     }
 }
