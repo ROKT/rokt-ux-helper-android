@@ -467,9 +467,9 @@ internal class ModifierFactory {
             )
             .then(
                 properties.backgroundColorState?.let {
-                    Modifier.background(color = it, shape = shape)
+                    Modifier.clip(shape).background(color = it, shape = shape)
                 } ?: properties.backgroundColor?.let {
-                    Modifier.background(color = getUiThemeColor(it, isDarkModeEnabled), shape = shape)
+                    Modifier.clip(shape).background(color = getUiThemeColor(it, isDarkModeEnabled), shape = shape)
                 } ?: Modifier,
             )
             .then(
