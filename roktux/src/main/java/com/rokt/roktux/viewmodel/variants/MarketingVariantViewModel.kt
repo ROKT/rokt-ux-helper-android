@@ -21,6 +21,7 @@ internal class MarketingViewModel(
     private var customState: Map<String, Int>,
 ) : BaseViewModel<LayoutContract.LayoutEvent, MarketingVariantUiState, MarketingVariantContract.LayoutVariantEffect>() {
     private var offerViewedJob: Job? = null
+    private var signalViewedSent = false
 
     init {
         val slot = modelMapper.getSavedExperience()?.plugins?.getOrNull(
@@ -51,6 +52,14 @@ internal class MarketingViewModel(
                 }
             }
 
+            is LayoutContract.LayoutEvent.UserInteracted -> {
+                offerViewedJob?.cancel()
+                if (!signalViewedSent) {
+                    signalViewedSent = true
+                    setEffect { MarketingVariantContract.LayoutVariantEffect.SetSignalViewed(currentOffer) }
+                }
+            }
+
             else -> {
                 setEffect { MarketingVariantContract.LayoutVariantEffect.PropagateEvent(event) }
             }
@@ -62,7 +71,10 @@ internal class MarketingViewModel(
         if (event.visible && offerViewedJob == null) {
             offerViewedJob = viewModelScope.launch(ioDispatcher) {
                 delay(VISIBILITY_CHECKPOINT_MILLIS)
-                setEffect { MarketingVariantContract.LayoutVariantEffect.SetSignalViewed(event.offerId) }
+                if (!signalViewedSent) {
+                    signalViewedSent = true
+                    setEffect { MarketingVariantContract.LayoutVariantEffect.SetSignalViewed(event.offerId) }
+                }
             }
         }
     }
