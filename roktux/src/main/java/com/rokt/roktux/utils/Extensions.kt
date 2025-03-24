@@ -239,6 +239,20 @@ internal suspend fun PointerInputScope.interceptTap(
     }
 }
 
+internal fun Modifier.onUserInteractionDetected(onInteraction: () -> Unit): Modifier =
+    this then Modifier.pointerInput(Unit) {
+        awaitEachGesture {
+            val down = awaitFirstDown(pass = PointerEventPass.Initial)
+            do {
+                val event = awaitPointerEvent(pass = PointerEventPass.Final)
+                val change = event.changes[0]
+                if (change.id == down.id && !change.pressed) {
+                    onInteraction()
+                }
+            } while (event.changes.any { it.id == down.id && it.pressed })
+        }
+    }
+
 internal fun Modifier.componentVisibilityChange(
     callback: (identifier: Int, visible: Boolean) -> Unit,
     identifier: Int,
