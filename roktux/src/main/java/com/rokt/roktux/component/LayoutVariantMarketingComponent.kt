@@ -14,6 +14,7 @@ import com.rokt.modelmapper.uimodel.LayoutSchemaUiModel
 import com.rokt.roktux.di.layout.LocalLayoutComponent
 import com.rokt.roktux.di.variants.marketing.MarketingComponent
 import com.rokt.roktux.utils.componentVisibilityChange
+import com.rokt.roktux.utils.onUserInteractionDetected
 import com.rokt.roktux.viewmodel.base.BaseContract
 import com.rokt.roktux.viewmodel.layout.LayoutContract
 import com.rokt.roktux.viewmodel.layout.OfferUiState
@@ -73,7 +74,9 @@ internal class LayoutVariantMarketingComponent(private val factory: LayoutUiMode
                                 )
                             },
                             viewModel.currentOffer,
-                        ),
+                        ).onUserInteractionDetected {
+                            viewModel.setEvent(LayoutContract.LayoutEvent.UserInteracted)
+                        },
                         isPressed = isPressed,
                         offerState = offerState.copy(
                             creativeCopy = state.value.creativeCopy,
