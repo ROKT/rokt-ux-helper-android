@@ -25,6 +25,7 @@ import com.rokt.roktux.viewmodel.layout.OfferUiState
 import kotlinx.collections.immutable.ImmutableMap
 import kotlinx.collections.immutable.persistentMapOf
 import kotlinx.collections.immutable.toImmutableMap
+import kotlinx.coroutines.Dispatchers
 
 class DcuiComponentRule(val composeTestRule: ComposeContentTestRule) : BaseComponentRule(composeTestRule, true) {
 
@@ -69,6 +70,8 @@ class DcuiComponentRule(val composeTestRule: ComposeContentTestRule) : BaseCompo
                     customStates = mapOf(),
                     offerCustomStates = mapOf(),
                     edgeToEdgeDisplay = false,
+                    mainDispatcher = Dispatchers.Main,
+                    ioDispatcher = Dispatchers.IO,
                 ),
                 LocalFontFamilyProvider provides persistentMapOf("roboto" to FontFamily.Default),
             ) {

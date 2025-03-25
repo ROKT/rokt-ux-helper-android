@@ -6,6 +6,7 @@ plugins {
     alias(libs.plugins.dokka)
     alias(libs.plugins.kover)
     alias(libs.plugins.rokt.android.library.publish)
+    alias(libs.plugins.roborazzi)
 }
 
 val libGroupId = "com.rokt"
@@ -47,6 +48,14 @@ android {
     testOptions {
         unitTests {
             isIncludeAndroidResources = true
+            all {
+                it.useJUnit {
+                    // Run screenshot tests by using -PrunSnapshotTests
+                    if (project.hasProperty("runSnapshotTests")) {
+                        includeCategories("com.rokt.roktux.snapshot.SnapshotTest")
+                    }
+                }
+            }
         }
     }
 }
@@ -82,6 +91,10 @@ dependencies {
     testImplementation(libs.robolectric)
     testImplementation(libs.androidx.compose.ui.test)
     testImplementation(libs.kotlinx.serialization.json)
+    testImplementation(libs.roborazzi)
+    testImplementation(libs.roborazzi.compose)
+    testImplementation(libs.roborazzi.junit.rule)
+    testImplementation(libs.coil.test)
     debugImplementation(libs.rebugger) // Use only in debug builds
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.test.espresso.core)
