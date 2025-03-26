@@ -11,9 +11,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Support for the `ImageCarousel` node
+- Support for the `DataImageCarousel` node
 - `Passthrough` support in `LinkOpenTarget`
 - `layoutId` to the `OpenUrl` event
+- Support for the `CatalogStackedCollection` and `CatalogResponseButton` nodes
 
 ### Fixed
 
