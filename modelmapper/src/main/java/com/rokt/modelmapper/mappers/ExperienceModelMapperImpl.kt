@@ -144,10 +144,12 @@ class ExperienceModelMapperImpl(private val experienceResponse: String, private 
     )
 
     private fun NetworkCreativeImage.toCreateImageModel(): OfferImageModel = OfferImageModel(
-        light = light,
-        dark = dark,
-        alt = alt,
-        title = title,
+        HMap().apply {
+            set(TypedKey<String>(KEY_LIGHT), light)
+            set(TypedKey<String>(KEY_DARK), dark)
+            set(TypedKey<String>(KEY_ALT), alt)
+            set(TypedKey<String>(KEY_TITLE), title)
+        },
     )
 
     private fun NetworkResponseOption.toResponseOptionModel(): ResponseOptionModel = ResponseOptionModel(
@@ -207,10 +209,12 @@ class ExperienceModelMapperImpl(private val experienceResponse: String, private 
     }
 
     private fun NetworkCreativeImage.toCatalogItemImage(): OfferImageModel = OfferImageModel(
-        light = light,
-        dark = dark,
-        alt = alt,
-        title = title,
+        HMap().apply {
+            set(TypedKey<String>(KEY_LIGHT), light)
+            set(TypedKey<String>(KEY_DARK), dark)
+            set(TypedKey<String>(KEY_ALT), alt)
+            set(TypedKey<String>(KEY_TITLE), title)
+        },
     )
 
     private fun transformImage(imageMap: Map<String, NetworkCreativeImage>): CatalogImageWrapperModel =
@@ -319,6 +323,12 @@ class ExperienceModelMapperImpl(private val experienceResponse: String, private 
         is LayoutSchemaModel.DataIcon -> transformDataIcon(layoutSchemaModel, offerModel, module, itemIndex)
 
         is LayoutSchemaModel.StaticIcon -> transformStaticIcon(layoutSchemaModel)
+
+        is LayoutSchemaModel.DataImageCarousel -> transformDataImageCarousel(
+            layoutSchemaModel,
+            offerModel,
+        )
+
         else -> null
     }
 
@@ -341,11 +351,14 @@ class ExperienceModelMapperImpl(private val experienceResponse: String, private 
         const val KEY_INSTANCE_GUID = "instanceGuid"
         const val KEY_SIGNAL_TYPE = "signalType"
         const val KEY_IS_POSITIVE = "isPositive"
+        const val KEY_LIGHT = "light"
+        const val KEY_DARK = "dark"
+        const val KEY_ALT = "alt"
+        const val KEY_TITLE = "title"
 
         private const val KEY_IMAGES = "images"
         private const val KEY_CATALOG_ITEM_ID = "catalogItemId"
         private const val KEY_CART_ITEM_ID = "cartItemId"
-        private const val KEY_TITLE = "title"
         private const val KEY_DESCRIPTION = "description"
         private const val KEY_PRICE = "price"
         private const val KEY_ORIGINAL_PRICE = "originalPrice"

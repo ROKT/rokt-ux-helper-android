@@ -495,6 +495,7 @@ internal class LayoutViewModel(
             val openUrlEvent = RoktUxEvent.OpenUrl(
                 url = url,
                 id = id,
+                layoutId = pluginId,
                 type = openLinks,
                 onClose = { urlId -> onUrlClosed(urlId, shouldProgress) }, // Pass the id to handle closure
                 onError = { _, throwable ->
@@ -505,24 +506,46 @@ internal class LayoutViewModel(
             // Send the event to the application
             uxEvent(openUrlEvent)
         } else {
-            setEffect {
-                if (openLinks == OpenLinks.Internally) {
-                    LayoutContract.LayoutEffect.OpenUrlInternal(
-                        url,
-                        id,
-                        { urlId -> onUrlClosed(urlId, shouldProgress) },
-                    ) { _, throwable ->
-                        onUrlClosed(id, shouldProgress)
-                        handleError(throwable)
+            when (openLinks) {
+                OpenLinks.Internally -> {
+                    setEffect {
+                        LayoutContract.LayoutEffect.OpenUrlInternal(
+                            url,
+                            id,
+                            { urlId -> onUrlClosed(urlId, shouldProgress) },
+                        ) { _, throwable ->
+                            onUrlClosed(id, shouldProgress)
+                            handleError(throwable)
+                        }
                     }
-                } else {
-                    LayoutContract.LayoutEffect.OpenUrlExternal(
-                        url,
-                        id,
-                        { urlId -> onUrlClosed(urlId, shouldProgress) },
-                    ) { _, throwable ->
-                        onUrlClosed(id, shouldProgress)
-                        handleError(throwable)
+                }
+
+                OpenLinks.Passthrough -> {
+                    val openUrlEvent = RoktUxEvent.OpenUrl(
+                        url = url,
+                        id = id,
+                        layoutId = pluginId,
+                        type = openLinks,
+                        onClose = { urlId -> onUrlClosed(urlId, shouldProgress) }, // Pass the id to handle closure
+                        onError = { _, throwable ->
+                            onUrlClosed(id, shouldProgress)
+                            handleError(throwable)
+                        },
+                    )
+                    // Send the event to the application
+                    uxEvent(openUrlEvent)
+                }
+
+                else -> {
+                    setEffect {
+                        LayoutContract.LayoutEffect.OpenUrlExternal(
+                            url,
+                            id,
+                            { urlId -> onUrlClosed(urlId, shouldProgress) },
+                        ) { _, throwable ->
+                            onUrlClosed(id, shouldProgress)
+                            handleError(throwable)
+                        }
                     }
                 }
             }

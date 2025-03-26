@@ -9,6 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Support for the `ImageCarousel` node
+- `Passthrough` support in `LinkOpenTarget`
+- `layoutId` to the `OpenUrl` event
+
 ### Fixed
 
 - Fix border radius clipping issue

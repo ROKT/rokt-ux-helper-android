@@ -1,0 +1,56 @@
+{
+  "type": "DataImageCarousel",
+  "node": {
+    "imageKey": "creativeCarouselImageVertical",
+    "duration": 4000,
+    "styles": {
+      "elements": {
+        "own": [
+          {
+            "default": {
+              "background": {
+                "backgroundColor": {
+                  "light": "#d51a1a",
+                  "dark": "#cdcdcd"
+                }
+              },
+              "dimension": {
+                "minWidth": 0,
+                "width": {
+                  "type": "fixed",
+                  "value": 150
+                },
+                "height": {
+                  "type": "fixed",
+                  "value": 180
+                }
+              }
+            }
+          }
+        ],
+        "indicator": [
+          {
+            "default": {
+              "dimension": {
+                "height": {
+                  "type": "fixed",
+                  "value": 40
+                }
+              }
+            }
+          }
+        ],
+        "seenIndicator": [],
+        "progressIndicatorContainer": [
+          {
+            "default": {
+              "flexChild": {
+                "alignSelf": "flex-end"
+              }
+            }
+          }
+        ]
+      }
+    }
+  }
+}
