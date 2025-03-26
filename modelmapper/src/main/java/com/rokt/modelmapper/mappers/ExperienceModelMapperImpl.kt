@@ -329,6 +329,21 @@ class ExperienceModelMapperImpl(private val experienceResponse: String, private 
             offerModel,
         )
 
+        is LayoutSchemaModel.CatalogStackedCollection -> transformCatalogStackedCollection(
+            layoutSchemaModel,
+            offerModel,
+        ) { index, catalogItemModule, child ->
+            transformLayoutSchemaModel(child, offerModel, responseContextKey, index, catalogItemModule)
+        }
+
+        is LayoutSchemaModel.CatalogResponseButton -> transformCatalogResponseButton(
+            layoutSchemaModel,
+            offerModel,
+            itemIndex,
+        ) { child ->
+            transformLayoutSchemaModel(child, offerModel, responseContextKey, itemIndex, module)
+        }
+
         else -> null
     }
 

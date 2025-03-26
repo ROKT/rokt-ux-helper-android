@@ -16,4 +16,6 @@ enum class RoktDemoErrorTypes {
 
 sealed interface UiContent {
     data class ExperienceContent(val experienceResponse: String, val location: String) : UiContent
+    data class PaymentSuccessContent(val message: String) : UiContent
+    data class PaymentFailureContent(val message: String) : UiContent
 }
