@@ -7,6 +7,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.semantics.clearAndSetSemantics
+import androidx.compose.ui.semantics.contentDescription
 import coil.ImageLoader
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
@@ -33,7 +35,7 @@ internal class ImageComponent(private val modifierFactory: ModifierFactory) :
             val url = if (isDarkModeEnabled) model.darkUrl ?: model.lightUrl else model.lightUrl
             AsyncImage(
                 model = ImageRequest.Builder(LocalContext.current).data(url).build(),
-                contentDescription = model.alt,
+                contentDescription = null,
                 imageLoader = LocalLayoutComponent.current[ImageLoader::class.java],
                 modifier = modifier.then(
                     modifierFactory.createModifier(
@@ -43,7 +45,12 @@ internal class ImageComponent(private val modifierFactory: ModifierFactory) :
                         isPressed = isPressed,
                         isDarkModeEnabled = isDarkModeEnabled,
                         offerState = offerState,
-                    ),
+                    )
+                        .clearAndSetSemantics {
+                            if (!model.alt.isNullOrBlank()) {
+                                contentDescription = model.alt.orEmpty()
+                            }
+                        },
                 ),
                 onError = { onImageError = true },
             )
