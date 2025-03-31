@@ -1,5 +1,7 @@
 package com.rokt.roktux.component
 
+import androidx.compose.ui.test.SemanticsMatcher
+import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.assertContentDescriptionEquals
 import androidx.compose.ui.test.assertHeightIsEqualTo
 import androidx.compose.ui.test.assertIsDisplayed
@@ -85,6 +87,21 @@ class ImageComponentTest : BaseDcuiEspressoTest() {
     fun testImageComponentAltText() {
         composeTestRule.onNodeWithTag(DCUI_COMPONENT_TAG)
             .assertContentDescriptionEquals("alternative text")
+    }
+
+    @Test
+    @DcuiNodeJson(jsonFile = "ImageComponent/Image_with_AltText_empty.json")
+    fun testImageComponentAltTextEmpty() {
+        composeTestRule.onNodeWithTag(DCUI_COMPONENT_TAG)
+            .assert(
+                SemanticsMatcher(
+                    "contentDescription is empty",
+                ) {
+                    it.layoutInfo.getModifierInfo().any { modifierInfo ->
+                        modifierInfo.modifier.javaClass.name.contains("ClearAndSetSemantics")
+                    }
+                },
+            )
     }
 
     @Ignore("Until dark mode")
