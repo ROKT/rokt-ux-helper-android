@@ -98,7 +98,7 @@ class ImageComponentTest : BaseDcuiEspressoTest() {
                     "contentDescription is empty",
                 ) {
                     it.layoutInfo.getModifierInfo().any { modifierInfo ->
-                        modifierInfo.modifier.javaClass.name.contains("ClearAndSetSemantics")
+                        modifierInfo.modifier.javaClass.name.contains("AppendedSemantics")
                     }
                 },
             )
