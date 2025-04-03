@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.5.0] - 2025-04-02
+
 ### Added
 
 - Support for the `DataImageCarousel` node
@@ -70,6 +72,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Initial implementation of UX Helper
 
-[unreleased]: https://github.com/ROKT/rokt-ux-helper-android/compare/0.4.0...HEAD
+[unreleased]: https://github.com/ROKT/rokt-ux-helper-android/compare/0.5.0...HEAD
+[0.5.0]: https://github.com/ROKT/rokt-ux-helper-android/compare/0.4.0...0.5.0
 [0.4.0]: https://github.com/ROKT/rokt-ux-helper-android/compare/0.3.0...0.4.0
 [0.3.0]: https://github.com/ROKT/rokt-ux-helper-android/compare/f3489d36b16268fe284acf868f3c147b96c0adb7...0.3.0
