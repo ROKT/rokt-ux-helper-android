@@ -1,5 +1,6 @@
 package com.rokt.roktux.component
 
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.test.assertHeightIsEqualTo
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertTextEquals
@@ -285,6 +286,51 @@ class TextComponentTest : BaseDcuiEspressoTest() {
             .assertTextEquals("CLICK HERE")
             .assertLinkFontSize(16)
             .assertLinkTextColor("#FF3700B3")
+    }
+
+    @Test
+    @DcuiNodeJson(jsonFile = "TextComponent/RichText_with_text_transformation.json")
+    fun testRichTextComponentTextTransformation() {
+        composeTestRule.onNodeWithTag(DCUI_COMPONENT_TAG)
+            .assertTextEquals("Powered By ROKT - PRIVACY POLICY")
+    }
+
+    @Test
+    @DcuiNodeJson(jsonFile = "TextComponent/RichText_with_text_transformation.json")
+    fun testRichTextComponentLinkClickEvent() {
+        // Click on 'ROKT' link
+        composeTestRule.onNodeWithTag(DCUI_COMPONENT_TAG)
+            .assertExists()
+            .performTouchInput { click(position = Offset(10f, 10f)) }
+
+        Assert.assertTrue(
+            getCapturedEvents().stream()
+                .anyMatch { e ->
+                    e.equals(
+                        LayoutContract.LayoutEvent.UrlSelected(
+                            "https://rokt.com",
+                            OpenLinks.Externally,
+                        ),
+                    )
+                },
+        )
+
+        // Click on 'PRIVACY POLICY' link
+        composeTestRule.onNodeWithTag(DCUI_COMPONENT_TAG)
+            .assertExists()
+            .performTouchInput { click(position = centerRight) }
+
+        Assert.assertTrue(
+            getCapturedEvents().stream()
+                .anyMatch { e ->
+                    e.equals(
+                        LayoutContract.LayoutEvent.UrlSelected(
+                            "https://rokt.com/privacy-policy/",
+                            OpenLinks.Externally,
+                        ),
+                    )
+                },
+        )
     }
 
     @Test

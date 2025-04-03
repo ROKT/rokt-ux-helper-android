@@ -1,0 +1,28 @@
+{
+  "type": "RichText",
+  "node": {
+    "value": "powered by <a target=\"_blank\" href=\"https://rokt.com\">Rokt</a> - <a target=\"_blank\" href=\"https://rokt.com/privacy-policy/\">Privacy Policy</a>",
+    "styles": {
+      "elements": {
+        "own": [
+          {
+            "default": {
+              "text": {
+                "textTransform": "capitalize"
+              }
+            }
+          }
+        ],
+        "link": [
+          {
+            "default": {
+              "text": {
+                "textTransform": "uppercase"
+              }
+            }
+          }
+        ]
+      }
+    }
+  }
+}

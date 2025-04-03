@@ -9,6 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+### Fixed
+
+- Fixed html links not opening when textTransformation is set to upper case
+
 ## [0.5.0] - 2025-04-02
 
 ### Added
