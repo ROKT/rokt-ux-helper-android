@@ -65,11 +65,11 @@ internal class LayoutVariantMarketingComponent(private val factory: LayoutUiMode
                     factory.CreateComposable(
                         model = state.value.uiModel,
                         modifier = Modifier.componentVisibilityChange(
-                            { viewId, visible ->
+                            { viewId, visibilityInfo ->
                                 viewModel.setEvent(
                                     LayoutContract.LayoutEvent.OfferVisibilityChanged(
                                         viewId,
-                                        visible,
+                                        visibilityInfo.visible && !visibilityInfo.obscured && !visibilityInfo.misSized,
                                     ),
                                 )
                             },
