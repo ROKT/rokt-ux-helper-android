@@ -340,6 +340,14 @@ internal class ModifierFactory {
             ConditionalStyleState.Transition -> transitionModifier.borderStyle ?: modifierProperty.borderStyle
         }
 
+        val opacity = transition.animateFloat({ tween(transitionDuration) }, label = "opacity") { state ->
+            when (state) {
+                ConditionalStyleState.Normal -> modifierProperty.opacity
+                ConditionalStyleState.Transition ->
+                    transitionModifier.opacity ?: modifierProperty.opacity
+            } ?: Float.MIN_VALUE
+        }
+
         return remember(transition) {
             TransitionModifierProperties(
                 offset = offset,
@@ -363,6 +371,7 @@ internal class ModifierFactory {
                 padding = padding,
                 margin = margin,
                 rotateZ = rotation,
+                opacity = opacity,
             )
         }
     }
@@ -493,6 +502,9 @@ internal class ModifierFactory {
                     }
                 } ?: Modifier,
             )
+            .then(
+                properties.opacity?.let { Modifier.alpha(it) } ?: Modifier,
+            )
             .then(properties.padding?.let { Modifier.padding(it) } ?: Modifier)
     }
 
@@ -518,6 +530,7 @@ internal class ModifierFactory {
         backgroundColor = backgroundColor ?: properties.backgroundColor,
         backgroundImage = backgroundImage ?: properties.backgroundImage,
         blurRadius = blurRadius ?: properties.blurRadius,
+        opacity = opacity ?: properties.opacity,
         padding = padding ?: properties.padding,
     )
 
