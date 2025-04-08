@@ -56,6 +56,7 @@ internal class RichTextComponent(private val modifierFactory: ModifierFactory) :
             isDarkModeEnabled = isDarkModeEnabled,
             conditionalTransitionTextStyling = model.conditionalTransitionTextStyling,
             offerState = offerState,
+            isRichText = true,
             onEventSent = onEventSent,
         )
         val linkStyleUiState = modifierFactory.createTextStyle(
@@ -66,6 +67,7 @@ internal class RichTextComponent(private val modifierFactory: ModifierFactory) :
             isDarkModeEnabled = isDarkModeEnabled,
             baseStyles = model.textStyles,
             offerState = offerState,
+            isRichText = true,
             onEventSent = onEventSent,
         )
 
@@ -82,7 +84,8 @@ internal class RichTextComponent(private val modifierFactory: ModifierFactory) :
                     letterSpacing = linkStyleUiState.textStyle.letterSpacing,
                     textDecoration = linkStyleUiState.textStyle.textDecoration,
                 ),
-                linkStyleUiState.textTransform,
+                textTransform = textStyleUiState.textTransform,
+                linkTextTransform = linkStyleUiState.textTransform,
             ) { url ->
                 onEventSent(LayoutContract.LayoutEvent.UrlSelected(url, model.openLinks))
             }
@@ -111,15 +114,16 @@ private fun String.asHTML(
     fontSize: TextUnit,
     urlSpanStyle: SpanStyle,
     textTransform: TextUiTransform,
+    linkTextTransform: TextUiTransform,
     onClick: (url: String) -> Unit,
 ) = buildAnnotatedString {
     val spanned = HtmlCompat.fromHtml(this@asHTML, HtmlCompat.FROM_HTML_MODE_COMPACT)
     val spans = spanned.getSpans<Any>(0, spanned.length)
-    var spannedString = spanned.toString()
+    var spannedString = getTransformText(spanned.toString(), textTransform)
     spans.filter { it !is BulletSpan }.forEach { span ->
         val start = spanned.getSpanStart(span)
         val end = spanned.getSpanEnd(span)
-        val spanString = getTransformText(spannedString.substring(start, end), textTransform)
+        val spanString = getTransformText(spannedString.substring(start, end), linkTextTransform)
         spannedString = spannedString.replaceRange(start, end, spanString)
         when (span) {
             is RelativeSizeSpan -> span.spanStyle(fontSize)

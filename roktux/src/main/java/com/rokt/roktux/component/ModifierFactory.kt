@@ -1017,6 +1017,7 @@ internal class ModifierFactory {
         defaultFontFamily: String? = null,
         conditionalTransitionTextStyling: ConditionalTransitionTextStyling? = null,
         baseStyles: ImmutableList<StateBlock<TextStylingUiProperties>>? = null,
+        isRichText: Boolean = false,
         onEventSent: (LayoutContract.LayoutEvent) -> Unit,
     ): TextStyleUiState {
         val transitionStyleState = evaluateState(
@@ -1043,6 +1044,7 @@ internal class ModifierFactory {
                 fontFamilyMap,
                 defaultFontFamily,
                 resolver,
+                isRichText,
                 onEventSent,
             )
         } else {
@@ -1060,6 +1062,7 @@ internal class ModifierFactory {
                     fontFamilyMap,
                     defaultFontFamily,
                     resolver,
+                    isRichText,
                     onEventSent,
                 )
             }
@@ -1111,9 +1114,10 @@ internal class ModifierFactory {
         fontFamilyMap: ImmutableMap<String, FontFamily>,
         defaultFontFamily: String?,
         resolver: FontFamily.Resolver,
+        isRichText: Boolean,
         onEventSent: (LayoutContract.LayoutEvent) -> Unit,
     ): TextStyleUiState {
-        val transformedText = stylingUiProperties.textTransform?.run {
+        val transformedText = stylingUiProperties.textTransform?.takeIf { !isRichText }?.run {
             when (this) {
                 TextUiTransform.Capitalize -> text.split(" ").joinToString(" ") { value ->
                     value.replaceFirstChar {
