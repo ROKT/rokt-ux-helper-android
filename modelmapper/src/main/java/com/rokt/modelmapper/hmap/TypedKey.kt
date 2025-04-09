@@ -16,12 +16,7 @@ package com.rokt.modelmapper.hmap
 class TypedKey<T> @PublishedApi internal constructor(val type: Class<out T>, val key: String) {
 
     companion object {
-        inline operator fun <reified T : Any> invoke(key: String): TypedKey<T> {
-            if (T::class.typeParameters.isNotEmpty()) {
-                throw IllegalArgumentException("Value type cannot have type parameters")
-            }
-            return TypedKey(T::class.java, key)
-        }
+        inline operator fun <reified T : Any> invoke(key: String): TypedKey<T> = TypedKey(T::class.java, key)
     }
 
     override fun hashCode(): Int {

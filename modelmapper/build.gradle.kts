@@ -48,7 +48,6 @@ dependencies {
     implementation(libs.kotlinx.collections.immutable)
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.compose.foundation)
-    implementation(libs.kotlin.reflect)
     testApi(libs.bundles.mockk)
     testImplementation(libs.junit4)
     testImplementation(libs.junit.params)
