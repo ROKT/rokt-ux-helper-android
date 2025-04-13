@@ -6,8 +6,8 @@
         "own": [
           {
             "default": {
-              "container": {
-                "alignItems": "stretch"
+              "dimension": {
+                "maxWidth": 200
               }
             }
           }
@@ -16,53 +16,48 @@
     },
     "children": [
       {
-        "type": "When",
+        "type": "BasicText",
         "node": {
-          "predicates": [
-            {
-              "type": "StaticBoolean",
-              "predicate": {
-                "value": true,
-                "condition": "is-true"
-              }
-            }
-          ],
-          "children": [
-            {
-              "type": "BasicText",
-              "node": {
-                "value": "Test Offer",
-                "styles": {
-                  "elements": {
-                    "own": [
-                      {
-                        "default": {
-                          "flexChild": {
-                            "alignSelf": "stretch"
-                          }
-                        }
-                      }
-                    ]
+          "styles": {
+            "elements": {
+              "own": [
+                {
+                  "default": {
+                    "dimension": {
+                      "minWidth": 100
+                    },
+                    "flexChild": {
+                      "weight": 1,
+                      "alignSelf": "stretch"
+                    }
                   }
                 }
-              }
+              ]
             }
-          ]
+          },
+          "value": "Child1"
         }
       },
       {
         "type": "BasicText",
         "node": {
-          "value": "Long Offer with multiple test in it to verify the height",
           "styles": {
             "elements": {
               "own": [
                 {
-                  "default": {}
+                  "default": {
+                    "dimension": {
+                      "minWidth": 200
+                    },
+                    "flexChild": {
+                      "weight": 1
+                    }
+                  }
                 }
               ]
             }
-          }
+          },
+          "value": "Child2"
         }
       }
     ]

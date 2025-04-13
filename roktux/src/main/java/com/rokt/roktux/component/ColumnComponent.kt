@@ -2,6 +2,7 @@ package com.rokt.roktux.component
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -83,16 +84,20 @@ internal class ColumnComponent(
                         containerProperties = nonWhenChild.containerProperties,
                         index = breakpointIndex,
                         isPressed = isPressed,
-                    ).also { container ->
-                        container.weight?.let {
+                    ).also { childContainer ->
+                        childContainer.weight?.let {
                             childModifier = childModifier.then(Modifier.weight(it))
                         }
-                        container.selfAlignmentBias?.let {
+                        childContainer.selfAlignmentBias?.let {
                             if (it == AlignmentUiModel.Stretch.bias) {
                                 anyStretchChild = true
+                                childModifier = childModifier.then(Modifier.fillMaxWidth())
                             } else {
                                 childModifier = childModifier.then(Modifier.align(BiasAlignment.Horizontal(it)))
                             }
+                        }
+                        if (container.alignmentBias == AlignmentUiModel.Stretch.bias) {
+                            childModifier = childModifier.then(Modifier.fillMaxWidth())
                         }
                     }
                     factory.CreateComposable(

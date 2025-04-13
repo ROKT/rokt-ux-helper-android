@@ -6,6 +6,9 @@
         "own": [
           {
             "default": {
+              "dimension": {
+                "maxWidth": 200
+              },
               "container": {
                 "alignItems": "stretch"
               }
@@ -18,23 +21,45 @@
       {
         "type": "BasicText",
         "node": {
-          "value": "Test Offer",
           "styles": {
             "elements": {
-              "own": []
+              "own": [
+                {
+                  "default": {
+                    "dimension": {
+                      "minWidth": 100
+                    },
+                    "flexChild": {
+                      "weight": 1
+                    }
+                  }
+                }
+              ]
             }
-          }
+          },
+          "value": "Child1"
         }
       },
       {
         "type": "BasicText",
         "node": {
-          "value": "Long Offer with multiple test in it to verify the height",
           "styles": {
             "elements": {
-              "own": []
+              "own": [
+                {
+                  "default": {
+                    "dimension": {
+                      "minWidth": 200
+                    },
+                    "flexChild": {
+                      "weight": 1
+                    }
+                  }
+                }
+              ]
             }
-          }
+          },
+          "value": "Child2"
         }
       }
     ]

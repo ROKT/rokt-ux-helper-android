@@ -141,20 +141,19 @@ class RowComponentTest : BaseDcuiEspressoTest() {
     @DcuiNodeJson(jsonFile = "RowComponent/Row_with_StretchAlignment.json")
     fun testRowComponentWithStretchAlignment() {
         composeTestRule.onNodeWithTag(DCUI_COMPONENT_TAG).assertIsDisplayed()
-        val childRect1 = composeTestRule.onNodeWithText("Test Offer").fetchSemanticsNode().boundsInRoot
-        val childRect2 = composeTestRule.onNodeWithText("Long Offer with multiple test in it to verify the height")
-            .fetchSemanticsNode().boundsInRoot
+        val childRect1 = composeTestRule.onNodeWithText("Child1").fetchSemanticsNode().boundsInRoot
+        val childRect2 = composeTestRule.onNodeWithText("Child2").fetchSemanticsNode().boundsInRoot
         assertEquals(childRect1.height, childRect2.height)
+        assertEquals(200.dp, childRect1.height.dp)
     }
 
     @Test
     @DcuiNodeJson(jsonFile = "RowComponent/Row_with_StretchAlignment_child.json")
     fun testRowComponentWithStretchAlignmentChild() {
-        composeTestRule.onNodeWithTag(DCUI_COMPONENT_TAG).assertIsDisplayed()
-        val childRect1 = composeTestRule.onNodeWithText("Test Offer").fetchSemanticsNode().boundsInRoot
-        val childRect2 = composeTestRule.onNodeWithText("Long Offer with multiple test in it to verify the height")
-            .fetchSemanticsNode().boundsInRoot
+        val childRect1 = composeTestRule.onNodeWithText("Child1").fetchSemanticsNode().boundsInRoot
+        val childRect2 = composeTestRule.onNodeWithText("Child2").fetchSemanticsNode().boundsInRoot
         assertEquals(childRect1.height, childRect2.height)
+        assertEquals(200.dp, childRect1.height.dp)
     }
 
     @Test

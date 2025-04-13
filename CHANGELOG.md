@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - Fixed html links not opening when textTransformation is set to upper case
+- Component stretch behaviour not being applied
 
 ## [0.5.0] - 2025-04-02
 
