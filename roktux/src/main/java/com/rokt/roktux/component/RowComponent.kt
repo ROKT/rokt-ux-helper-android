@@ -3,6 +3,7 @@ package com.rokt.roktux.component
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.runtime.Composable
@@ -80,16 +81,20 @@ internal class RowComponent(private val factory: LayoutUiModelFactory, private v
                         containerProperties = nonWhenChild.containerProperties,
                         index = breakpointIndex,
                         isPressed = isPressed,
-                    ).also { container ->
-                        container.weight?.let {
+                    ).also { childContainer ->
+                        childContainer.weight?.let {
                             childModifier = childModifier.then(Modifier.weight(it))
                         }
-                        container.selfAlignmentBias?.let {
+                        childContainer.selfAlignmentBias?.let {
                             if (it == AlignmentUiModel.Stretch.bias) {
                                 anyStretchChild = true
+                                childModifier = childModifier.then(Modifier.fillMaxHeight())
                             } else {
                                 childModifier = childModifier.then(Modifier.align(BiasAlignment.Vertical(it)))
                             }
+                        }
+                        if (container.alignmentBias == AlignmentUiModel.Stretch.bias) {
+                            childModifier = childModifier.then(Modifier.fillMaxHeight())
                         }
                     }
                     factory.CreateComposable(

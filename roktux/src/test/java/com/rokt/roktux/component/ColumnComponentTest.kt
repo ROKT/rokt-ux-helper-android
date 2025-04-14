@@ -102,6 +102,25 @@ class ColumnComponentTest : BaseDcuiEspressoTest() {
     }
 
     @Test
+    @DcuiNodeJson(jsonFile = "ColumnComponent/Column_with_StretchAlignment.json")
+    fun testColumnComponentWithStretchAlignment() {
+        composeTestRule.onNodeWithTag(DCUI_COMPONENT_TAG).assertIsDisplayed()
+        val childRect1 = composeTestRule.onNodeWithText("Child1").fetchSemanticsNode().boundsInRoot
+        val childRect2 = composeTestRule.onNodeWithText("Child2").fetchSemanticsNode().boundsInRoot
+        assertEquals(childRect1.width, childRect2.width)
+        assertEquals(200.dp, childRect1.width.dp)
+    }
+
+    @Test
+    @DcuiNodeJson(jsonFile = "ColumnComponent/Column_with_StretchAlignment_child.json")
+    fun testColumnComponentWithStretchAlignmentChild() {
+        val childRect1 = composeTestRule.onNodeWithText("Child1").fetchSemanticsNode().boundsInRoot
+        val childRect2 = composeTestRule.onNodeWithText("Child2").fetchSemanticsNode().boundsInRoot
+        assertEquals(childRect1.width, childRect2.width)
+        assertEquals(200.dp, childRect1.width.dp)
+    }
+
+    @Test
     @DcuiNodeJson(jsonFile = "ColumnComponent/Column_with_Padding.json")
     fun testColumnComponentWithPadding() {
         composeTestRule.onNodeWithTag(DCUI_COMPONENT_TAG)
