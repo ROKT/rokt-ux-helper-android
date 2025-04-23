@@ -69,7 +69,9 @@ internal class LayoutVariantMarketingComponent(private val factory: LayoutUiMode
                                 viewModel.setEvent(
                                     LayoutContract.LayoutEvent.OfferVisibilityChanged(
                                         viewId,
-                                        visibilityInfo.visible && !visibilityInfo.obscured && !visibilityInfo.misSized,
+                                        visibilityInfo.visible &&
+                                            !visibilityInfo.obscured &&
+                                            !visibilityInfo.incorrectlySized,
                                     ),
                                 )
                             },

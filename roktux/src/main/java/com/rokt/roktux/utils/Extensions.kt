@@ -262,7 +262,7 @@ internal fun Modifier.componentVisibilityChange(
     identifier: Int,
 ): Modifier = composed {
     val view = LocalView.current
-    var previousVisibilityInfo = ComponentVisibilityInfo(visible = false, obscured = false, misSized = false)
+    var previousVisibilityInfo = ComponentVisibilityInfo(visible = false, obscured = false, incorrectlySized = false)
     onGloballyPositioned { coordinates ->
         // Check if we are inside Compose. It is correct when the view is an instance of ComposeView
         val isComposeView = view is ComposeView
@@ -281,13 +281,13 @@ private fun getComponentVisibilityInfo(
 ): ComponentVisibilityInfo {
     // Check if view or component is not attached to the window
     if (!view.isAttachedToWindow || !coordinates.isAttached) {
-        return ComponentVisibilityInfo(visible = false, obscured = false, misSized = false)
+        return ComponentVisibilityInfo(visible = false, obscured = false, incorrectlySized = false)
     }
     // Get the total area required to show the component
     val totalArea = (coordinates.size.height * coordinates.size.width).toFloat()
     // Return if the total area is 0
     if (totalArea == 0f) {
-        return ComponentVisibilityInfo(visible = false, obscured = false, misSized = false)
+        return ComponentVisibilityInfo(visible = false, obscured = false, incorrectlySized = false)
     }
 
     // Get the window Rect
@@ -300,7 +300,7 @@ private fun getComponentVisibilityInfo(
 
     // If the visible area is 0, then it is not visible.
     if (intersectRect.height <= 0 || intersectRect.width <= 0) {
-        return ComponentVisibilityInfo(visible = false, obscured = false, misSized = false)
+        return ComponentVisibilityInfo(visible = false, obscured = false, incorrectlySized = false)
     }
 
     // Calculate the area of visible rect and find the ratio of it with the total area
@@ -375,7 +375,7 @@ internal fun View.isLayoutMisSized(
         expectedWidth != currentWidth
 }
 
-data class ComponentVisibilityInfo(val visible: Boolean, val obscured: Boolean, val misSized: Boolean)
+data class ComponentVisibilityInfo(val visible: Boolean, val obscured: Boolean, val incorrectlySized: Boolean)
 
 private fun LayoutSchemaUiModel.isBottomSheet(): Boolean = this is LayoutSchemaUiModel.BottomSheetUiModel
 
