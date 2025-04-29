@@ -3,7 +3,7 @@ name: Run tests and lint
 on:
   push:
     branches:
-      - "main"
+      - main
   pull_request:
 
 concurrency:
@@ -105,3 +105,13 @@ jobs:
             **/build/reports/roborazzi
             **/build/test-results/roborazzi
           retention-days: 7
+
+  pr-notify:
+    if: >
+      github.event_name == 'pull_request' &&
+      github.event.pull_request.draft == false
+    needs: [trunk-check, lint, unit-test, assemble-debug, snapshot-test]
+    name: Notify GChat
+    uses: ROKT/rokt-workflows/.github/workflows/oss_pr_opened_notification.yml@main
+    secrets:
+      gchat_webhook: ${{ secrets.GCHAT_PRS_MOBILE_INTEGRATION_CHANNEL_WEBHOOK }}
