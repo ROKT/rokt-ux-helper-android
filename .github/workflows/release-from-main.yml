@@ -183,8 +183,8 @@ jobs:
       - name: Update Rokt Android SDK's UX Helper version
         uses: colathro/toml-editor@da6b46ee7779ed730d2160393ed95fb20e82696d # v1.1.1
         with:
-          file: "gradle/libs.versions.toml"
-          key: "versions.roktUxHelper"
+          file: gradle/libs.versions.toml
+          key: versions.roktUxHelper
           value: ${{ needs.setup-and-version.outputs.next_snapshot_version }}
 
       - name: Create Pull Request
