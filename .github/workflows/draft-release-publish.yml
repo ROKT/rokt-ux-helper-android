@@ -1,4 +1,4 @@
-name: Create draft release
+name: Create draft release from main
 
 on:
   workflow_dispatch: # checkov:skip=CKV_GHA_7
