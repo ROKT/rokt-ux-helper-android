@@ -1,14 +1,16 @@
-name: Create draft release
+name: Create draft release from main
 
 on:
   workflow_dispatch: # checkov:skip=CKV_GHA_7
     inputs:
-      version:
-        description: "The version you want to release in the format X.Y.Z"
+      bump-type:
+        description: Specify if the version should be bumped as major, minor, patch
         required: true
-      version-suffix:
-        description: "If not provided defaults to -alpha.{build-number}. The suffix to apply to the version e.g. -beta.1, -SNAPSHOT"
-        required: false
+        type: choice
+        options:
+          - major
+          - minor
+          - patch
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
@@ -17,6 +19,8 @@ concurrency:
 permissions:
   contents: write
   pull-requests: write
+  checks: write
+  id-token: write
 
 jobs:
   publish-draft-release:
@@ -27,49 +31,53 @@ jobs:
       ORG_GRADLE_PROJECT_mavenCentralUsername: ${{ secrets.SONATYPE_USERNAME }}
       ORG_GRADLE_PROJECT_mavenCentralPassword: ${{ secrets.SONATYPE_PASSWORD }}
     steps:
-      - name: Validate version format
-        id: validate_version
-        run: |
-          if [[ ! "${{ github.event.inputs.version }}" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-            echo "Error: Invalid version format. Please provide a version in the format X.Y.Z where X, Y, and Z are numbers."
-            exit 1
-          fi
-          echo "Valid version: ${{ github.event.inputs.version }}"
-          echo "validated-version=${{ github.event.inputs.version }}" >> $GITHUB_OUTPUT
-      - name: Validate version suffix
-        run: |
-          if [ -n "${{ github.event.inputs.version-suffix }}" ]; then
-            if [[ ! "${{ github.event.inputs.version-suffix }}" =~ ^-[A-Za-z0-9]+([.-][A-Za-z0-9]+)*$ ]]; then
-              echo "Error: Invalid version-suffix. It must start with '-' and can include periods or hyphens followed by alphanumeric characters, e.g., '-SNAPSHOT', '-alpha.3'." >&2
-              exit 1
-            fi
-          fi
       - name: Checkout repository
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          ref: main
       - name: Setup JDK
         uses: ./.github/actions/setup-java
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@06832c7b30a0129d7fb559bcc6e43d26f6374244 # v4.3.1
-      - name: Save validated version to file
+
+      - name: Get current version
+        id: version-file
         run: |
-          echo "${{ steps.validate_version.outputs.validated-version }}" > VERSION
-      - name: Release version name
-        id: version-suffix
+          version_from_file=$(head -n 1 VERSION)
+          echo "release-version=$version_from_file" >> $GITHUB_OUTPUT
+
+      - name: Bump version
+        id: bump-version
         run: |
-          if [ -n "${{ github.event.inputs.version-suffix }}" ]; then
-            version_suffix="${{ github.event.inputs.version-suffix }}"
+          version="${{ steps.version-file.outputs.release-version }}"
+          bump="${{ github.event.inputs.bump-type }}"
+
+          IFS='.' read -r major minor patch <<< "$version"
+
+          if [ "$bump" = "major" ]; then
+              major=$((major + 1))
+              minor=0
+              patch=0
+          elif [ "$bump" = "minor" ]; then
+              minor=$((minor + 1))
+              patch=0
+          elif [ "$bump" = "patch" ]; then
+              patch=$((patch + 1))
           else
-            version_suffix="-alpha.${{ github.run_attempt }}"
+              echo "Invalid bump type: $bump"
+              exit 1
           fi
-          echo "version-suffix=$version_suffix" >> $GITHUB_OUTPUT
+
+          new_version="${major}.${minor}.${patch}"
+          echo "New version: $new_version"
+
+          echo "new-version=$new_version" >> $GITHUB_OUTPUT
       - name: Update changelog
         uses: thomaseizinger/keep-a-changelog-new-release@f62c3c390716df5af712ba5d94f4f4a8efc1306d # v3.1.0
         with:
-          tag: ${{ steps.validate_version.outputs.validated-version }}
+          tag: ${{ steps.bump-version.outputs.new-version }}
       - name: Publish to Maven local
-        run: ./gradlew publishMavenPublicationToMavenLocal -PVERSION=${{ steps.validate_version.outputs.validated-version }} -PVERSION_SUFFIX=${{ steps.version-suffix.outputs.version-suffix }}
-      - name: Publish to Maven Central
-        run: ./gradlew publishMavenPublicationToMavenCentralRepository -PVERSION=${{ steps.validate_version.outputs.validated-version }} -PVERSION_SUFFIX=${{ steps.version-suffix.outputs.version-suffix }} --no-configuration-cache
+        run: ./gradlew publishMavenPublicationToMavenLocal -PVERSION=${{ steps.bump-version.outputs.new-version }}
       - name: Upload AAR artifacts
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
@@ -78,14 +86,14 @@ jobs:
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@271a8d0340265f705b14b6d32b9829c1cb33d45e # v7.0.8
         with:
-          commit-message: Create ${{ steps.validate_version.outputs.validated-version }}${{ steps.version-suffix.outputs.version-suffix }}
-          branch: release/${{ steps.validate_version.outputs.validated-version }}
-          title: Prepare release ${{ steps.validate_version.outputs.validated-version }}
+          commit-message: Create ${{ steps.bump-version.outputs.new-version }}
+          branch: release/${{ steps.bump-version.outputs.new-version }}
+          title: Prepare release ${{ steps.bump-version.outputs.new-version }}
           base: main
           body: |
-            Preparing for release ${{ steps.validate_version.outputs.validated-version }}
+            Preparing for release ${{ steps.bump-version.outputs.new-version }}
             - Bumped version
             - Updated changelog
-            - Generated release build ${{ steps.validate_version.outputs.validated-version }}${{ steps.version-suffix.outputs.version-suffix }}
+            - Generated release build ${{ steps.bump-version.outputs.new-version }}
           labels: |
             release

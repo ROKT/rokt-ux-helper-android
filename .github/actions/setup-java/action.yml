@@ -1,7 +1,7 @@
 name: Setup Java composite
 description: Sets up a consistent Java version for each workflow
 runs:
-  using: "composite"
+  using: composite
   steps:
     - name: Setup Java
       uses: actions/setup-java@v4
