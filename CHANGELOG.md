@@ -11,6 +11,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Support new response action type `ExternalPaymentTrigger`
+
 ### Fixed
 
 - Fixed html links not opening when textTransformation is set to upper case

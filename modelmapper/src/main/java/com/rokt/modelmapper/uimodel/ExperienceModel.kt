@@ -77,6 +77,7 @@ enum class Action {
     Url,
 
     CaptureOnly,
+    ExternalPaymentTrigger,
 }
 
 enum class SignalType {

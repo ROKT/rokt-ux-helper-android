@@ -201,6 +201,7 @@ class ExperienceModelMapperImpl(private val experienceResponse: String, private 
     private fun NetworkAction.toActionModel(): Action = when (this) {
         NetworkAction.Url -> Action.Url
         NetworkAction.CaptureOnly -> Action.CaptureOnly
+        NetworkAction.ExternalPaymentTrigger -> Action.ExternalPaymentTrigger
     }
 
     private fun NetworkSignalType.toSignalTypeModel(): SignalType = when (this) {
