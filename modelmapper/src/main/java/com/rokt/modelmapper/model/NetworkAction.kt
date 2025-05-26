@@ -10,4 +10,7 @@ enum class NetworkAction {
 
     @SerialName("CaptureOnly")
     CaptureOnly,
+
+    @SerialName("ExternalPaymentTrigger")
+    ExternalPaymentTrigger,
 }

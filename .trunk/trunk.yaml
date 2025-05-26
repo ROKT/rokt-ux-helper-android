@@ -2,13 +2,13 @@
 # To learn more about the format of this file, see https://docs.trunk.io/reference/trunk-yaml
 version: 0.1
 cli:
-  version: 1.22.11
+  version: 1.22.12
   sha256:
-    darwin_arm64: 6da8e132e051da26be74cbd7f93f4cd46784053fdffef3f62115f25ea99819ae
-    darwin_x86_64: c61f01419db420c723062b25934236f49f85f7546634b12d7a1b218325c1dd80
-    linux_arm64: 6d5d3ba7270d98101b401fd92846bc6b161cfa642e6d67bad079692ed89bfd44
-    linux_x86_64: 064563443111095005368f97353608bbaffb63834e39e4a86019c1549ace2c42
-    mingw_x86_64: b33e02a08ab7a23ffe1e6d76d1ed5d3f67eb79a82f0d871cc45d7934e3c7cc40
+    darwin_arm64: 744929fbd319da62b4f17a077002045664754017306c49887e3613c1435d5c97
+    darwin_x86_64: 9118290d392b8abdd5fa80d13c8fe422a86186458536f66700e9b1b2c0416fb4
+    linux_arm64: e84f13a724627199bf8935a366e9cfc8b7b34f442c2a2952c9d4e53a0cabc8af
+    linux_x86_64: 0c8d78f7d39d26bb8916fd1d05f912612916aa411c64c2d06a14de1dbca27c75
+    mingw_x86_64: 82a7624060f79e88d406a343b05aae830e14193b17a1e31b06da3a940394dec9
 # Trunk provides extensibility via plugins. (https://docs.trunk.io/plugins)
 plugins:
   sources:
@@ -16,7 +16,7 @@ plugins:
       ref: main
       uri: https://github.com/ROKT/rokt-workflows
     - id: trunk
-      ref: v1.6.7
+      ref: v1.6.8
       uri: https://github.com/trunk-io/plugins
 # Many linters and tools depend on runtimes - configure them here. (https://docs.trunk.io/runtimes)
 runtimes:
@@ -29,20 +29,19 @@ runtimes:
 lint:
   enabled:
     - validate-actions-versions
-    - checkov@3.2.386
+    - checkov@3.2.411
     - git-diff-check
     - ktlint@1.5.0
     - markdownlint@0.44.0
-    - oxipng@9.1.4
+    - oxipng@9.1.5
     - prettier@3.5.3
     - shellcheck@0.10.0
     - shfmt@3.6.0
     - taplo@0.9.3
-    - trufflehog@3.88.17
+    - trufflehog@3.88.25
     - actionlint@1.7.7
-  disabled:
-    - yamllint
-    - osv-scanner
+    - yamllint@1.37.0
+    - osv-scanner@2.0.1
   ignore:
     - linters: [ALL]
       paths:

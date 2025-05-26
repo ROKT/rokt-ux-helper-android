@@ -35,6 +35,7 @@ dependencies {
 
 - You can find a summary of changes in the [Changelog](CHANGELOG.md)
 - If there are any migrations between versions you will find instructions in the [migration guide](MIGRATING.md)
+- To learn about how to release the UX Helper modules, check out the releasing guide [here](RELEASING.md)
 
 ## Jetpack Compose Compatibility
 
@@ -57,6 +58,12 @@ Before submitting changes ensure that:
 - Lint checks pass with `./gradlew lint`
 
 Additional checks are conducted using GitHub Actions which run on all pull requests and are required to pass before the changes are merged. You can find the details of the full pipeline [here](.github/workflows/pull-request.yml).
+
+To publish the UX Helper modules locally for use in other projects, run
+
+- `./gradlew publishMavenPublicationToMavenLocal -PVERSION=x.y.z`
+
+You should comment out the `signAllPublications()` line in `MavenCentralPublish.kt` if you do not wish to sign the modules.
 
 ## Modules
 

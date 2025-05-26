@@ -31,16 +31,15 @@ gitGraph
 - Every commit on main:
     - Finds the last version from the VERSION file e.g. 4.7.0 bumps the minor version e.g. 4.8.0
     - Generates a build for Maven Central in the format 4.8.0-SNAPSHOT
-    - (TODO) Tags the latest commit on main with the snapshot version e.g. 4.8.0-SNAPSHOT
+    - Tags the latest commit on main with the snapshot version e.g. 4.8.0-SNAPSHOT
 
 ## Major / Minor version release
 
-1. Run the workflow called "Create draft release" which will:
+1. Run the workflow called "Create draft release from main" which will:
     - Open a PR targeting main branch
 2. Once tested and approved by the relevant owners, merge the PR to main
 3. Once merged the following will occur:
     - Update changelog - unreleased section moved to correct version number
-    - Build uploaded to Maven Central
     - Release made on Github with relevant build files
     - Commit tagged with version number
 
