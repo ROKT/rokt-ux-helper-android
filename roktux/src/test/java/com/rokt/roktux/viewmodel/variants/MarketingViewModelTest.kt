@@ -79,7 +79,7 @@ class MarketingViewModelTest : BaseViewModelTest() {
     }
 
     @Test
-    fun `UserInteracted should set the the SetSignalViewed effect only once`() = runTest {
+    fun `UserInteracted should set the SetSignalViewed effect only once`() = runTest {
         // Given
         val event = LayoutContract.LayoutEvent.UserInteracted
 
