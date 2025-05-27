@@ -5,9 +5,11 @@ import android.app.Activity
 import android.content.Context
 import android.content.ContextWrapper
 import android.content.Intent
+import android.graphics.Rect
 import android.net.Uri
 import android.os.Build
 import android.view.View
+import android.view.ViewGroup
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.animateIntOffsetAsState
@@ -28,6 +30,7 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.layout.boundsInWindow
 import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalView
@@ -87,6 +90,7 @@ internal fun BindData.getValue(offerState: OfferUiState, viewableItems: Int): St
         offerState.lastOfferIndex,
         viewableItems,
     )
+
     is BindData.State -> (offerState.currentOfferIndex + 1).toString()
     else -> null
 }
@@ -239,28 +243,52 @@ internal suspend fun PointerInputScope.interceptTap(
     }
 }
 
+internal fun Modifier.onUserInteractionDetected(onInteraction: () -> Unit): Modifier =
+    this then Modifier.pointerInput(Unit) {
+        awaitEachGesture {
+            val down = awaitFirstDown(pass = PointerEventPass.Initial)
+            do {
+                val event = awaitPointerEvent(pass = PointerEventPass.Final)
+                val change = event.changes[0]
+                if (change.id == down.id && !change.pressed) {
+                    onInteraction()
+                }
+            } while (event.changes.any { it.id == down.id && it.pressed })
+        }
+    }
+
 internal fun Modifier.componentVisibilityChange(
-    callback: (identifier: Int, visible: Boolean) -> Unit,
+    callback: (identifier: Int, visibilityInfo: ComponentVisibilityInfo) -> Unit,
     identifier: Int,
 ): Modifier = composed {
     val view = LocalView.current
-    var visibility = false
+    var previousVisibilityInfo = ComponentVisibilityInfo(visible = false, obscured = false, incorrectlySized = false)
     onGloballyPositioned { coordinates ->
-        val currentVisibility = getVisibilityRatio(coordinates, view) >= COMPONENT_VISIBILITY_THRESHOLD_RATIO
-        if (currentVisibility != visibility) {
-            visibility = currentVisibility
-            callback(identifier, visibility)
+        // Check if we are inside Compose. It is correct when the view is an instance of ComposeView
+        val isComposeView = view is ComposeView
+        val currentVisibilityInfo = getComponentVisibilityInfo(coordinates, view, isComposeView)
+        if (currentVisibilityInfo != previousVisibilityInfo) {
+            previousVisibilityInfo = currentVisibilityInfo
+            callback(identifier, currentVisibilityInfo)
         }
     }
 }
 
-private fun getVisibilityRatio(coordinates: LayoutCoordinates, view: View): Float {
-    // Return 0 if view or component is not attached to the window
-    if (!view.isAttachedToWindow || !coordinates.isAttached) return 0f
+private fun getComponentVisibilityInfo(
+    coordinates: LayoutCoordinates,
+    view: View,
+    isComposeView: Boolean,
+): ComponentVisibilityInfo {
+    // Check if view or component is not attached to the window
+    if (!view.isAttachedToWindow || !coordinates.isAttached) {
+        return ComponentVisibilityInfo(visible = false, obscured = false, incorrectlySized = false)
+    }
     // Get the total area required to show the component
     val totalArea = (coordinates.size.height * coordinates.size.width).toFloat()
-    // Return 0 of the total area is 0
-    if (totalArea == 0f) return 0f
+    // Return if the total area is 0
+    if (totalArea == 0f) {
+        return ComponentVisibilityInfo(visible = false, obscured = false, incorrectlySized = false)
+    }
 
     // Get the window Rect
     val windowRect = android.graphics.Rect()
@@ -270,11 +298,84 @@ private fun getVisibilityRatio(coordinates: LayoutCoordinates, view: View): Floa
     val componentRect = coordinates.boundsInWindow()
     val intersectRect = windowRect.toComposeRect().intersect(componentRect)
 
-    if (intersectRect.height <= 0 || intersectRect.width <= 0) return 0f
+    // If the visible area is 0, then it is not visible.
+    if (intersectRect.height <= 0 || intersectRect.width <= 0) {
+        return ComponentVisibilityInfo(visible = false, obscured = false, incorrectlySized = false)
+    }
+
     // Calculate the area of visible rect and find the ratio of it with the total area
     val visibleArea = intersectRect.height * intersectRect.width
-    return visibleArea / totalArea
+    val visibilityRatio = visibleArea / totalArea
+    val visible = visibilityRatio >= COMPONENT_VISIBILITY_THRESHOLD_RATIO
+
+    // Check if component is obscured by others.
+    val obscured = coordinates.isObscured(view)
+
+    // Check if the component is incorrectly sized
+    val incorrectlySized = if (!isComposeView) {
+        view.isSizeIncorrect(
+            coordinates.size.width,
+            coordinates.size.height,
+            coordinates.size.height,
+            coordinates.size.width,
+        )
+    } else {
+        false
+    }
+
+    return ComponentVisibilityInfo(visible, obscured, incorrectlySized)
 }
+
+/**
+ * Returns true if the [LayoutCoordinates] is obscured by another view.
+ */
+private fun LayoutCoordinates.isObscured(view: View): Boolean {
+    val componentBounds = this.boundsInWindow()
+    val componentRect = Rect(
+        componentBounds.left.toInt(),
+        componentBounds.top.toInt(),
+        componentBounds.right.toInt(),
+        componentBounds.bottom.toInt(),
+    )
+    val parent = view.parent
+    return if (parent is ViewGroup) {
+        (0 until parent.childCount).any { index ->
+            val child = parent.getChildAt(index)
+            if (child != view) {
+                val location = IntArray(2)
+                child.getLocationInWindow(location)
+                val rect = Rect(
+                    location[0],
+                    location[1],
+                    location[0] + child.measuredWidth,
+                    location[1] + child.measuredHeight,
+                )
+                // Check for intersect.
+                rect.intersect(componentRect)
+            } else {
+                false
+            }
+        }
+    } else {
+        false
+    }
+}
+
+internal fun View.isSizeIncorrect(
+    expectedHeight: Int,
+    expectedWidth: Int,
+    currentHeight: Int,
+    currentWidth: Int,
+): Boolean {
+    val visibleRect = Rect()
+    getLocalVisibleRect(visibleRect)
+    return expectedHeight != visibleRect.height() ||
+        expectedWidth != visibleRect.width() ||
+        expectedHeight != currentHeight ||
+        expectedWidth != currentWidth
+}
+
+data class ComponentVisibilityInfo(val visible: Boolean, val obscured: Boolean, val incorrectlySized: Boolean)
 
 private fun LayoutSchemaUiModel.isBottomSheet(): Boolean = this is LayoutSchemaUiModel.BottomSheetUiModel
 

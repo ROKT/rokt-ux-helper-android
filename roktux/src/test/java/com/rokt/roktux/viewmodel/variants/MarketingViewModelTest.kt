@@ -11,7 +11,9 @@ import io.mockk.mockk
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Before
@@ -77,9 +79,83 @@ class MarketingViewModelTest : BaseViewModelTest() {
     }
 
     @Test
-    fun `Other LayoutEvents should be propagated as LayoutVariantEffect`() = runTest {
+    fun `UserInteracted should set the SetSignalViewed effect only once`() = runTest {
         // Given
         val event = LayoutContract.LayoutEvent.UserInteracted
+
+        // When
+        viewModel.setEvent(event)
+        viewModel.setEvent(event)
+        val effects = mutableListOf<MarketingVariantContract.LayoutVariantEffect>()
+        val job = launch {
+            viewModel.effect.collect { effects.add(it) }
+        }
+        advanceUntilIdle()
+        job.cancel()
+
+        // Then
+        assertThat(effects).hasSize(1)
+        assertThat(effects[0]).isEqualTo(MarketingVariantContract.LayoutVariantEffect.SetSignalViewed(0))
+    }
+
+    @Test
+    fun `OfferVisibilityChanged should trigger SetSignalViewed effect if the visibility was not changed within 1 second`() = runTest(ioDispatcher) {
+        // Given
+        val event = LayoutContract.LayoutEvent.OfferVisibilityChanged(0, true)
+
+        // When
+        viewModel.setEvent(event)
+        advanceUntilIdle()
+        val effect = viewModel.effect.first()
+
+        // Then
+        assertThat(effect).isEqualTo(MarketingVariantContract.LayoutVariantEffect.SetSignalViewed(0))
+    }
+
+    @Test
+    fun `OfferVisibilityChanged should not trigger SetSignalViewed effect when the visibility changed within 1 second`() = runTest(ioDispatcher) {
+        // Given
+        val event = LayoutContract.LayoutEvent.OfferVisibilityChanged(0, true)
+
+        // When
+        viewModel.setEvent(event)
+        viewModel.setEvent(event.copy(visible = false))
+        val effects = mutableListOf<MarketingVariantContract.LayoutVariantEffect>()
+        val job = launch {
+            viewModel.effect.collect { effects.add(it) }
+        }
+        advanceUntilIdle()
+        job.cancel()
+
+        // Then
+        assertThat(effects).isEmpty()
+    }
+
+    @Test
+    fun `OfferVisibilityChanged should not trigger SetSignalViewed if it was already triggered by UserInteracted event`() = runTest(ioDispatcher) {
+        // Given
+        val offerVisibilityEvent = LayoutContract.LayoutEvent.OfferVisibilityChanged(0, true)
+        val userInteractedEvent = LayoutContract.LayoutEvent.UserInteracted
+
+        // When
+        viewModel.setEvent(offerVisibilityEvent)
+        viewModel.setEvent(userInteractedEvent)
+        val effects = mutableListOf<MarketingVariantContract.LayoutVariantEffect>()
+        val job = launch {
+            viewModel.effect.collect { effects.add(it) }
+        }
+        advanceUntilIdle()
+        job.cancel()
+
+        // Then
+        assertThat(effects).hasSize(1)
+        assertThat(effects[0]).isEqualTo(MarketingVariantContract.LayoutVariantEffect.SetSignalViewed(0))
+    }
+
+    @Test
+    fun `Other LayoutEvents should be propagated as LayoutVariantEffect`() = runTest {
+        // Given
+        val event = LayoutContract.LayoutEvent.FirstOfferLoaded
 
         // When
         viewModel.setEvent(event)

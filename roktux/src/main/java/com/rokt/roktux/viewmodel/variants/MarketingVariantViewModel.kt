@@ -13,6 +13,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancelChildren
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import java.util.concurrent.atomic.AtomicBoolean
 
 internal class MarketingViewModel(
     val currentOffer: Int,
@@ -21,6 +22,7 @@ internal class MarketingViewModel(
     private var customState: Map<String, Int>,
 ) : BaseViewModel<LayoutContract.LayoutEvent, MarketingVariantUiState, MarketingVariantContract.LayoutVariantEffect>() {
     private var offerViewedJob: Job? = null
+    private var signalViewedSent = AtomicBoolean(false)
 
     init {
         val slot = modelMapper.getSavedExperience()?.plugins?.getOrNull(
@@ -51,6 +53,13 @@ internal class MarketingViewModel(
                 }
             }
 
+            is LayoutContract.LayoutEvent.UserInteracted -> {
+                offerViewedJob?.cancel()
+                if (signalViewedSent.compareAndSet(false, true)) {
+                    setEffect { MarketingVariantContract.LayoutVariantEffect.SetSignalViewed(currentOffer) }
+                }
+            }
+
             else -> {
                 setEffect { MarketingVariantContract.LayoutVariantEffect.PropagateEvent(event) }
             }
@@ -62,7 +71,9 @@ internal class MarketingViewModel(
         if (event.visible && offerViewedJob == null) {
             offerViewedJob = viewModelScope.launch(ioDispatcher) {
                 delay(VISIBILITY_CHECKPOINT_MILLIS)
-                setEffect { MarketingVariantContract.LayoutVariantEffect.SetSignalViewed(event.offerId) }
+                if (signalViewedSent.compareAndSet(false, true)) {
+                    setEffect { MarketingVariantContract.LayoutVariantEffect.SetSignalViewed(event.offerId) }
+                }
             }
         }
     }
