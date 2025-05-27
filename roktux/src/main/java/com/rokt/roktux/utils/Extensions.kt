@@ -313,13 +313,13 @@ private fun getComponentVisibilityInfo(
 
     // Check if the component is incorrectly sized
     val incorrectlySized = if (!isComposeView) {
-        view.isSizeIncorrect(
-            coordinates.size.width,
-            coordinates.size.height,
-            coordinates.size.height,
-            coordinates.size.width,
-        )
+        // If the Android View's measured dimensions are smaller than the space
+        // the Composable layout wants to occupy, it's considered incorrectly sized
+        // as the View itself would be clipping the Composable content.
+        view.width < coordinates.size.width || view.height < coordinates.size.height
     } else {
+        // For a pure ComposeView, the coordinates.size is the authoritative size.
+        // Any clipping would typically be handled by Compose modifiers or parent Composables.
         false
     }
 
@@ -359,20 +359,6 @@ private fun LayoutCoordinates.isObscured(view: View): Boolean {
     } else {
         false
     }
-}
-
-internal fun View.isSizeIncorrect(
-    expectedHeight: Int,
-    expectedWidth: Int,
-    currentHeight: Int,
-    currentWidth: Int,
-): Boolean {
-    val visibleRect = Rect()
-    getLocalVisibleRect(visibleRect)
-    return expectedHeight != visibleRect.height() ||
-        expectedWidth != visibleRect.width() ||
-        expectedHeight != currentHeight ||
-        expectedWidth != currentWidth
 }
 
 data class ComponentVisibilityInfo(val visible: Boolean, val obscured: Boolean, val incorrectlySized: Boolean)
