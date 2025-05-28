@@ -53,6 +53,10 @@ jobs:
           current_version: ${{ steps.version-file.outputs.release-version }}
           level: ${{ github.event.inputs.bump-type || 'patch' }}
 
+      - name: Save updated version to file
+        run: |
+          echo "${{ steps.bump-version.outputs.new_version }}" > VERSION
+
       - name: Update changelog
         uses: thomaseizinger/keep-a-changelog-new-release@f62c3c390716df5af712ba5d94f4f4a8efc1306d # v3.1.0
         with:
