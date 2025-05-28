@@ -176,7 +176,6 @@ jobs:
         with:
           repository: ROKT/sdk-android-source
           token: ${{ steps.generate-token.outputs.token }}
-          path: sdk-android-source
           ref: main
           persist-credentials: false
 
