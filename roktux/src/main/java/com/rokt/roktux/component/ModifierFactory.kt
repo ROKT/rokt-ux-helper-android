@@ -669,140 +669,138 @@ internal class ModifierFactory {
                 else -> clip(shape).then(Modifier.border(strokeWidth, color, shape))
             }
         }
-        return clip(shape).then(
-            composed(
-                factory = {
-                    val density = LocalDensity.current
-                    val strokeWidthsPx = strokeWidths.map { density.run { it.dp.toPx() } }
-                    val cornerRadiusPx = density.run { cornerRadiusDp.toPx() }
-                    val pathEffect = when (strokeStyle) {
-                        BorderStyleUiModel.Dashed -> PathEffect.dashPathEffect(
-                            floatArrayOf(
-                                DASHED_WIDTH,
-                                DASHED_SPACING,
-                            ),
-                            0f,
-                        )
-
-                        else -> null
-                    }
-
-                    this.then(
-                        Modifier.drawWithCache {
-                            onDrawWithContent {
-                                drawContent()
-                                val width = size.width
-                                val height = size.height
-
-                                drawLine(
-                                    color = if (strokeWidthsPx[0] > 0) color else Color.Transparent,
-                                    start = Offset(
-                                        x = cornerRadiusPx + (strokeWidthsPx[3] / 2),
-                                        y = (strokeWidthsPx[0] / 2),
-                                    ),
-                                    end = Offset(
-                                        x = width - cornerRadiusPx - (strokeWidthsPx[1] / 2),
-                                        y = (strokeWidthsPx[0] / 2),
-                                    ),
-                                    strokeWidth = strokeWidthsPx[0],
-                                    pathEffect = pathEffect,
-                                )
-
-                                drawArc(
-                                    color = color,
-                                    startAngle = 270f,
-                                    sweepAngle = 90f,
-                                    useCenter = false,
-                                    topLeft = Offset(
-                                        x = width - (cornerRadiusPx * 2) - (strokeWidthsPx[1] / 2),
-                                        y = (strokeWidthsPx[0] / 2),
-                                    ),
-                                    size = Size(cornerRadiusPx * 2, cornerRadiusPx * 2),
-                                    style = Stroke(
-                                        width = min(strokeWidthsPx[0], strokeWidthsPx[1]),
-                                        pathEffect = pathEffect,
-                                    ),
-                                )
-
-                                drawLine(
-                                    color = if (strokeWidthsPx[1] > 0) color else Color.Transparent,
-                                    start = Offset(x = width - (strokeWidthsPx[1] / 2), y = cornerRadiusPx),
-                                    end = Offset(x = width - (strokeWidthsPx[1] / 2), y = height - cornerRadiusPx),
-                                    strokeWidth = strokeWidthsPx[1],
-                                    pathEffect = pathEffect,
-                                )
-
-                                drawArc(
-                                    color = color,
-                                    startAngle = 0f,
-                                    sweepAngle = 90f,
-                                    useCenter = false,
-                                    topLeft = Offset(
-                                        x = width - (cornerRadiusPx * 2) - (strokeWidthsPx[1] / 2),
-                                        y = height - (cornerRadiusPx * 2) - (strokeWidthsPx[2] / 2),
-                                    ),
-                                    size = Size(cornerRadiusPx * 2, cornerRadiusPx * 2),
-                                    style = Stroke(
-                                        width = min(strokeWidthsPx[1], strokeWidthsPx[2]),
-                                        pathEffect = pathEffect,
-                                    ),
-                                )
-
-                                drawLine(
-                                    color = if (strokeWidthsPx[2] > 0) color else Color.Transparent,
-                                    start = Offset(
-                                        x = width - cornerRadiusPx - (strokeWidthsPx[1] / 2),
-                                        y = height - (strokeWidthsPx[2] / 2),
-                                    ),
-                                    end = Offset(
-                                        x = cornerRadiusPx + (strokeWidthsPx[3] / 2),
-                                        y = height - (strokeWidthsPx[2] / 2),
-                                    ),
-                                    strokeWidth = strokeWidthsPx[2],
-                                    pathEffect = pathEffect,
-                                )
-
-                                drawArc(
-                                    color = color,
-                                    startAngle = 90f,
-                                    sweepAngle = 90f,
-                                    useCenter = false,
-                                    topLeft = Offset(
-                                        x = (strokeWidthsPx[3] / 2),
-                                        y = height - (cornerRadiusPx * 2) - (strokeWidthsPx[2] / 2),
-                                    ),
-                                    size = Size(cornerRadiusPx * 2, cornerRadiusPx * 2),
-                                    style = Stroke(
-                                        width = min(strokeWidthsPx[2], strokeWidthsPx[3]),
-                                        pathEffect = pathEffect,
-                                    ),
-                                )
-
-                                drawLine(
-                                    color = if (strokeWidthsPx[3] > 0) color else Color.Transparent,
-                                    start = Offset(x = strokeWidthsPx[3] / 2, y = height - cornerRadiusPx),
-                                    end = Offset(x = strokeWidthsPx[3] / 2, y = cornerRadiusPx),
-                                    strokeWidth = strokeWidthsPx[3],
-                                    pathEffect = pathEffect,
-                                )
-
-                                drawArc(
-                                    color = color,
-                                    startAngle = 180F,
-                                    sweepAngle = 90F,
-                                    useCenter = false,
-                                    topLeft = Offset(x = (strokeWidthsPx[3] / 2), y = (strokeWidthsPx[0] / 2)),
-                                    size = Size(cornerRadiusPx * 2, cornerRadiusPx * 2),
-                                    style = Stroke(
-                                        width = min(strokeWidthsPx[3], strokeWidthsPx[0]),
-                                        pathEffect = pathEffect,
-                                    ),
-                                )
-                            }
-                        },
+        return clip(shape).composed(
+            factory = {
+                val density = LocalDensity.current
+                val strokeWidthsPx = strokeWidths.map { density.run { it.dp.toPx() } }
+                val cornerRadiusPx = density.run { cornerRadiusDp.toPx() }
+                val pathEffect = when (strokeStyle) {
+                    BorderStyleUiModel.Dashed -> PathEffect.dashPathEffect(
+                        floatArrayOf(
+                            DASHED_WIDTH,
+                            DASHED_SPACING,
+                        ),
+                        0f,
                     )
-                },
-            ),
+
+                    else -> null
+                }
+
+                this.then(
+                    Modifier.drawWithCache {
+                        onDrawWithContent {
+                            drawContent()
+                            val width = size.width
+                            val height = size.height
+
+                            drawLine(
+                                color = if (strokeWidthsPx[0] > 0) color else Color.Transparent,
+                                start = Offset(
+                                    x = cornerRadiusPx + (strokeWidthsPx[3] / 2),
+                                    y = (strokeWidthsPx[0] / 2),
+                                ),
+                                end = Offset(
+                                    x = width - cornerRadiusPx - (strokeWidthsPx[1] / 2),
+                                    y = (strokeWidthsPx[0] / 2),
+                                ),
+                                strokeWidth = strokeWidthsPx[0],
+                                pathEffect = pathEffect,
+                            )
+
+                            drawArc(
+                                color = color,
+                                startAngle = 270f,
+                                sweepAngle = 90f,
+                                useCenter = false,
+                                topLeft = Offset(
+                                    x = width - (cornerRadiusPx * 2) - (strokeWidthsPx[1] / 2),
+                                    y = (strokeWidthsPx[0] / 2),
+                                ),
+                                size = Size(cornerRadiusPx * 2, cornerRadiusPx * 2),
+                                style = Stroke(
+                                    width = min(strokeWidthsPx[0], strokeWidthsPx[1]),
+                                    pathEffect = pathEffect,
+                                ),
+                            )
+
+                            drawLine(
+                                color = if (strokeWidthsPx[1] > 0) color else Color.Transparent,
+                                start = Offset(x = width - (strokeWidthsPx[1] / 2), y = cornerRadiusPx),
+                                end = Offset(x = width - (strokeWidthsPx[1] / 2), y = height - cornerRadiusPx),
+                                strokeWidth = strokeWidthsPx[1],
+                                pathEffect = pathEffect,
+                            )
+
+                            drawArc(
+                                color = color,
+                                startAngle = 0f,
+                                sweepAngle = 90f,
+                                useCenter = false,
+                                topLeft = Offset(
+                                    x = width - (cornerRadiusPx * 2) - (strokeWidthsPx[1] / 2),
+                                    y = height - (cornerRadiusPx * 2) - (strokeWidthsPx[2] / 2),
+                                ),
+                                size = Size(cornerRadiusPx * 2, cornerRadiusPx * 2),
+                                style = Stroke(
+                                    width = min(strokeWidthsPx[1], strokeWidthsPx[2]),
+                                    pathEffect = pathEffect,
+                                ),
+                            )
+
+                            drawLine(
+                                color = if (strokeWidthsPx[2] > 0) color else Color.Transparent,
+                                start = Offset(
+                                    x = width - cornerRadiusPx - (strokeWidthsPx[1] / 2),
+                                    y = height - (strokeWidthsPx[2] / 2),
+                                ),
+                                end = Offset(
+                                    x = cornerRadiusPx + (strokeWidthsPx[3] / 2),
+                                    y = height - (strokeWidthsPx[2] / 2),
+                                ),
+                                strokeWidth = strokeWidthsPx[2],
+                                pathEffect = pathEffect,
+                            )
+
+                            drawArc(
+                                color = color,
+                                startAngle = 90f,
+                                sweepAngle = 90f,
+                                useCenter = false,
+                                topLeft = Offset(
+                                    x = (strokeWidthsPx[3] / 2),
+                                    y = height - (cornerRadiusPx * 2) - (strokeWidthsPx[2] / 2),
+                                ),
+                                size = Size(cornerRadiusPx * 2, cornerRadiusPx * 2),
+                                style = Stroke(
+                                    width = min(strokeWidthsPx[2], strokeWidthsPx[3]),
+                                    pathEffect = pathEffect,
+                                ),
+                            )
+
+                            drawLine(
+                                color = if (strokeWidthsPx[3] > 0) color else Color.Transparent,
+                                start = Offset(x = strokeWidthsPx[3] / 2, y = height - cornerRadiusPx),
+                                end = Offset(x = strokeWidthsPx[3] / 2, y = cornerRadiusPx),
+                                strokeWidth = strokeWidthsPx[3],
+                                pathEffect = pathEffect,
+                            )
+
+                            drawArc(
+                                color = color,
+                                startAngle = 180F,
+                                sweepAngle = 90F,
+                                useCenter = false,
+                                topLeft = Offset(x = (strokeWidthsPx[3] / 2), y = (strokeWidthsPx[0] / 2)),
+                                size = Size(cornerRadiusPx * 2, cornerRadiusPx * 2),
+                                style = Stroke(
+                                    width = min(strokeWidthsPx[3], strokeWidthsPx[0]),
+                                    pathEffect = pathEffect,
+                                ),
+                            )
+                        }
+                    },
+                )
+            },
         )
     }
 
