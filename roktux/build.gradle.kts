@@ -27,7 +27,7 @@ roktMavenPublish {
 
 android {
     namespace = "com.rokt.roktux"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         minSdk = 21
