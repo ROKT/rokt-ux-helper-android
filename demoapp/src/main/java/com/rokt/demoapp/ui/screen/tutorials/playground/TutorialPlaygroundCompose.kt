@@ -57,7 +57,6 @@ fun TutorialPlaygroundCompose(
             .fillMaxSize()
             .background(Color.White, RectangleShape),
     ) {
-
         val customTabContract = remember {
             InternalActivityResultContract()
         }
