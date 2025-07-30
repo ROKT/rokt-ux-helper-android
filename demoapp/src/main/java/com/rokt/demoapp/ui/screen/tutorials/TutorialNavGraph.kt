@@ -12,6 +12,7 @@ object TutorialDestinations {
 }
 
 enum class DestinationType(val value: String) {
+    TUTORIAL_PLAYGROUND_COMPOSE("tutorial_playground_compose"),
     TUTORIAL_ONE_COMPOSE("tutorial_one_compose"),
     TUTORIAL_TWO_COMPOSE("tutorial_two_compose"),
     TUTORIAL_THREE_COMPOSE("tutorial_three_compose"),

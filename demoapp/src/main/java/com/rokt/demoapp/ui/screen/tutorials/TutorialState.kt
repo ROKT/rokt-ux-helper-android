@@ -10,6 +10,7 @@ import com.rokt.demoapp.ui.screen.tutorials.five.TutorialFiveActivity
 import com.rokt.demoapp.ui.screen.tutorials.four.TutorialFourCompose
 import com.rokt.demoapp.ui.screen.tutorials.nine.TutorialNineCompose
 import com.rokt.demoapp.ui.screen.tutorials.one.TutorialOneCompose
+import com.rokt.demoapp.ui.screen.tutorials.playground.TutorialPlaygroundCompose
 import com.rokt.demoapp.ui.screen.tutorials.seven.TutorialSevenActivity
 import com.rokt.demoapp.ui.screen.tutorials.six.TutorialSixActivity
 import com.rokt.demoapp.ui.screen.tutorials.three.TutorialThreeCompose
@@ -44,6 +45,13 @@ sealed class TutorialPageListItem(val title: String, val description: String, va
 internal fun rememberTutorialPageState(backPressed: () -> Unit): TutorialScreenState = remember {
     TutorialScreenState(
         items = listOf(
+            TutorialPageListItem.ComposablePageListItem(
+                title = "Playground Activity",
+                description = "Application using mock data",
+                drawableResource = R.drawable.ic_primary_button,
+                navAction = DestinationType.TUTORIAL_PLAYGROUND_COMPOSE,
+                content = { TutorialPlaygroundCompose(backPressed) },
+            ),
             TutorialPageListItem.ComposablePageListItem(
                 title = "Tutorial 1",
                 description = "Application using Compose and Default System fonts",
