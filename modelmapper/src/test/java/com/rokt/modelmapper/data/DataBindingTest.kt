@@ -370,8 +370,8 @@ class DataBindingImplTest : MockkUnitTest() {
 
         // Assert
         assertThat(result.size, `is`(1))
-        assertThat(result.containsKey(1), `is`(true))
-        assertThat(result[1]?.properties?.get(TypedKey<String>("title")), `is`("creativeImage 1 !!!"))
+        assertThat(result.containsKey(3), `is`(true))
+        assertThat(result[3]?.properties?.get(TypedKey<String>("title")), `is`("creativeImage 3 !!!"))
     }
 
     @Test
@@ -381,7 +381,7 @@ class DataBindingImplTest : MockkUnitTest() {
 
         // Assert
         assertThat(result.size, `is`(1))
-        assertThat(result.containsKey(1), `is`(true))
+        assertThat(result.containsKey(3), `is`(true))
     }
 
     @Test
