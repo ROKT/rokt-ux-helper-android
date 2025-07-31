@@ -32,15 +32,16 @@ internal inline fun <reified T : Any> bindModel(
         offerModel?.creative?.responseOptions?.get(inputKey) as? T
     }
 
-    OfferImageModel::class -> {
-        if (module == Module.AddToCart) {
-            offerModel?.catalogItems?.getOrNull(
-                itemIndex,
-            )?.imageWrapper?.properties?.get<OfferImageModel>(TypedKey<OfferImageModel>(inputKey)) as? T
-        } else {
-            offerModel?.creative?.images?.get(inputKey) as? T
-        }
-    }
+    OfferImageModel::class ->
+        inputKey.split('|').firstNotNullOfOrNull { subKey ->
+            val trimmedKey = subKey.trim()
+            if (module == Module.AddToCart) {
+                offerModel?.catalogItems?.getOrNull(itemIndex)
+                    ?.imageWrapper?.properties?.get<OfferImageModel>(TypedKey<OfferImageModel>(trimmedKey))
+            } else {
+                offerModel?.creative?.images?.get(trimmedKey)
+            }
+        } as? T
 
     CreativeIcon::class -> {
         offerModel?.creative?.icons?.get(inputKey) as? T
@@ -187,14 +188,20 @@ private class PlaceholderReplacer(
 }
 
 internal fun getOfferImages(inputKey: String = "", offerModel: OfferModel?): Map<Int, OfferImageModel> {
-    val result = TreeMap<Int, OfferImageModel>()
-    for ((key, value) in offerModel?.creative?.images ?: emptyMap()) {
-        if (key.startsWith(inputKey)) {
-            val suffix = key.substring(inputKey.length + 1) // Extract the number after the prefix
-            result[suffix.toInt()] = value
+    val prefixes = inputKey.split('|').map { it.trim() }.filter(String::isNotEmpty)
+    val images = offerModel?.creative?.images ?: return emptyMap()
+
+    return images.mapNotNull { (imageKey, imageValue) ->
+        val matchingPrefix = prefixes.find { prefix -> imageKey.startsWith(prefix) }
+        if (matchingPrefix != null && imageKey.length > matchingPrefix.length) {
+            val suffix = imageKey.substring(matchingPrefix.length + 1)
+            suffix.toIntOrNull()?.let { imageNumber ->
+                imageNumber to imageValue
+            }
+        } else {
+            null
         }
-    }
-    return result
+    }.toMap(TreeMap())
 }
 
 private enum class TemplateDataPrefix(val value: String) {

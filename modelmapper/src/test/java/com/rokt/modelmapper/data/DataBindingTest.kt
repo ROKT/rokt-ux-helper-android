@@ -293,6 +293,116 @@ class DataBindingImplTest : MockkUnitTest() {
     }
 
     @Test
+    fun `when bind model is called for OfferImageModel with multiple keys, it should return the first valid one`() {
+        // Act
+        val value =
+            bindModel<OfferImageModel>(
+                "invalidKey|creativeCarouselImageVertical.3",
+                offerModel = offer,
+            )
+
+        // Assert
+        assertThat(value, `is`(notNullValue()))
+        assertThat(value, `is`(instanceOf(OfferImageModel::class.java)))
+        assertThat((value as OfferImageModel).properties[TypedKey<String>("title")], `is`("creativeImage 3 !!!"))
+    }
+
+    @Test
+    fun `when bind model is called for OfferImageModel with multiple keys with spaces, it should return the first valid one`() {
+        // Act
+        val value =
+            bindModel<OfferImageModel>(
+                " invalidKey | creativeCarouselImageVertical.3 ",
+                offerModel = offer,
+            )
+
+        // Assert
+        assertThat(value, `is`(notNullValue()))
+        assertThat(value, `is`(instanceOf(OfferImageModel::class.java)))
+        assertThat((value as OfferImageModel).properties[TypedKey<String>("title")], `is`("creativeImage 3 !!!"))
+    }
+
+    @Test
+    fun `when bind model is called for OfferImageModel with multiple keys, and none of them matches, it should return null`() {
+        // Act
+        val value =
+            bindModel<OfferImageModel>(
+                "invalidKey|anotherInvalidKey",
+                offerModel = offer,
+            )
+
+        // Assert
+        assertThat(value, `is`(nullValue()))
+    }
+
+    @Test
+    fun `when bind model is called for OfferImageModel and AddToCart module with multiple keys, it should return the first valid one`() {
+        // Act
+        val value =
+            bindModel<OfferImageModel>(
+                "invalidKey|catalogItemImage1",
+                offerModel = offer,
+                module = Module.AddToCart,
+                itemIndex = 0,
+            )
+
+        // Assert
+        assertThat(value, `is`(notNullValue()))
+        assertThat(value, `is`(instanceOf(OfferImageModel::class.java)))
+        assertThat((value as OfferImageModel).properties[TypedKey<String>("title")], `is`("title1"))
+    }
+
+    @Test
+    fun `when getOfferImages is called with a valid prefix, it should return matching images`() {
+        // Act
+        val result = getOfferImages("creativeCarouselImageHorizontal", offer)
+
+        // Assert
+        assertThat(result.size, `is`(1))
+        assertThat(result.containsKey(1), `is`(true))
+        assertThat(result[1]?.properties?.get(TypedKey<String>("title")), `is`("creativeImage 1 !!!"))
+    }
+
+    @Test
+    fun `when getOfferImages is called with multiple prefixes, it should return matching images`() {
+        // Act
+        val result = getOfferImages("invalidKey|creativeCarouselImageVertical", offer)
+
+        // Assert
+        assertThat(result.size, `is`(1))
+        assertThat(result.containsKey(1), `is`(true))
+        assertThat(result[1]?.properties?.get(TypedKey<String>("title")), `is`("creativeImage 1 !!!"))
+    }
+
+    @Test
+    fun `when getOfferImages is called with prefixes with spaces, it should trim them and return matching images`() {
+        // Act
+        val result = getOfferImages(" invalidKey | creativeCarouselImageVertical ", offer)
+
+        // Assert
+        assertThat(result.size, `is`(1))
+        assertThat(result.containsKey(1), `is`(true))
+    }
+
+    @Test
+    fun `when getOfferImages is called with an invalid prefix, it should return an empty map`() {
+        // Act
+        val result = getOfferImages("invalidPrefix", offer)
+
+        // Assert
+        assertThat(result.isEmpty(), `is`(true))
+    }
+
+    @Test
+    fun `when getOfferImages is called with a null offer, it should return an empty map`() {
+        // Act
+        val result = getOfferImages("creativeCarouselImageHorizontal", null)
+
+        // Assert
+        assertThat(result.isEmpty(), `is`(true))
+    }
+
+    @Test
     @Parameters(method = "getDataBindingParameters")
     fun testDataValueBinding(input: String, output: String, contextKey: String?, clazz: Class<*>, itemIndex: Int = 0) {
         println("$input $output $contextKey $clazz")

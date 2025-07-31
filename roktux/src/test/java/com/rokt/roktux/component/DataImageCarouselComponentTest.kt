@@ -117,4 +117,13 @@ class DataImageCarouselComponentTest : BaseDcuiEspressoTest() {
         assertNotEquals(childRect.topLeft, Offset.Zero)
         assertEquals(childRect.bottom, parentRect.bottom)
     }
+
+    @Test
+    @DcuiNodeJson(jsonFile = "DataImageCarouselComponent/DataImageCarousel_Fallback_ImageKey.json")
+    @DcuiConfig(testInInnerLayout = true)
+    @DcuiOfferJson(jsonFile = "offer/Offer_with_image_carousel_key.json")
+    fun testDataImageCarouselComponentWithFallbackImageKey() {
+        composeTestRule.onNodeWithTag(DCUI_COMPONENT_TAG).assertIsDisplayed().assertHeightIsEqualTo(180.dp)
+            .assertWidthIsEqualTo(150.dp).assertBackgroundColor("#d51a1a")
+    }
 }
