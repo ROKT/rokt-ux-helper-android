@@ -25,6 +25,7 @@
     <string name="summary_dialog_btn_negative">No thanks</string>
     <string name="summary_dialog_btn_positive">Continue</string>
     <string name="text_preview">Preview</string>
+    <string name="text_playground">Playground</string>
     <string name="button_view_example_text">View example</string>
     <string name="button_view_example_icon">Icon eye</string>
     <string name="text_account_details_description">Enter your Rokt Account ID, along with the View Name and Location of the layout you’d like to preview. If you do not know these details, contact your account manager.</string>
