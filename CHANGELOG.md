@@ -13,6 +13,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Fallback `imageKey` support in `DataImage` and `DataImageCarousel` nodes
 
+### Fixed
+
+- Remove incorrectly applied vertical padding on the CarouselDistribution
+
 ## [0.6.0] - 2025-05-28
 
 ### Added
