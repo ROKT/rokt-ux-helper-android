@@ -8,7 +8,7 @@ plugins {
 
 android {
     namespace = "com.rokt.demoapp"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.rokt.demoapp"
