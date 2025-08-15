@@ -29,32 +29,34 @@ internal class CreativeResponseComponent(
         breakpointIndex: Int,
         onEventSent: (LayoutContract.LayoutEvent) -> Unit,
     ) {
-        if (isActionAllowed(model.responseOption?.properties)) {
-            model.responseOption?.let { responseOptionModel ->
-                ButtonComponent(
-                    model = model,
-                    factory = factory,
-                    modifierFactory = modifierFactory,
-                    modifier = modifier,
-                    offerState = offerState,
-                    isDarkModeEnabled = isDarkModeEnabled,
-                    breakpointIndex = breakpointIndex,
-                    onEventSent = onEventSent,
-                ) {
-                    onEventSent.invoke(
-                        LayoutContract.LayoutEvent.ResponseOptionSelected(
-                            offerState.currentOfferIndex,
-                            model.openLinks,
-                            responseOptionModel.properties,
-                        ),
-                    )
+        model.responseOption?.let { responseOption ->
+            if (shouldDisplayForActionType(responseOption.properties)) {
+                model.responseOption?.let { responseOptionModel ->
+                    ButtonComponent(
+                        model = model,
+                        factory = factory,
+                        modifierFactory = modifierFactory,
+                        modifier = modifier,
+                        offerState = offerState,
+                        isDarkModeEnabled = isDarkModeEnabled,
+                        breakpointIndex = breakpointIndex,
+                        onEventSent = onEventSent,
+                    ) {
+                        onEventSent.invoke(
+                            LayoutContract.LayoutEvent.ResponseOptionSelected(
+                                offerState.currentOfferIndex,
+                                model.openLinks,
+                                responseOptionModel.properties,
+                            ),
+                        )
+                    }
                 }
             }
         }
     }
 
-    private fun isActionAllowed(properties: HMap?): Boolean {
-        val action = properties?.get(TypedKey<Action>(KEY_ACTION))
+    private fun shouldDisplayForActionType(properties: HMap): Boolean {
+        val action = properties.get(TypedKey<Action>(KEY_ACTION))
         return action != Action.ExternalPaymentTrigger
     }
 }
