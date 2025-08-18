@@ -139,6 +139,9 @@ internal class CarouselDistributionComponent(
                     pagerSnapDistance = PagerSnapDistance.atMost(viewableItems),
                 ),
                 userScrollEnabled = canScroll,
+
+                // There are usually no more than 4 offers / slots available
+                beyondViewportPageCount = offerState.lastOfferIndex + 1
             ) { page ->
                 factory.CreateComposable(
                     model = LayoutSchemaUiModel.MarketingUiModel(),
