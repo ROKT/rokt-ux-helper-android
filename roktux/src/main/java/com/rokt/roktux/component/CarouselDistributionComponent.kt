@@ -153,7 +153,7 @@ internal class CarouselDistributionComponent(
                 for (pageIndex in 0 until pagerState.pageCount) {
                     val subcomposables = subcompose(pageIndex) {
                         factory.CreateComposable(
-                            model = LayoutSchemaUiModel.MarketingUiModel(),
+                            model = LayoutSchemaUiModel.MarketingUiModel(true),
                             modifier = modifier,
                             isPressed = isPressed,
                             offerState = offerState.copy(currentOfferIndex = pageIndex, viewableItems = viewableItems),
@@ -207,9 +207,6 @@ internal class CarouselDistributionComponent(
                             pagerSnapDistance = PagerSnapDistance.atMost(viewableItems),
                         ),
                         userScrollEnabled = canScroll,
-
-                        // There are usually no more than 4 offers / slots available
-                        beyondViewportPageCount = offerState.lastOfferIndex + 1
                     ) { page ->
                         factory.CreateComposable(
                             model = LayoutSchemaUiModel.MarketingUiModel(),
