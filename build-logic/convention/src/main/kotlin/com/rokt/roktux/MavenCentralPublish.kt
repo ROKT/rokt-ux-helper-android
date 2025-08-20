@@ -6,6 +6,8 @@ import com.vanniktech.maven.publish.SonatypeHost
 import org.gradle.api.Project
 
 fun Project.configureMavenPublishing(roktMavenPublish: RoktMavenPublishExtension) {
+    val shouldSkipSign = project.findProperty("SKIP_SIGN")?.toString() == "true"
+
     extensions.configure<MavenPublishBaseExtension>("mavenPublishing") {
         afterEvaluate {
             publishToMavenCentral(SonatypeHost.CENTRAL_PORTAL)
@@ -14,7 +16,13 @@ fun Project.configureMavenPublishing(roktMavenPublish: RoktMavenPublishExtension
                 groupId = roktMavenPublish.groupId.get(),
                 version = roktMavenPublish.version.get(),
             )
-            signAllPublications()
+
+            if (!shouldSkipSign) {
+                signAllPublications()
+            } else {
+                println("Skip signAllPublications")
+            }
+
             pom {
                 name.set(roktMavenPublish.artifactId.get())
                 description.set(roktMavenPublish.description.get())
