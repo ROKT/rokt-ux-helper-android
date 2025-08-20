@@ -1,9 +1,11 @@
 package com.rokt.roktux.component
 
-import android.R.attr.maxHeight
+import androidx.compose.foundation.background
 import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.calculateEndPadding
+import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.pager.HorizontalPager
@@ -24,6 +26,7 @@ import androidx.compose.ui.BiasAlignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.SubcomposeLayout
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalFocusManager
@@ -32,6 +35,7 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.platform.LocalLayoutDirection
 import com.rokt.modelmapper.uimodel.LayoutSchemaUiModel
 import com.rokt.modelmapper.uimodel.PeekThroughSizeUiModel
 import com.rokt.modelmapper.utils.DEFAULT_VIEWABLE_ITEMS
@@ -106,6 +110,18 @@ internal class CarouselDistributionComponent(
             }
         }
 
+        // Calculate the content padding and page spacing that will be applied
+        val contentPadding = getPeekThroughDimension(
+            breakpointIndex = breakpointIndex,
+            viewWidth = viewWidth,
+            peekThroughSizeItems = model.peekThroughSizeUiModel,
+            viewableItems = viewableItems,
+        )
+        val pageSpacing = container.gap ?: 0.dp
+
+        // Get the layout direction for calculations
+        val layoutDirection = LocalLayoutDirection.current
+
         Box(
             modifier = Modifier
                 .semantics {
@@ -122,6 +138,18 @@ internal class CarouselDistributionComponent(
             ) { constraints ->
                 val measuredHeights = mutableListOf<Dp>()
 
+                // Calculate the actual available width for each page content
+                val totalHorizontalPadding = (contentPadding.calculateStartPadding(layoutDirection) +
+                    contentPadding.calculateEndPadding(layoutDirection)).toPx()
+                val totalPageSpacing = (pageSpacing * (viewableItems - 1)).toPx()
+                val availableWidthForContent = (constraints.maxWidth - totalHorizontalPadding - totalPageSpacing) / viewableItems
+
+                // Create adjusted constraints that respect the actual available space per page
+                val adjustedConstraints = constraints.copy(
+                    maxWidth = availableWidthForContent.toInt(),
+                    minWidth = availableWidthForContent.toInt()
+                )
+
                 for (pageIndex in 0 until pagerState.pageCount) {
                     val subcomposables = subcompose(pageIndex) {
                         factory.CreateComposable(
@@ -134,7 +162,7 @@ internal class CarouselDistributionComponent(
                         ) { event -> }
                     }
 
-                    val placeable = subcomposables.firstOrNull()?.measure(constraints)
+                    val placeable = subcomposables.firstOrNull()?.measure(adjustedConstraints)
 
                     with(this) {
                         placeable?.let {
@@ -185,7 +213,8 @@ internal class CarouselDistributionComponent(
                     ) { page ->
                         factory.CreateComposable(
                             model = LayoutSchemaUiModel.MarketingUiModel(),
-                            modifier = modifier,
+                            modifier = modifier
+                                .height(maxHeight.value),
                             isPressed = isPressed,
                             offerState = offerState.copy(currentOfferIndex = page, viewableItems = viewableItems),
                             isDarkModeEnabled = isDarkModeEnabled,
