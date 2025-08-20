@@ -27,19 +27,21 @@ sealed class LayoutSchemaUiModel(
     open val containerProperties: ImmutableList<StateBlock<ContainerProperties>>? = null,
     open val conditionalTransitionModifiers: ConditionalTransitionModifier? = null,
 ) {
-    class BasicTextUiModel(
-        ownModifiers: ImmutableList<StateBlock<ModifierProperties>>?,
-        containerProperties: ImmutableList<StateBlock<ContainerProperties>>?,
-        conditionalTransitionModifiers: ConditionalTransitionModifier?,
+
+
+    data class BasicTextUiModel(
+        override val ownModifiers: ImmutableList<StateBlock<ModifierProperties>>?,
+        override val containerProperties: ImmutableList<StateBlock<ContainerProperties>>?,
+        override val conditionalTransitionModifiers: ConditionalTransitionModifier?,
         val conditionalTransitionTextStyling: ConditionalTransitionTextStyling?,
         val textStyles: ImmutableList<StateBlock<TextStylingUiProperties>>?,
         val value: BindData,
     ) : LayoutSchemaUiModel(ownModifiers, containerProperties, conditionalTransitionModifiers)
 
-    class RichTextUiModel(
-        ownModifiers: ImmutableList<StateBlock<ModifierProperties>>?,
-        containerProperties: ImmutableList<StateBlock<ContainerProperties>>?,
-        conditionalTransitionModifiers: ConditionalTransitionModifier?,
+    data class RichTextUiModel(
+        override val ownModifiers: ImmutableList<StateBlock<ModifierProperties>>?,
+        override val containerProperties: ImmutableList<StateBlock<ContainerProperties>>?,
+        override val conditionalTransitionModifiers: ConditionalTransitionModifier?,
         val conditionalTransitionTextStyling: ConditionalTransitionTextStyling?,
         val textStyles: ImmutableList<StateBlock<TextStylingUiProperties>>?,
         val linkStyles: ImmutableList<StateBlock<TextStylingUiProperties>>?,
@@ -47,41 +49,41 @@ sealed class LayoutSchemaUiModel(
         val value: BindData,
     ) : LayoutSchemaUiModel(ownModifiers, containerProperties, conditionalTransitionModifiers)
 
-    class ColumnUiModel(
-        ownModifiers: ImmutableList<StateBlock<ModifierProperties>>?,
-        containerProperties: ImmutableList<StateBlock<ContainerProperties>>?,
-        conditionalTransitionModifiers: ConditionalTransitionModifier?,
+    data class ColumnUiModel(
+        override val ownModifiers: ImmutableList<StateBlock<ModifierProperties>>?,
+        override val containerProperties: ImmutableList<StateBlock<ContainerProperties>>?,
+        override val conditionalTransitionModifiers: ConditionalTransitionModifier?,
         val isScrollable: Boolean,
         val children: ImmutableList<LayoutSchemaUiModel?>,
     ) : LayoutSchemaUiModel(ownModifiers, containerProperties, conditionalTransitionModifiers)
 
-    class RowUiModel(
-        ownModifiers: ImmutableList<StateBlock<ModifierProperties>>?,
-        containerProperties: ImmutableList<StateBlock<ContainerProperties>>?,
-        conditionalTransitionModifiers: ConditionalTransitionModifier?,
+    data class RowUiModel(
+        override val ownModifiers: ImmutableList<StateBlock<ModifierProperties>>?,
+        override val containerProperties: ImmutableList<StateBlock<ContainerProperties>>?,
+        override val conditionalTransitionModifiers: ConditionalTransitionModifier?,
         val isScrollable: Boolean,
         val children: ImmutableList<LayoutSchemaUiModel?>,
     ) : LayoutSchemaUiModel(ownModifiers, containerProperties, conditionalTransitionModifiers)
 
-    class BoxUiModel(
-        ownModifiers: ImmutableList<StateBlock<ModifierProperties>>?,
-        containerProperties: ImmutableList<StateBlock<ContainerProperties>>?,
-        conditionalTransitionModifiers: ConditionalTransitionModifier?,
+    data class BoxUiModel(
+        override val ownModifiers: ImmutableList<StateBlock<ModifierProperties>>?,
+        override val containerProperties: ImmutableList<StateBlock<ContainerProperties>>?,
+        override val conditionalTransitionModifiers: ConditionalTransitionModifier?,
         val children: ImmutableList<LayoutSchemaUiModel?>,
     ) : LayoutSchemaUiModel(ownModifiers, containerProperties, conditionalTransitionModifiers)
 
     // Column
-    class CatalogStackedCollectionUiModel(
-        ownModifiers: ImmutableList<StateBlock<ModifierProperties>>?,
-        containerProperties: ImmutableList<StateBlock<ContainerProperties>>?,
-        conditionalTransitionModifiers: ConditionalTransitionModifier?,
+    data class CatalogStackedCollectionUiModel(
+        override val ownModifiers: ImmutableList<StateBlock<ModifierProperties>>?,
+        override val containerProperties: ImmutableList<StateBlock<ContainerProperties>>?,
+        override val conditionalTransitionModifiers: ConditionalTransitionModifier?,
         val children: ImmutableList<LayoutSchemaUiModel?>, // the type of it is either RowUiModel or ColumnUiModel
     ) : LayoutSchemaUiModel(ownModifiers, containerProperties, conditionalTransitionModifiers)
 
-    class ProgressIndicatorUiModel(
-        ownModifiers: ImmutableList<StateBlock<ModifierProperties>>?,
-        containerProperties: ImmutableList<StateBlock<ContainerProperties>>?,
-        conditionalTransitionModifiers: ConditionalTransitionModifier?,
+    data class ProgressIndicatorUiModel(
+        override val ownModifiers: ImmutableList<StateBlock<ModifierProperties>>?,
+        override val containerProperties: ImmutableList<StateBlock<ContainerProperties>>?,
+        override val conditionalTransitionModifiers: ConditionalTransitionModifier?,
         val startPosition: Int,
         val accessibilityHidden: Boolean,
         val indicatorText: BindData,
@@ -90,10 +92,10 @@ sealed class LayoutSchemaUiModel(
         val seenIndicator: ProgressIndicatorItemUiModel?,
     ) : LayoutSchemaUiModel(ownModifiers, containerProperties, conditionalTransitionModifiers)
 
-    class ProgressIndicatorItemUiModel(
-        ownModifiers: ImmutableList<StateBlock<ModifierProperties>>?,
-        containerProperties: ImmutableList<StateBlock<ContainerProperties>>?,
-        conditionalTransitionModifiers: ConditionalTransitionModifier?,
+    data class ProgressIndicatorItemUiModel(
+        override val ownModifiers: ImmutableList<StateBlock<ModifierProperties>>?,
+        override val containerProperties: ImmutableList<StateBlock<ContainerProperties>>?,
+        override val conditionalTransitionModifiers: ConditionalTransitionModifier?,
         val textStyles: ImmutableList<StateBlock<TextStylingUiProperties>>?,
     ) : LayoutSchemaUiModel(ownModifiers, containerProperties, conditionalTransitionModifiers)
 
@@ -170,7 +172,12 @@ sealed class LayoutSchemaUiModel(
         val peekThroughSizeUiModel: ImmutableList<PeekThroughSizeUiModel>,
     ) : LayoutSchemaUiModel(ownModifiers, containerProperties, conditionalTransitionModifiers)
 
-    class MarketingUiModel : LayoutSchemaUiModel()
+    data class MarketingUiModel(
+        val preRenderMeasure: Boolean = false,
+        override val ownModifiers: ImmutableList<StateBlock<ModifierProperties>>? = null,
+        override val containerProperties: ImmutableList<StateBlock<ContainerProperties>>? = null,
+        override val conditionalTransitionModifiers: ConditionalTransitionModifier? = null,
+    ) : LayoutSchemaUiModel(ownModifiers, containerProperties, conditionalTransitionModifiers)
 
     class OverlayUiModel(
         ownModifiers: ImmutableList<StateBlock<ModifierProperties>>?,
@@ -393,7 +400,7 @@ data class ModifierProperties(
     override val maxHeight: Dp? = null,
     override val maxWidth: Dp? = null,
     override val width: WidthUiModel? = null,
-    override val height: HeightUiModel? = null,
+    override var height: HeightUiModel? = null,
     override val shadowColor: ThemeColorUiModel? = null,
     override val shadowBlurRadius: Dp? = null,
     override val shadowSpreadRadius: Float? = null,
