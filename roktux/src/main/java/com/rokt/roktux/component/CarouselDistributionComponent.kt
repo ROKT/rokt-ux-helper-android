@@ -1,8 +1,11 @@
 package com.rokt.roktux.component
 
+import android.R.attr.maxHeight
 import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PageSize
 import androidx.compose.foundation.pager.PagerDefaults
@@ -21,11 +24,13 @@ import androidx.compose.ui.BiasAlignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.layout.SubcomposeLayout
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.Density
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.rokt.modelmapper.uimodel.LayoutSchemaUiModel
 import com.rokt.modelmapper.uimodel.PeekThroughSizeUiModel
@@ -60,6 +65,10 @@ internal class CarouselDistributionComponent(
         val focusRequester = remember { FocusRequester() }
         val coroutineScope = rememberCoroutineScope()
         var viewWidth by remember { mutableIntStateOf(0) }
+
+        val allChildrenHeights = remember { mutableStateOf<List<Dp>>(emptyList()) }
+        val maxHeight = remember { mutableStateOf(0.dp) }
+
         val viewableItems = getViewableItems(
             breakpointIndex = breakpointIndex,
             viewableItemsList = model.viewableItems,
@@ -108,61 +117,98 @@ internal class CarouselDistributionComponent(
                 )
                 .focusable(),
         ) {
-            HorizontalPager(
-                modifier = modifierFactory
-                    .createModifier(
-                        modifierPropertiesList = model.ownModifiers,
-                        conditionalTransitionModifier = model.conditionalTransitionModifiers,
-                        breakpointIndex = breakpointIndex,
-                        isPressed = isPressed,
-                        isDarkModeEnabled = isDarkModeEnabled,
-                        offerState = offerState,
-                    )
-                    .then(modifier)
-                    .onSizeChanged {
-                        viewWidth = it.width
-                    },
-                verticalAlignment = BiasAlignment.Vertical(
-                    container.alignmentBias,
-                ),
-                state = pagerState,
-                pageSize = carouselPageSize(viewableItems),
-                contentPadding = getPeekThroughDimension(
-                    breakpointIndex = breakpointIndex,
-                    viewWidth = viewWidth,
-                    peekThroughSizeItems = model.peekThroughSizeUiModel,
-                    viewableItems = viewableItems,
-                ),
-                pageSpacing = container.gap ?: 0.dp,
-                flingBehavior = PagerDefaults.flingBehavior(
-                    state = pagerState,
-                    pagerSnapDistance = PagerSnapDistance.atMost(viewableItems),
-                ),
-                userScrollEnabled = canScroll,
+            SubcomposeLayout(
+                modifier = Modifier.fillMaxWidth()
+            ) { constraints ->
+                val measuredHeights = mutableListOf<Dp>()
 
-                // There are usually no more than 4 offers / slots available
-                beyondViewportPageCount = offerState.lastOfferIndex + 1
-            ) { page ->
-                factory.CreateComposable(
-                    model = LayoutSchemaUiModel.MarketingUiModel(),
-                    modifier = modifier,
-                    isPressed = isPressed,
-                    offerState = offerState.copy(currentOfferIndex = page, viewableItems = viewableItems),
-                    isDarkModeEnabled = isDarkModeEnabled,
-                    breakpointIndex = breakpointIndex,
-                ) { event ->
-                    coroutineScope.launch {
-                        if (event is LayoutContract.LayoutEvent.ResponseOptionSelected) {
-                            // Only progress to next offer if viewableItems is 1
-                            if (viewableItems == DEFAULT_VIEWABLE_ITEMS) {
-                                onEventSent(event.copy(shouldProgress = true))
-                            } else {
-                                onEventSent(event)
-                            }
-                        } else {
-                            onEventSent(event)
+                for (pageIndex in 0 until pagerState.pageCount) {
+                    val subcomposables = subcompose(pageIndex) {
+                        factory.CreateComposable(
+                            model = LayoutSchemaUiModel.MarketingUiModel(),
+                            modifier = modifier,
+                            isPressed = isPressed,
+                            offerState = offerState.copy(currentOfferIndex = pageIndex, viewableItems = viewableItems),
+                            isDarkModeEnabled = isDarkModeEnabled,
+                            breakpointIndex = breakpointIndex,
+                        ) { event -> }
+                    }
+
+                    val placeable = subcomposables.firstOrNull()?.measure(constraints)
+
+                    with(this) {
+                        placeable?.let {
+                            val viewHeight = it.height.toDp()
+                            measuredHeights.add(viewHeight)
                         }
                     }
+                }
+
+                allChildrenHeights.value = measuredHeights
+                maxHeight.value = measuredHeights.maxOrNull() ?: 0.dp
+
+                val pagerPlaceable = subcompose(pagerState) {
+                    HorizontalPager(
+                        modifier = modifierFactory
+                            .createModifier(
+                                modifierPropertiesList = model.ownModifiers,
+                                conditionalTransitionModifier = model.conditionalTransitionModifiers,
+                                breakpointIndex = breakpointIndex,
+                                isPressed = isPressed,
+                                isDarkModeEnabled = isDarkModeEnabled,
+                                offerState = offerState,
+                            )
+                            .then(modifier)
+                            .onSizeChanged {
+                                viewWidth = it.width
+                            },
+                        verticalAlignment = BiasAlignment.Vertical(
+                            container.alignmentBias,
+                        ),
+                        state = pagerState,
+                        pageSize = carouselPageSize(viewableItems),
+                        contentPadding = getPeekThroughDimension(
+                            breakpointIndex = breakpointIndex,
+                            viewWidth = viewWidth,
+                            peekThroughSizeItems = model.peekThroughSizeUiModel,
+                            viewableItems = viewableItems,
+                        ),
+                        pageSpacing = container.gap ?: 0.dp,
+                        flingBehavior = PagerDefaults.flingBehavior(
+                            state = pagerState,
+                            pagerSnapDistance = PagerSnapDistance.atMost(viewableItems),
+                        ),
+                        userScrollEnabled = canScroll,
+
+                        // There are usually no more than 4 offers / slots available
+                        beyondViewportPageCount = offerState.lastOfferIndex + 1
+                    ) { page ->
+                        factory.CreateComposable(
+                            model = LayoutSchemaUiModel.MarketingUiModel(),
+                            modifier = modifier,
+                            isPressed = isPressed,
+                            offerState = offerState.copy(currentOfferIndex = page, viewableItems = viewableItems),
+                            isDarkModeEnabled = isDarkModeEnabled,
+                            breakpointIndex = breakpointIndex,
+                        ) { event ->
+                            coroutineScope.launch {
+                                if (event is LayoutContract.LayoutEvent.ResponseOptionSelected) {
+                                    // Only progress to next offer if viewableItems is 1
+                                    if (viewableItems == DEFAULT_VIEWABLE_ITEMS) {
+                                        onEventSent(event.copy(shouldProgress = true))
+                                    } else {
+                                        onEventSent(event)
+                                    }
+                                } else {
+                                    onEventSent(event)
+                                }
+                            }
+                        }
+                    }
+                }.first().measure(constraints)
+
+                layout(pagerPlaceable.width, pagerPlaceable.height) {
+                    pagerPlaceable.placeRelative(0, 0)
                 }
             }
             LaunchedEffect(key1 = Unit) {
