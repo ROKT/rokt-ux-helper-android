@@ -1,6 +1,5 @@
 package com.rokt.roktux.component
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
@@ -26,16 +25,15 @@ import androidx.compose.ui.BiasAlignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.SubcomposeLayout
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.platform.LocalLayoutDirection
 import com.rokt.modelmapper.uimodel.LayoutSchemaUiModel
 import com.rokt.modelmapper.uimodel.PeekThroughSizeUiModel
 import com.rokt.modelmapper.utils.DEFAULT_VIEWABLE_ITEMS
@@ -134,20 +132,23 @@ internal class CarouselDistributionComponent(
                 .focusable(),
         ) {
             SubcomposeLayout(
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
             ) { constraints ->
                 val measuredHeights = mutableListOf<Dp>()
 
                 // Calculate the actual available width for each page content
-                val totalHorizontalPadding = (contentPadding.calculateStartPadding(layoutDirection) +
-                    contentPadding.calculateEndPadding(layoutDirection)).toPx()
+                val totalHorizontalPadding = (
+                    contentPadding.calculateStartPadding(layoutDirection) +
+                        contentPadding.calculateEndPadding(layoutDirection)
+                    ).toPx()
                 val totalPageSpacing = (pageSpacing * (viewableItems - 1)).toPx()
-                val availableWidthForContent = (constraints.maxWidth - totalHorizontalPadding - totalPageSpacing) / viewableItems
+                val availableWidthForContent =
+                    (constraints.maxWidth - totalHorizontalPadding - totalPageSpacing) / viewableItems
 
                 // Create adjusted constraints that respect the actual available space per page
                 val adjustedConstraints = constraints.copy(
                     maxWidth = availableWidthForContent.toInt(),
-                    minWidth = availableWidthForContent.toInt()
+                    minWidth = availableWidthForContent.toInt(),
                 )
 
                 for (pageIndex in 0 until pagerState.pageCount) {
