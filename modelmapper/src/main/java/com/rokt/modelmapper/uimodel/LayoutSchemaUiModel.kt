@@ -402,7 +402,7 @@ data class ModifierProperties(
     override val maxHeight: Dp? = null,
     override val maxWidth: Dp? = null,
     override val width: WidthUiModel? = null,
-    override var height: HeightUiModel? = null,
+    override val height: HeightUiModel? = null,
     override val shadowColor: ThemeColorUiModel? = null,
     override val shadowBlurRadius: Dp? = null,
     override val shadowSpreadRadius: Float? = null,
