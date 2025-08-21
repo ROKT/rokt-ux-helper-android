@@ -192,7 +192,8 @@ private fun getPeekThroughDimension(
                 (viewWidth.toFloat() * (peekThroughSize.value / 100)).dp
         }
         PaddingValues(
-            transformedPeekThroughSize,
+            start = transformedPeekThroughSize,
+            end = transformedPeekThroughSize,
         )
     }
 }

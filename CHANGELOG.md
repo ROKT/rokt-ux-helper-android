@@ -9,6 +9,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.7.0] - 2025-08-18
+
+### Added
+
+- Hide the Creative Response Component when the actionType is external
+- Fallback `imageKey` support in `DataImage` and `DataImageCarousel` nodes
+
+### Fixed
+
+- Remove incorrectly applied vertical padding on the CarouselDistribution
+
 ## [0.6.0] - 2025-05-28
 
 ### Added
@@ -84,7 +95,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Initial implementation of UX Helper
 
-[unreleased]: https://github.com/ROKT/rokt-ux-helper-android/compare/0.6.0...HEAD
+[unreleased]: https://github.com/ROKT/rokt-ux-helper-android/compare/0.7.0...HEAD
+[0.7.0]: https://github.com/ROKT/rokt-ux-helper-android/compare/0.6.0...0.7.0
 [0.6.0]: https://github.com/ROKT/rokt-ux-helper-android/compare/0.5.0...0.6.0
 [0.5.0]: https://github.com/ROKT/rokt-ux-helper-android/compare/0.4.0...0.5.0
 [0.4.0]: https://github.com/ROKT/rokt-ux-helper-android/compare/0.3.0...0.4.0

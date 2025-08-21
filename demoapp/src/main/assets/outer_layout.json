@@ -1,0 +1,1467 @@
+{
+  "breakpoints": {},
+  "layout": {
+    "type": "Overlay",
+    "node": {
+      "allowBackdropToClose": false,
+      "styles": {
+        "elements": {
+          "own": [
+            {
+              "default": {
+                "background": {
+                  "backgroundColor": {
+                    "light": "#FFFFFF"
+                  }
+                },
+                "border": {},
+                "dimension": {
+                  "width": {
+                    "type": "fit",
+                    "value": "fit-width"
+                  },
+                  "height": {
+                    "type": "fit",
+                    "value": "wrap-content"
+                  }
+                },
+                "flexChild": {
+                  "alignSelf": "center"
+                },
+                "spacing": {
+                  "padding": "0 0 0 0",
+                  "margin": "10 10 10 10"
+                }
+              }
+            }
+          ],
+          "wrapper": [
+            {
+              "default": {
+                "container": {
+                  "justifyContent": "center",
+                  "alignItems": "center"
+                },
+                "background": {
+                  "backgroundColor": {
+                    "light": "#80000000"
+                  }
+                }
+              }
+            }
+          ]
+        }
+      },
+      "children": [
+        {
+          "type": "Row",
+          "node": {
+            "styles": {
+              "elements": {
+                "own": [
+                  {
+                    "default": {
+                      "container": {
+                        "alignItems": "center"
+                      },
+                      "background": {
+                        "backgroundColor": {
+                          "light": "#222222"
+                        }
+                      },
+                      "dimension": {
+                        "width": {
+                          "type": "fit",
+                          "value": "fit-width"
+                        },
+                        "height": {
+                          "type": "fit",
+                          "value": "wrap-content"
+                        }
+                      },
+                      "spacing": {
+                        "padding": "12 4 12 4",
+                        "margin": "0 0 0 0"
+                      }
+                    }
+                  }
+                ]
+              }
+            },
+            "children": [
+              {
+                "type": "When",
+                "node": {
+                  "predicates": [
+                    {
+                      "type": "StaticBoolean",
+                      "predicate": {
+                        "condition": "is-true",
+                        "value": true
+                      }
+                    }
+                  ],
+                  "children": [
+                    {
+                      "type": "CloseButton",
+                      "node": {
+                        "styles": {
+                          "elements": {
+                            "own": [
+                              {
+                                "default": {
+                                  "container": {
+                                    "justifyContent": "center",
+                                    "alignItems": "center"
+                                  },
+                                  "background": {},
+                                  "border": {},
+                                  "dimension": {
+                                    "height": {
+                                      "type": "fit",
+                                      "value": "wrap-content"
+                                    }
+                                  },
+                                  "spacing": {
+                                    "padding": "6 6 6 6",
+                                    "margin": "0 0 0 0"
+                                  }
+                                }
+                              }
+                            ]
+                          }
+                        },
+                        "children": [
+                          {
+                            "type": "StaticImage",
+                            "node": {
+                              "styles": {
+                                "elements": {
+                                  "own": [
+                                    {
+                                      "default": {
+                                        "dimension": {
+                                          "width": {
+                                            "type": "fixed",
+                                            "value": 16.0
+                                          },
+                                          "height": {
+                                            "type": "fixed",
+                                            "value": 16.0
+                                          }
+                                        },
+                                        "flexChild": {
+                                          "alignSelf": "center"
+                                        }
+                                      }
+                                    }
+                                  ]
+                                }
+                              },
+                              "url": {
+                                "light": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADgAAAA4CAYAAACohjseAAAACXBIWXMAACxLAAAsSwGlPZapAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAFJSURBVHgB7ZpBDsIwDAQjXsL/P9Gn5CkDCHypBCTEjjcRK1W92PJM1aQ5tJRTgOv9Oh73skiamV+FlWfqCpLNzKdCVpBsZn5TKC3ZzPylUFKyi5nn4mxJVZBslLMcvQ01U/JnVhaQHGZEWNKNDUFJdyaEJMNYEJAMZyBRctrsDMnpM2cOJOutmTGY7HUfCYDAphYGgopcBBBqcp5gqMp5AKIuNwK6jNyAZE/ttSikU3ItOYujZJWTszhIVlk5y4BklZez/CBZo+Qu5Z++bP2KsvMmw86fCXb+0LPzUY2dD9sjoKhLegCiKukJhppkBBAqkpEgZEvOACBLcubg6ZIkPNVpM0lcF+GzEdjZwhgQkAtjQUjOnQlBOTc2hOWGGVlAbkiS/894OnKWbuYvDVJylm7mNw2ScpZu5lODtJylm/nVcKwgZ/nEfAOqCnML3il4nQAAAABJRU5ErkJggg==",
+                                "dark": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADgAAAA4CAYAAACohjseAAAACXBIWXMAACxLAAAsSwGlPZapAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAFJSURBVHgB7ZpBDsIwDAQjXsL/P9Gn5CkDCHypBCTEjjcRK1W92PJM1aQ5tJRTgOv9Oh73skiamV+FlWfqCpLNzKdCVpBsZn5TKC3ZzPylUFKyi5nn4mxJVZBslLMcvQ01U/JnVhaQHGZEWNKNDUFJdyaEJMNYEJAMZyBRctrsDMnpM2cOJOutmTGY7HUfCYDAphYGgopcBBBqcp5gqMp5AKIuNwK6jNyAZE/ttSikU3ItOYujZJWTszhIVlk5y4BklZez/CBZo+Qu5Z++bP2KsvMmw86fCXb+0LPzUY2dD9sjoKhLegCiKukJhppkBBAqkpEgZEvOACBLcubg6ZIkPNVpM0lcF+GzEdjZwhgQkAtjQUjOnQlBOTc2hOWGGVlAbkiS/894OnKWbuYvDVJylm7mNw2ScpZu5lODtJylm/nVcKwgZ/nEfAOqCnML3il4nQAAAABJRU5ErkJggg=="
+                              }
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "RichText",
+                "node": {
+                  "styles": {
+                    "elements": {
+                      "own": [
+                        {
+                          "default": {
+                            "dimension": {
+                              "width": {
+                                "type": "fit",
+                                "value": "fit-width"
+                              }
+                            },
+                            "flexChild": {
+                              "weight": 1.0
+                            },
+                            "spacing": {
+                              "padding": "0 0 0 0",
+                              "margin": "0 8 0 8"
+                            },
+                            "text": {
+                              "textColor": {
+                                "light": "#FFFFFF"
+                              },
+                              "fontSize": 16.0,
+                              "fontWeight": "700",
+                              "horizontalTextAlign": "start"
+                            }
+                          }
+                        }
+                      ]
+                    }
+                  },
+                  "value": "Your order is confirmed"
+                }
+              },
+              {
+                "type": "When",
+                "node": {
+                  "predicates": [
+                    {
+                      "type": "StaticBoolean",
+                      "predicate": {
+                        "condition": "is-false",
+                        "value": true
+                      }
+                    }
+                  ],
+                  "children": [
+                    {
+                      "type": "CloseButton",
+                      "node": {
+                        "styles": {
+                          "elements": {
+                            "own": [
+                              {
+                                "default": {
+                                  "container": {
+                                    "justifyContent": "center",
+                                    "alignItems": "center"
+                                  },
+                                  "background": {},
+                                  "border": {},
+                                  "dimension": {
+                                    "height": {
+                                      "type": "fit",
+                                      "value": "wrap-content"
+                                    }
+                                  },
+                                  "spacing": {
+                                    "padding": "6 6 6 6",
+                                    "margin": "0 0 0 0"
+                                  }
+                                }
+                              }
+                            ]
+                          }
+                        },
+                        "children": [
+                          {
+                            "type": "StaticImage",
+                            "node": {
+                              "styles": {
+                                "elements": {
+                                  "own": [
+                                    {
+                                      "default": {
+                                        "dimension": {
+                                          "width": {
+                                            "type": "fixed",
+                                            "value": 16.0
+                                          },
+                                          "height": {
+                                            "type": "fixed",
+                                            "value": 16.0
+                                          }
+                                        },
+                                        "flexChild": {
+                                          "alignSelf": "center"
+                                        }
+                                      }
+                                    }
+                                  ]
+                                }
+                              },
+                              "url": {
+                                "light": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADgAAAA4CAYAAACohjseAAAACXBIWXMAACxLAAAsSwGlPZapAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAFJSURBVHgB7ZpBDsIwDAQjXsL/P9Gn5CkDCHypBCTEjjcRK1W92PJM1aQ5tJRTgOv9Oh73skiamV+FlWfqCpLNzKdCVpBsZn5TKC3ZzPylUFKyi5nn4mxJVZBslLMcvQ01U/JnVhaQHGZEWNKNDUFJdyaEJMNYEJAMZyBRctrsDMnpM2cOJOutmTGY7HUfCYDAphYGgopcBBBqcp5gqMp5AKIuNwK6jNyAZE/ttSikU3ItOYujZJWTszhIVlk5y4BklZez/CBZo+Qu5Z++bP2KsvMmw86fCXb+0LPzUY2dD9sjoKhLegCiKukJhppkBBAqkpEgZEvOACBLcubg6ZIkPNVpM0lcF+GzEdjZwhgQkAtjQUjOnQlBOTc2hOWGGVlAbkiS/894OnKWbuYvDVJylm7mNw2ScpZu5lODtJylm/nVcKwgZ/nEfAOqCnML3il4nQAAAABJRU5ErkJggg==",
+                                "dark": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADgAAAA4CAYAAACohjseAAAACXBIWXMAACxLAAAsSwGlPZapAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAFJSURBVHgB7ZpBDsIwDAQjXsL/P9Gn5CkDCHypBCTEjjcRK1W92PJM1aQ5tJRTgOv9Oh73skiamV+FlWfqCpLNzKdCVpBsZn5TKC3ZzPylUFKyi5nn4mxJVZBslLMcvQ01U/JnVhaQHGZEWNKNDUFJdyaEJMNYEJAMZyBRctrsDMnpM2cOJOutmTGY7HUfCYDAphYGgopcBBBqcp5gqMp5AKIuNwK6jNyAZE/ttSikU3ItOYujZJWTszhIVlk5y4BklZez/CBZo+Qu5Z++bP2KsvMmw86fCXb+0LPzUY2dD9sjoKhLegCiKukJhppkBBAqkpEgZEvOACBLcubg6ZIkPNVpM0lcF+GzEdjZwhgQkAtjQUjOnQlBOTc2hOWGGVlAbkiS/894OnKWbuYvDVJylm7mNw2ScpZu5lODtJylm/nVcKwgZ/nEfAOqCnML3il4nQAAAABJRU5ErkJggg=="
+                              }
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "When",
+          "node": {
+            "predicates": [
+              {
+                "type": "StaticBoolean",
+                "predicate": {
+                  "condition": "is-true",
+                  "value": false
+                }
+              },
+              {
+                "type": "StaticBoolean",
+                "predicate": {
+                  "condition": "is-true",
+                  "value": true
+                }
+              },
+              {
+                "type": "StaticBoolean",
+                "predicate": {
+                  "condition": "is-true",
+                  "value": true
+                }
+              }
+            ],
+            "children": [
+              {
+                "type": "ProgressIndicator",
+                "node": {
+                  "styles": {
+                    "elements": {
+                      "own": [
+                        {
+                          "default": {
+                            "container": {
+                              "justifyContent": "center"
+                            },
+                            "flexChild": {
+                              "alignSelf": "center"
+                            },
+                            "spacing": {
+                              "padding": "0 0 0 0",
+                              "margin": "12 0 16 0"
+                            }
+                          }
+                        }
+                      ],
+                      "indicator": [
+                        {
+                          "default": {
+                            "container": {
+                              "justifyContent": "center",
+                              "alignItems": "center"
+                            },
+                            "background": {
+                              "backgroundColor": {
+                                "light": "#D7D7D7"
+                              }
+                            },
+                            "border": {
+                              "borderRadius": 11.0
+                            },
+                            "dimension": {
+                              "width": {
+                                "type": "fixed",
+                                "value": 22.0
+                              },
+                              "height": {
+                                "type": "fixed",
+                                "value": 22.0
+                              }
+                            },
+                            "spacing": {
+                              "padding": "0 0 0 0",
+                              "margin": "0 6 0 0"
+                            },
+                            "text": {
+                              "textColor": {
+                                "light": "#FFFFFF"
+                              },
+                              "fontSize": 11.0,
+                              "fontWeight": "700"
+                            }
+                          }
+                        }
+                      ],
+                      "seenIndicator": [
+                        {
+                          "default": {
+                            "background": {
+                              "backgroundColor": {
+                                "light": "#262626"
+                              }
+                            },
+                            "text": {
+                              "textColor": {
+                                "light": "#FFFFFF"
+                              }
+                            }
+                          }
+                        }
+                      ]
+                    }
+                  },
+                  "indicator": "%^STATE.IndicatorPosition^%",
+                  "startPosition": 2
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "When",
+          "node": {
+            "predicates": [
+              {
+                "type": "StaticBoolean",
+                "predicate": {
+                  "condition": "is-false",
+                  "value": false
+                }
+              },
+              {
+                "type": "Progression",
+                "predicate": {
+                  "condition": "is-above",
+                  "value": "0"
+                }
+              },
+              {
+                "type": "StaticBoolean",
+                "predicate": {
+                  "condition": "is-true",
+                  "value": true
+                }
+              },
+              {
+                "type": "StaticBoolean",
+                "predicate": {
+                  "condition": "is-true",
+                  "value": true
+                }
+              }
+            ],
+            "children": [
+              {
+                "type": "ProgressIndicator",
+                "node": {
+                  "styles": {
+                    "elements": {
+                      "own": [
+                        {
+                          "default": {
+                            "container": {
+                              "justifyContent": "center"
+                            },
+                            "flexChild": {
+                              "alignSelf": "center"
+                            },
+                            "spacing": {
+                              "padding": "0 0 0 0",
+                              "margin": "12 0 16 0"
+                            }
+                          }
+                        }
+                      ],
+                      "indicator": [
+                        {
+                          "default": {
+                            "container": {
+                              "justifyContent": "center",
+                              "alignItems": "center"
+                            },
+                            "background": {
+                              "backgroundColor": {
+                                "light": "#D7D7D7"
+                              }
+                            },
+                            "border": {
+                              "borderRadius": 11.0
+                            },
+                            "dimension": {
+                              "width": {
+                                "type": "fixed",
+                                "value": 22.0
+                              },
+                              "height": {
+                                "type": "fixed",
+                                "value": 22.0
+                              }
+                            },
+                            "spacing": {
+                              "padding": "0 0 0 0",
+                              "margin": "0 6 0 0"
+                            },
+                            "text": {
+                              "textColor": {
+                                "light": "#FFFFFF"
+                              },
+                              "fontSize": 11.0,
+                              "fontWeight": "700"
+                            }
+                          }
+                        }
+                      ],
+                      "seenIndicator": [
+                        {
+                          "default": {
+                            "background": {
+                              "backgroundColor": {
+                                "light": "#262626"
+                              }
+                            },
+                            "text": {
+                              "textColor": {
+                                "light": "#FFFFFF"
+                              }
+                            }
+                          }
+                        }
+                      ]
+                    }
+                  },
+                  "indicator": "%^STATE.IndicatorPosition^%",
+                  "startPosition": 2
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "When",
+          "node": {
+            "predicates": [
+              {
+                "type": "StaticBoolean",
+                "predicate": {
+                  "condition": "is-true",
+                  "value": false
+                }
+              },
+              {
+                "type": "StaticBoolean",
+                "predicate": {
+                  "condition": "is-true",
+                  "value": false
+                }
+              },
+              {
+                "type": "StaticBoolean",
+                "predicate": {
+                  "condition": "is-true",
+                  "value": false
+                }
+              }
+            ],
+            "children": [
+              {
+                "type": "BasicText",
+                "node": {
+                  "styles": {
+                    "elements": {
+                      "own": [
+                        {
+                          "default": {
+                            "dimension": {
+                              "width": {
+                                "type": "fit",
+                                "value": "fit-width"
+                              }
+                            },
+                            "spacing": {
+                              "padding": "0 10 0 10",
+                              "margin": "0 0 0 0"
+                            },
+                            "text": {
+                              "textColor": {
+                                "light": "#262626"
+                              },
+                              "fontSize": 14.0,
+                              "fontWeight": "700",
+                              "horizontalTextAlign": "start"
+                            }
+                          }
+                        }
+                      ]
+                    }
+                  },
+                  "value": "%^STATE.IndicatorPosition^% of %^STATE.TotalOffers^%"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "When",
+          "node": {
+            "predicates": [
+              {
+                "type": "StaticBoolean",
+                "predicate": {
+                  "condition": "is-false",
+                  "value": false
+                }
+              },
+              {
+                "type": "Progression",
+                "predicate": {
+                  "condition": "is-above",
+                  "value": "0"
+                }
+              },
+              {
+                "type": "StaticBoolean",
+                "predicate": {
+                  "condition": "is-true",
+                  "value": false
+                }
+              },
+              {
+                "type": "StaticBoolean",
+                "predicate": {
+                  "condition": "is-true",
+                  "value": false
+                }
+              }
+            ],
+            "children": [
+              {
+                "type": "BasicText",
+                "node": {
+                  "styles": {
+                    "elements": {
+                      "own": [
+                        {
+                          "default": {
+                            "dimension": {
+                              "width": {
+                                "type": "fit",
+                                "value": "fit-width"
+                              }
+                            },
+                            "spacing": {
+                              "padding": "0 10 0 10",
+                              "margin": "0 0 0 0"
+                            },
+                            "text": {
+                              "textColor": {
+                                "light": "#262626"
+                              },
+                              "fontSize": 14.0,
+                              "fontWeight": "700",
+                              "horizontalTextAlign": "start"
+                            }
+                          }
+                        }
+                      ]
+                    }
+                  },
+                  "value": "%^STATE.IndicatorPosition^% of %^STATE.TotalOffers^%"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "When",
+          "node": {
+            "predicates": [
+              {
+                "type": "StaticBoolean",
+                "predicate": {
+                  "condition": "is-false",
+                  "value": false
+                }
+              },
+              {
+                "type": "Progression",
+                "predicate": {
+                  "condition": "is",
+                  "value": "0"
+                }
+              }
+            ],
+            "children": [
+              {
+                "type": "RichText",
+                "node": {
+                  "styles": {
+                    "elements": {
+                      "own": [
+                        {
+                          "default": {
+                            "dimension": {
+                              "width": {
+                                "type": "fit",
+                                "value": "fit-width"
+                              }
+                            },
+                            "spacing": {
+                              "padding": "0 0 0 0",
+                              "margin": "12 10 12 10"
+                            },
+                            "background": {
+                              "backgroundColor": {
+                                "light": "#FFFFFF"
+                              }
+                            },
+                            "text": {
+                              "textColor": {
+                                "light": "#262626"
+                              },
+                              "fontSize": 14.0,
+                              "fontWeight": "400",
+                              "lineHeight": 14.3,
+                              "horizontalTextAlign": "start"
+                            }
+                          }
+                        }
+                      ]
+                    }
+                  },
+                  "value": "Thank you for your purchase:"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "When",
+          "node": {
+            "predicates": [
+              {
+                "type": "StaticBoolean",
+                "predicate": {
+                  "condition": "is-true",
+                  "value": false
+                }
+              }
+            ],
+            "children": [
+              {
+                "type": "RichText",
+                "node": {
+                  "styles": {
+                    "elements": {
+                      "own": [
+                        {
+                          "default": {
+                            "dimension": {
+                              "width": {
+                                "type": "fit",
+                                "value": "fit-width"
+                              }
+                            },
+                            "spacing": {
+                              "padding": "0 0 0 0",
+                              "margin": "12 10 12 10"
+                            },
+                            "background": {
+                              "backgroundColor": {
+                                "light": "#FFFFFF"
+                              }
+                            },
+                            "text": {
+                              "textColor": {
+                                "light": "#262626"
+                              },
+                              "fontSize": 14.0,
+                              "fontWeight": "400",
+                              "lineHeight": 14.3,
+                              "horizontalTextAlign": "start"
+                            }
+                          }
+                        }
+                      ]
+                    }
+                  },
+                  "value": "Thank you for your purchase:"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "OneByOneDistribution",
+          "node": {
+            "styles": {
+              "elements": {
+                "own": [
+                  {
+                    "default": {
+                      "container": {},
+                      "background": {
+                        "backgroundColor": {
+                          "light": "#FFFFFF"
+                        }
+                      },
+                      "dimension": {
+                        "height": {
+                          "type": "fit",
+                          "value": "wrap-content"
+                        }
+                      },
+                      "spacing": {
+                        "padding": "0 0 0 0",
+                        "margin": "0 10 0 10"
+                      }
+                    }
+                  }
+                ]
+              }
+            },
+            "transition": {
+              "type": "FadeInOut",
+              "settings": {
+                "duration": 250
+              }
+            }
+          }
+        },
+        {
+          "type": "When",
+          "node": {
+            "predicates": [
+              {
+                "type": "StaticBoolean",
+                "predicate": {
+                  "condition": "is-false",
+                  "value": false
+                }
+              },
+              {
+                "type": "Progression",
+                "predicate": {
+                  "condition": "is",
+                  "value": "0"
+                }
+              }
+            ],
+            "children": [
+              {
+                "type": "RichText",
+                "node": {
+                  "styles": {
+                    "elements": {
+                      "own": [
+                        {
+                          "default": {
+                            "dimension": {
+                              "width": {
+                                "type": "fit",
+                                "value": "fit-width"
+                              }
+                            },
+                            "spacing": {
+                              "padding": "0 0 0 0",
+                              "margin": "12 10 12 10"
+                            },
+                            "background": {
+                              "backgroundColor": {
+                                "light": "#FFFFFF"
+                              }
+                            },
+                            "text": {
+                              "textColor": {
+                                "light": "#262626"
+                              },
+                              "fontSize": 11.0,
+                              "fontWeight": "400",
+                              "lineHeight": 14.3,
+                              "horizontalTextAlign": "start"
+                            }
+                          }
+                        }
+                      ]
+                    }
+                  },
+                  "value": ""
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "When",
+          "node": {
+            "predicates": [
+              {
+                "type": "StaticBoolean",
+                "predicate": {
+                  "condition": "is-true",
+                  "value": false
+                }
+              }
+            ],
+            "children": [
+              {
+                "type": "RichText",
+                "node": {
+                  "styles": {
+                    "elements": {
+                      "own": [
+                        {
+                          "default": {
+                            "dimension": {
+                              "width": {
+                                "type": "fit",
+                                "value": "fit-width"
+                              }
+                            },
+                            "spacing": {
+                              "padding": "0 0 0 0",
+                              "margin": "12 10 12 10"
+                            },
+                            "background": {
+                              "backgroundColor": {
+                                "light": "#FFFFFF"
+                              }
+                            },
+                            "text": {
+                              "textColor": {
+                                "light": "#262626"
+                              },
+                              "fontSize": 11.0,
+                              "fontWeight": "400",
+                              "lineHeight": 14.3,
+                              "horizontalTextAlign": "start"
+                            }
+                          }
+                        }
+                      ]
+                    }
+                  },
+                  "value": ""
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "When",
+          "node": {
+            "predicates": [
+              {
+                "type": "StaticBoolean",
+                "predicate": {
+                  "condition": "is-true",
+                  "value": false
+                }
+              },
+              {
+                "type": "StaticBoolean",
+                "predicate": {
+                  "condition": "is-true",
+                  "value": true
+                }
+              },
+              {
+                "type": "StaticBoolean",
+                "predicate": {
+                  "condition": "is-false",
+                  "value": true
+                }
+              }
+            ],
+            "children": [
+              {
+                "type": "ProgressIndicator",
+                "node": {
+                  "styles": {
+                    "elements": {
+                      "own": [
+                        {
+                          "default": {
+                            "container": {
+                              "justifyContent": "center"
+                            },
+                            "flexChild": {
+                              "alignSelf": "center"
+                            },
+                            "spacing": {
+                              "padding": "0 0 0 0",
+                              "margin": "12 0 16 0"
+                            }
+                          }
+                        }
+                      ],
+                      "indicator": [
+                        {
+                          "default": {
+                            "container": {
+                              "justifyContent": "center",
+                              "alignItems": "center"
+                            },
+                            "background": {
+                              "backgroundColor": {
+                                "light": "#D7D7D7"
+                              }
+                            },
+                            "border": {
+                              "borderRadius": 11.0
+                            },
+                            "dimension": {
+                              "width": {
+                                "type": "fixed",
+                                "value": 22.0
+                              },
+                              "height": {
+                                "type": "fixed",
+                                "value": 22.0
+                              }
+                            },
+                            "spacing": {
+                              "padding": "0 0 0 0",
+                              "margin": "0 6 0 0"
+                            },
+                            "text": {
+                              "textColor": {
+                                "light": "#FFFFFF"
+                              },
+                              "fontSize": 11.0,
+                              "fontWeight": "700"
+                            }
+                          }
+                        }
+                      ],
+                      "seenIndicator": [
+                        {
+                          "default": {
+                            "background": {
+                              "backgroundColor": {
+                                "light": "#262626"
+                              }
+                            },
+                            "text": {
+                              "textColor": {
+                                "light": "#FFFFFF"
+                              }
+                            }
+                          }
+                        }
+                      ]
+                    }
+                  },
+                  "indicator": "%^STATE.IndicatorPosition^%",
+                  "startPosition": 2
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "When",
+          "node": {
+            "predicates": [
+              {
+                "type": "StaticBoolean",
+                "predicate": {
+                  "condition": "is-false",
+                  "value": false
+                }
+              },
+              {
+                "type": "Progression",
+                "predicate": {
+                  "condition": "is-above",
+                  "value": "0"
+                }
+              },
+              {
+                "type": "StaticBoolean",
+                "predicate": {
+                  "condition": "is-true",
+                  "value": true
+                }
+              },
+              {
+                "type": "StaticBoolean",
+                "predicate": {
+                  "condition": "is-false",
+                  "value": true
+                }
+              }
+            ],
+            "children": [
+              {
+                "type": "ProgressIndicator",
+                "node": {
+                  "styles": {
+                    "elements": {
+                      "own": [
+                        {
+                          "default": {
+                            "container": {
+                              "justifyContent": "center"
+                            },
+                            "flexChild": {
+                              "alignSelf": "center"
+                            },
+                            "spacing": {
+                              "padding": "0 0 0 0",
+                              "margin": "12 0 16 0"
+                            }
+                          }
+                        }
+                      ],
+                      "indicator": [
+                        {
+                          "default": {
+                            "container": {
+                              "justifyContent": "center",
+                              "alignItems": "center"
+                            },
+                            "background": {
+                              "backgroundColor": {
+                                "light": "#D7D7D7"
+                              }
+                            },
+                            "border": {
+                              "borderRadius": 11.0
+                            },
+                            "dimension": {
+                              "width": {
+                                "type": "fixed",
+                                "value": 22.0
+                              },
+                              "height": {
+                                "type": "fixed",
+                                "value": 22.0
+                              }
+                            },
+                            "spacing": {
+                              "padding": "0 0 0 0",
+                              "margin": "0 6 0 0"
+                            },
+                            "text": {
+                              "textColor": {
+                                "light": "#FFFFFF"
+                              },
+                              "fontSize": 11.0,
+                              "fontWeight": "700"
+                            }
+                          }
+                        }
+                      ],
+                      "seenIndicator": [
+                        {
+                          "default": {
+                            "background": {
+                              "backgroundColor": {
+                                "light": "#262626"
+                              }
+                            },
+                            "text": {
+                              "textColor": {
+                                "light": "#FFFFFF"
+                              }
+                            }
+                          }
+                        }
+                      ]
+                    }
+                  },
+                  "indicator": "%^STATE.IndicatorPosition^%",
+                  "startPosition": 2
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "When",
+          "node": {
+            "predicates": [
+              {
+                "type": "StaticBoolean",
+                "predicate": {
+                  "condition": "is-true",
+                  "value": false
+                }
+              },
+              {
+                "type": "StaticBoolean",
+                "predicate": {
+                  "condition": "is-true",
+                  "value": false
+                }
+              },
+              {
+                "type": "StaticBoolean",
+                "predicate": {
+                  "condition": "is-false",
+                  "value": false
+                }
+              }
+            ],
+            "children": [
+              {
+                "type": "BasicText",
+                "node": {
+                  "styles": {
+                    "elements": {
+                      "own": [
+                        {
+                          "default": {
+                            "dimension": {
+                              "width": {
+                                "type": "fit",
+                                "value": "fit-width"
+                              }
+                            },
+                            "spacing": {
+                              "padding": "0 10 0 10",
+                              "margin": "0 0 0 0"
+                            },
+                            "text": {
+                              "textColor": {
+                                "light": "#262626"
+                              },
+                              "fontSize": 14.0,
+                              "fontWeight": "700",
+                              "horizontalTextAlign": "start"
+                            }
+                          }
+                        }
+                      ]
+                    }
+                  },
+                  "value": "%^STATE.IndicatorPosition^% of %^STATE.TotalOffers^%"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "When",
+          "node": {
+            "predicates": [
+              {
+                "type": "StaticBoolean",
+                "predicate": {
+                  "condition": "is-false",
+                  "value": false
+                }
+              },
+              {
+                "type": "Progression",
+                "predicate": {
+                  "condition": "is-above",
+                  "value": "0"
+                }
+              },
+              {
+                "type": "StaticBoolean",
+                "predicate": {
+                  "condition": "is-true",
+                  "value": false
+                }
+              },
+              {
+                "type": "StaticBoolean",
+                "predicate": {
+                  "condition": "is-false",
+                  "value": false
+                }
+              }
+            ],
+            "children": [
+              {
+                "type": "BasicText",
+                "node": {
+                  "styles": {
+                    "elements": {
+                      "own": [
+                        {
+                          "default": {
+                            "dimension": {
+                              "width": {
+                                "type": "fit",
+                                "value": "fit-width"
+                              }
+                            },
+                            "spacing": {
+                              "padding": "0 10 0 10",
+                              "margin": "0 0 0 0"
+                            },
+                            "text": {
+                              "textColor": {
+                                "light": "#262626"
+                              },
+                              "fontSize": 14.0,
+                              "fontWeight": "700",
+                              "horizontalTextAlign": "start"
+                            }
+                          }
+                        }
+                      ]
+                    }
+                  },
+                  "value": "%^STATE.IndicatorPosition^% of %^STATE.TotalOffers^%"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "Row",
+          "node": {
+            "styles": {
+              "elements": {
+                "own": [
+                  {
+                    "default": {
+                      "background": {
+                        "backgroundColor": {
+                          "light": "#D7D7D7"
+                        }
+                      },
+                      "dimension": {
+                        "width": {
+                          "type": "percentage",
+                          "value": 95.0
+                        },
+                        "height": {
+                          "type": "fixed",
+                          "value": 1.0
+                        }
+                      },
+                      "flexChild": {
+                        "alignSelf": "center"
+                      },
+                      "spacing": {
+                        "padding": "0 0 0 0",
+                        "margin": "10 0 0 0"
+                      }
+                    }
+                  }
+                ]
+              }
+            },
+            "children": []
+          }
+        },
+        {
+          "type": "Column",
+          "node": {
+            "styles": {
+              "elements": {
+                "own": [
+                  {
+                    "default": {
+                      "background": {},
+                      "dimension": {
+                        "height": {
+                          "type": "fit",
+                          "value": "wrap-content"
+                        }
+                      },
+                      "spacing": {
+                        "padding": "10 10 10 10",
+                        "margin": "0 0 0 0"
+                      }
+                    }
+                  }
+                ]
+              }
+            },
+            "children": [
+              {
+                "type": "RichText",
+                "node": {
+                  "styles": {
+                    "elements": {
+                      "own": [
+                        {
+                          "default": {
+                            "dimension": {
+                              "width": {
+                                "type": "fit",
+                                "value": "fit-width"
+                              }
+                            },
+                            "background": {
+                              "backgroundColor": {
+                                "light": "#FFFFFF"
+                              }
+                            },
+                            "text": {
+                              "textColor": {
+                                "light": "#262626"
+                              },
+                              "fontSize": 11.0,
+                              "fontWeight": "400",
+                              "lineHeight": 14.3,
+                              "horizontalTextAlign": "end"
+                            }
+                          }
+                        }
+                      ],
+                      "link": [
+                        {
+                          "default": {
+                            "text": {
+                              "textColor": {
+                                "light": "#009cde"
+                              },
+                              "textDecoration": "underline"
+                            }
+                          }
+                        }
+                      ]
+                    }
+                  },
+                  "value": "Powered by <a href=\"https://www.rokt.com\">Rokt</a> - <a href=\"https://www.rokt.com/privacy-policy/\">Privacy Policy</a>"
+                }
+              },
+              {
+                "type": "RichText",
+                "node": {
+                  "styles": {
+                    "elements": {
+                      "own": [
+                        {
+                          "default": {
+                            "dimension": {
+                              "width": {
+                                "type": "fit",
+                                "value": "fit-width"
+                              }
+                            },
+                            "background": {
+                              "backgroundColor": {
+                                "light": "#FFFFFF"
+                              }
+                            },
+                            "text": {
+                              "textColor": {
+                                "light": "#262626"
+                              },
+                              "fontSize": 11.0,
+                              "fontWeight": "400",
+                              "lineHeight": 14.3,
+                              "horizontalTextAlign": "start"
+                            }
+                          }
+                        }
+                      ],
+                      "link": [
+                        {
+                          "default": {
+                            "text": {
+                              "textColor": {
+                                "light": "#009cde"
+                              },
+                              "textDecoration": "underline"
+                            }
+                          }
+                        }
+                      ]
+                    }
+                  },
+                  "value": ""
+                }
+              }
+            ]
+          }
+        }
+      ]
+    }
+  },
+  "display": "FULLSCREEN"
+}
