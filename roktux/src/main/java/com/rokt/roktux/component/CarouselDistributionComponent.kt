@@ -154,7 +154,7 @@ internal class CarouselDistributionComponent(
                     val subcomposables = subcompose(pageIndex) {
                         factory.CreateComposable(
                             model = LayoutSchemaUiModel.MarketingUiModel(true),
-                            modifier = modifier,
+                            modifier = Modifier,
                             isPressed = isPressed,
                             offerState = offerState.copy(currentOfferIndex = pageIndex, viewableItems = viewableItems),
                             isDarkModeEnabled = isDarkModeEnabled,
@@ -186,7 +186,7 @@ internal class CarouselDistributionComponent(
                                 isDarkModeEnabled = isDarkModeEnabled,
                                 offerState = offerState,
                             )
-                            .then(modifier)
+                            .then(Modifier)
                             .onSizeChanged {
                                 viewWidth = it.width
                             },
@@ -210,7 +210,7 @@ internal class CarouselDistributionComponent(
                     ) { page ->
                         factory.CreateComposable(
                             model = LayoutSchemaUiModel.MarketingUiModel(),
-                            modifier = modifier
+                            modifier = Modifier
                                 .height(maxHeight.value),
                             isPressed = isPressed,
                             offerState = offerState.copy(currentOfferIndex = page, viewableItems = viewableItems),
