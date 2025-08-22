@@ -103,7 +103,7 @@ internal fun Context.getDeviceLocale(): String = if (Build.VERSION.SDK_INT >= Bu
 }
 
 internal fun Context.getPackageVersion(): String = try {
-    packageManager.getPackageInfo(packageName, 0).versionName.stripNonAscii()
+    packageManager.getPackageInfo(packageName, 0).versionName?.stripNonAscii() ?: ""
 } catch (e: Exception) {
     ""
 }

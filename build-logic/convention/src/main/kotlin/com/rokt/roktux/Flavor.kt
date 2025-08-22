@@ -23,7 +23,7 @@ enum class Flavor(val dimension: FlavorDimension, val applicationIdSuffix: Strin
 
 data class BuildConfigs(val versionName: String, val dcuiVersion: String)
 
-fun Project.configureFlavors(commonExtension: CommonExtension<*, *, *, *, *>, buildConfigs: BuildConfigs? = null) {
+fun Project.configureFlavors(commonExtension: CommonExtension<*, *, *, *, *, *>, buildConfigs: BuildConfigs? = null) {
     commonExtension.apply {
         flavorDimensions += FlavorDimension.RoktEnvironment.toString()
         productFlavors {
