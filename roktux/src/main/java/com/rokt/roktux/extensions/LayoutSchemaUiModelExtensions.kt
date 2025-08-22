@@ -11,11 +11,11 @@ import kotlinx.collections.immutable.toImmutableList
  * Note: These functions work with the sealed class pattern where each subtype is a data class
  */
 fun LayoutSchemaUiModel.transformModifiers(
-    predicate: (StateBlock<ModifierProperties>, Int) -> Boolean,
+    predicate: (StateBlock<ModifierProperties>) -> Boolean,
     transformation: (StateBlock<ModifierProperties>) -> StateBlock<ModifierProperties>,
 ): LayoutSchemaUiModel {
-    val modifiedModifiers = ownModifiers?.mapIndexed { index, modifier ->
-        if (predicate(modifier, index)) {
+    val modifiedModifiers = ownModifiers?.map { modifier ->
+        if (predicate(modifier)) {
             transformation(modifier)
         } else {
             modifier
@@ -55,7 +55,7 @@ fun LayoutSchemaUiModel.transformHeightForAllMatching(
     condition: (StateBlock<ModifierProperties>) -> Boolean,
     newHeight: HeightUiModel,
 ): LayoutSchemaUiModel = transformModifiers(
-    predicate = { modifier, _ -> condition(modifier) },
+    predicate = { modifier -> condition(modifier) },
     transformation = { modifier ->
         StateBlock(
             default = modifier.default.copy(height = newHeight),
