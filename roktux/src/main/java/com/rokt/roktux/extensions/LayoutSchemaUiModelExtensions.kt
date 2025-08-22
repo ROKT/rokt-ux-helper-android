@@ -14,6 +14,10 @@ fun LayoutSchemaUiModel.transformModifiers(
     predicate: (StateBlock<ModifierProperties>) -> Boolean,
     transformation: (StateBlock<ModifierProperties>) -> StateBlock<ModifierProperties>,
 ): LayoutSchemaUiModel {
+    if (!hasModifiersMatching(predicate)) {
+        return this
+    }
+
     val modifiedModifiers = ownModifiers?.map { modifier ->
         if (predicate(modifier)) {
             transformation(modifier)
@@ -50,6 +54,12 @@ fun LayoutSchemaUiModel.transformModifiers(
         else -> this
     }
 }
+
+/**
+ * Checks if any modifiers in this LayoutSchemaUiModel match the given predicate
+ */
+fun LayoutSchemaUiModel.hasModifiersMatching(predicate: (StateBlock<ModifierProperties>) -> Boolean): Boolean =
+    ownModifiers?.any { predicate(it) } == true
 
 fun LayoutSchemaUiModel.transformHeightForAllMatching(
     condition: (StateBlock<ModifierProperties>) -> Boolean,
