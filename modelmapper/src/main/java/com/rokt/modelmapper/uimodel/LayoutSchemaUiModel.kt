@@ -352,15 +352,15 @@ sealed class PeekThroughSizeUiModel(val value: Float) {
 }
 
 sealed class HeightUiModel {
-    class Fixed(val value: Float) : HeightUiModel()
-    class Percentage(val value: Float) : HeightUiModel()
+    data class Fixed(val value: Float) : HeightUiModel()
+    data class Percentage(val value: Float) : HeightUiModel()
     object MatchParent : HeightUiModel()
     object WrapContent : HeightUiModel()
 }
 
 sealed class WidthUiModel {
-    class Fixed(val value: Float) : WidthUiModel()
-    class Percentage(val value: Float) : WidthUiModel()
+    data class Fixed(val value: Float) : WidthUiModel()
+    data class Percentage(val value: Float) : WidthUiModel()
     object MatchParent : WidthUiModel()
     object WrapContent : WidthUiModel()
 }
