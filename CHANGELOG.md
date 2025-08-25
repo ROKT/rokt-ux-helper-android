@@ -19,6 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - Remove incorrectly applied vertical padding on the CarouselDistribution
+- Fixed CarouselDistribution pages filling screen when using fit-height
 
 ## [0.6.0] - 2025-05-28
 

@@ -1,6 +1,7 @@
 package com.rokt.roktux.component
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.height
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -10,9 +11,11 @@ import androidx.compose.ui.semantics.isTraversalGroup
 import androidx.compose.ui.semantics.semantics
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.rokt.modelmapper.uimodel.HeightUiModel
 import com.rokt.modelmapper.uimodel.LayoutSchemaUiModel
 import com.rokt.roktux.di.layout.LocalLayoutComponent
 import com.rokt.roktux.di.variants.marketing.MarketingComponent
+import com.rokt.roktux.extensions.transformHeightForAllMatching
 import com.rokt.roktux.utils.componentVisibilityChange
 import com.rokt.roktux.utils.onUserInteractionDetected
 import com.rokt.roktux.viewmodel.base.BaseContract
@@ -62,8 +65,25 @@ internal class LayoutVariantMarketingComponent(private val factory: LayoutUiMode
                         isTraversalGroup = true
                     },
                 ) {
+                    // At this point we will know the distribution type and if it is a pre-render measure
+                    // If so remove fit height from all children that have MatchParent height
+                    val updatedState = if (model.preRenderMeasure &&
+                        state.value.uiModel.ownModifiers?.any {
+                            it.default.height == HeightUiModel.MatchParent
+                        } == true
+                    ) {
+                        state.value.copy(
+                            uiModel = state.value.uiModel.transformHeightForAllMatching(
+                                condition = { stateBlock -> stateBlock.default.height == HeightUiModel.MatchParent },
+                                newHeight = HeightUiModel.WrapContent,
+                            ),
+                        )
+                    } else {
+                        state.value
+                    }
+
                     factory.CreateComposable(
-                        model = state.value.uiModel,
+                        model = updatedState.uiModel,
                         modifier = Modifier.componentVisibilityChange(
                             { viewId, visibilityInfo ->
                                 viewModel.setEvent(
