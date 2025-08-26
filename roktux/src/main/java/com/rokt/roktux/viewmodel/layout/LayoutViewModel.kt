@@ -141,6 +141,7 @@ internal class LayoutViewModel(
                     layoutSchema.conditionalTransitionModifiers,
                     layoutSchema.allowBackdropToClose,
                     layoutSchema.child,
+                    layoutSchema.minimizable,
                     edgeToEdgeDisplay,
                 )
             }

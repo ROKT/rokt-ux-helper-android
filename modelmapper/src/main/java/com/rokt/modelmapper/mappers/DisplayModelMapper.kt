@@ -91,6 +91,7 @@ internal fun transformBottomSheet(
         ),
         allowBackdropToClose = bottomSheetModel.node.allowBackdropToClose,
         conditionalTransitionModifiers = null,
+        minimizable = bottomSheetModel.node.minimizable ?: false,
         child = LayoutSchemaUiModel.ColumnUiModel(
             ownModifiers,
             containerProperties = ownStyles.transformContainer(

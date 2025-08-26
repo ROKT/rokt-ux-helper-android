@@ -133,6 +133,7 @@ class ExtensionsTest {
                     containerProperties = null,
                     allowBackdropToClose = false,
                     conditionalTransitionModifiers = null,
+                    minimizable = false,
                     child = LayoutSchemaUiModel.ColumnUiModel(
                         ownModifiers = null,
                         containerProperties = null,

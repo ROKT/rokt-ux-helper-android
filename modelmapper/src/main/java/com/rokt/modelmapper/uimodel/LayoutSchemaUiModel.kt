@@ -187,6 +187,7 @@ sealed class LayoutSchemaUiModel(
         conditionalTransitionModifiers: ConditionalTransitionModifier?,
         val allowBackdropToClose: Boolean,
         val child: ColumnUiModel,
+        val minimizable: Boolean,
         val edgeToEdgeDisplay: Boolean = true,
     ) : LayoutSchemaUiModel(ownModifiers, containerProperties, conditionalTransitionModifiers)
 
