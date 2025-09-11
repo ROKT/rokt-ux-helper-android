@@ -16,6 +16,7 @@ import com.rokt.core.testutils.annotations.DcuiNodeComponentState
 import com.rokt.core.testutils.annotations.DcuiNodeJson
 import com.rokt.core.testutils.annotations.DcuiOfferJson
 import com.rokt.core.testutils.annotations.WindowSize
+import com.rokt.core.testutils.assertion.assertAlpha
 import com.rokt.core.testutils.assertion.assertBackgroundColor
 import com.rokt.core.testutils.assertion.assertHeightFit
 import com.rokt.core.testutils.assertion.assertHeightWrapContent
@@ -287,5 +288,12 @@ class BoxComponentTest : BaseDcuiEspressoTest() {
 
         assertEquals(childRect.topLeft, Offset.Zero)
         assertNotEquals(childRect.bottom, parentRect.bottom)
+    }
+
+    @Test
+    @DcuiNodeJson(jsonFile = "BoxComponent/Box_with_Opacity.json")
+    fun testBoxComponentWithOpacity() {
+        composeTestRule.onNodeWithTag(DCUI_COMPONENT_TAG)
+            .assertAlpha(0.4f)
     }
 }
