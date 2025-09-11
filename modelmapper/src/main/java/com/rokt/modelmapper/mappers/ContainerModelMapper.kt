@@ -230,6 +230,7 @@ private fun ZStackContainerStylingProperties.toContainerStyling() = ContainerSty
     overflow = overflow,
     gap = null,
     blur = blur,
+    opacity = opacity,
 )
 
 internal fun LayoutSchemaModel.ScrollableRow.toRow(): LayoutSchemaModel.Row {

@@ -1,0 +1,67 @@
+package com.rokt.roktux.snapshot
+
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
+import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.test.ext.junit.runners.AndroidJUnit4
+import coil.ImageLoader
+import coil.annotation.ExperimentalCoilApi
+import coil.test.FakeImageLoaderEngine
+import com.github.takahirom.roborazzi.ExperimentalRoborazziApi
+import com.github.takahirom.roborazzi.captureScreenRoboImage
+import com.rokt.core.testutils.TestJsonLoader
+import com.rokt.roktux.RoktLayout
+import com.rokt.roktux.RoktUxConfig
+import com.rokt.roktux.imagehandler.ImageLoaderStrategy
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.runTest
+import org.junit.Rule
+import org.junit.Test
+import org.junit.experimental.categories.Category
+import org.junit.runner.RunWith
+import org.robolectric.RuntimeEnvironment
+import org.robolectric.annotation.Config
+import org.robolectric.annotation.GraphicsMode
+
+@RunWith(AndroidJUnit4::class)
+@Category(SnapshotTest::class)
+@GraphicsMode(GraphicsMode.Mode.NATIVE)
+@Config(
+    sdk = [33],
+    qualifiers = "xxhdpi",
+)
+class OpacitySnapshotTest {
+
+    private val testDispatcher = UnconfinedTestDispatcher()
+
+    @get:Rule
+    val composeTestRule = createComposeRule()
+
+    @OptIn(ExperimentalRoborazziApi::class, ExperimentalCoilApi::class)
+    @Test
+    fun testOverlayWithOpacity() = runTest(testDispatcher) {
+        val experienceResponse = TestJsonLoader.loadJsonFromAssetsDirectory("Snapshot", "OverlayWithOpacity.json")
+
+        val engine = FakeImageLoaderEngine.Builder()
+            .default(ColorDrawable(Color.RED))
+            .build()
+
+        val imageLoader = ImageLoader.Builder(RuntimeEnvironment.getApplication())
+            .components { add(engine) }
+            .build()
+
+        composeTestRule.setContent {
+            RoktLayout(
+                experienceResponse = experienceResponse,
+                location = "Location1",
+                mainDispatcher = testDispatcher,
+                ioDispatcher = testDispatcher,
+                roktUxConfig = RoktUxConfig
+                    .builder()
+                    .imageHandlingStrategy(ImageLoaderStrategy(imageLoader))
+                    .build(),
+            )
+        }
+        captureScreenRoboImage()
+    }
+}
