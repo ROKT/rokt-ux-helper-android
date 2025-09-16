@@ -1,0 +1,29 @@
+{
+  "type": "Column",
+  "node": {
+    "styles": {
+      "elements": {
+        "own": [
+          {
+            "default": {
+              "container": {
+                "opacity": 0.7
+              },
+              "dimension": {
+                "width": {
+                  "type": "fixed",
+                  "value": "150"
+                },
+                "height": {
+                  "type": "fixed",
+                  "value": "180"
+                }
+              }
+            }
+          }
+        ]
+      }
+    },
+    "children": []
+  }
+}

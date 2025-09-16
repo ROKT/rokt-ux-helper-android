@@ -392,6 +392,7 @@ interface BaseModifierProperties {
     val padding: PaddingValues?
     val margin: PaddingValues?
     val rotateZ: Float?
+    val opacity: Float?
 }
 
 @Immutable
@@ -419,6 +420,7 @@ data class ModifierProperties(
     override val padding: PaddingValues? = null,
     override val margin: PaddingValues? = null,
     override val rotateZ: Float? = null,
+    override val opacity: Float? = null,
 ) : BaseModifierProperties
 
 @Immutable
@@ -451,6 +453,7 @@ class TransitionModifierProperties(
     override val borderUseTopCornerRadius: Boolean?,
     override val backgroundColor: ThemeColorUiModel? = null,
     override var backgroundImage: BackgroundImageUiModel? = null,
+    opacity: State<Float?>,
     blurRadius: State<Float?>,
     backgroundColorState: State<Color?>,
     padding: State<PaddingValues?>,
@@ -469,6 +472,7 @@ class TransitionModifierProperties(
     override val padding by padding
     override val margin by margin
     override val rotateZ by rotateZ
+    override val opacity by opacity
 }
 
 @Immutable

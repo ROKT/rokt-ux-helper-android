@@ -131,6 +131,7 @@ internal fun transformModifier(
     },
     borderUseTopCornerRadius = false,
     blurRadius = containerProperties?.blur,
+    opacity = containerProperties?.opacity,
     backgroundColor = backgroundProperties?.backgroundColor?.let { ThemeColorUiModel(it.light, it.dark) },
     backgroundImage = transformBackgroundImage(backgroundProperties?.backgroundImage),
 )

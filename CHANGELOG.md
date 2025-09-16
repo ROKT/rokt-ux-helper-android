@@ -9,6 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Added `opacity` styling property support in container nodes
+
 ### Fixed
 
 - Fixed CarouselDistribution pages filling screen when using fit-height
