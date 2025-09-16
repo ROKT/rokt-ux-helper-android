@@ -338,7 +338,7 @@ private fun RoktLayout(
             }
         }
     }
-    LaunchedEffect(key1 = Unit) {
+    LaunchedEffect(key1 = viewModel) {
         viewModel.setEvent(LayoutContract.LayoutEvent.LayoutInitialised)
     }
 }
