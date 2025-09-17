@@ -345,6 +345,8 @@ class ExperienceModelMapperImpl(private val experienceResponse: String, private 
             transformLayoutSchemaModel(child, offerModel, responseContextKey, itemIndex, module)
         }
 
+        is LayoutSchemaModel.TimerStateTrigger -> transformTimerStateTrigger(layoutSchemaModel)
+
         else -> null
     }
 
