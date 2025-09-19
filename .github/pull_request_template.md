@@ -1,3 +1,5 @@
+<!-- markdownlint-disable MD041 -->
+
 ## Background
 
 - {Explain the context of the change, including the problem it addresses or relevant background information}
@@ -23,4 +25,4 @@
 
 ## Reference Issue (For employees only. Ignore if you are an outside contributor)
 
-- Closes https://go/j/[ticket-number]
+- Closes [ticket](https://go/j/[ticket-number])
