@@ -76,6 +76,7 @@ internal class LayoutUiModelFactory(modifierFactory: ModifierFactory = ModifierF
             LayoutSchemaUiModel.DataImageCarouselUiModel::class to DataImageCarouselComponent(this, modifierFactory),
             LayoutSchemaUiModel.CatalogStackedCollectionUiModel::class to
                 CatalogStackedCollectionComponent(this, modifierFactory),
+            LayoutSchemaUiModel.TimerStateTriggerUiModel::class to TimerStateTriggerComponent(),
         )
 
     @Composable

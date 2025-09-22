@@ -1,0 +1,8 @@
+{
+  "type": "TimerStateTrigger",
+  "node": {
+    "customStateKey": "ZeroDelayState",
+    "value": 10,
+    "delay": 0
+  }
+}

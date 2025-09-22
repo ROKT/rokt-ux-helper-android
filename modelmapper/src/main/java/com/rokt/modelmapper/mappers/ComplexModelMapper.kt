@@ -537,6 +537,14 @@ internal fun transformCarouselProgressIndicatorItem(
     )
 }
 
+internal fun transformTimerStateTrigger(
+    layoutSchemaModel: LayoutSchemaModel.TimerStateTrigger,
+): LayoutSchemaUiModel.TimerStateTriggerUiModel = LayoutSchemaUiModel.TimerStateTriggerUiModel(
+    customStateKey = layoutSchemaModel.node.customStateKey,
+    delay = layoutSchemaModel.node.delay?.toLong() ?: 0,
+    value = layoutSchemaModel.node.value?.toInt() ?: 0,
+)
+
 private fun OrderableWhenCondition.toUiModel() = when (this) {
     OrderableWhenCondition.Is -> OrderableWhenUiCondition.Is
     OrderableWhenCondition.IsNot -> OrderableWhenUiCondition.IsNot

@@ -1,0 +1,8 @@
+{
+  "type": "TimerStateTrigger",
+  "node": {
+    "customStateKey": "TimerTestState",
+    "value": 1,
+    "delay": 100
+  }
+}

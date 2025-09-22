@@ -238,6 +238,9 @@ sealed class LayoutSchemaUiModel(
         val progressIndicatorContainer: ProgressIndicatorItemUiModel?,
         val customStateKey: String,
     ) : LayoutSchemaUiModel(ownModifiers, containerProperties, conditionalTransitionModifiers)
+
+    data class TimerStateTriggerUiModel(val customStateKey: String, val value: Int, val delay: Long) :
+        LayoutSchemaUiModel()
 }
 
 sealed class ButtonUiModel(

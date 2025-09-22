@@ -1,0 +1,8 @@
+{
+  "type": "TimerStateTrigger",
+  "node": {
+    "customStateKey": "LongDelayState",
+    "value": 5,
+    "delay": 1000
+  }
+}
