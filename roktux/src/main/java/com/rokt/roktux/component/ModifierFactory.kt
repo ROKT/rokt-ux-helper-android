@@ -463,13 +463,23 @@ internal class ModifierFactory {
                         properties.borderStyle ?: BorderStyleUiModel.Solid,
                         shape,
                     )
-                } ?: Modifier,
+                } ?: Modifier.multiDimensionalBorder(
+                    strokeWidths = listOf(1f),
+                    Color.Transparent,
+                    properties.borderRadius ?: 0.dp,
+                    properties.borderStyle ?: BorderStyleUiModel.Solid,
+                    shape,
+                ),
             )
             .then(
                 properties.backgroundColorState?.let {
-                    Modifier.clip(shape).background(color = it, shape = shape)
+                    Modifier
+                        .clip(shape)
+                        .background(color = it, shape = shape)
                 } ?: properties.backgroundColor?.let {
-                    Modifier.clip(shape).background(color = getUiThemeColor(it, isDarkModeEnabled), shape = shape)
+                    Modifier
+                        .clip(shape)
+                        .background(color = getUiThemeColor(it, isDarkModeEnabled), shape = shape)
                 } ?: Modifier,
             )
             .then(

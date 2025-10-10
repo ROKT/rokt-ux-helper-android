@@ -7,6 +7,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.semantics.invisibleToUser
 import androidx.compose.ui.semantics.semantics
@@ -39,6 +40,7 @@ internal class ImageComponent(private val modifierFactory: ModifierFactory) :
                 model = ImageRequest.Builder(LocalContext.current).data(url).build(),
                 contentDescription = model.alt,
                 imageLoader = LocalLayoutComponent.current[ImageLoader::class.java],
+                contentScale = model.scaleType ?: ContentScale.None,
                 modifier = modifier.then(
                     modifierFactory
                         .createModifier(

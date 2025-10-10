@@ -203,6 +203,7 @@ sealed class LayoutSchemaUiModel(
         val lightUrl: String,
         val darkUrl: String?,
         val title: String?,
+        val scaleType: ContentScale?,
         val alt: String?,
     ) : LayoutSchemaUiModel(ownModifiers, containerProperties, conditionalTransitionModifiers)
 

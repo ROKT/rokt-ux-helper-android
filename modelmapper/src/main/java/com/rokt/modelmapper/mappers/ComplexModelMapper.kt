@@ -5,6 +5,7 @@ import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.ui.layout.ContentScale
 import com.rokt.modelmapper.data.BindData
 import com.rokt.modelmapper.data.bindModel
 import com.rokt.modelmapper.data.getOfferImages
@@ -30,6 +31,8 @@ import com.rokt.modelmapper.uimodel.WhenUiTransition
 import com.rokt.network.model.BasicStateStylingBlock
 import com.rokt.network.model.BooleanWhenCondition
 import com.rokt.network.model.DataImageCarouselIndicatorStyles
+import com.rokt.network.model.DimensionHeightValue
+import com.rokt.network.model.DimensionWidthValue
 import com.rokt.network.model.EqualityWhenCondition
 import com.rokt.network.model.ExistenceWhenCondition
 import com.rokt.network.model.InTransition
@@ -455,6 +458,12 @@ internal fun transformDataImageCarousel(
     offerModel: OfferModel?,
 ): LayoutSchemaUiModel.DataImageCarouselUiModel {
     val ownStyles = dataImageCarousel.node.styles?.elements?.own?.toImmutableList()
+    val width = ownStyles?.firstOrNull()?.default?.dimension?.width
+    val height = ownStyles?.firstOrNull()?.default?.dimension?.height
+    val contentScale: ContentScale = when {
+        width is DimensionWidthValue.Fit && height is DimensionHeightValue.Fit -> ContentScale.Crop
+        else -> ContentScale.Fit
+    }
     val ownModifiers = ownStyles.transformModifier(
         transformSpacing = { ownStyle -> ownStyle.toBasicStateStylingBlock { style -> style.spacing } },
         transformDimension = { ownStyle -> ownStyle.toBasicStateStylingBlock { style -> style.dimension } },
@@ -509,6 +518,7 @@ internal fun transformDataImageCarousel(
                 darkUrl = entry.value.properties.get<String>(TypedKey<String>(KEY_DARK)),
                 lightUrl = entry.value.properties.get<String>(TypedKey<String>(KEY_LIGHT)).orEmpty(),
                 title = entry.value.properties.get<String>(TypedKey<String>(KEY_TITLE)),
+                scaleType = contentScale,
             )
         },
         customStateKey = "$dataImageCarouselCustomKeyPrefix${dataImageCarousel.node.imageKey}",
