@@ -463,7 +463,16 @@ internal class ModifierFactory {
                         properties.borderStyle ?: BorderStyleUiModel.Solid,
                         shape,
                     )
-                } ?: Modifier,
+                } ?: run {
+                    //  When borderWidth IS null → transparent border fallback
+                    Modifier.multiDimensionalBorder(
+                        strokeWidths = listOf(1f),
+                        Color.Transparent,
+                        properties.borderRadius ?: 0.dp,
+                        properties.borderStyle ?: BorderStyleUiModel.Solid,
+                        shape,
+                    )
+                },
             )
             .then(
                 properties.backgroundColorState?.let {

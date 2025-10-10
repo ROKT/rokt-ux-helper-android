@@ -1,5 +1,6 @@
 package com.rokt.modelmapper.mappers
 
+import androidx.compose.ui.layout.ContentScale
 import com.rokt.modelmapper.data.BindData
 import com.rokt.modelmapper.data.bindModel
 import com.rokt.modelmapper.hmap.TypedKey
@@ -18,6 +19,8 @@ import com.rokt.modelmapper.uimodel.OfferModel
 import com.rokt.network.model.BasicStateStylingBlock
 import com.rokt.network.model.BasicTextStyle
 import com.rokt.network.model.DataIconStyles
+import com.rokt.network.model.DimensionHeightValue
+import com.rokt.network.model.DimensionWidthValue
 import com.rokt.network.model.LayoutSchemaModel
 import com.rokt.network.model.StaticIconStyles
 import kotlinx.collections.immutable.toImmutableList
@@ -131,6 +134,12 @@ internal fun transformDataImage(
     itemIndex: Int,
 ): LayoutSchemaUiModel.ImageUiModel {
     val ownStyles = dataImageModel.node.styles?.elements?.own?.toImmutableList()
+    val width = ownStyles?.firstOrNull()?.default?.dimension?.width
+    val height = ownStyles?.firstOrNull()?.default?.dimension?.height
+    val contentScale: ContentScale = when {
+        width is DimensionWidthValue.Fit && height is DimensionHeightValue.Fit -> ContentScale.Crop
+        else -> ContentScale.Fit
+    }
     val ownModifiers = ownStyles.transformModifier(
         transformBorder = { ownStyle -> ownStyle.toBasicStateStylingBlock { style -> style.border } },
         transformSpacing = { ownStyle -> ownStyle.toBasicStateStylingBlock { style -> style.spacing } },
@@ -162,11 +171,18 @@ internal fun transformDataImage(
         darkUrl = boundModel?.properties?.get<String>(TypedKey<String>(KEY_DARK)),
         title = boundModel?.properties?.get<String>(TypedKey<String>(KEY_TITLE)),
         alt = boundModel?.properties?.get<String>(TypedKey<String>(KEY_ALT)),
+        scaleType = contentScale,
     )
 }
 
 internal fun transformStaticImage(staticImageModel: LayoutSchemaModel.StaticImage): LayoutSchemaUiModel.ImageUiModel {
     val ownStyles = staticImageModel.node.styles?.elements?.own?.toImmutableList()
+    val width = ownStyles?.firstOrNull()?.default?.dimension?.width
+    val height = ownStyles?.firstOrNull()?.default?.dimension?.height
+    val contentScale: ContentScale = when {
+        width is DimensionWidthValue.Fit && height is DimensionHeightValue.Fit -> ContentScale.Crop
+        else -> ContentScale.Fit
+    }
     val ownModifiers = ownStyles.transformModifier(
         transformBorder = { ownStyle -> ownStyle.toBasicStateStylingBlock { style -> style.border } },
         transformSpacing = { ownStyle -> ownStyle.toBasicStateStylingBlock { style -> style.spacing } },
@@ -196,6 +212,7 @@ internal fun transformStaticImage(staticImageModel: LayoutSchemaModel.StaticImag
         lightUrl = staticImageModel.node.url.light,
         darkUrl = staticImageModel.node.url.dark,
         title = staticImageModel.node.title,
+        scaleType = contentScale,
         alt = staticImageModel.node.alt,
     )
 }
