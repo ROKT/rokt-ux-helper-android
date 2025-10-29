@@ -9,6 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Fix Hero image DataImage component dimension
+
 ## [0.7.1] - 2025-09-16
 
 ### Fixed
