@@ -234,6 +234,7 @@ sealed class LayoutSchemaUiModel(
         val images: Map<Int, ImageUiModel>,
         val duration: Long,
         val indicator: ProgressIndicatorItemUiModel?,
+        val transition: DataImageTransition?,
         val activeIndicator: ProgressIndicatorItemUiModel?,
         val seenIndicator: ProgressIndicatorItemUiModel?,
         val progressIndicatorContainer: ProgressIndicatorItemUiModel?,
@@ -547,6 +548,23 @@ enum class OpenLinks {
     Internally,
     Externally,
     Passthrough,
+}
+
+data class DataImageTransition(val type: Type = Type.None, val settings: Settings? = null) {
+    enum class Type {
+        FadeInOut,
+        SlideInOut,
+        None,
+    }
+
+    data class Settings(val speed: String? = null) {
+        fun durationMillis(): Int = when (speed?.lowercase()) {
+            "slow" -> 1500
+            "medium" -> 800
+            "fast" -> 300
+            else -> 500
+        }
+    }
 }
 
 data class WhenUiTransition(

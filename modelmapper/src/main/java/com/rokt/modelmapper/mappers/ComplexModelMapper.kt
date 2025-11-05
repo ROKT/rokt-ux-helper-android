@@ -18,6 +18,8 @@ import com.rokt.modelmapper.mappers.ExperienceModelMapperImpl.Companion.KEY_TITL
 import com.rokt.modelmapper.uimodel.BooleanWhenUiCondition
 import com.rokt.modelmapper.uimodel.CatalogItemModel
 import com.rokt.modelmapper.uimodel.ConditionalTransitionModifier
+import com.rokt.modelmapper.uimodel.DataImageTransition
+import com.rokt.modelmapper.uimodel.DataImageTransition.Type
 import com.rokt.modelmapper.uimodel.EqualityWhenUiCondition
 import com.rokt.modelmapper.uimodel.ExistenceWhenUiCondition
 import com.rokt.modelmapper.uimodel.LayoutSchemaUiModel
@@ -31,8 +33,6 @@ import com.rokt.modelmapper.uimodel.WhenUiTransition
 import com.rokt.network.model.BasicStateStylingBlock
 import com.rokt.network.model.BooleanWhenCondition
 import com.rokt.network.model.DataImageCarouselIndicatorStyles
-import com.rokt.network.model.DimensionHeightValue
-import com.rokt.network.model.DimensionWidthValue
 import com.rokt.network.model.EqualityWhenCondition
 import com.rokt.network.model.ExistenceWhenCondition
 import com.rokt.network.model.InTransition
@@ -460,10 +460,7 @@ internal fun transformDataImageCarousel(
     val ownStyles = dataImageCarousel.node.styles?.elements?.own?.toImmutableList()
     val width = ownStyles?.firstOrNull()?.default?.dimension?.width
     val height = ownStyles?.firstOrNull()?.default?.dimension?.height
-    val contentScale: ContentScale = when {
-        width is DimensionWidthValue.Fit && height is DimensionHeightValue.Fit -> ContentScale.Crop
-        else -> ContentScale.Fit
-    }
+    val contentScale: ContentScale = ContentScale.Fit
     val ownModifiers = ownStyles.transformModifier(
         transformSpacing = { ownStyle -> ownStyle.toBasicStateStylingBlock { style -> style.spacing } },
         transformDimension = { ownStyle -> ownStyle.toBasicStateStylingBlock { style -> style.dimension } },
@@ -499,6 +496,9 @@ internal fun transformDataImageCarousel(
         },
         indicator = dataImageCarousel.node.styles?.elements?.indicator?.let {
             transformCarouselProgressIndicatorItem(it)
+        },
+        transition = dataImageCarousel.node.transition?.let {
+            transformCarouselTransition(it)
         },
         seenIndicator = dataImageCarousel.node.styles?.elements?.seenIndicator?.let {
             transformCarouselProgressIndicatorItem(it)
@@ -545,6 +545,26 @@ internal fun transformCarouselProgressIndicatorItem(
         conditionalTransitionModifiers = null,
         textStyles = null,
     )
+}
+
+internal fun transformCarouselTransition(transition: Any?): DataImageTransition = when (transition) {
+    is com.rokt.network.model.CarouselTransition.FadeInOut -> {
+        val speed = transition.settings?.speed?.name
+        DataImageTransition(
+            type = DataImageTransition.Type.FadeInOut,
+            settings = DataImageTransition.Settings(speed = speed),
+        )
+    }
+
+    is com.rokt.network.model.CarouselTransition.SlideInOut -> {
+        val speed = transition.settings?.speed?.name
+        DataImageTransition(
+            type = DataImageTransition.Type.SlideInOut,
+            settings = DataImageTransition.Settings(speed = speed),
+        )
+    }
+
+    else -> DataImageTransition(Type.None)
 }
 
 private fun OrderableWhenCondition.toUiModel() = when (this) {

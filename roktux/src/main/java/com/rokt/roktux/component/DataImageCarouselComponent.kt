@@ -1,9 +1,16 @@
 package com.rokt.roktux.component
 
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -25,6 +32,7 @@ import androidx.compose.ui.semantics.invisibleToUser
 import androidx.compose.ui.semantics.semantics
 import coil.ImageLoader
 import coil.request.ImageRequest
+import com.rokt.modelmapper.uimodel.DataImageTransition
 import com.rokt.modelmapper.uimodel.LayoutSchemaUiModel
 import com.rokt.roktux.di.layout.LocalLayoutComponent
 import com.rokt.roktux.viewmodel.layout.LayoutContract
@@ -118,6 +126,8 @@ internal class DataImageCarouselComponent(
                         )
                     }
                 }
+                val currentPage = pagerState.currentPage
+
                 HorizontalPager(
                     state = pagerState,
                     flingBehavior = PagerDefaults.flingBehavior(
@@ -126,17 +136,36 @@ internal class DataImageCarouselComponent(
                     ),
                     userScrollEnabled = false,
                 ) { page ->
-                    val image: LayoutSchemaUiModel.ImageUiModel? = carouselImages[page].first
-                    image?.let {
-                        factory.CreateComposable(
-                            model = image,
-                            modifier = Modifier,
-                            isPressed = isPressed,
-                            offerState = offerState,
-                            isDarkModeEnabled = isDarkModeEnabled,
-                            breakpointIndex = breakpointIndex,
-                            onEventSent = onEventSent,
-                        )
+                    val duration = model.transition?.settings?.durationMillis()?.toInt() ?: 300
+                    AnimatedContent(
+                        targetState = carouselImages[currentPage].first,
+                        transitionSpec = {
+                            if (model.transition?.type == DataImageTransition.Type.FadeInOut) {
+                                fadeIn(animationSpec = tween<Float>(durationMillis = duration)) togetherWith
+                                    fadeOut(animationSpec = tween<Float>(durationMillis = duration))
+                            } else {
+                                slideInHorizontally(
+                                    animationSpec = tween(durationMillis = duration, easing = FastOutSlowInEasing),
+                                    initialOffsetX = { fullWidth -> fullWidth },
+                                ) togetherWith slideOutHorizontally(
+                                    animationSpec = tween(durationMillis = duration, easing = FastOutSlowInEasing),
+                                    targetOffsetX = { fullWidth -> -fullWidth / 2 },
+                                )
+                            }
+                        },
+                        label = "Image Slide Animation",
+                    ) { image ->
+                        image?.let {
+                            factory.CreateComposable(
+                                model = image,
+                                modifier = Modifier,
+                                isPressed = isPressed,
+                                offerState = offerState,
+                                isDarkModeEnabled = isDarkModeEnabled,
+                                breakpointIndex = breakpointIndex,
+                                onEventSent = onEventSent,
+                            )
+                        }
                     }
                 }
                 if (pagerState.pageCount > 1) {

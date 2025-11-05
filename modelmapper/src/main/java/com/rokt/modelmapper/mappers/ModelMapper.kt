@@ -19,8 +19,6 @@ import com.rokt.modelmapper.uimodel.OfferModel
 import com.rokt.network.model.BasicStateStylingBlock
 import com.rokt.network.model.BasicTextStyle
 import com.rokt.network.model.DataIconStyles
-import com.rokt.network.model.DimensionHeightValue
-import com.rokt.network.model.DimensionWidthValue
 import com.rokt.network.model.LayoutSchemaModel
 import com.rokt.network.model.StaticIconStyles
 import kotlinx.collections.immutable.toImmutableList
@@ -136,10 +134,7 @@ internal fun transformDataImage(
     val ownStyles = dataImageModel.node.styles?.elements?.own?.toImmutableList()
     val width = ownStyles?.firstOrNull()?.default?.dimension?.width
     val height = ownStyles?.firstOrNull()?.default?.dimension?.height
-    val contentScale: ContentScale = when {
-        width is DimensionWidthValue.Fit && height is DimensionHeightValue.Fit -> ContentScale.Crop
-        else -> ContentScale.Fit
-    }
+    val contentScale: ContentScale = ContentScale.Fit
     val ownModifiers = ownStyles.transformModifier(
         transformBorder = { ownStyle -> ownStyle.toBasicStateStylingBlock { style -> style.border } },
         transformSpacing = { ownStyle -> ownStyle.toBasicStateStylingBlock { style -> style.spacing } },
@@ -179,10 +174,7 @@ internal fun transformStaticImage(staticImageModel: LayoutSchemaModel.StaticImag
     val ownStyles = staticImageModel.node.styles?.elements?.own?.toImmutableList()
     val width = ownStyles?.firstOrNull()?.default?.dimension?.width
     val height = ownStyles?.firstOrNull()?.default?.dimension?.height
-    val contentScale: ContentScale = when {
-        width is DimensionWidthValue.Fit && height is DimensionHeightValue.Fit -> ContentScale.Crop
-        else -> ContentScale.Fit
-    }
+    val contentScale: ContentScale = ContentScale.Fit
     val ownModifiers = ownStyles.transformModifier(
         transformBorder = { ownStyle -> ownStyle.toBasicStateStylingBlock { style -> style.border } },
         transformSpacing = { ownStyle -> ownStyle.toBasicStateStylingBlock { style -> style.spacing } },
