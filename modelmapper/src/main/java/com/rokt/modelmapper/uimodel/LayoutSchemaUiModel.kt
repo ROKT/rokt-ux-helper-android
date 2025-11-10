@@ -233,7 +233,8 @@ sealed class LayoutSchemaUiModel(
         override val conditionalTransitionModifiers: ConditionalTransitionModifier?,
         val images: Map<Int, ImageUiModel>,
         val duration: Long,
-        val indicator: ProgressIndicatorItemUiModel?,
+        val indicatorStyle: ProgressIndicatorItemUiModel?,
+        val indicator: DataImageIndicators?,
         val transition: DataImageTransition?,
         val activeIndicator: ProgressIndicatorItemUiModel?,
         val seenIndicator: ProgressIndicatorItemUiModel?,
@@ -559,11 +560,19 @@ data class DataImageTransition(val type: Type = Type.None, val settings: Setting
 
     data class Settings(val speed: String? = null) {
         fun durationMillis(): Int = when (speed?.lowercase()) {
-            "slow" -> 1500
-            "medium" -> 800
-            "fast" -> 300
+            "slow" -> 2000
+            "medium" -> 1000
+            "fast" -> 200
             else -> 500
         }
+    }
+}
+
+data class DataImageIndicators(val show: Boolean = false, val activeIndicatorMode: Mode = Mode.None) {
+    enum class Mode {
+        Timer,
+        Manual,
+        None,
     }
 }
 

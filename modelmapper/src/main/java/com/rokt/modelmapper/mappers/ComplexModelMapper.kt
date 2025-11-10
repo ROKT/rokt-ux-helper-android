@@ -18,6 +18,7 @@ import com.rokt.modelmapper.mappers.ExperienceModelMapperImpl.Companion.KEY_TITL
 import com.rokt.modelmapper.uimodel.BooleanWhenUiCondition
 import com.rokt.modelmapper.uimodel.CatalogItemModel
 import com.rokt.modelmapper.uimodel.ConditionalTransitionModifier
+import com.rokt.modelmapper.uimodel.DataImageIndicators
 import com.rokt.modelmapper.uimodel.DataImageTransition
 import com.rokt.modelmapper.uimodel.DataImageTransition.Type
 import com.rokt.modelmapper.uimodel.EqualityWhenUiCondition
@@ -494,8 +495,11 @@ internal fun transformDataImageCarousel(
         activeIndicator = dataImageCarousel.node.styles?.elements?.activeIndicator?.let {
             transformCarouselProgressIndicatorItem(it)
         },
-        indicator = dataImageCarousel.node.styles?.elements?.indicator?.let {
+        indicatorStyle = dataImageCarousel.node.styles?.elements?.indicator?.let {
             transformCarouselProgressIndicatorItem(it)
+        },
+        indicator = dataImageCarousel.node.indicators?.let {
+            transformCarouselIndicators(it)
         },
         transition = dataImageCarousel.node.transition?.let {
             transformCarouselTransition(it)
@@ -565,6 +569,21 @@ internal fun transformCarouselTransition(transition: Any?): DataImageTransition 
     }
 
     else -> DataImageTransition(Type.None)
+}
+
+internal fun transformCarouselIndicators(indicators: Any?): DataImageIndicators = when (indicators) {
+    is com.rokt.network.model.DataImageCarouselIndicators -> {
+        val show = indicators.show ?: false
+        val mode = when (indicators.activeIndicatorMode?.name?.lowercase()) {
+            "timer" -> DataImageIndicators.Mode.Timer
+            "manual" -> DataImageIndicators.Mode.Manual
+            else -> DataImageIndicators.Mode.None
+        }
+
+        DataImageIndicators(show = show, activeIndicatorMode = mode)
+    }
+
+    else -> DataImageIndicators()
 }
 
 private fun OrderableWhenCondition.toUiModel() = when (this) {
