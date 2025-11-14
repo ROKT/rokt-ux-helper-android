@@ -33,6 +33,7 @@ import com.rokt.modelmapper.uimodel.WhenUiPredicate
 import com.rokt.modelmapper.uimodel.WhenUiTransition
 import com.rokt.network.model.BasicStateStylingBlock
 import com.rokt.network.model.BooleanWhenCondition
+import com.rokt.network.model.CarouselActiveIndicatorMode
 import com.rokt.network.model.CarouselTransition
 import com.rokt.network.model.DataImageCarouselIndicatorStyles
 import com.rokt.network.model.DataImageCarouselIndicators
@@ -560,7 +561,7 @@ internal fun transformCarouselProgressIndicatorItem(
 
 internal fun transformCarouselTransition(transition: CarouselTransition): DataImageTransition = when (transition) {
     is com.rokt.network.model.CarouselTransition.FadeInOut -> {
-        val speed = transition.settings?.speed?.name
+        val speed = transition.settings?.speed
         DataImageTransition(
             type = DataImageTransition.Type.FadeInOut,
             settings = DataImageTransition.Settings(speed = speed),
@@ -568,7 +569,7 @@ internal fun transformCarouselTransition(transition: CarouselTransition): DataIm
     }
 
     is com.rokt.network.model.CarouselTransition.SlideInOut -> {
-        val speed = transition.settings?.speed?.name
+        val speed = transition.settings?.speed
         DataImageTransition(
             type = DataImageTransition.Type.SlideInOut,
             settings = DataImageTransition.Settings(speed = speed),
@@ -580,9 +581,9 @@ internal fun transformCarouselTransition(transition: CarouselTransition): DataIm
 
 internal fun transformCarouselIndicators(indicators: DataImageCarouselIndicators): DataImageIndicators {
     val show = indicators.show ?: false
-    val mode = when (indicators.activeIndicatorMode?.name?.lowercase()) {
-        IndicatorMode.Timer.name.lowercase() -> DataImageIndicators.Mode.Timer
-        IndicatorMode.Manual.name.lowercase() -> DataImageIndicators.Mode.Manual
+    val mode = when (indicators.activeIndicatorMode) {
+        CarouselActiveIndicatorMode.Timer -> DataImageIndicators.Mode.Timer
+        CarouselActiveIndicatorMode.Normal -> DataImageIndicators.Mode.Manual
         else -> DataImageIndicators.Mode.None
     }
     return DataImageIndicators(show = show, activeIndicatorMode = mode)
@@ -641,10 +642,4 @@ private fun WhenHidden.toHideUiModel() = when (this) {
 private fun ProgressionDirection.toProgressionUiModel() = when (this) {
     ProgressionDirection.Forward -> ProgressUiDirection.Forward
     ProgressionDirection.Backward -> ProgressUiDirection.Backward
-}
-
-enum class IndicatorMode {
-    Timer,
-    Manual,
-    None,
 }

@@ -19,6 +19,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.DpOffset
 import com.rokt.modelmapper.data.BindData
 import com.rokt.modelmapper.hmap.HMap
+import com.rokt.network.model.TransitionSpeedSetting
 import kotlinx.collections.immutable.ImmutableList
 
 @Immutable
@@ -558,12 +559,12 @@ data class DataImageTransition(val type: Type = Type.None, val settings: Setting
         None,
     }
 
-    data class Settings(val speed: String? = null) {
+    data class Settings(val speed: TransitionSpeedSetting? = null) {
         fun durationMillis(type: Type?): Int {
-            val animationSpeed = when (speed?.lowercase()) {
-                AnimationSpeed.Slow.name.lowercase() -> AnimationSpeed.Slow
-                AnimationSpeed.Medium.name.lowercase() -> AnimationSpeed.Medium
-                AnimationSpeed.Fast.name.lowercase() -> AnimationSpeed.Fast
+            val animationSpeed = when (speed) {
+                TransitionSpeedSetting.Slow -> AnimationSpeed.Slow
+                TransitionSpeedSetting.Medium -> AnimationSpeed.Medium
+                TransitionSpeedSetting.Fast -> AnimationSpeed.Fast
                 else -> AnimationSpeed.Unknown
             }
 
