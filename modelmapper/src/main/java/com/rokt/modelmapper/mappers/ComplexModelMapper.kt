@@ -33,7 +33,11 @@ import com.rokt.modelmapper.uimodel.WhenUiPredicate
 import com.rokt.modelmapper.uimodel.WhenUiTransition
 import com.rokt.network.model.BasicStateStylingBlock
 import com.rokt.network.model.BooleanWhenCondition
+import com.rokt.network.model.CarouselTransition
 import com.rokt.network.model.DataImageCarouselIndicatorStyles
+import com.rokt.network.model.DataImageCarouselIndicators
+import com.rokt.network.model.DimensionHeightValue
+import com.rokt.network.model.DimensionWidthValue
 import com.rokt.network.model.EqualityWhenCondition
 import com.rokt.network.model.ExistenceWhenCondition
 import com.rokt.network.model.InTransition
@@ -461,7 +465,10 @@ internal fun transformDataImageCarousel(
     val ownStyles = dataImageCarousel.node.styles?.elements?.own?.toImmutableList()
     val width = ownStyles?.firstOrNull()?.default?.dimension?.width
     val height = ownStyles?.firstOrNull()?.default?.dimension?.height
-    val contentScale: ContentScale = ContentScale.Fit
+    val contentScale: ContentScale = when {
+        width is DimensionWidthValue.Fit && height is DimensionHeightValue.Fit -> ContentScale.Crop
+        else -> ContentScale.Fit
+    }
     val ownModifiers = ownStyles.transformModifier(
         transformSpacing = { ownStyle -> ownStyle.toBasicStateStylingBlock { style -> style.spacing } },
         transformDimension = { ownStyle -> ownStyle.toBasicStateStylingBlock { style -> style.dimension } },
@@ -551,7 +558,7 @@ internal fun transformCarouselProgressIndicatorItem(
     )
 }
 
-internal fun transformCarouselTransition(transition: Any?): DataImageTransition = when (transition) {
+internal fun transformCarouselTransition(transition: CarouselTransition): DataImageTransition = when (transition) {
     is com.rokt.network.model.CarouselTransition.FadeInOut -> {
         val speed = transition.settings?.speed?.name
         DataImageTransition(
@@ -571,19 +578,14 @@ internal fun transformCarouselTransition(transition: Any?): DataImageTransition 
     else -> DataImageTransition(Type.None)
 }
 
-internal fun transformCarouselIndicators(indicators: Any?): DataImageIndicators = when (indicators) {
-    is com.rokt.network.model.DataImageCarouselIndicators -> {
-        val show = indicators.show ?: false
-        val mode = when (indicators.activeIndicatorMode?.name?.lowercase()) {
-            "timer" -> DataImageIndicators.Mode.Timer
-            "manual" -> DataImageIndicators.Mode.Manual
-            else -> DataImageIndicators.Mode.None
-        }
-
-        DataImageIndicators(show = show, activeIndicatorMode = mode)
+internal fun transformCarouselIndicators(indicators: DataImageCarouselIndicators): DataImageIndicators {
+    val show = indicators.show ?: false
+    val mode = when (indicators.activeIndicatorMode?.name?.lowercase()) {
+        IndicatorMode.Timer.name.lowercase() -> DataImageIndicators.Mode.Timer
+        IndicatorMode.Manual.name.lowercase() -> DataImageIndicators.Mode.Manual
+        else -> DataImageIndicators.Mode.None
     }
-
-    else -> DataImageIndicators()
+    return DataImageIndicators(show = show, activeIndicatorMode = mode)
 }
 
 private fun OrderableWhenCondition.toUiModel() = when (this) {
@@ -639,4 +641,10 @@ private fun WhenHidden.toHideUiModel() = when (this) {
 private fun ProgressionDirection.toProgressionUiModel() = when (this) {
     ProgressionDirection.Forward -> ProgressUiDirection.Forward
     ProgressionDirection.Backward -> ProgressUiDirection.Backward
+}
+
+enum class IndicatorMode {
+    Timer,
+    Manual,
+    None,
 }

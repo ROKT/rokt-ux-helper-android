@@ -559,11 +559,21 @@ data class DataImageTransition(val type: Type = Type.None, val settings: Setting
     }
 
     data class Settings(val speed: String? = null) {
-        fun durationMillis(): Int = when (speed?.lowercase()) {
-            "slow" -> 2000
-            "medium" -> 1000
-            "fast" -> 200
-            else -> 500
+        fun durationMillis(type: Type?): Int {
+            val animationSpeed = when (speed?.lowercase()) {
+                AnimationSpeed.Slow.name.lowercase() -> AnimationSpeed.Slow
+                AnimationSpeed.Medium.name.lowercase() -> AnimationSpeed.Medium
+                AnimationSpeed.Fast.name.lowercase() -> AnimationSpeed.Fast
+                else -> AnimationSpeed.Unknown
+            }
+
+            val duration = when (type) {
+                DataImageTransition.Type.FadeInOut -> animationSpeed.fadeInOutDuration
+                DataImageTransition.Type.SlideInOut -> animationSpeed.slideInOutDuration
+                else -> animationSpeed.slideInOutDuration
+            }
+
+            return duration
         }
     }
 }
@@ -604,3 +614,10 @@ enum class ProgressUiDirection {
 }
 
 enum class ConditionalStyleState { Normal, Transition }
+
+enum class AnimationSpeed(val fadeInOutDuration: Int, val slideInOutDuration: Int) {
+    Slow(1000, 2000),
+    Medium(400, 1000),
+    Fast(200, 200),
+    Unknown(500, 500),
+}

@@ -113,20 +113,23 @@ internal class DataImageCarouselComponent(
                             carouselPosition + 1,
                         ),
                     )
-                    while (true) {
-                        delay(model.duration)
-                        val pagePosition = if (pagerState.currentPage == pagerState.pageCount - 1) {
-                            0
-                        } else {
-                            pagerState.currentPage + 1
+                    // Skip auto-scroll if duration is 0 or negative (useful for tests)
+                    if (model.duration > 0) {
+                        while (true) {
+                            delay(model.duration)
+                            val pagePosition = if (pagerState.currentPage == pagerState.pageCount - 1) {
+                                0
+                            } else {
+                                pagerState.currentPage + 1
+                            }
+                            pagerState.scrollToPage(pagePosition)
+                            onEventSent(
+                                LayoutContract.LayoutEvent.SetCustomState(
+                                    model.customStateKey,
+                                    pagePosition + 1,
+                                ),
+                            )
                         }
-                        pagerState.scrollToPage(pagePosition)
-                        onEventSent(
-                            LayoutContract.LayoutEvent.SetCustomState(
-                                model.customStateKey,
-                                pagePosition + 1,
-                            ),
-                        )
                     }
                 }
                 val currentPage = pagerState.currentPage
@@ -139,7 +142,7 @@ internal class DataImageCarouselComponent(
                     ),
                     userScrollEnabled = false,
                 ) { page ->
-                    val duration = model.transition?.settings?.durationMillis()?.toInt() ?: 300
+                    val duration = model.transition?.settings?.durationMillis(model.transition?.type)?.toInt() ?: 300
                     AnimatedContent(
                         targetState = carouselImages[currentPage].first,
                         transitionSpec = {
@@ -152,11 +155,10 @@ internal class DataImageCarouselComponent(
                                     initialOffsetX = { fullWidth -> fullWidth },
                                 ) togetherWith slideOutHorizontally(
                                     animationSpec = tween(durationMillis = duration, easing = FastOutSlowInEasing),
-                                    targetOffsetX = { fullWidth -> -fullWidth / 2 },
+                                    targetOffsetX = { fullWidth -> -fullWidth },
                                 )
                             }
                         },
-                        label = "Image Slide Animation",
                     ) { image ->
                         image?.let {
                             factory.CreateComposable(
@@ -232,7 +234,7 @@ internal class DataImageCarouselComponent(
                                     CarouselIndicatorItemComponent(
                                         modifier = childModifier,
                                         model = indicator,
-                                        baseModel = model.indicatorStyle!!, // Safe to unwrap as we have already checked for null
+                                        baseModel = defaultIndicator,
                                         isPressed = isPressed,
                                         isDarkModeEnabled = isDarkModeEnabled,
                                         breakpointIndex = breakpointIndex,
