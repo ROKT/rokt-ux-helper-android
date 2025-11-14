@@ -2,7 +2,17 @@
   "type": "DataImageCarousel",
   "node": {
     "imageKey": "creativeCarouselImageVertical",
-    "duration": 4000,
+    "duration": 0,
+    "indicators": {
+      "show": true,
+      "activeIndicatorMode": "timer"
+    },
+    "transition": {
+      "type": "SlideInOut",
+      "settings": {
+        "speed": "slow"
+      }
+    },
     "styles": {
       "elements": {
         "own": [

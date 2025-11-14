@@ -19,6 +19,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.DpOffset
 import com.rokt.modelmapper.data.BindData
 import com.rokt.modelmapper.hmap.HMap
+import com.rokt.network.model.TransitionSpeedSetting
 import kotlinx.collections.immutable.ImmutableList
 
 @Immutable
@@ -233,7 +234,9 @@ sealed class LayoutSchemaUiModel(
         override val conditionalTransitionModifiers: ConditionalTransitionModifier?,
         val images: Map<Int, ImageUiModel>,
         val duration: Long,
-        val indicator: ProgressIndicatorItemUiModel?,
+        val indicatorStyle: ProgressIndicatorItemUiModel?,
+        val indicator: DataImageIndicators?,
+        val transition: DataImageTransition?,
         val activeIndicator: ProgressIndicatorItemUiModel?,
         val seenIndicator: ProgressIndicatorItemUiModel?,
         val progressIndicatorContainer: ProgressIndicatorItemUiModel?,
@@ -549,6 +552,41 @@ enum class OpenLinks {
     Passthrough,
 }
 
+data class DataImageTransition(val type: Type = Type.None, val settings: Settings? = null) {
+    enum class Type {
+        FadeInOut,
+        SlideInOut,
+        None,
+    }
+
+    data class Settings(val speed: TransitionSpeedSetting? = null) {
+        fun durationMillis(type: Type?): Int {
+            val animationSpeed = when (speed) {
+                TransitionSpeedSetting.Slow -> AnimationSpeed.Slow
+                TransitionSpeedSetting.Medium -> AnimationSpeed.Medium
+                TransitionSpeedSetting.Fast -> AnimationSpeed.Fast
+                else -> AnimationSpeed.Unknown
+            }
+
+            val duration = when (type) {
+                DataImageTransition.Type.FadeInOut -> animationSpeed.fadeInOutDuration
+                DataImageTransition.Type.SlideInOut -> animationSpeed.slideInOutDuration
+                else -> animationSpeed.slideInOutDuration
+            }
+
+            return duration
+        }
+    }
+}
+
+data class DataImageIndicators(val show: Boolean = false, val activeIndicatorMode: Mode = Mode.None) {
+    enum class Mode {
+        Timer,
+        Manual,
+        None,
+    }
+}
+
 data class WhenUiTransition(
     val inTransition: EnterTransition = EnterTransition.None,
     val outTransition: ExitTransition = ExitTransition.None,
@@ -577,3 +615,10 @@ enum class ProgressUiDirection {
 }
 
 enum class ConditionalStyleState { Normal, Transition }
+
+enum class AnimationSpeed(val fadeInOutDuration: Int, val slideInOutDuration: Int) {
+    Slow(1000, 2000),
+    Medium(400, 1000),
+    Fast(200, 200),
+    Unknown(500, 500),
+}

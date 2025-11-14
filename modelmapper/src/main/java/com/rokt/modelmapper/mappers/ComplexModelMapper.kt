@@ -18,6 +18,9 @@ import com.rokt.modelmapper.mappers.ExperienceModelMapperImpl.Companion.KEY_TITL
 import com.rokt.modelmapper.uimodel.BooleanWhenUiCondition
 import com.rokt.modelmapper.uimodel.CatalogItemModel
 import com.rokt.modelmapper.uimodel.ConditionalTransitionModifier
+import com.rokt.modelmapper.uimodel.DataImageIndicators
+import com.rokt.modelmapper.uimodel.DataImageTransition
+import com.rokt.modelmapper.uimodel.DataImageTransition.Type
 import com.rokt.modelmapper.uimodel.EqualityWhenUiCondition
 import com.rokt.modelmapper.uimodel.ExistenceWhenUiCondition
 import com.rokt.modelmapper.uimodel.LayoutSchemaUiModel
@@ -30,7 +33,10 @@ import com.rokt.modelmapper.uimodel.WhenUiPredicate
 import com.rokt.modelmapper.uimodel.WhenUiTransition
 import com.rokt.network.model.BasicStateStylingBlock
 import com.rokt.network.model.BooleanWhenCondition
+import com.rokt.network.model.CarouselActiveIndicatorMode
+import com.rokt.network.model.CarouselTransition
 import com.rokt.network.model.DataImageCarouselIndicatorStyles
+import com.rokt.network.model.DataImageCarouselIndicators
 import com.rokt.network.model.DimensionHeightValue
 import com.rokt.network.model.DimensionWidthValue
 import com.rokt.network.model.EqualityWhenCondition
@@ -497,8 +503,14 @@ internal fun transformDataImageCarousel(
         activeIndicator = dataImageCarousel.node.styles?.elements?.activeIndicator?.let {
             transformCarouselProgressIndicatorItem(it)
         },
-        indicator = dataImageCarousel.node.styles?.elements?.indicator?.let {
+        indicatorStyle = dataImageCarousel.node.styles?.elements?.indicator?.let {
             transformCarouselProgressIndicatorItem(it)
+        },
+        indicator = dataImageCarousel.node.indicators?.let {
+            transformCarouselIndicators(it)
+        },
+        transition = dataImageCarousel.node.transition?.let {
+            transformCarouselTransition(it)
         },
         seenIndicator = dataImageCarousel.node.styles?.elements?.seenIndicator?.let {
             transformCarouselProgressIndicatorItem(it)
@@ -545,6 +557,36 @@ internal fun transformCarouselProgressIndicatorItem(
         conditionalTransitionModifiers = null,
         textStyles = null,
     )
+}
+
+internal fun transformCarouselTransition(transition: CarouselTransition): DataImageTransition = when (transition) {
+    is com.rokt.network.model.CarouselTransition.FadeInOut -> {
+        val speed = transition.settings?.speed
+        DataImageTransition(
+            type = DataImageTransition.Type.FadeInOut,
+            settings = DataImageTransition.Settings(speed = speed),
+        )
+    }
+
+    is com.rokt.network.model.CarouselTransition.SlideInOut -> {
+        val speed = transition.settings?.speed
+        DataImageTransition(
+            type = DataImageTransition.Type.SlideInOut,
+            settings = DataImageTransition.Settings(speed = speed),
+        )
+    }
+
+    else -> DataImageTransition(Type.None)
+}
+
+internal fun transformCarouselIndicators(indicators: DataImageCarouselIndicators): DataImageIndicators {
+    val show = indicators.show ?: false
+    val mode = when (indicators.activeIndicatorMode) {
+        CarouselActiveIndicatorMode.Timer -> DataImageIndicators.Mode.Timer
+        CarouselActiveIndicatorMode.Normal -> DataImageIndicators.Mode.Manual
+        else -> DataImageIndicators.Mode.None
+    }
+    return DataImageIndicators(show = show, activeIndicatorMode = mode)
 }
 
 private fun OrderableWhenCondition.toUiModel() = when (this) {

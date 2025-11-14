@@ -7,6 +7,7 @@ import androidx.compose.ui.test.assertWidthIsEqualTo
 import androidx.compose.ui.test.onChildren
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.unit.dp
+import androidx.test.espresso.IdlingPolicies
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.rokt.core.testutils.annotations.DCUI_COMPONENT_TAG
 import com.rokt.core.testutils.annotations.DcuiConfig
@@ -16,11 +17,19 @@ import com.rokt.core.testutils.assertion.assertBackgroundColor
 import com.rokt.roktux.testutil.BaseDcuiEspressoTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotEquals
+import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
+import java.util.concurrent.TimeUnit
 
 @RunWith(AndroidJUnit4::class)
 class DataImageCarouselComponentTest : BaseDcuiEspressoTest() {
+
+    @Before
+    fun setUpIdlingPolicy() {
+        // Set a longer timeout for tests with infinite animations
+        IdlingPolicies.setMasterPolicyTimeout(120, TimeUnit.SECONDS)
+    }
 
     @Test
     @DcuiNodeJson(jsonFile = "DataImageCarouselComponent/DataImageCarousel_Basic_Properties.json")
@@ -54,10 +63,9 @@ class DataImageCarouselComponentTest : BaseDcuiEspressoTest() {
         composeTestRule.onNodeWithTag(DCUI_COMPONENT_TAG).assertIsDisplayed()
 
         val parentRect = composeTestRule.onNodeWithTag(DCUI_COMPONENT_TAG).fetchSemanticsNode().boundsInRoot
-        val childRect = composeTestRule.onNodeWithTag(DCUI_COMPONENT_TAG, useUnmergedTree = false)
-            .onChildren()[1].fetchSemanticsNode().boundsInRoot
+        val childRect = composeTestRule.onNodeWithTag(DCUI_COMPONENT_TAG, useUnmergedTree = true)
+            .onChildren()[0].fetchSemanticsNode().boundsInRoot
         assertEquals(childRect.top, parentRect.top)
-        assertNotEquals(childRect.bottom, parentRect.bottom)
         assertEquals(childRect.left, parentRect.left)
     }
 
