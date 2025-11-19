@@ -9,8 +9,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Updated to the latest DCUI schema version.
+- Added support for the new transition node as per updated DCUI schema.
+
 ### Fixed
 
+- Updated image scaling logic for cross-platform consistency.
 - Fix Hero image DataImage component dimension
 
 ## [0.7.1] - 2025-09-16
