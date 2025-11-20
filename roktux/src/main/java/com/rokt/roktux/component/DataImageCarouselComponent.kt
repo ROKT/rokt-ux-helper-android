@@ -132,7 +132,6 @@ internal class DataImageCarouselComponent(
                         }
                     }
                 }
-                val currentPage = pagerState.currentPage
 
                 HorizontalPager(
                     state = pagerState,
@@ -144,7 +143,7 @@ internal class DataImageCarouselComponent(
                 ) { page ->
                     val duration = model.transition?.settings?.durationMillis(model.transition?.type)?.toInt() ?: 300
                     AnimatedContent(
-                        targetState = carouselImages[currentPage].first,
+                        targetState = carouselImages[page].first,
                         transitionSpec = {
                             if (model.transition?.type == DataImageTransition.Type.FadeInOut) {
                                 fadeIn(animationSpec = tween<Float>(durationMillis = duration)) togetherWith
