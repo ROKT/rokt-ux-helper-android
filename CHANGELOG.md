@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.8.0] - 2025-11-20
+
 ### Added
 
 - Updated to the DCUI schema version `2.3.0`.
@@ -113,7 +115,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Initial implementation of UX Helper
 
-[unreleased]: https://github.com/ROKT/rokt-ux-helper-android/compare/0.7.1...HEAD
+[unreleased]: https://github.com/ROKT/rokt-ux-helper-android/compare/0.8.0...HEAD
+[0.8.0]: https://github.com/ROKT/rokt-ux-helper-android/compare/0.7.1...0.8.0
 [0.7.1]: https://github.com/ROKT/rokt-ux-helper-android/compare/0.7.0...0.7.1
 [0.7.0]: https://github.com/ROKT/rokt-ux-helper-android/compare/0.6.0...0.7.0
 [0.6.0]: https://github.com/ROKT/rokt-ux-helper-android/compare/0.5.0...0.6.0
