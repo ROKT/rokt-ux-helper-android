@@ -11,6 +11,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.8.1] - 2025-12-01
 
+### Changed
+
+- Replaced desugaring configuration with native Kotlin APIs.
+
 ## [0.8.0] - 2025-11-20
 
 ### Added
