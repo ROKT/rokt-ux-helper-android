@@ -3,7 +3,6 @@ package com.rokt.roktux
 import com.android.build.api.dsl.CommonExtension
 import org.gradle.api.JavaVersion
 import org.gradle.api.Project
-import org.gradle.kotlin.dsl.dependencies
 import org.gradle.kotlin.dsl.provideDelegate
 import org.gradle.kotlin.dsl.withType
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
@@ -21,7 +20,6 @@ fun Project.configureKotlinAndroid(commonExtension: CommonExtension<*, *, *, *, 
             // https://developer.android.com/studio/write/java11-minimal-support-table
             sourceCompatibility = JavaVersion.VERSION_11
             targetCompatibility = JavaVersion.VERSION_11
-            isCoreLibraryDesugaringEnabled = true
         }
 
         lint {
@@ -47,9 +45,5 @@ fun Project.configureKotlinAndroid(commonExtension: CommonExtension<*, *, *, *, 
                 "-opt-in=kotlin.Experimental",
             )
         }
-    }
-
-    dependencies {
-        add("coreLibraryDesugaring", libs.findLibrary("android.desugarJdkLibs").get())
     }
 }

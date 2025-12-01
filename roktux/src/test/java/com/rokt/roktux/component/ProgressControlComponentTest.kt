@@ -49,8 +49,7 @@ class ProgressControlComponentTest : BaseDcuiEspressoTest() {
             .performClick()
 
         Assert.assertTrue(
-            getCapturedEvents().stream()
-                .anyMatch { e -> e.equals(LayoutContract.LayoutEvent.LayoutVariantNavigated(1)) },
+            getCapturedEvents().any { e -> e.equals(LayoutContract.LayoutEvent.LayoutVariantNavigated(1)) },
         )
     }
 
@@ -64,8 +63,7 @@ class ProgressControlComponentTest : BaseDcuiEspressoTest() {
             .performClick()
 
         Assert.assertFalse(
-            getCapturedEvents().stream()
-                .anyMatch { e -> e.equals(LayoutContract.LayoutEvent.LayoutVariantNavigated(2)) },
+            getCapturedEvents().any { e -> e.equals(LayoutContract.LayoutEvent.LayoutVariantNavigated(2)) },
         )
     }
 
@@ -79,8 +77,7 @@ class ProgressControlComponentTest : BaseDcuiEspressoTest() {
             .performClick()
 
         Assert.assertTrue(
-            getCapturedEvents().stream()
-                .anyMatch { e -> e.equals(LayoutContract.LayoutEvent.LayoutVariantNavigated(0)) },
+            getCapturedEvents().any { e -> e.equals(LayoutContract.LayoutEvent.LayoutVariantNavigated(0)) },
         )
     }
 
@@ -94,8 +91,7 @@ class ProgressControlComponentTest : BaseDcuiEspressoTest() {
             .performClick()
 
         Assert.assertFalse(
-            getCapturedEvents().stream()
-                .anyMatch { e -> e.equals(LayoutContract.LayoutEvent.LayoutVariantNavigated(0)) },
+            getCapturedEvents().any { e -> e.equals(LayoutContract.LayoutEvent.LayoutVariantNavigated(0)) },
         )
     }
 }

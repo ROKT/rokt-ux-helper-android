@@ -1,6 +1,5 @@
 [versions]
 androidGradlePlugin = "8.6.1"
-androidDesugarJdkLibs = "2.1.5"
 androidxActivity = "1.10.1"
 androidxAppCompat = "1.7.1"
 androidxComposeBom = "2024.09.02"
@@ -47,7 +46,6 @@ roborazzi = "1.43.0"
 [libraries]
 androidx-activity-compose = { group = "androidx.activity", name = "activity-compose", version.ref = "androidxActivity" }
 androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "androidxAppCompat" }
-android-desugarJdkLibs = { group = "com.android.tools", name = "desugar_jdk_libs", version.ref = "androidDesugarJdkLibs" }
 androidx-compose-bom = { group = "androidx.compose", name = "compose-bom", version.ref = "androidxComposeBom" }
 androidx-compose-foundation = { group = "androidx.compose.foundation", name = "foundation" }
 androidx-compose-foundation-layout = { group = "androidx.compose.foundation", name = "foundation-layout" }
