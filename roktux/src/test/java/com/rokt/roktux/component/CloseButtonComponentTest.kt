@@ -43,6 +43,6 @@ class CloseButtonComponentTest : BaseDcuiEspressoTest() {
         composeTestRule.onNodeWithTag(DCUI_COMPONENT_TAG, useUnmergedTree = true)
             .performClick()
 
-        assertTrue(getCapturedEvents().stream().anyMatch { e -> e is LayoutContract.LayoutEvent.CloseSelected })
+        assertTrue(getCapturedEvents().any { e -> e is LayoutContract.LayoutEvent.CloseSelected })
     }
 }

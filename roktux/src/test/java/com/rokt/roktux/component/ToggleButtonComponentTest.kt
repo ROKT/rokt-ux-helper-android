@@ -35,8 +35,7 @@ class ToggleButtonComponentTest : BaseDcuiEspressoTest() {
             .performClick()
 
         Assert.assertTrue(
-            getCapturedEvents().stream()
-                .anyMatch { e -> e.equals(LayoutContract.LayoutEvent.SetCustomState("ToggleButtonState", 1)) },
+            getCapturedEvents().any { e -> e.equals(LayoutContract.LayoutEvent.SetCustomState("ToggleButtonState", 1)) },
         )
     }
 }

@@ -42,8 +42,7 @@ class StaticLinkTest : BaseDcuiEspressoTest() {
             .performTouchInput { click(position = centerLeft) }
 
         Assert.assertTrue(
-            getCapturedEvents().stream()
-                .anyMatch { e -> e.equals(LayoutContract.LayoutEvent.UrlSelected("someUrl", OpenLinks.Internally)) },
+            getCapturedEvents().any { e -> e.equals(LayoutContract.LayoutEvent.UrlSelected("someUrl", OpenLinks.Internally)) },
         )
     }
 

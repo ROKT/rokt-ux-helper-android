@@ -267,15 +267,14 @@ class TextComponentTest : BaseDcuiEspressoTest() {
             .performTouchInput { click(position = centerLeft) }
 
         Assert.assertTrue(
-            getCapturedEvents().stream()
-                .anyMatch { e ->
-                    e.equals(
-                        LayoutContract.LayoutEvent.UrlSelected(
-                            "https://rokt.com",
-                            OpenLinks.Externally,
-                        ),
-                    )
-                },
+            getCapturedEvents().any { e ->
+                e.equals(
+                    LayoutContract.LayoutEvent.UrlSelected(
+                        "https://rokt.com",
+                        OpenLinks.Externally,
+                    ),
+                )
+            },
         )
     }
 
@@ -304,15 +303,14 @@ class TextComponentTest : BaseDcuiEspressoTest() {
             .performTouchInput { click(position = Offset(10f, 10f)) }
 
         Assert.assertTrue(
-            getCapturedEvents().stream()
-                .anyMatch { e ->
-                    e.equals(
-                        LayoutContract.LayoutEvent.UrlSelected(
-                            "https://rokt.com",
-                            OpenLinks.Externally,
-                        ),
-                    )
-                },
+            getCapturedEvents().any { e ->
+                e.equals(
+                    LayoutContract.LayoutEvent.UrlSelected(
+                        "https://rokt.com",
+                        OpenLinks.Externally,
+                    ),
+                )
+            },
         )
 
         // Click on 'PRIVACY POLICY' link
@@ -321,15 +319,14 @@ class TextComponentTest : BaseDcuiEspressoTest() {
             .performTouchInput { click(position = centerRight) }
 
         Assert.assertTrue(
-            getCapturedEvents().stream()
-                .anyMatch { e ->
-                    e.equals(
-                        LayoutContract.LayoutEvent.UrlSelected(
-                            "https://rokt.com/privacy-policy/",
-                            OpenLinks.Externally,
-                        ),
-                    )
-                },
+            getCapturedEvents().any { e ->
+                e.equals(
+                    LayoutContract.LayoutEvent.UrlSelected(
+                        "https://rokt.com/privacy-policy/",
+                        OpenLinks.Externally,
+                    ),
+                )
+            },
         )
     }
 

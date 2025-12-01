@@ -35,7 +35,7 @@ internal class ToggleButtonStateTriggerComponent(
             ignoreChildrenForAccessibility = true,
             onEventSent = onEventSent,
         ) {
-            val newState = if (offerState.customState.getOrDefault(model.customStateKey, 0) == 0) {
+            val newState = if ((offerState.customState[model.customStateKey] ?: 0) == 0) {
                 1
             } else {
                 0

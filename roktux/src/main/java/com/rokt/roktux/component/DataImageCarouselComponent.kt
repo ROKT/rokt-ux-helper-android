@@ -63,7 +63,7 @@ internal class DataImageCarouselComponent(
             isPressed = isPressed,
         )
         // State is stored from 1 to n, but the pager starts from 0
-        val carouselPosition = offerState.customState.getOrDefault(model.customStateKey, 1) - 1
+        val carouselPosition = (offerState.customState[model.customStateKey] ?: 1) - 1
         val context = LocalContext.current
         val imageLoader = LocalLayoutComponent.current[ImageLoader::class.java]
         val carouselImages = remember(isDarkModeEnabled) {
