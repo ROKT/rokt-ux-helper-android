@@ -10,6 +10,7 @@ import org.gradle.api.Project
 import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.dependencies
 import org.gradle.kotlin.dsl.kotlin
+import org.gradle.kotlin.dsl.project
 
 class AndroidLibraryConventionPlugin : Plugin<Project> {
     override fun apply(target: Project) {
@@ -19,12 +20,14 @@ class AndroidLibraryConventionPlugin : Plugin<Project> {
                 apply("org.jetbrains.kotlin.android")
             }
             var versionParam = "sdkVersionName"
+            var testModuleName = ":ux-helper:testutils"
             if (rootProject.name.contains(
                     "UxHelper",
                     true,
                 )
             ) {
                 versionParam = "roktUxHelper"
+                testModuleName = ":testutils"
             }
             if (target.path.contains(":ux-helper:")) {
                 versionParam = "roktUxHelper"
@@ -52,6 +55,7 @@ class AndroidLibraryConventionPlugin : Plugin<Project> {
             dependencies {
                 add("androidTestImplementation", kotlin("test"))
                 add("testImplementation", kotlin("test"))
+                add("testImplementation", project(testModuleName))
             }
         }
     }
