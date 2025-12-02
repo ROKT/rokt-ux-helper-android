@@ -9,6 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- Consolidated `modelmapper` and `core` modules into `roktux`
+
 ## [0.8.1] - 2025-12-01
 
 ### Changed
