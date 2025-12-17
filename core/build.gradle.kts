@@ -37,11 +37,22 @@ android {
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
     }
+
+    testOptions {
+        unitTests {
+            isIncludeAndroidResources = true
+        }
+    }
 }
 
 dependencies {
     implementation(libs.androidx.lifecycle.viewModelCompose)
     testImplementation(libs.junit4)
+    testImplementation(libs.robolectric)
+    testImplementation(platform(libs.androidx.compose.bom))
+    testImplementation(libs.androidx.compose.ui.test)
+    testImplementation(libs.androidx.junit)
+    debugImplementation(libs.androidx.compose.ui.testManifest)
     lintChecks(libs.compose.lint.checks)
     dokkaPlugin(libs.dokka.android)
 }
