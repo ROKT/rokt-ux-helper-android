@@ -57,7 +57,7 @@ jobs:
       - name: Upload Test Report
         uses: codecov/codecov-action@671740ac38dd9b0130fbe1cec585b89eea48d3de # v5.5.2
         with:
-          files: ./roktux/build/reports/kover/report.xml,./modelmapper/build/reports/kover/report.xml,./core/build/reports/kover/report.xml
+          files: ./roktux/build/reports/kover/report.xml
           token: ${{ secrets.CODECOV_TOKEN }}
 
   assemble-debug:
