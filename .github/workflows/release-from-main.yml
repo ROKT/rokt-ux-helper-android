@@ -191,8 +191,7 @@ jobs:
             exit 1
           fi
 
-          sed -i.bak 's/^[[:space:]]*roktUxHelper[[:space:]]*=[[:space:]]*"[^"]*"/roktUxHelper = "'"$new_version"'"/' "$file"
-          rm -f "$file.bak"
+          sed -i 's/^[[:space:]]*roktUxHelper[[:space:]]*=[[:space:]]*"[^"]*"/roktUxHelper = "'"$new_version"'"/' "$file"
           grep -nE '^[[:space:]]*roktUxHelper' "$file"
 
       - name: Create Pull Request
