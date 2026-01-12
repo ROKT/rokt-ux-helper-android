@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.8.3] - 2026-01-12
+
 ### Fixed
 
 - DataImageCarousel scaling issue for smaller images.
@@ -131,7 +133,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Initial implementation of UX Helper
 
-[unreleased]: https://github.com/ROKT/rokt-ux-helper-android/compare/0.8.2...HEAD
+[unreleased]: https://github.com/ROKT/rokt-ux-helper-android/compare/0.8.3...HEAD
+[0.8.3]: https://github.com/ROKT/rokt-ux-helper-android/compare/0.8.2...0.8.3
 [0.8.2]: https://github.com/ROKT/rokt-ux-helper-android/compare/0.8.1...0.8.2
 [0.8.1]: https://github.com/ROKT/rokt-ux-helper-android/compare/0.8.0...0.8.1
 [0.8.0]: https://github.com/ROKT/rokt-ux-helper-android/compare/0.7.1...0.8.0
