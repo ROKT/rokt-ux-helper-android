@@ -18,7 +18,7 @@ fun Project.configureMavenPublishing(roktMavenPublish: RoktMavenPublishExtension
             )
 
             if (!shouldSkipSign) {
-                signAllPublications()
+                //   signAllPublications()
             } else {
                 println("Skip signAllPublications")
             }

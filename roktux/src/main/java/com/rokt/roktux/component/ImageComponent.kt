@@ -1,5 +1,6 @@
 package com.rokt.roktux.component
 
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -50,7 +51,7 @@ internal class ImageComponent(private val modifierFactory: ModifierFactory) :
                             isPressed = isPressed,
                             isDarkModeEnabled = isDarkModeEnabled,
                             offerState = offerState,
-                        )
+                        ).aspectRatio(16f / 9f)
                         .semantics {
                             if (model.alt.isNullOrBlank()) {
                                 invisibleToUser()

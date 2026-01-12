@@ -1,3 +1,4 @@
+
 plugins {
     alias(libs.plugins.rokt.android.library)
     alias(libs.plugins.rokt.android.library.compose)
@@ -12,7 +13,8 @@ plugins {
 val libGroupId = "com.rokt"
 val libArtifactId = "roktux"
 val formattedVersion by extra {
-    val versionFromProperty = project.findProperty("VERSION")?.toString().takeIf { !it.isNullOrBlank() } ?: "0.0.0"
+    val versionFromProperty =
+        project.findProperty("VERSION")?.toString().takeIf { !it.isNullOrBlank() } ?: "10.25.1234564564"
     val versionSuffix = project.findProperty("VERSION_SUFFIX")?.toString().takeIf { !it.isNullOrBlank() } ?: ""
     versionFromProperty + versionSuffix
 }

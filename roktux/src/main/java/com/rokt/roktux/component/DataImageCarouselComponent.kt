@@ -15,6 +15,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerDefaults
 import androidx.compose.foundation.pager.rememberPagerState
@@ -22,6 +23,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -29,7 +31,9 @@ import androidx.compose.ui.BiasAlignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.invisibleToUser
 import androidx.compose.ui.semantics.semantics
@@ -132,7 +136,8 @@ internal class DataImageCarouselComponent(
                         }
                     }
                 }
-
+                var maxPageHeight by remember { mutableStateOf(0) }
+                val currentPage = pagerState.currentPage
                 HorizontalPager(
                     state = pagerState,
                     flingBehavior = PagerDefaults.flingBehavior(
@@ -141,34 +146,62 @@ internal class DataImageCarouselComponent(
                     ),
                     userScrollEnabled = false,
                 ) { page ->
-                    val duration = model.transition?.settings?.durationMillis(model.transition?.type)?.toInt() ?: 300
-                    AnimatedContent(
-                        targetState = carouselImages[page].first,
-                        transitionSpec = {
-                            if (model.transition?.type == DataImageTransition.Type.FadeInOut) {
-                                fadeIn(animationSpec = tween<Float>(durationMillis = duration)) togetherWith
-                                    fadeOut(animationSpec = tween<Float>(durationMillis = duration))
-                            } else {
-                                slideInHorizontally(
-                                    animationSpec = tween(durationMillis = duration, easing = FastOutSlowInEasing),
-                                    initialOffsetX = { fullWidth -> fullWidth },
-                                ) togetherWith slideOutHorizontally(
-                                    animationSpec = tween(durationMillis = duration, easing = FastOutSlowInEasing),
-                                    targetOffsetX = { fullWidth -> -fullWidth },
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .onGloballyPositioned { coordinates ->
+                                println("**** ROKT onGloballyPositioned ${coordinates.size}")
+                                val height = coordinates.size.height
+                                if (height > maxPageHeight) {
+                                    maxPageHeight = height
+                                }
+                            }
+                            .then(
+                                if (maxPageHeight > 0) {
+                                    Modifier.height(with(LocalDensity.current) { maxPageHeight.toDp() })
+                                    Modifier.height(
+                                        with(LocalDensity.current) {
+                                            println(
+                                                "**** ROKT maxPageHeight: $maxPageHeight converted to dp: ${maxPageHeight.toDp()}",
+                                            )
+                                            maxPageHeight.toDp()
+                                        },
+                                    )
+                                } else {
+                                    Modifier
+                                },
+                            ),
+                    ) {
+                        val duration =
+                            model.transition?.settings?.durationMillis(model.transition?.type)?.toInt() ?: 300
+                        AnimatedContent(
+                            targetState = carouselImages[currentPage].first,
+                            transitionSpec = {
+                                if (model.transition?.type == DataImageTransition.Type.FadeInOut) {
+                                    fadeIn(animationSpec = tween<Float>(durationMillis = duration)) togetherWith
+                                        fadeOut(animationSpec = tween<Float>(durationMillis = duration))
+                                } else {
+                                    slideInHorizontally(
+                                        animationSpec = tween(durationMillis = duration, easing = FastOutSlowInEasing),
+                                        initialOffsetX = { fullWidth -> fullWidth },
+                                    ) togetherWith slideOutHorizontally(
+                                        animationSpec = tween(durationMillis = duration, easing = FastOutSlowInEasing),
+                                        targetOffsetX = { fullWidth -> -fullWidth },
+                                    )
+                                }
+                            },
+                        ) { image ->
+                            image?.let {
+                                factory.CreateComposable(
+                                    model = image,
+                                    modifier = Modifier,
+                                    isPressed = isPressed,
+                                    offerState = offerState,
+                                    isDarkModeEnabled = isDarkModeEnabled,
+                                    breakpointIndex = breakpointIndex,
+                                    onEventSent = onEventSent,
                                 )
                             }
-                        },
-                    ) { image ->
-                        image?.let {
-                            factory.CreateComposable(
-                                model = image,
-                                modifier = Modifier,
-                                isPressed = isPressed,
-                                offerState = offerState,
-                                isDarkModeEnabled = isDarkModeEnabled,
-                                breakpointIndex = breakpointIndex,
-                                onEventSent = onEventSent,
-                            )
                         }
                     }
                 }
