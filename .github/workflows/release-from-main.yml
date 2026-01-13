@@ -101,7 +101,7 @@ jobs:
         run: |
           echo "Renamed AAR Files: ${{ steps.rename-aar.outputs.renamed_aar_files }}"
       - name: Upload AAR artifacts
-        uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 #v5.0.0
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f #v6.0.0
         with:
           name: aar-files
           path: "**/*.aar"
@@ -127,7 +127,7 @@ jobs:
           done
           echo "renamed_pom_files=$(IFS=","; echo "${RENAMED_FILES[*]}")" >> $GITHUB_OUTPUT
       - name: Upload POM artifacts
-        uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 #v5.0.0
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f #v6.0.0
         with:
           name: pom-files
           path: "**/*.pom"
