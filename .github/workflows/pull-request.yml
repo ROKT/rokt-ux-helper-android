@@ -31,6 +31,11 @@ jobs:
 
   lint:
     runs-on: ubuntu-latest
+    env:
+      GRADLE_OPTS: >-
+        -Xmx2g
+        -XX:+UseParallelGC
+        -XX:MaxMetaspaceSize=512m
     steps:
       - name: Checkout repository
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
@@ -39,10 +44,15 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@4d9f0ba0025fe599b4ebab900eb7f3a1d93ef4c2 # v5.0.0
       - name: Run lint
-        run: ./gradlew lint
+        run: ./gradlew lint --no-daemon --max-workers=2
 
   unit-test:
     runs-on: ubuntu-latest
+    env:
+      GRADLE_OPTS: >-
+        -Xmx2g
+        -XX:+UseParallelGC
+        -XX:MaxMetaspaceSize=512m
     steps:
       - name: Checkout repository
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
@@ -51,9 +61,9 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@4d9f0ba0025fe599b4ebab900eb7f3a1d93ef4c2 # v5.0.0
       - name: Run tests
-        run: ./gradlew test
+        run: ./gradlew test --no-daemon --max-workers=2 -Dkotlin.daemon.jvm.options="-Xmx1g"
       - name: Generate coverage
-        run: ./gradlew koverXmlReport
+        run: ./gradlew koverXmlReport --no-daemon --max-workers=2
       - name: Upload Test Report
         uses: codecov/codecov-action@671740ac38dd9b0130fbe1cec585b89eea48d3de # v5.5.2
         with:
@@ -62,6 +72,11 @@ jobs:
 
   assemble-debug:
     runs-on: ubuntu-latest
+    env:
+      GRADLE_OPTS: >-
+        -Xmx2g
+        -XX:+UseParallelGC
+        -XX:MaxMetaspaceSize=512m
     steps:
       - name: Checkout repository
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
@@ -70,7 +85,7 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@4d9f0ba0025fe599b4ebab900eb7f3a1d93ef4c2 # v5.0.0
       - name: Assemble debug
-        run: ./gradlew --no-daemon assembleDebug
+        run: ./gradlew --no-daemon --max-workers=2 assembleDebug -Dkotlin.daemon.jvm.options="-Xmx1g"
       - name: Upload APK artifacts
         uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
         with:
@@ -84,6 +99,11 @@ jobs:
 
   snapshot-test:
     runs-on: ubuntu-latest
+    env:
+      GRADLE_OPTS: >-
+        -Xmx2g
+        -XX:+UseParallelGC
+        -XX:MaxMetaspaceSize=512m
     steps:
       - name: Checkout repository
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
@@ -99,7 +119,7 @@ jobs:
       - name: Verify snapshots
         id: verify-snapshots
         run: |
-          ./gradlew verifyRoborazziRelease -PenableSnapshotTests --tests "com.rokt.roktux.snapshot.*"
+          ./gradlew verifyRoborazziRelease -PenableSnapshotTests --tests "com.rokt.roktux.snapshot.*" --no-daemon --max-workers=2 -Dkotlin.daemon.jvm.options="-Xmx1g"
 
       - name: Upload snapshot artifacts
         uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
