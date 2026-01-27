@@ -65,8 +65,8 @@ tasks.withType(Test::class.java) {
 }
 
 dependencies {
-    api(projects.uxHelper.modelmapper)
-    implementation(projects.uxHelper.core)
+    api(libs.dcui.schema)
+    api(libs.kotlinx.serialization.json)
     implementation(libs.coil.kt)
     implementation(libs.coil.kt.compose)
     implementation(libs.coil.kt.svg)
@@ -85,12 +85,7 @@ dependencies {
     implementation(libs.androidx.compose.ui.util)
     implementation(libs.androidx.compose.runtime)
     implementation(libs.androidx.browser)
-    testImplementation(projects.uxHelper.modelmapper)
-    testImplementation(libs.junit4)
     testImplementation(libs.junit.params)
-    testImplementation(libs.robolectric)
-    testImplementation(libs.androidx.compose.ui.test)
-    testImplementation(libs.kotlinx.serialization.json)
     testImplementation(libs.roborazzi)
     testImplementation(libs.roborazzi.compose)
     testImplementation(libs.roborazzi.junit.rule)
