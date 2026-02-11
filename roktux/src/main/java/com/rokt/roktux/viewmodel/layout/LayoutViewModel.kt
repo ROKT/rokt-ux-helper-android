@@ -29,6 +29,7 @@ import com.rokt.roktux.event.RoktPlatformEvent
 import com.rokt.roktux.event.RoktUxEvent
 import com.rokt.roktux.event.UrlEventState
 import com.rokt.roktux.event.toEventType
+import com.rokt.roktux.logging.RoktUXLogger
 import com.rokt.roktux.utils.chunk
 import com.rokt.roktux.utils.isEmbedded
 import com.rokt.roktux.viewmodel.base.BaseViewModel
@@ -98,13 +99,18 @@ internal class LayoutViewModel(
     }
 
     private fun handleExecuteEvent() {
+        RoktUXLogger.debug { "Processing layout execute event for location: $location" }
         safeLaunch {
             withContext(ioDispatcher) {
                 val response = modelMapper.transformResponse()
                 if (response.isSuccess) {
+                    RoktUXLogger.debug { "Experience response parsed successfully for location: $location" }
                     createLayoutState(currentOffer)
                 } else {
                     response.exceptionOrNull()?.let { exception ->
+                        RoktUXLogger.error(error = exception) {
+                            "Failed to parse experience response for location: $location"
+                        }
                         handleError(exception)
                     }
                 }
@@ -174,10 +180,12 @@ internal class LayoutViewModel(
     override suspend fun handleEvents(event: LayoutContract.LayoutEvent) {
         when (event) {
             LayoutContract.LayoutEvent.LayoutInitialised -> {
+                RoktUXLogger.verbose { "Layout initialised for location: $location" }
                 handleExecuteEvent()
             }
 
             is LayoutContract.LayoutEvent.LayoutReady -> {
+                RoktUXLogger.info { "Layout ready for plugin: $pluginId" }
                 uxEvent(RoktUxEvent.LayoutReady(pluginId))
                 handlePlatformEvent(
                     RoktPlatformEvent(
@@ -189,6 +197,7 @@ internal class LayoutViewModel(
             }
 
             is LayoutContract.LayoutEvent.LayoutInteractive -> {
+                RoktUXLogger.verbose { "Layout interactive for plugin: $pluginId" }
                 uxEvent(RoktUxEvent.LayoutInteractive(pluginId))
             }
 
@@ -503,6 +512,7 @@ internal class LayoutViewModel(
     }
 
     override fun handleError(exception: Throwable) {
+        RoktUXLogger.error(error = exception) { "Layout error occurred" }
         super.handleError(exception)
         uxEvent.invoke(RoktUxEvent.LayoutFailure())
         if (!(::experienceModel.isInitialized && experienceModel.options.useDiagnosticEvents)) {

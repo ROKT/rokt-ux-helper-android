@@ -38,6 +38,7 @@ import com.rokt.modelmapper.uimodel.ResponseOptionModel
 import com.rokt.modelmapper.uimodel.SignalType
 import com.rokt.modelmapper.uimodel.SlotModel
 import com.rokt.network.model.LayoutSchemaModel
+import com.rokt.roktux.logging.RoktUXLogger
 import kotlinx.collections.immutable.ImmutableMap
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.collections.immutable.toImmutableMap
@@ -61,10 +62,12 @@ class ExperienceModelMapperImpl(private val experienceResponse: String, private 
     }
 
     override fun transformResponse(): Result<ExperienceModel> {
+        RoktUXLogger.verbose { "Transforming experience response" }
         savedExperienceModel = try {
             json.decodeFromString<NetworkExperienceResponse>(experienceResponse)
                 .let { Result.success(it.toExperienceModel()) }
         } catch (e: Throwable) {
+            RoktUXLogger.error(error = e) { "Failed to transform experience response" }
             Result.failure(e)
         }
         return savedExperienceModel ?: Result.failure(Exception())
