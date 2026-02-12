@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.9.0] - 2026-02-12
+
 ### Added
 
 - Add configurable console logging with `RoktUx.setLogLevel()`
@@ -143,7 +145,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Initial implementation of UX Helper
 
-[unreleased]: https://github.com/ROKT/rokt-ux-helper-android/compare/0.8.4...HEAD
+[unreleased]: https://github.com/ROKT/rokt-ux-helper-android/compare/0.9.0...HEAD
+[0.9.0]: https://github.com/ROKT/rokt-ux-helper-android/compare/0.8.4...0.9.0
 [0.8.4]: https://github.com/ROKT/rokt-ux-helper-android/compare/0.8.3...0.8.4
 [0.8.3]: https://github.com/ROKT/rokt-ux-helper-android/compare/0.8.2...0.8.3
 [0.8.2]: https://github.com/ROKT/rokt-ux-helper-android/compare/0.8.1...0.8.2
