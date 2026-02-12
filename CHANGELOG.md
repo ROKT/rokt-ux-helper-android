@@ -9,6 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Add configurable console logging with `RoktUx.setLogLevel()`
+
 ## [0.8.4] - 2026-01-27
 
 ### Changed

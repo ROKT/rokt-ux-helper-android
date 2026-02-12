@@ -32,6 +32,7 @@ import com.rokt.roktux.di.layout.LocalFontFamilyProvider
 import com.rokt.roktux.di.layout.LocalLayoutComponent
 import com.rokt.roktux.event.RoktPlatformEventsWrapper
 import com.rokt.roktux.event.RoktUxEvent
+import com.rokt.roktux.logging.RoktUXLogger
 import com.rokt.roktux.utils.AnimationState
 import com.rokt.roktux.utils.InternalActivityResultContract
 import com.rokt.roktux.utils.calculateBreakpoint
@@ -74,6 +75,9 @@ fun RoktLayout(
     onUxEvent: (event: RoktUxEvent) -> Unit = { },
     onPlatformEvent: (platformEvents: RoktPlatformEventsWrapper) -> Unit = { },
 ) {
+    LaunchedEffect(location) {
+        RoktUXLogger.verbose { "RoktLayout loading for location: $location" }
+    }
     RoktLayout(
         experienceResponse = experienceResponse,
         location = location,

@@ -2,11 +2,26 @@ package com.rokt.roktux
 
 import android.content.Context
 import android.os.Build
+import com.rokt.roktux.logging.RoktUXLogLevel
+import com.rokt.roktux.logging.RoktUXLogger
 import com.rokt.roktux.utils.getDeviceLocale
 import com.rokt.roktux.utils.getDeviceName
 import com.rokt.roktux.utils.getPackageVersion
 
 public object RoktUx {
+
+    /**
+     * Sets the log level for RoktUXHelper console output.
+     *
+     * Controls the verbosity of log messages written to Logcat under the "RoktUX" tag.
+     * Default is [RoktUXLogLevel.NONE] (no logging).
+     *
+     * @param logLevel The minimum log level to display.
+     */
+    @JvmStatic
+    public fun setLogLevel(logLevel: RoktUXLogLevel) {
+        RoktUXLogger.logLevel = logLevel
+    }
 
     /**
      * Get the Rokt Integration configuration. Data to be included in the Rokt API request.
