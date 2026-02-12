@@ -6,7 +6,7 @@ import android.util.Log
  * Default [LogHandler] implementation that writes to Android Logcat
  * using [android.util.Log] methods mapped to [RoktUXLogLevel].
  */
-public object LogcatLogHandler : LogHandler {
+internal object LogcatLogHandler : LogHandler {
 
     override fun log(level: RoktUXLogLevel, tag: String, message: String, error: Throwable?) {
         when (level) {

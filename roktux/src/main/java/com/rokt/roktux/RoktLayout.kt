@@ -76,7 +76,7 @@ fun RoktLayout(
     onPlatformEvent: (platformEvents: RoktPlatformEventsWrapper) -> Unit = { },
 ) {
     LaunchedEffect(location) {
-        RoktUXLogger.info { "RoktLayout loading for location: $location" }
+        RoktUXLogger.verbose { "RoktLayout loading for location: $location" }
     }
     RoktLayout(
         experienceResponse = experienceResponse,

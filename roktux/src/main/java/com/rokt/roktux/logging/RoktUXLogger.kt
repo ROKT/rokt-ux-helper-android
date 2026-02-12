@@ -13,21 +13,20 @@ package com.rokt.roktux.logging
  * RoktUXLogger.debug { "Layout loaded successfully" }
  * ```
  */
-public object RoktUXLogger {
+internal object RoktUXLogger {
 
     /**
      * The current minimum log level. Messages below this level are not logged.
      * Default is [RoktUXLogLevel.NONE] (no logging).
      */
     @Volatile
-    public var logLevel: RoktUXLogLevel = RoktUXLogLevel.NONE
+    var logLevel: RoktUXLogLevel = RoktUXLogLevel.NONE
 
     /**
      * The log output backend. Default is [LogcatLogHandler].
      */
     @Volatile
-    @PublishedApi
-    internal var handler: LogHandler = LogcatLogHandler
+    var handler: LogHandler = LogcatLogHandler
 
     /**
      * Logs a verbose message for detailed diagnostic information.
@@ -36,7 +35,7 @@ public object RoktUXLogger {
      * @param error Optional [Throwable] to include in the log output.
      * @param message Lambda producing the log message string.
      */
-    public inline fun verbose(error: Throwable? = null, message: () -> String) {
+    inline fun verbose(error: Throwable? = null, message: () -> String) {
         if (logLevel.priority <= RoktUXLogLevel.VERBOSE.priority) {
             handler.log(RoktUXLogLevel.VERBOSE, TAG, message(), error)
         }
@@ -49,7 +48,7 @@ public object RoktUXLogger {
      * @param error Optional [Throwable] to include in the log output.
      * @param message Lambda producing the log message string.
      */
-    public inline fun debug(error: Throwable? = null, message: () -> String) {
+    inline fun debug(error: Throwable? = null, message: () -> String) {
         if (logLevel.priority <= RoktUXLogLevel.DEBUG.priority) {
             handler.log(RoktUXLogLevel.DEBUG, TAG, message(), error)
         }
@@ -62,7 +61,7 @@ public object RoktUXLogger {
      * @param error Optional [Throwable] to include in the log output.
      * @param message Lambda producing the log message string.
      */
-    public inline fun info(error: Throwable? = null, message: () -> String) {
+    inline fun info(error: Throwable? = null, message: () -> String) {
         if (logLevel.priority <= RoktUXLogLevel.INFO.priority) {
             handler.log(RoktUXLogLevel.INFO, TAG, message(), error)
         }
@@ -75,7 +74,7 @@ public object RoktUXLogger {
      * @param error Optional [Throwable] to include in the log output.
      * @param message Lambda producing the log message string.
      */
-    public inline fun warning(error: Throwable? = null, message: () -> String) {
+    inline fun warning(error: Throwable? = null, message: () -> String) {
         if (logLevel.priority <= RoktUXLogLevel.WARNING.priority) {
             handler.log(RoktUXLogLevel.WARNING, TAG, message(), error)
         }
@@ -88,12 +87,11 @@ public object RoktUXLogger {
      * @param error Optional [Throwable] to include in the log output.
      * @param message Lambda producing the log message string.
      */
-    public inline fun error(error: Throwable? = null, message: () -> String) {
+    inline fun error(error: Throwable? = null, message: () -> String) {
         if (logLevel.priority <= RoktUXLogLevel.ERROR.priority) {
             handler.log(RoktUXLogLevel.ERROR, TAG, message(), error)
         }
     }
 
-    @PublishedApi
     internal const val TAG: String = "RoktUX"
 }

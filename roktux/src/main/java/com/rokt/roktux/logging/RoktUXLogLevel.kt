@@ -10,12 +10,8 @@ package com.rokt.roktux.logging
  * - [WARNING]: Recoverable issues that don't prevent operation
  * - [ERROR]: Failures that prevent expected behavior
  * - [NONE]: No logging (default for production)
- *
- * @property priority Integer priority where lower values are more verbose.
  */
-// Suppress as this needs to be part of the public API
-@Suppress("RedundantVisibilityModifier")
-public enum class RoktUXLogLevel(public val priority: Int) {
+public enum class RoktUXLogLevel(internal val priority: Int) {
     VERBOSE(0),
     DEBUG(1),
     INFO(2),
@@ -24,13 +20,11 @@ public enum class RoktUXLogLevel(public val priority: Int) {
     NONE(5),
     ;
 
-    public companion object {
+    internal companion object {
         /**
          * Returns the [RoktUXLogLevel] matching the given [priority],
          * or [NONE] if no match is found.
          */
-        @JvmStatic
-        public fun fromPriority(priority: Int): RoktUXLogLevel =
-            values().firstOrNull { it.priority == priority } ?: NONE
+        fun fromPriority(priority: Int): RoktUXLogLevel = values().firstOrNull { it.priority == priority } ?: NONE
     }
 }
