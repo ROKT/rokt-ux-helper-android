@@ -1,10 +1,31 @@
 name: Setup Java composite
-description: Sets up a consistent Java version for each workflow
+description: Sets up Java and stable Gradle defaults for CI
 runs:
   using: composite
   steps:
     - name: Setup Java
-      uses: actions/setup-java@v4
+      uses: actions/setup-java@3a4f6e1af504cf6a31855fa899c6aa5355ba6c12 # v4.7.0
       with:
         java-version: 17
-        distribution: microsoft
+        distribution: temurin
+
+    - name: Cache Gradle dependencies
+      uses: actions/cache@d4323d4df104b026a6aa633fdb11d772146be0bf # v4.2.2
+      with:
+        path: |
+          ~/.gradle/caches
+          ~/.gradle/wrapper
+        key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+        restore-keys: |
+          ${{ runner.os }}-gradle-
+
+    - name: Configure Gradle properties
+      shell: bash
+      run: |
+        mkdir -p ~/.gradle
+        echo "org.gradle.jvmargs=-Xmx2g -XX:+TieredCompilation -XX:TieredStopAtLevel=1 -Dfile.encoding=UTF-8" >> ~/.gradle/gradle.properties
+        echo "kotlin.daemon.jvmargs=-Xmx512m -XX:+TieredCompilation -XX:TieredStopAtLevel=1" >> ~/.gradle/gradle.properties
+        echo "org.gradle.parallel=true" >> ~/.gradle/gradle.properties
+        echo "org.gradle.configureondemand=true" >> ~/.gradle/gradle.properties
+        echo "kotlin.incremental=true" >> ~/.gradle/gradle.properties
+        echo "org.gradle.daemon=false" >> ~/.gradle/gradle.properties
