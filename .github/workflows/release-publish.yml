@@ -1,4 +1,4 @@
-name: Release Android UX Helper
+name: Release – Publish
 
 on:
   push:
