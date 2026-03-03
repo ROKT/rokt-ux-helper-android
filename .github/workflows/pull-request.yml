@@ -1,4 +1,4 @@
-name: Run tests and lint
+name: Pull Request
 
 on:
   push:
@@ -75,12 +75,12 @@ jobs:
       - name: Assemble debug
         run: ./gradlew --no-daemon --max-workers=2 assembleDebug -Dkotlin.daemon.jvm.options="-Xmx1g"
       - name: Upload APK artifacts
-        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
+        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
         with:
           name: apk-files
           path: "**/*.apk"
       - name: Upload AAR artifacts
-        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
+        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
         with:
           name: aar-files
           path: "**/*.aar"
@@ -105,7 +105,7 @@ jobs:
           ./gradlew verifyRoborazziRelease -PenableSnapshotTests --tests "com.rokt.roktux.snapshot.*" --no-daemon --max-workers=2 -Dkotlin.daemon.jvm.options="-Xmx1g"
 
       - name: Upload snapshot artifacts
-        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
+        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
         if: always()
         with:
           name: snapshot

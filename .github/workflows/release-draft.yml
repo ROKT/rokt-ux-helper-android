@@ -1,16 +1,16 @@
-name: Create draft release from main
+name: Release – Draft
 
 on:
   workflow_dispatch: # checkov:skip=CKV_GHA_7
     inputs:
       bump-type:
-        description: Specify if the version should be bumped as major, minor, patch
+        description: Specify if the version should be bumped as patch, minor, or major
         required: true
         type: choice
         options:
-          - major
-          - minor
           - patch
+          - minor
+          - major
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -64,7 +64,7 @@ jobs:
       - name: Publish to Maven local
         run: ./gradlew publishMavenPublicationToMavenLocal -PVERSION=${{ steps.bump-version.outputs.new_version }}
       - name: Upload AAR artifacts
-        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
+        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
         with:
           name: aar-files
           path: "**/*.aar"
