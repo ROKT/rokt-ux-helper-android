@@ -306,8 +306,11 @@ class ExperienceModelMapperImpl(private val experienceResponse: String, private 
         ) { child -> transformLayoutSchemaModel(child, offerModel, responseContextKey, itemIndex, module) }
 
         is LayoutSchemaModel.OneByOneDistribution -> transformOneByOneDistribution(layoutSchemaModel)
+
         is LayoutSchemaModel.GroupedDistribution -> transformGroupedDistribution(layoutSchemaModel)
+
         is LayoutSchemaModel.CarouselDistribution -> transformCarouselDistribution(layoutSchemaModel)
+
         is LayoutSchemaModel.Overlay -> transformOverlay(layoutSchemaModel) { child ->
             transformLayoutSchemaModel(child, offerModel, responseContextKey, itemIndex, module)
         }

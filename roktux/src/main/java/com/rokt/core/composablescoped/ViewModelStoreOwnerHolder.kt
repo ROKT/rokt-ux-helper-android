@@ -87,6 +87,7 @@ internal class ComposableScopedViewModelStoreOwnerHolder : ViewModel() {
                 scopedComposableIsPresentInComposition.collectLatest { isPresent ->
                     when {
                         isPresent || scopedComposableLifecycle.value == null -> return@collectLatest
+
                         scopedComposableLifecycle.value?.currentState == Lifecycle.State.RESUMED -> {
                             clearComposableScopedViewModelStore(composableKey)
                         }

@@ -144,6 +144,7 @@ private fun transformHeight(height: DimensionHeightValue?): HeightUiModel? = hei
         }
 
         is DimensionHeightValue.Fixed -> HeightUiModel.Fixed(heightValue.value)
+
         is DimensionHeightValue.Percentage -> HeightUiModel.Percentage(heightValue.value.div(100))
     }
 }
@@ -157,6 +158,7 @@ private fun transformWidth(width: DimensionWidthValue?): WidthUiModel? = width?.
         }
 
         is DimensionWidthValue.Fixed -> WidthUiModel.Fixed(widthValue.value)
+
         is DimensionWidthValue.Percentage -> WidthUiModel.Percentage(widthValue.value.div(100))
     }
 }

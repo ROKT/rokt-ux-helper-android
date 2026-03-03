@@ -49,7 +49,9 @@ internal inline fun <reified T : Any> bindModel(
 
     CatalogItemModel::class -> {
         offerModel?.catalogItems?.getOrNull(itemIndex) as? T
-    } else -> null
+    }
+
+    else -> null
 }
 
 private class PlaceholderReplacer(
