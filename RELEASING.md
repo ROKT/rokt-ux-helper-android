@@ -35,7 +35,7 @@ gitGraph
 
 ## Major / Minor version release
 
-1. Run the workflow called "Create draft release from main" which will:
+1. Run the workflow called "Release – Draft" which will:
     - Open a PR targeting main branch
 2. Once tested and approved by the relevant owners, merge the PR to main
 3. Once merged the following will occur:

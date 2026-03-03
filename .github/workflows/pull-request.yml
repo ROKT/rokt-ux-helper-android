@@ -1,4 +1,4 @@
-name: Run tests and lint
+name: Pull Request
 
 on:
   push:
