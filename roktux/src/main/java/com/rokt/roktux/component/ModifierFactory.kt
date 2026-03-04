@@ -230,6 +230,7 @@ internal class ModifierFactory {
         ) { state ->
             when (state) {
                 ConditionalStyleState.Normal -> modifierProperty.offset
+
                 ConditionalStyleState.Transition ->
                     transitionModifier.offset ?: modifierProperty.offset
             } ?: DpOffset(Dp.Hairline, Dp.Hairline)
@@ -238,6 +239,7 @@ internal class ModifierFactory {
         val minWidth = transition.animateDp({ tween(transitionDuration) }, label = "minWidth") { state ->
             when (state) {
                 ConditionalStyleState.Normal -> modifierProperty.minWidth
+
                 ConditionalStyleState.Transition ->
                     transitionModifier.minWidth
             } ?: Dp.Hairline
@@ -246,6 +248,7 @@ internal class ModifierFactory {
         val minHeight = transition.animateDp({ tween(transitionDuration) }, label = "minHeight") { state ->
             when (state) {
                 ConditionalStyleState.Normal -> modifierProperty.minHeight
+
                 ConditionalStyleState.Transition ->
                     transitionModifier.minHeight ?: modifierProperty.minHeight
             } ?: Dp.Hairline
@@ -254,6 +257,7 @@ internal class ModifierFactory {
         val maxWidth = transition.animateDp({ tween(transitionDuration) }, label = "maxWidth") { state ->
             when (state) {
                 ConditionalStyleState.Normal -> modifierProperty.maxWidth
+
                 ConditionalStyleState.Transition ->
                     transitionModifier.maxWidth ?: modifierProperty.maxWidth
             } ?: Dp.Hairline
@@ -262,6 +266,7 @@ internal class ModifierFactory {
         val maxHeight = transition.animateDp({ tween(transitionDuration) }, label = "maxHeight") { state ->
             when (state) {
                 ConditionalStyleState.Normal -> modifierProperty.maxHeight ?: Dp.Hairline
+
                 ConditionalStyleState.Transition ->
                     transitionModifier.maxHeight ?: modifierProperty.maxHeight
             } ?: Dp.Hairline
@@ -285,6 +290,7 @@ internal class ModifierFactory {
         val rotation = transition.animateFloat({ tween(transitionDuration) }, label = "rotation") { state ->
             when (state) {
                 ConditionalStyleState.Normal -> modifierProperty.rotateZ
+
                 ConditionalStyleState.Transition ->
                     transitionModifier.rotateZ ?: modifierProperty.rotateZ
             } ?: Float.MIN_VALUE
@@ -293,6 +299,7 @@ internal class ModifierFactory {
         val blurRadius = transition.animateFloat({ tween(transitionDuration) }, label = "blurRadius") { state ->
             when (state) {
                 ConditionalStyleState.Normal -> modifierProperty.blurRadius
+
                 ConditionalStyleState.Transition ->
                     transitionModifier.blurRadius ?: modifierProperty.blurRadius
             } ?: Float.MIN_VALUE
@@ -315,6 +322,7 @@ internal class ModifierFactory {
 
         val shadowSpreadRadius = when (transitionStyleState) {
             ConditionalStyleState.Normal -> modifierProperty.shadowSpreadRadius
+
             ConditionalStyleState.Transition ->
                 transitionModifier.shadowSpreadRadius
                     ?: modifierProperty.shadowSpreadRadius
@@ -877,10 +885,18 @@ internal class ModifierFactory {
 
         val hex = hexColor.substring(1)
         val normalizedHex = when (hex.length) {
-            3 -> hex.map { "$it$it" }.joinToString(separator = "", prefix = "ff") // RGB -> AARRGGBB
-            4 -> hex.map { "$it$it" }.joinToString(separator = "") // ARGB -> AARRGGBB
-            6 -> "ff$hex" // RRGGBB -> AARRGGBB
-            8 -> hex // AARRGGBB (already correct)
+            3 -> hex.map { "$it$it" }.joinToString(separator = "", prefix = "ff")
+
+            // RGB -> AARRGGBB
+            4 -> hex.map { "$it$it" }.joinToString(separator = "")
+
+            // ARGB -> AARRGGBB
+            6 -> "ff$hex"
+
+            // RRGGBB -> AARRGGBB
+            8 -> hex
+
+            // AARRGGBB (already correct)
             else -> throw IllegalArgumentException("Invalid hex color length: ${hex.length}")
         }
 
@@ -962,7 +978,9 @@ internal class ModifierFactory {
             )
 
             arrangementBias == ArrangementUiModel.End.bias -> Arrangement.Bottom
+
             arrangementBias == ArrangementUiModel.Center.bias -> Arrangement.Center
+
             else -> Arrangement.Top
         }
         val horizontalArrangement = when {
@@ -972,7 +990,9 @@ internal class ModifierFactory {
             )
 
             arrangementBias == ArrangementUiModel.End.bias -> Arrangement.End
+
             arrangementBias == ArrangementUiModel.Center.bias -> Arrangement.Center
+
             else -> Arrangement.Start
         }
         ContainerUiProperties(
@@ -1140,7 +1160,9 @@ internal class ModifierFactory {
                 }
 
                 TextUiTransform.Uppercase -> text.uppercase()
+
                 TextUiTransform.Lowercase -> text.lowercase()
+
                 TextUiTransform.None -> text
             }
         } ?: text
@@ -1323,6 +1345,7 @@ internal class ModifierFactory {
         val letterSpacing = transition.animateFloat({ tween(transitionDuration) }, label = "letterSpacing") { state ->
             when (state) {
                 ConditionalStyleState.Normal -> textStylesProperty.letterSpacing
+
                 ConditionalStyleState.Transition ->
                     transitionTextStyling.letterSpacing
                         ?: textStylesProperty.letterSpacing
@@ -1358,6 +1381,7 @@ internal class ModifierFactory {
             ) { state ->
                 when (state) {
                     ConditionalStyleState.Normal -> textStylesProperty.horizontalTextAlign
+
                     ConditionalStyleState.Transition ->
                         transitionTextStyling.horizontalTextAlign
                             ?: textStylesProperty.horizontalTextAlign
@@ -1372,6 +1396,7 @@ internal class ModifierFactory {
             ) { state ->
                 when (state) {
                     ConditionalStyleState.Normal -> textStylesProperty.baselineTextAlign
+
                     ConditionalStyleState.Transition ->
                         transitionTextStyling.baselineTextAlign
                             ?: textStylesProperty.baselineTextAlign
@@ -1386,6 +1411,7 @@ internal class ModifierFactory {
             ) { state ->
                 when (state) {
                     ConditionalStyleState.Normal -> textStylesProperty.fontStyle
+
                     ConditionalStyleState.Transition ->
                         transitionTextStyling.fontStyle
                             ?: textStylesProperty.fontStyle
@@ -1400,6 +1426,7 @@ internal class ModifierFactory {
             ) { state ->
                 when (state) {
                     ConditionalStyleState.Normal -> textStylesProperty.textDecoration
+
                     ConditionalStyleState.Transition ->
                         transitionTextStyling.textDecoration
                             ?: textStylesProperty.textDecoration

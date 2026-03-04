@@ -127,13 +127,21 @@ private fun String.asHTML(
         spannedString = spannedString.replaceRange(start, end, spanString)
         when (span) {
             is RelativeSizeSpan -> span.spanStyle(fontSize)
+
             is StyleSpan -> span.spanStyle()
+
             is UnderlineSpan -> span.spanStyle()
+
             is BackgroundColorSpan -> span.spanStyle()
+
             is ForegroundColorSpan -> span.spanStyle()
+
             is StrikethroughSpan -> span.spanStyle()
+
             is SuperscriptSpan -> span.spanStyle()
+
             is SubscriptSpan -> span.spanStyle()
+
             is URLSpan -> {
                 addLink(
                     LinkAnnotation.Url(
@@ -171,7 +179,9 @@ private fun RelativeSizeSpan.spanStyle(fontSize: TextUnit): SpanStyle =
 
 private fun StyleSpan.spanStyle(): SpanStyle? = when (style) {
     Typeface.BOLD -> SpanStyle(fontWeight = FontWeight.Bold)
+
     Typeface.ITALIC -> SpanStyle(fontStyle = FontStyle.Italic)
+
     Typeface.BOLD_ITALIC -> SpanStyle(
         fontWeight = FontWeight.Bold,
         fontStyle = FontStyle.Italic,
@@ -191,7 +201,9 @@ private fun getTransformText(text: String, textTransform: TextUiTransform?): Str
         }
 
         TextUiTransform.Lowercase -> text.lowercase()
+
         TextUiTransform.Uppercase -> text.uppercase()
+
         TextUiTransform.None -> text
     }
 } ?: text

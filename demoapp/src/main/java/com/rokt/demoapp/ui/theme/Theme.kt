@@ -52,6 +52,7 @@ fun RoktAndroidSdkTheme(
         }
 
         darkTheme -> DarkColorScheme
+
         else -> LightColorScheme
     }
 

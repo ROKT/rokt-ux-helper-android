@@ -264,6 +264,7 @@ private fun getPeekThroughDimension(
         }
         val transformedPeekThroughSize = when (val peekThroughSize = peekThroughSizeItems[peekThroughBreakpointIndex]) {
             is PeekThroughSizeUiModel.Fixed -> peekThroughSize.value.dp
+
             is PeekThroughSizeUiModel.Percentage ->
                 (viewWidth.toFloat() * (peekThroughSize.value / 100)).dp
         }

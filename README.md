@@ -35,7 +35,7 @@ dependencies {
 
 - You can find a summary of changes in the [Changelog](CHANGELOG.md)
 - If there are any migrations between versions you will find instructions in the [migration guide](MIGRATING.md)
-- To learn about how to release the UX Helper modules, check out the releasing guide [here](RELEASING.md)
+- To learn about how to release the UX Helper modules, check out the [releasing guide](RELEASING.md)
 
 ## Jetpack Compose Compatibility
 
@@ -45,7 +45,7 @@ As `roktux` uses Jetpack Compose, consuming projects should use Compose librarie
 | --------------- | ----------- |
 | 0.1.0 - current | 2024.09.02  |
 
-You can view the BOM to library version mapping [here](https://developer.android.com/develop/ui/compose/bom/bom-mapping).
+You can view the [BOM to library version mapping](https://developer.android.com/develop/ui/compose/bom/bom-mapping).
 
 ## Development and useful commands
 
@@ -57,7 +57,7 @@ Before submitting changes ensure that:
 - Tests pass with `./gradlew test`
 - Lint checks pass with `./gradlew lint`
 
-Additional checks are conducted using GitHub Actions which run on all pull requests and are required to pass before the changes are merged. You can find the details of the full pipeline [here](.github/workflows/pull-request.yml).
+Additional checks are conducted using GitHub Actions which run on all pull requests and are required to pass before the changes are merged. You can find the [full pipeline details](.github/workflows/pull-request.yml).
 
 To publish the UX Helper modules locally for use in other projects, run
 

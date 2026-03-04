@@ -92,6 +92,7 @@ internal fun BindData.getValue(offerState: OfferUiState, viewableItems: Int): St
     )
 
     is BindData.State -> (offerState.currentOfferIndex + 1).toString()
+
     else -> null
 }
 
