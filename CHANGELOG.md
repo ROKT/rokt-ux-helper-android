@@ -9,8 +9,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-
 ## [0.9.1] - 2026-03-06
+
+### Fixed
+
+- Image width and scale behaviour in DataImageCarouselComponent ([#219](https://github.com/ROKT/rokt-ux-helper-android/pull/219))
 
 ### Changed
 
@@ -21,11 +24,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Workflow naming alignment ([#214](https://github.com/ROKT/rokt-ux-helper-android/pull/214))
 - Bump actions/upload-artifact from 6.0.0 to 7.0.0 ([#216](https://github.com/ROKT/rokt-ux-helper-android/pull/216))
 - Add workflow to update trunk and configure Gradle build environment properly ([#211](https://github.com/ROKT/rokt-ux-helper-android/pull/211))
-
-### Fixed
-
-- Image width and scale behaviour in DataImageCarouselComponent ([#219](https://github.com/ROKT/rokt-ux-helper-android/pull/219))
-
 
 ## [0.9.0] - 2026-02-12
 
