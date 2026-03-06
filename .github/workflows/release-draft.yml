@@ -35,6 +35,7 @@ jobs:
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
           ref: main
+          fetch-depth: 0
       - name: Setup JDK
         uses: ./.github/actions/setup-java
       - name: Setup Gradle
@@ -57,10 +58,11 @@ jobs:
         run: |
           echo "${{ steps.bump-version.outputs.new_version }}" > VERSION
 
-      - name: Update changelog
-        uses: thomaseizinger/keep-a-changelog-new-release@f62c3c390716df5af712ba5d94f4f4a8efc1306d # v3.1.0
+      - name: Generate changelog from git history
+        id: changelog
+        uses: ROKT/rokt-workflows/actions/generate-changelog@main
         with:
-          tag: ${{ steps.bump-version.outputs.new_version }}
+          version: ${{ steps.bump-version.outputs.new_version }}
       - name: Publish to Maven local
         run: ./gradlew publishMavenPublicationToMavenLocal -PVERSION=${{ steps.bump-version.outputs.new_version }}
       - name: Upload AAR artifacts
