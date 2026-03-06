@@ -9,6 +9,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+
+## [0.9.1] - 2026-03-06
+
+### Changed
+
+- Align draft release changelog generation ([#220](https://github.com/ROKT/rokt-ux-helper-android/pull/220))
+- Remove update-android-sdk PR creation on release ([#218](https://github.com/ROKT/rokt-ux-helper-android/pull/218))
+- Bump tj-actions/changed-files from 47.0.2 to 47.0.4 ([#213](https://github.com/ROKT/rokt-ux-helper-android/pull/213))
+- Upgrade trunk to 1.25.0 ([#215](https://github.com/ROKT/rokt-ux-helper-android/pull/215))
+- Workflow naming alignment ([#214](https://github.com/ROKT/rokt-ux-helper-android/pull/214))
+- Bump actions/upload-artifact from 6.0.0 to 7.0.0 ([#216](https://github.com/ROKT/rokt-ux-helper-android/pull/216))
+- Add workflow to update trunk and configure Gradle build environment properly ([#211](https://github.com/ROKT/rokt-ux-helper-android/pull/211))
+
+### Fixed
+
+- Image width and scale behaviour in DataImageCarouselComponent ([#219](https://github.com/ROKT/rokt-ux-helper-android/pull/219))
+
+
 ## [0.9.0] - 2026-02-12
 
 ### Added
@@ -145,7 +163,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Initial implementation of UX Helper
 
-[unreleased]: https://github.com/ROKT/rokt-ux-helper-android/compare/0.9.0...HEAD
+[unreleased]: https://github.com/ROKT/rokt-ux-helper-android/compare/0.9.1...HEAD
+[0.9.1]: https://github.com/ROKT/rokt-ux-helper-android/compare/0.9.0...0.9.1
 [0.9.0]: https://github.com/ROKT/rokt-ux-helper-android/compare/0.8.4...0.9.0
 [0.8.4]: https://github.com/ROKT/rokt-ux-helper-android/compare/0.8.3...0.8.4
 [0.8.3]: https://github.com/ROKT/rokt-ux-helper-android/compare/0.8.2...0.8.3
