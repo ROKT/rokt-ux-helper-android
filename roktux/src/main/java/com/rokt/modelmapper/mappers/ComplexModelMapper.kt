@@ -468,7 +468,7 @@ internal fun transformDataImageCarousel(
     val height = ownStyles?.firstOrNull()?.default?.dimension?.height
     val contentScale: ContentScale = when {
         width is DimensionWidthValue.Fit && height is DimensionHeightValue.Fit -> ContentScale.Crop
-        else -> ContentScale.Fit
+        else -> ContentScale.FillWidth
     }
     val ownModifiers = ownStyles.transformModifier(
         transformSpacing = { ownStyle -> ownStyle.toBasicStateStylingBlock { style -> style.spacing } },

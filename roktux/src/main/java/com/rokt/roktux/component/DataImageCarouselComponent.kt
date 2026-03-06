@@ -185,7 +185,7 @@ internal class DataImageCarouselComponent(
                             image?.let {
                                 factory.CreateComposable(
                                     model = image,
-                                    modifier = Modifier,
+                                    modifier = Modifier.fillMaxWidth(),
                                     isPressed = isPressed,
                                     offerState = offerState,
                                     isDarkModeEnabled = isDarkModeEnabled,
