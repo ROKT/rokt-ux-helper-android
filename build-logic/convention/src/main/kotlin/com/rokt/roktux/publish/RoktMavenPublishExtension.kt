@@ -5,11 +5,6 @@ import org.gradle.api.provider.Property
 interface RoktMavenPublishExtension {
 
     /**
-     * Library version
-     */
-    val version: Property<String>
-
-    /**
      * Group Id of the library
      */
     val groupId: Property<String>

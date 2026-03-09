@@ -11,15 +11,9 @@ plugins {
 
 val libGroupId = "com.rokt"
 val libArtifactId = "roktux"
-val formattedVersion by extra {
-    val versionFromProperty = project.findProperty("VERSION")?.toString().takeIf { !it.isNullOrBlank() } ?: "0.0.0"
-    val versionSuffix = project.findProperty("VERSION_SUFFIX")?.toString().takeIf { !it.isNullOrBlank() } ?: ""
-    versionFromProperty + versionSuffix
-}
 val libDescription = "Rokt UX Helper Library"
 
 roktMavenPublish {
-    version.set(formattedVersion)
     groupId.set(libGroupId)
     artifactId.set(libArtifactId)
     description.set(libDescription)
@@ -35,7 +29,8 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles("consumer-rules.pro")
 
-        buildConfigField("String", "SDK_VERSION", "\"${formattedVersion}\"")
+        val sdkVersion = project.findProperty("VERSION")?.toString()?.takeIf { it.isNotBlank() } ?: "0.0.0"
+        buildConfigField("String", "SDK_VERSION", "\"${sdkVersion}\"")
         buildConfigField("String", "SCHEMA_VERSION", "\"${libs.versions.dcui.get()}\"")
     }
 
