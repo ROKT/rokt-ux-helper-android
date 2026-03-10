@@ -64,6 +64,15 @@ internal class BottomSheetComponent(
                 modifierFactory.createBackgroundShape(it)
             } ?: RectangleShape
         var hasUserInteracted by remember { mutableStateOf(false) }
+        // Prefer shouldDismissOnBackPress=false; on M3 1.4.x the one-arg constructor is missing
+        // (NoSuchMethodError), so fall back to no-arg default.
+        val sheetProperties = remember {
+            try {
+                ModalBottomSheetProperties(shouldDismissOnBackPress = false)
+            } catch (_: NoSuchMethodError) {
+                ModalBottomSheetProperties()
+            }
+        }
         ModalBottomSheet(
             onDismissRequest = {
                 if (!hasUserInteracted) {
@@ -76,9 +85,7 @@ internal class BottomSheetComponent(
             scrimColor = scrimColor ?: BottomSheetDefaults.ScrimColor,
             dragHandle = {},
             containerColor = Color.Transparent,
-            properties = ModalBottomSheetProperties(
-                shouldDismissOnBackPress = false,
-            ),
+            properties = sheetProperties,
             modifier = modifier,
             contentWindowInsets = {
                 if (model.edgeToEdgeDisplay) {
