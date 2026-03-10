@@ -20,7 +20,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Bump ffurrer2/extract-release-notes from 3.0.0 to 3.1.0 ([#223](https://github.com/ROKT/rokt-ux-helper-android/pull/223))
 - Bump gradle/actions from 5.0.1 to 5.0.2 ([#224](https://github.com/ROKT/rokt-ux-helper-android/pull/224))
 
-
 ## [0.9.1] - 2026-03-06
 
 ### Fixed
