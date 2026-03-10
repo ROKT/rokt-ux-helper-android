@@ -9,6 +9,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.9.2] - 2026-03-10
+
+### Fixed
+
+- App crash when compose version material3 1.4.0 is used ([#225](https://github.com/ROKT/rokt-ux-helper-android/pull/225))
+
+### Changed
+
+- Bump ffurrer2/extract-release-notes from 3.0.0 to 3.1.0 ([#223](https://github.com/ROKT/rokt-ux-helper-android/pull/223))
+- Bump gradle/actions from 5.0.1 to 5.0.2 ([#224](https://github.com/ROKT/rokt-ux-helper-android/pull/224))
+
+
 ## [0.9.1] - 2026-03-06
 
 ### Fixed
@@ -161,7 +173,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Initial implementation of UX Helper
 
-[unreleased]: https://github.com/ROKT/rokt-ux-helper-android/compare/0.9.1...HEAD
+[unreleased]: https://github.com/ROKT/rokt-ux-helper-android/compare/0.9.2...HEAD
+[0.9.2]: https://github.com/ROKT/rokt-ux-helper-android/compare/0.9.1...0.9.2
 [0.9.1]: https://github.com/ROKT/rokt-ux-helper-android/compare/0.9.0...0.9.1
 [0.9.0]: https://github.com/ROKT/rokt-ux-helper-android/compare/0.8.4...0.9.0
 [0.8.4]: https://github.com/ROKT/rokt-ux-helper-android/compare/0.8.3...0.8.4
