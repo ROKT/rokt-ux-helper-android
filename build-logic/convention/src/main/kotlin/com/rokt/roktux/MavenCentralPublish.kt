@@ -5,8 +5,6 @@ import com.vanniktech.maven.publish.MavenPublishBaseExtension
 import com.vanniktech.maven.publish.SonatypeHost
 import org.gradle.api.Project
 import org.gradle.api.publish.maven.tasks.PublishToMavenLocal
-import org.gradle.api.tasks.bundling.Jar
-import java.io.File
 
 fun Project.configureMavenPublishing(roktMavenPublish: RoktMavenPublishExtension) {
     val versionFromProperty = project.findProperty("VERSION")?.toString().takeIf { !it.isNullOrBlank() } ?: "0.0.0"
@@ -72,67 +70,6 @@ fun Project.configureMavenPublishing(roktMavenPublish: RoktMavenPublishExtension
             if (name.contains(publicationName, ignoreCase = true)) {
                 dependsOn(validateTaskName)
             }
-        }
-    }
-
-    project.afterEvaluate {
-        if (roktMavenPublish.includeDocs.getOrElse(false)) {
-            val docDir = File(project.projectDir, "doc")
-            if (!docDir.exists() || !docDir.isDirectory) return@afterEvaluate
-
-            val namespace = project.extensions.findByName("android")?.let {
-                it::class.java.getMethod("getNamespace").invoke(it)?.toString()
-            } ?: "com.rokt.roktux"
-            val packagePath = namespace.replace('.', '/')
-
-            val sourceJarTaskNames = listOf(
-                "sourceDevReleaseJar",
-                "sourcesJar",
-                "devReleaseSourcesJar",
-                "sourceReleaseJar",
-                "releaseSourcesJar",
-            )
-
-            val sourceJarTask = sourceJarTaskNames
-                .firstNotNullOfOrNull { taskName -> project.tasks.findByName(taskName) } ?: return@afterEvaluate
-
-            sourceJarTask.enabled = false
-
-            val variantName = if (sourceJarTask.name.contains("Dev")) "devRelease" else "release"
-            val intermediateDir = File(project.buildDir, "intermediates/source_jar/$variantName")
-            val outputDir = File(project.buildDir, "libs")
-            val outputFileName = "${project.name}-$formattedVersion-sources.jar"
-
-            val customTaskName = "doc${sourceJarTask.name.replaceFirstChar { it.uppercase() }}"
-            val docTask = project.tasks.create(customTaskName, Jar::class.java) {
-                archiveClassifier.set("sources")
-                from(docDir) { into(packagePath) }
-                destinationDirectory.set(outputDir)
-                archiveFileName.set(outputFileName)
-            }
-
-            sourceJarTask.dependsOn(docTask)
-
-            sourceJarTask.doLast {
-                project.copy {
-                    from(docTask.archiveFile)
-                    into(docTask.destinationDirectory)
-                    rename { docTask.archiveFileName.get() }
-                }
-            }
-
-            val createDirTask = project.tasks.create("createIntermediateSourceJarDir") {
-                doLast {
-                    intermediateDir.mkdirs()
-                    project.copy {
-                        from(docTask.archiveFile)
-                        into(intermediateDir)
-                        rename { "$variantName-sources.jar" }
-                    }
-                }
-            }
-
-            docTask.finalizedBy(createDirTask)
         }
     }
 }

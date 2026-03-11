@@ -20,11 +20,6 @@ interface RoktMavenPublishExtension {
     val mockSuffix: Property<String>
 
     /**
-     * Set to true to include docs from `./doc` path
-     */
-    val includeDocs: Property<Boolean>
-
-    /**
      * description of the library
      */
     val description: Property<String>
