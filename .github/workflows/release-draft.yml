@@ -60,7 +60,7 @@ jobs:
 
       - name: Generate changelog from git history
         id: changelog
-        uses: ROKT/rokt-workflows/actions/generate-changelog@main
+        uses: ROKT/rokt-workflows/actions/generate-changelog@1859338d7c2c2b873233505c751acbf09fb218d5 # main
         with:
           version: ${{ steps.bump-version.outputs.new_version }}
       - name: Publish to Maven local
