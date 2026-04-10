@@ -3,6 +3,8 @@ name: Zizmor Security Scan
 on:
   workflow_dispatch:
   pull_request:
+    branches:
+      - main
     paths:
       - .github/workflows/**
       - .github/actions/**
@@ -26,10 +28,11 @@ jobs:
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
           persist-credentials: false
+          fetch-depth: 1
       - name: Install zizmor
         run: pipx install zizmor==1.23.1
-      # continue-on-error: true until pre-existing findings are resolved.
-      # Once triaged, remove this flag to make zizmor a hard blocker.
+      # TODO: Remove continue-on-error once pre-existing findings are triaged.
+      # Tracked as part of the zizmor rollout project (Phase 2c).
       - name: Run zizmor
         continue-on-error: true
         run: zizmor --format plain .
