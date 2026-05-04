@@ -58,6 +58,8 @@ jobs:
         uses: ./.github/actions/setup-java
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@0f4528296b4bc09e8ae0fc7be30185a4ab435545 # v6.0.0
+        with:
+          cache-provider: basic
       - name: Publish to Maven Central
         run: ./gradlew publishMavenPublicationToMavenCentralRepository -PVERSION=${{ needs.setup-and-version.outputs.next_snapshot_version }} --no-configuration-cache
 
@@ -79,6 +81,8 @@ jobs:
         uses: ./.github/actions/setup-java
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@0f4528296b4bc09e8ae0fc7be30185a4ab435545 # v6.0.0
+        with:
+          cache-provider: basic
       - name: Publish to Maven local
         run: ./gradlew publishMavenPublicationToMavenLocal -PVERSION=${{ needs.setup-and-version.outputs.full_release_version }}
       - name: Publish to Maven Central

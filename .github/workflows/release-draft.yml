@@ -40,6 +40,8 @@ jobs:
         uses: ./.github/actions/setup-java
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@0f4528296b4bc09e8ae0fc7be30185a4ab435545 # v6.0.0
+        with:
+          cache-provider: basic
 
       - name: Get current version
         id: version-file
