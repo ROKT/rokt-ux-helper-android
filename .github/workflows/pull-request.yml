@@ -44,7 +44,9 @@ jobs:
       - name: Setup JDK
         uses: ./.github/actions/setup-java
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@0f4528296b4bc09e8ae0fc7be30185a4ab435545 # v6.0.0
+        uses: gradle/actions/setup-gradle@50e97c2cd7a37755bbfafc9c5b7cafaece252f6e # v6.1.0
+        with:
+          cache-provider: basic
       - name: Run lint
         run: ./gradlew lint --no-daemon --max-workers=2
 
@@ -58,7 +60,9 @@ jobs:
       - name: Setup JDK
         uses: ./.github/actions/setup-java
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@0f4528296b4bc09e8ae0fc7be30185a4ab435545 # v6.0.0
+        uses: gradle/actions/setup-gradle@50e97c2cd7a37755bbfafc9c5b7cafaece252f6e # v6.1.0
+        with:
+          cache-provider: basic
       - name: Run tests
         run: ./gradlew test --no-daemon --max-workers=2 -Dkotlin.daemon.jvm.options="-Xmx1g"
       - name: Generate coverage
@@ -79,7 +83,9 @@ jobs:
       - name: Setup JDK
         uses: ./.github/actions/setup-java
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@0f4528296b4bc09e8ae0fc7be30185a4ab435545 # v6.0.0
+        uses: gradle/actions/setup-gradle@50e97c2cd7a37755bbfafc9c5b7cafaece252f6e # v6.1.0
+        with:
+          cache-provider: basic
       - name: Assemble debug
         run: ./gradlew --no-daemon --max-workers=2 assembleDebug -Dkotlin.daemon.jvm.options="-Xmx1g"
       - name: Upload APK artifacts
