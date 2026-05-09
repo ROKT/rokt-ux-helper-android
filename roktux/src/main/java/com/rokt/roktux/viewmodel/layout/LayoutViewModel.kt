@@ -30,6 +30,7 @@ import com.rokt.roktux.event.RoktUxEvent
 import com.rokt.roktux.event.UrlEventState
 import com.rokt.roktux.event.toEventType
 import com.rokt.roktux.logging.RoktUXLogger
+import com.rokt.roktux.state.LayoutRuntimeState
 import com.rokt.roktux.utils.chunk
 import com.rokt.roktux.utils.isEmbedded
 import com.rokt.roktux.viewmodel.base.BaseViewModel
@@ -57,8 +58,8 @@ internal class LayoutViewModel(
     private val mainDispatcher: CoroutineDispatcher,
     private val handleUrlByApp: Boolean,
     private var currentOffer: Int,
-    private var customStates: Map<String, Int>,
-    private var offerCustomStates: Map<String, Map<String, Int>>,
+    customStates: Map<String, Int>,
+    offerCustomStates: Map<String, Map<String, Int>>,
     private var edgeToEdgeDisplay: Boolean,
 ) : BaseViewModel<LayoutContract.LayoutEvent, LayoutUiState, LayoutContract.LayoutEffect>() {
 
@@ -67,6 +68,10 @@ internal class LayoutViewModel(
     private lateinit var pluginModel: PluginModel
     private lateinit var pluginViewState: RoktViewState
     private var viewableItems: AtomicReference<Int> = AtomicReference(DEFAULT_VIEWABLE_ITEMS)
+    private val runtimeState = LayoutRuntimeState(
+        customStates = customStates,
+        offerCustomStates = offerCustomStates,
+    )
 
     // SDK's internal thread-safe structure to track URL states
     private val urlEventStateMap = ConcurrentHashMap<String, UrlEventState>()
@@ -166,8 +171,8 @@ internal class LayoutViewModel(
                         targetOfferIndex = currentOffer,
                         creativeCopy = persistentMapOf(),
                         breakpoints = pluginModel.breakpoint,
-                        customState = customStates.toImmutableMap(),
-                        offerCustomStates = offerCustomStates.mapValues { it.value.toImmutableMap() }.toImmutableMap(),
+                        customState = runtimeState.globalCustomStates().toImmutableMap(),
+                        offerCustomStates = runtimeState.immutableOfferCustomStates(),
                     ),
                 ),
             )
@@ -271,7 +276,14 @@ internal class LayoutViewModel(
             }
 
             is LayoutContract.LayoutEvent.SetOfferCustomState -> {
-                offerCustomStates += (event.offerId.toString() to event.customState)
+                runtimeState.replaceOfferCustomStates(event.offerId, event.customState)
+                updateState { currentUiState ->
+                    currentUiState.copy(
+                        offerUiState = currentUiState.offerUiState.copy(
+                            offerCustomStates = runtimeState.immutableOfferCustomStates(),
+                        ),
+                    )
+                }
                 sendViewState()
             }
 
@@ -492,10 +504,12 @@ internal class LayoutViewModel(
     }
 
     private fun updateCustomState(key: String, value: Int) {
-        customStates += (key to value)
+        runtimeState.setGlobalCustomState(key, value)
         updateState { currentUiState ->
             currentUiState.copy(
-                offerUiState = currentUiState.offerUiState.copy(customState = customStates.toImmutableMap()),
+                offerUiState = currentUiState.offerUiState.copy(
+                    customState = runtimeState.globalCustomStates().toImmutableMap(),
+                ),
             )
         }
     }
@@ -635,13 +649,16 @@ internal class LayoutViewModel(
     private fun sendViewState(currentOffer: Int = this.currentOffer, isDismissed: Boolean = false) {
         pluginViewState = RoktViewState(
             pluginId = pluginId,
-            customStates = customStates.toImmutableMap(),
-            offerCustomStates = offerCustomStates.toImmutableMap(),
+            customStates = runtimeState.globalCustomStates().toImmutableMap(),
+            offerCustomStates = runtimeState.allOfferCustomStates().toImmutableMap(),
             offerIndex = currentOffer,
             pluginDismissed = isDismissed,
         )
         viewStateChange(pluginViewState)
     }
+
+    private fun LayoutRuntimeState.immutableOfferCustomStates() =
+        allOfferCustomStates().mapValues { (_, value) -> value.toImmutableMap() }.toImmutableMap()
 
     companion object {
         private const val KEY_INITIATOR = "initiator"
