@@ -5,8 +5,11 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 
+// position = null means a global (layout-wide) state; non-null is scoped to that offer index.
 internal data class CustomStateKey(val position: Int?, val key: String)
 
+// Offer-position state overrides global state on lookup, missing values resolve to 0,
+// and toggle defaults from missing to 1.
 internal class CustomStateMap(
     initialGlobalStates: Map<String, Int> = emptyMap(),
     initialOfferStates: Map<Int, Map<String, Int>> = emptyMap(),
@@ -37,6 +40,7 @@ internal class CustomStateMap(
 
     operator fun get(key: CustomStateKey): Int? = state.value[key]
 
+    // Per-offer entry takes precedence; falls back to the global entry when no per-offer value exists.
     fun value(position: Int?, key: String): Int? {
         val currentState = state.value
         return if (position != null) {
@@ -62,8 +66,10 @@ internal class CustomStateMap(
 
     fun offerStates(position: Int): Map<String, Int> = statesForPosition(position = position)
 
+    // Flattened view for a given offer: per-offer keys overwrite global keys via Map `+` semantics.
     fun effectiveStates(position: Int): Map<String, Int> = globalStates() + offerStates(position)
 
+    // Public-facing shape: Int positions become String keys to match RoktViewState.offerCustomStates.
     fun allOfferStates(): Map<String, Map<String, Int>> = state.value.entries
         .mapNotNull { (key, value) ->
             key.position?.let { position ->
@@ -79,6 +85,7 @@ internal class CustomStateMap(
 
     private data class OfferState(val position: Int, val key: String, val value: Int)
 
+    // Replaces all entries for the given scope only; entries for the other scope are preserved.
     private fun replace(position: Int?, states: Map<String, Int>) {
         _state.update { currentState ->
             currentState

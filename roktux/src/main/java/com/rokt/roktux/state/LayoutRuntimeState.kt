@@ -2,10 +2,14 @@ package com.rokt.roktux.state
 
 import com.rokt.roktux.validation.ValidationCoordinator
 
+// Typed container for per-layout runtime state owned by LayoutViewModel/MarketingVariantViewModel,
+// replacing the previous generic `Any` bag so call sites get compile-time safety.
 internal class LayoutRuntimeState(
     val customStateMap: CustomStateMap = CustomStateMap(),
     val validationCoordinator: ValidationCoordinator = ValidationCoordinator(),
 ) {
+    // Convenience constructor for seeding from the public RoktViewState shape,
+    // where offer positions arrive as String keys from persisted JSON.
     constructor(
         customStates: Map<String, Int>,
         offerCustomStates: Map<String, Map<String, Int>>,
@@ -43,6 +47,7 @@ internal class LayoutRuntimeState(
     fun allOfferCustomStates(): Map<String, Map<String, Int>> = customStateMap.allOfferStates()
 }
 
+// Tolerant conversion: non-numeric position keys from persisted state are dropped rather than crashing.
 private fun Map<String, Map<String, Int>>.toPositionedOfferStates(): Map<Int, Map<String, Int>> =
     mapNotNull { (position, states) ->
         position.toIntOrNull()?.let { offerPosition -> offerPosition to states }
