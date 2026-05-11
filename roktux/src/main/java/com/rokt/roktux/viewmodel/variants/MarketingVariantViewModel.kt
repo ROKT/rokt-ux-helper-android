@@ -5,6 +5,8 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.CreationExtras
 import com.rokt.modelmapper.mappers.ModelMapper
+import com.rokt.roktux.state.CustomStateMap
+import com.rokt.roktux.state.LayoutRuntimeState
 import com.rokt.roktux.viewmodel.base.BaseViewModel
 import com.rokt.roktux.viewmodel.layout.LayoutContract
 import kotlinx.collections.immutable.toImmutableMap
@@ -19,10 +21,15 @@ internal class MarketingViewModel(
     val currentOffer: Int,
     modelMapper: ModelMapper,
     private val ioDispatcher: CoroutineDispatcher,
-    private var customState: Map<String, Int>,
+    customState: Map<String, Int>,
 ) : BaseViewModel<LayoutContract.LayoutEvent, MarketingVariantUiState, MarketingVariantContract.LayoutVariantEffect>() {
     private var offerViewedJob: Job? = null
     private var signalViewedSent = AtomicBoolean(false)
+    private val runtimeState = LayoutRuntimeState(
+        customStateMap = CustomStateMap(
+            initialOfferStates = mapOf(currentOffer to customState),
+        ),
+    )
 
     init {
         val slot = modelMapper.getSavedExperience()?.plugins?.getOrNull(
@@ -31,7 +38,13 @@ internal class MarketingViewModel(
         val layoutVariantSchema = slot?.layoutVariant?.layoutVariantSchema
         val creativeCopy = slot?.offer?.creative?.copy
         if (layoutVariantSchema != null && creativeCopy != null) {
-            setSuccessState(MarketingVariantUiState(layoutVariantSchema, creativeCopy, customState.toImmutableMap()))
+            setSuccessState(
+                MarketingVariantUiState(
+                    layoutVariantSchema,
+                    creativeCopy,
+                    runtimeState.offerCustomStates(currentOffer).toImmutableMap(),
+                ),
+            )
         }
     }
 
@@ -47,7 +60,7 @@ internal class MarketingViewModel(
                     MarketingVariantContract.LayoutVariantEffect.PropagateEvent(
                         LayoutContract.LayoutEvent.SetOfferCustomState(
                             currentOffer,
-                            customState,
+                            runtimeState.offerCustomStates(currentOffer),
                         ),
                     )
                 }
@@ -84,10 +97,10 @@ internal class MarketingViewModel(
     }
 
     private fun updateCustomState(key: String, value: Int) {
-        customState += (key to value)
+        runtimeState.setOfferCustomState(currentOffer, key, value)
         updateState { currentUiState ->
             currentUiState.copy(
-                customState = customState.toImmutableMap(),
+                customState = runtimeState.offerCustomStates(currentOffer).toImmutableMap(),
             )
         }
     }

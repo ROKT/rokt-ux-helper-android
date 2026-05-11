@@ -348,6 +348,26 @@ class RoktLayoutViewModelTest : BaseViewModelTest() {
     }
 
     @Test
+    fun `SetCustomState Event should update custom state and propagate the event`() = runTest {
+        // Arrange
+        val key = "key"
+        val value = 1
+
+        // Act
+        layoutViewModel.setEvent(LayoutContract.LayoutEvent.SetCustomState(key, value))
+
+        // Assert
+        verify {
+            viewStateChange.invoke(
+                withArg { state ->
+                    assertThat(state.customStates).containsEntry(key, value)
+                    assertThat(state.offerCustomStates).isEmpty()
+                },
+            )
+        }
+    }
+
+    @Test
     fun `FirstOfferLoaded should send the RoktPlatformEvent with SignalImpression for the layout and required metadata`() {
         // Act
         layoutViewModel.setEvent(LayoutContract.LayoutEvent.FirstOfferLoaded)
