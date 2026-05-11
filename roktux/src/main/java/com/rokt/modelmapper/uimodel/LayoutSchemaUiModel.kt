@@ -21,6 +21,7 @@ import com.rokt.modelmapper.data.BindData
 import com.rokt.modelmapper.hmap.HMap
 import com.rokt.network.model.TransitionSpeedSetting
 import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.ImmutableMap
 
 @Immutable
 sealed class LayoutSchemaUiModel(
@@ -78,6 +79,13 @@ sealed class LayoutSchemaUiModel(
         override val containerProperties: ImmutableList<StateBlock<ContainerProperties>>?,
         override val conditionalTransitionModifiers: ConditionalTransitionModifier?,
         val children: ImmutableList<LayoutSchemaUiModel?>, // the type of it is either RowUiModel or ColumnUiModel
+    ) : LayoutSchemaUiModel(ownModifiers, containerProperties, conditionalTransitionModifiers)
+
+    data class CatalogCombinedCollectionUiModel(
+        override val ownModifiers: ImmutableList<StateBlock<ModifierProperties>>?,
+        override val containerProperties: ImmutableList<StateBlock<ContainerProperties>>?,
+        override val conditionalTransitionModifiers: ConditionalTransitionModifier?,
+        val childrenByCatalogItem: ImmutableMap<Int, ImmutableList<LayoutSchemaUiModel?>>,
     ) : LayoutSchemaUiModel(ownModifiers, containerProperties, conditionalTransitionModifiers)
 
     data class ProgressIndicatorUiModel(

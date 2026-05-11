@@ -1,0 +1,76 @@
+{
+  "type": "CatalogCombinedCollection",
+  "node": {
+    "styles": {
+      "elements": {
+        "own": [
+          {
+            "default": {
+              "background": {
+                "backgroundColor": {
+                  "light": "#e8f4ff",
+                  "dark": "#102030"
+                }
+              },
+              "border": {
+                "borderColor": {
+                  "light": "#1a5fb4",
+                  "dark": "#cfe8ff"
+                },
+                "borderStyle": "solid",
+                "borderWidth": "2",
+                "borderRadius": 8
+              },
+              "container": {
+                "alignItems": "center",
+                "justifyContent": "center"
+              },
+              "dimension": {
+                "width": {
+                  "type": "fixed",
+                  "value": 220
+                },
+                "height": {
+                  "type": "fit",
+                  "value": "wrap-content"
+                }
+              }
+            }
+          }
+        ]
+      }
+    },
+    "template": {
+      "type": "Column",
+      "node": {
+        "children": [
+          {
+            "type": "BasicText",
+            "node": {
+              "value": "%^DATA.catalogItem.title^%",
+              "styles": {
+                "elements": {
+                  "own": [
+                    {
+                      "default": {
+                        "text": {
+                          "fontSize": 18,
+                          "textColor": {
+                            "light": "#111827",
+                            "dark": "#ffffff"
+                          },
+                          "fontWeight": "700",
+                          "horizontalTextAlign": "center"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        ]
+      }
+    }
+  }
+}

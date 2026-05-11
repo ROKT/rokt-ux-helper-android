@@ -456,7 +456,9 @@ internal fun WhenPredicate.transformWhenPredicate(): WhenUiPredicate = when (thi
         value = predicate.value,
     )
 
-    else -> throw IllegalArgumentException()
+    is WhenPredicate.DomainState -> TODO("DomainState predicate mapping is not implemented")
+
+    is WhenPredicate.Placeholder -> TODO("Placeholder predicate mapping is not implemented")
 }
 
 internal fun transformDataImageCarousel(
