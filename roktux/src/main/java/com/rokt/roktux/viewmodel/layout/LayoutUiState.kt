@@ -23,4 +23,5 @@ internal data class OfferUiState(
     val customState: ImmutableMap<String, Int>,
     val offerCustomStates: ImmutableMap<String, ImmutableMap<String, Int>> =
         emptyMap<String, ImmutableMap<String, Int>>().toImmutableMap(),
+    val activeCatalogItemIndex: Int = 0,
 )

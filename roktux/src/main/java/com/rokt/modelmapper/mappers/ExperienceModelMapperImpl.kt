@@ -343,6 +343,13 @@ class ExperienceModelMapperImpl(private val experienceResponse: String, private 
             transformLayoutSchemaModel(child, offerModel, responseContextKey, index, catalogItemModule)
         }
 
+        is LayoutSchemaModel.CatalogCombinedCollection -> transformCatalogCombinedCollection(
+            layoutSchemaModel,
+            offerModel,
+        ) { index, catalogItemModule, child ->
+            transformLayoutSchemaModel(child, offerModel, responseContextKey, index, catalogItemModule)
+        }
+
         is LayoutSchemaModel.CatalogResponseButton -> transformCatalogResponseButton(
             layoutSchemaModel,
             offerModel,
@@ -351,7 +358,15 @@ class ExperienceModelMapperImpl(private val experienceResponse: String, private 
             transformLayoutSchemaModel(child, offerModel, responseContextKey, itemIndex, module)
         }
 
-        else -> null
+        is LayoutSchemaModel.AccessibilityGrouped -> TODO("AccessibilityGrouped mapping is not implemented")
+
+        is LayoutSchemaModel.CatalogDevicePayButton -> TODO("CatalogDevicePayButton mapping is not implemented")
+
+        is LayoutSchemaModel.CatalogDropdown -> TODO("CatalogDropdown mapping is not implemented")
+
+        is LayoutSchemaModel.CatalogImageGallery -> TODO("CatalogImageGallery mapping is not implemented")
+
+        is LayoutSchemaModel.SlideStateTrigger -> TODO("SlideStateTrigger mapping is not implemented")
     }
 
     private fun bindValue(
