@@ -34,7 +34,12 @@ class CatalogImageGallerySnapshotTest : BaseDcuiEspressoTest() {
     fun testCatalogImageGalleryWithImagesAndIndicators() {
         composeTestRule.onNodeWithTag(DCUI_COMPONENT_TAG).assertIsDisplayed()
         composeTestRule.waitForIdle()
+        Thread.sleep(SNAPSHOT_IMAGE_LOAD_DELAY_MS)
 
         composeTestRule.onRoot().captureRoboImage()
+    }
+
+    private companion object {
+        const val SNAPSHOT_IMAGE_LOAD_DELAY_MS = 1_000L
     }
 }
