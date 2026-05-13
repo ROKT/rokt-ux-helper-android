@@ -64,15 +64,7 @@ internal class BottomSheetComponent(
                 modifierFactory.createBackgroundShape(it)
             } ?: RectangleShape
         var hasUserInteracted by remember { mutableStateOf(false) }
-        // Prefer shouldDismissOnBackPress=false; on M3 1.4.x the one-arg constructor is missing
-        // (NoSuchMethodError), so fall back to no-arg default.
-        val sheetProperties = remember {
-            try {
-                ModalBottomSheetProperties(shouldDismissOnBackPress = false)
-            } catch (_: NoSuchMethodError) {
-                ModalBottomSheetProperties()
-            }
-        }
+        val sheetProperties = remember { BottomSheetPropertiesCompat.create() }
         ModalBottomSheet(
             onDismissRequest = {
                 if (!hasUserInteracted) {
