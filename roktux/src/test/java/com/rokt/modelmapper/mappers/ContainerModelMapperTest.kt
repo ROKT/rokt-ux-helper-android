@@ -11,11 +11,17 @@ import com.rokt.modelmapper.uimodel.LayoutSchemaUiModel
 import com.rokt.modelmapper.uimodel.Module
 import com.rokt.modelmapper.uimodel.OfferImageModel
 import com.rokt.modelmapper.uimodel.OfferModel
+import com.rokt.network.model.BasicStateStylingBlock
 import com.rokt.network.model.CatalogCombinedCollectionLayoutSchemaTemplateNode
 import com.rokt.network.model.CatalogCombinedCollectionModel
+import com.rokt.network.model.CatalogImageGalleryElements
 import com.rokt.network.model.CatalogImageGalleryModel
+import com.rokt.network.model.CatalogImageGalleryStyles
 import com.rokt.network.model.ColumnModel
 import com.rokt.network.model.LayoutSchemaModel
+import com.rokt.network.model.LayoutStyle
+import com.rokt.network.model.TextStylingProperties
+import com.rokt.network.model.ThemeColor
 import com.rokt.network.model.WhenPredicate
 import kotlinx.collections.immutable.persistentMapOf
 import kotlinx.collections.immutable.toImmutableList
@@ -55,7 +61,21 @@ class ContainerModelMapperTest {
     fun `transformCatalogImageGallery builds images from active catalog item`() {
         val gallery = LayoutSchemaModel.CatalogImageGallery(
             CatalogImageGalleryModel<WhenPredicate>(
-                styles = null,
+                styles = LayoutStyle(
+                    elements = CatalogImageGalleryElements(
+                        own = emptyList(),
+                        controlButton = listOf(
+                            BasicStateStylingBlock(
+                                default = CatalogImageGalleryStyles(
+                                    text = TextStylingProperties(
+                                        fontSize = 16f,
+                                        textColor = ThemeColor(light = "#ffffff"),
+                                    ),
+                                ),
+                            ),
+                        ),
+                    ),
+                ),
                 showIndicators = false,
                 backwardIcon = "chevron-left",
                 forwardIcon = "chevron-right",
@@ -83,6 +103,8 @@ class ContainerModelMapperTest {
         assertThat(result.showIndicators).isFalse()
         assertThat(result.backwardIcon).isEqualTo("chevron-left")
         assertThat(result.forwardIcon).isEqualTo("chevron-right")
+        assertThat(result.controlButton?.textStyles?.firstOrNull()?.default?.fontSize).isEqualTo(16f)
+        assertThat(result.controlButton?.textStyles?.firstOrNull()?.default?.textColor?.light).isEqualTo("#ffffff")
         assertThat(result.a11yLabel).isEqualTo("Product images")
     }
 

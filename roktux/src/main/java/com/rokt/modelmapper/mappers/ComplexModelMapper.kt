@@ -38,6 +38,7 @@ import com.rokt.network.model.BooleanWhenCondition
 import com.rokt.network.model.CarouselActiveIndicatorMode
 import com.rokt.network.model.CarouselTransition
 import com.rokt.network.model.CatalogImageGalleryIndicatorStyles
+import com.rokt.network.model.CatalogImageGalleryStyles
 import com.rokt.network.model.DataImageCarouselIndicatorStyles
 import com.rokt.network.model.DataImageCarouselIndicators
 import com.rokt.network.model.DimensionHeightValue
@@ -626,10 +627,38 @@ internal fun transformCatalogImageGallery(
         progressIndicatorContainer = catalogImageGallery.node.styles?.elements?.progressIndicatorContainer?.let {
             transformCatalogImageGalleryProgressIndicatorItem(it)
         },
+        controlButton = catalogImageGallery.node.styles?.elements?.controlButton?.let {
+            transformCatalogImageGalleryControlButton(it)
+        },
         customStateKey = catalogImageGalleryCustomStateKey,
         backwardIcon = catalogImageGallery.node.backwardIcon,
         forwardIcon = catalogImageGallery.node.forwardIcon,
         a11yLabel = catalogImageGallery.node.a11yLabel,
+    )
+}
+
+internal fun transformCatalogImageGalleryControlButton(
+    controlButton: List<BasicStateStylingBlock<CatalogImageGalleryStyles>>?,
+): LayoutSchemaUiModel.CatalogImageGalleryControlButtonUiModel {
+    val styles = controlButton?.toImmutableList()
+    val ownModifiers = styles.transformModifier(
+        transformSpacing = { ownStyle -> ownStyle.toBasicStateStylingBlock { style -> style.spacing } },
+        transformDimension = { ownStyle -> ownStyle.toBasicStateStylingBlock { style -> style.dimension } },
+        transformBackground = { ownStyle -> ownStyle.toBasicStateStylingBlock { style -> style.background } },
+        transformBorder = { ownStyle -> ownStyle.toBasicStateStylingBlock { style -> style.border } },
+        transformContainer = { ownStyle -> ownStyle.toBasicStateStylingBlock { style -> style.container } },
+    )
+
+    return LayoutSchemaUiModel.CatalogImageGalleryControlButtonUiModel(
+        ownModifiers = ownModifiers,
+        containerProperties = styles.transformContainer(
+            transformContainer = { ownStyle -> ownStyle.toBasicStateStylingBlock { style -> style.container } },
+            transformFlexChild = { ownStyle -> ownStyle.toBasicStateStylingBlock { style -> style.flexChild } },
+        ),
+        conditionalTransitionModifiers = null,
+        textStyles = styles.transformTextStyles { ownStyle ->
+            ownStyle.toBasicStateStylingBlock { style -> style.text }
+        },
     )
 }
 

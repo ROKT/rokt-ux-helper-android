@@ -3,6 +3,8 @@
   "node": {
     "showIndicators": true,
     "a11yLabel": "Product images",
+    "backwardIcon": "\ue926",
+    "forwardIcon": "\ue927",
     "styles": {
       "elements": {
         "own": [
@@ -45,6 +47,43 @@
                 "height": {
                   "type": "fixed",
                   "value": 120
+                }
+              }
+            }
+          }
+        ],
+        "controlButton": [
+          {
+            "default": {
+              "background": {
+                "backgroundColor": {
+                  "light": "#111827",
+                  "dark": "#ffffff"
+                }
+              },
+              "border": {
+                "borderRadius": 14
+              },
+              "container": {
+                "alignItems": "center",
+                "justifyContent": "center"
+              },
+              "dimension": {
+                "width": {
+                  "type": "fixed",
+                  "value": 28
+                },
+                "height": {
+                  "type": "fixed",
+                  "value": 28
+                }
+              },
+              "text": {
+                "fontSize": 16,
+                "fontWeight": "700",
+                "textColor": {
+                  "light": "#ffffff",
+                  "dark": "#111827"
                 }
               }
             }
