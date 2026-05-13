@@ -9,6 +9,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.9.3] - 2026-05-13
+
+### Fixed
+
+- Handle bottom sheet properties constructor changes ([#241](https://github.com/ROKT/rokt-ux-helper-android/pull/241))
+- Harden GitHub Actions workflows and add zizmor CI check ([#233](https://github.com/ROKT/rokt-ux-helper-android/pull/233))
+- Pin reusable workflow references to commit SHAs ([#231](https://github.com/ROKT/rokt-ux-helper-android/pull/231))
+
+### Changed
+
+- Bump peter-evans/create-pull-request from 8.1.0 to 8.1.1 ([#240](https://github.com/ROKT/rokt-ux-helper-android/pull/240))
+- Bump tj-actions/changed-files from 47.0.5 to 47.0.6 ([#237](https://github.com/ROKT/rokt-ux-helper-android/pull/237))
+- Bump codecov/codecov-action from 5.5.3 to 6.0.0 ([#236](https://github.com/ROKT/rokt-ux-helper-android/pull/236))
+- Upgrade trunk ([#232](https://github.com/ROKT/rokt-ux-helper-android/pull/232))
+- Bump actions/create-github-app-token from 3.0.0 to 3.1.1 ([#235](https://github.com/ROKT/rokt-ux-helper-android/pull/235))
+- Bump actions/upload-artifact from 7.0.0 to 7.0.1 ([#234](https://github.com/ROKT/rokt-ux-helper-android/pull/234))
+- Bump codecov/codecov-action from 5.5.2 to 5.5.3 ([#230](https://github.com/ROKT/rokt-ux-helper-android/pull/230))
+- Bump gradle/actions from 5.0.2 to 6.0.0 ([#229](https://github.com/ROKT/rokt-ux-helper-android/pull/229))
+- Bump ncipollo/release-action from 1.20.0 to 1.21.0 ([#228](https://github.com/ROKT/rokt-ux-helper-android/pull/228))
+- Bump actions/create-github-app-token from 2.2.1 to 3.0.0 ([#227](https://github.com/ROKT/rokt-ux-helper-android/pull/227))
+- Centralise version/signing and add POM validation ([#222](https://github.com/ROKT/rokt-ux-helper-android/pull/222))
+
 ## [0.9.2] - 2026-03-10
 
 ### Fixed
@@ -172,7 +194,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Initial implementation of UX Helper
 
-[unreleased]: https://github.com/ROKT/rokt-ux-helper-android/compare/0.9.2...HEAD
+[unreleased]: https://github.com/ROKT/rokt-ux-helper-android/compare/0.9.3...HEAD
+[0.9.3]: https://github.com/ROKT/rokt-ux-helper-android/compare/0.9.2...0.9.3
 [0.9.2]: https://github.com/ROKT/rokt-ux-helper-android/compare/0.9.1...0.9.2
 [0.9.1]: https://github.com/ROKT/rokt-ux-helper-android/compare/0.9.0...0.9.1
 [0.9.0]: https://github.com/ROKT/rokt-ux-helper-android/compare/0.8.4...0.9.0
