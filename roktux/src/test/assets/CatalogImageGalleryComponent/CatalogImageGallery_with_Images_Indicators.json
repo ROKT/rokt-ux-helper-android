@@ -1,0 +1,135 @@
+{
+  "type": "CatalogImageGallery",
+  "node": {
+    "showIndicators": true,
+    "a11yLabel": "Product images",
+    "styles": {
+      "elements": {
+        "own": [
+          {
+            "default": {
+              "background": {
+                "backgroundColor": {
+                  "light": "#eef7ff",
+                  "dark": "#102030"
+                }
+              },
+              "container": {
+                "alignItems": "center",
+                "justifyContent": "center"
+              },
+              "dimension": {
+                "width": {
+                  "type": "fixed",
+                  "value": 180
+                },
+                "height": {
+                  "type": "fixed",
+                  "value": 140
+                }
+              }
+            }
+          }
+        ],
+        "mainImage": [
+          {
+            "default": {
+              "border": {
+                "borderRadius": 8
+              },
+              "dimension": {
+                "width": {
+                  "type": "fixed",
+                  "value": 160
+                },
+                "height": {
+                  "type": "fixed",
+                  "value": 120
+                }
+              }
+            }
+          }
+        ],
+        "progressIndicatorContainer": [
+          {
+            "default": {
+              "container": {
+                "alignItems": "center",
+                "justifyContent": "center"
+              },
+              "dimension": {
+                "width": {
+                  "type": "fit",
+                  "value": "wrap-content"
+                },
+                "height": {
+                  "type": "fixed",
+                  "value": 16
+                }
+              },
+              "spacing": {
+                "padding": "2"
+              }
+            }
+          }
+        ],
+        "indicator": [
+          {
+            "default": {
+              "background": {
+                "backgroundColor": {
+                  "light": "#9ca3af",
+                  "dark": "#9ca3af"
+                }
+              },
+              "border": {
+                "borderRadius": 6
+              },
+              "dimension": {
+                "width": {
+                  "type": "fixed",
+                  "value": 6
+                },
+                "height": {
+                  "type": "fixed",
+                  "value": 6
+                }
+              },
+              "spacing": {
+                "margin": "0 2"
+              }
+            }
+          }
+        ],
+        "activeIndicator": [
+          {
+            "default": {
+              "background": {
+                "backgroundColor": {
+                  "light": "#111827",
+                  "dark": "#ffffff"
+                }
+              },
+              "border": {
+                "borderRadius": 8
+              },
+              "dimension": {
+                "width": {
+                  "type": "fixed",
+                  "value": 8
+                },
+                "height": {
+                  "type": "fixed",
+                  "value": 8
+                }
+              },
+              "spacing": {
+                "margin": "0 2"
+              }
+            }
+          }
+        ]
+      }
+    }
+  }
+}

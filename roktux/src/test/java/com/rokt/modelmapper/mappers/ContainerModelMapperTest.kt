@@ -2,14 +2,18 @@ package com.rokt.modelmapper.mappers
 
 import com.rokt.modelmapper.data.BindData
 import com.rokt.modelmapper.hmap.HMap
+import com.rokt.modelmapper.hmap.TypedKey
+import com.rokt.modelmapper.hmap.set
 import com.rokt.modelmapper.uimodel.CatalogImageWrapperModel
 import com.rokt.modelmapper.uimodel.CatalogItemModel
 import com.rokt.modelmapper.uimodel.CreativeModel
 import com.rokt.modelmapper.uimodel.LayoutSchemaUiModel
 import com.rokt.modelmapper.uimodel.Module
+import com.rokt.modelmapper.uimodel.OfferImageModel
 import com.rokt.modelmapper.uimodel.OfferModel
 import com.rokt.network.model.CatalogCombinedCollectionLayoutSchemaTemplateNode
 import com.rokt.network.model.CatalogCombinedCollectionModel
+import com.rokt.network.model.CatalogImageGalleryModel
 import com.rokt.network.model.ColumnModel
 import com.rokt.network.model.LayoutSchemaModel
 import com.rokt.network.model.WhenPredicate
@@ -47,6 +51,41 @@ class ContainerModelMapperTest {
         assertThat(result.childrenByCatalogItem[1]?.single()?.text()).isEqualTo("item-1")
     }
 
+    @Test
+    fun `transformCatalogImageGallery builds images from active catalog item`() {
+        val gallery = LayoutSchemaModel.CatalogImageGallery(
+            CatalogImageGalleryModel<WhenPredicate>(
+                styles = null,
+                showIndicators = false,
+                backwardIcon = "chevron-left",
+                forwardIcon = "chevron-right",
+                a11yLabel = "Product images",
+            ),
+        )
+        val offerModel = createOfferModel(
+            catalogItemCount = 2,
+            imageKeysByItem = mapOf(
+                0 to listOf("catalogItemImage0"),
+                1 to listOf("catalogItemImage2", "catalogItemImage1"),
+            ),
+        )
+
+        val result = transformCatalogImageGallery(
+            catalogImageGallery = gallery,
+            offerModel = offerModel,
+            itemIndex = 1,
+            module = Module.AddToCart,
+        )
+
+        assertThat(result.images).containsOnlyKeys(0, 1)
+        assertThat(result.images[0]?.lightUrl).isEqualTo("https://example.com/item-1-catalogItemImage1.png")
+        assertThat(result.images[1]?.lightUrl).isEqualTo("https://example.com/item-1-catalogItemImage2.png")
+        assertThat(result.showIndicators).isFalse()
+        assertThat(result.backwardIcon).isEqualTo("chevron-left")
+        assertThat(result.forwardIcon).isEqualTo("chevron-right")
+        assertThat(result.a11yLabel).isEqualTo("Product images")
+    }
+
     private fun createTextUiModel(value: String): LayoutSchemaUiModel.BasicTextUiModel = LayoutSchemaUiModel.BasicTextUiModel(
         ownModifiers = null,
         containerProperties = null,
@@ -59,7 +98,10 @@ class ContainerModelMapperTest {
     private fun LayoutSchemaUiModel.text(): String? = (this as? LayoutSchemaUiModel.BasicTextUiModel)?.value
         ?.let { value -> (value as? BindData.Value)?.text }
 
-    private fun createOfferModel(catalogItemCount: Int): OfferModel = OfferModel(
+    private fun createOfferModel(
+        catalogItemCount: Int,
+        imageKeysByItem: Map<Int, List<String>> = emptyMap(),
+    ): OfferModel = OfferModel(
         campaignId = "campaignId",
         creative = CreativeModel(
             referralCreativeId = "creativeId",
@@ -74,8 +116,23 @@ class ContainerModelMapperTest {
         catalogItems = List(catalogItemCount) {
             CatalogItemModel(
                 properties = HMap(),
-                imageWrapper = CatalogImageWrapperModel(HMap()),
+                imageWrapper = CatalogImageWrapperModel(
+                    HMap().apply {
+                        imageKeysByItem[it]?.forEach { imageKey ->
+                            set(TypedKey<OfferImageModel>(imageKey), createOfferImage(it, imageKey))
+                        }
+                    },
+                ),
             )
         }.toImmutableList(),
+    )
+
+    private fun createOfferImage(catalogItemIndex: Int, imageKey: String): OfferImageModel = OfferImageModel(
+        HMap().apply {
+            set(TypedKey<String>(ExperienceModelMapperImpl.KEY_LIGHT), "https://example.com/item-$catalogItemIndex-$imageKey.png")
+            set(TypedKey<String>(ExperienceModelMapperImpl.KEY_DARK), "")
+            set(TypedKey<String>(ExperienceModelMapperImpl.KEY_ALT), "Catalog image")
+            set(TypedKey<String>(ExperienceModelMapperImpl.KEY_TITLE), imageKey)
+        },
     )
 }
