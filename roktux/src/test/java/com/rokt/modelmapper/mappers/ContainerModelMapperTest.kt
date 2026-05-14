@@ -7,6 +7,9 @@ import com.rokt.modelmapper.hmap.get
 import com.rokt.modelmapper.hmap.set
 import com.rokt.modelmapper.uimodel.Address
 import com.rokt.modelmapper.uimodel.CatalogImageWrapperModel
+import com.rokt.modelmapper.uimodel.CatalogItemGroupAttributeModel
+import com.rokt.modelmapper.uimodel.CatalogItemGroupModel
+import com.rokt.modelmapper.uimodel.CatalogItemGroupOptionModel
 import com.rokt.modelmapper.uimodel.CatalogItemModel
 import com.rokt.modelmapper.uimodel.CreativeModel
 import com.rokt.modelmapper.uimodel.HeightUiModel
@@ -17,6 +20,7 @@ import com.rokt.modelmapper.uimodel.OfferModel
 import com.rokt.modelmapper.uimodel.PaymentMethod
 import com.rokt.modelmapper.uimodel.TransactionData
 import com.rokt.modelmapper.uimodel.WidthUiModel
+import com.rokt.network.model.BackgroundStylingProperties
 import com.rokt.network.model.BasicStateStylingBlock
 import com.rokt.network.model.BasicTextModel
 import com.rokt.network.model.CatalogCombinedCollectionLayoutSchemaTemplateNode
@@ -24,6 +28,9 @@ import com.rokt.network.model.CatalogCombinedCollectionModel
 import com.rokt.network.model.CatalogDevicePayButtonElements
 import com.rokt.network.model.CatalogDevicePayButtonModel
 import com.rokt.network.model.CatalogDevicePayButtonStyles
+import com.rokt.network.model.CatalogDropdownElements
+import com.rokt.network.model.CatalogDropdownModel
+import com.rokt.network.model.CatalogDropdownStyles
 import com.rokt.network.model.CatalogImageGalleryElements
 import com.rokt.network.model.CatalogImageGalleryModel
 import com.rokt.network.model.CatalogImageGalleryStyles
@@ -34,6 +41,7 @@ import com.rokt.network.model.DimensionStylingProperties
 import com.rokt.network.model.DimensionWidthValue
 import com.rokt.network.model.FlexAlignment
 import com.rokt.network.model.FlexJustification
+import com.rokt.network.model.FormStateStylingBlock
 import com.rokt.network.model.LayoutSchemaModel
 import com.rokt.network.model.LayoutStyle
 import com.rokt.network.model.PaymentProvider
@@ -220,6 +228,73 @@ class ContainerModelMapperTest {
         ),
     )
 
+    @Test
+    fun `transformCatalogDropdown maps catalog item group and state styles`() {
+        val dropdown = LayoutSchemaModel.CatalogDropdown(
+            CatalogDropdownModel<WhenPredicate>(
+                placeholderValue = "Select an option",
+                unavailableValue = "Unavailable",
+                styles = LayoutStyle(
+                    elements = CatalogDropdownElements(
+                        own = listOf(
+                            FormStateStylingBlock(default = CatalogDropdownStyles()),
+                        ),
+                        head = listOf(
+                            FormStateStylingBlock(
+                                default = CatalogDropdownStyles(
+                                    text = TextStylingProperties(
+                                        fontSize = 14f,
+                                        textColor = ThemeColor(light = "#111827"),
+                                    ),
+                                ),
+                                selected = CatalogDropdownStyles(
+                                    background = BackgroundStylingProperties(
+                                        backgroundColor = ThemeColor(light = "#eef7ff"),
+                                    ),
+                                ),
+                            ),
+                        ),
+                        option = listOf(
+                            FormStateStylingBlock(
+                                default = CatalogDropdownStyles(),
+                                disabled = CatalogDropdownStyles(
+                                    text = TextStylingProperties(
+                                        textColor = ThemeColor(light = "#9ca3af"),
+                                    ),
+                                ),
+                            ),
+                        ),
+                    ),
+                ),
+                a11yLabel = "Select size",
+            ),
+        )
+        val offerModel = createOfferModel(
+            catalogItemCount = 2,
+            catalogItemGroup = createCatalogItemGroup(),
+        )
+
+        val result = transformCatalogDropdown(
+            catalogDropdown = dropdown,
+            offerModel = offerModel,
+            attributeIndex = 0,
+        )
+
+        assertThat(result.placeholderValue).isEqualTo("Select an option")
+        assertThat(result.unavailableValue).isEqualTo("Unavailable")
+        assertThat(result.a11yLabel).isEqualTo("Select size")
+        assertThat(result.attributeIndex).isEqualTo(0)
+        assertThat(result.customStateKey).isEqualTo("CatalogDropdown.0.selectedIndex")
+        assertThat(result.catalogItemGroup?.attributes?.single()?.label).isEqualTo("Select size")
+        assertThat(result.catalogItemGroup?.attributes?.single()?.options?.map { it.label })
+            .containsExactly("8oz", "16oz")
+        assertThat(result.head?.default?.textStyles?.firstOrNull()?.default?.fontSize).isEqualTo(14f)
+        assertThat(result.head?.selected?.ownModifiers?.firstOrNull()?.default?.backgroundColor?.light)
+            .isEqualTo("#eef7ff")
+        assertThat(result.option?.disabled?.textStyles?.firstOrNull()?.default?.textColor?.light)
+            .isEqualTo("#9ca3af")
+    }
+
     private fun createTextUiModel(value: String): LayoutSchemaUiModel.BasicTextUiModel = LayoutSchemaUiModel.BasicTextUiModel(
         ownModifiers = null,
         containerProperties = null,
@@ -237,6 +312,7 @@ class ContainerModelMapperTest {
         imageKeysByItem: Map<Int, List<String>> = emptyMap(),
         catalogItemPropertiesByItem: Map<Int, HMap> = emptyMap(),
         transactionData: TransactionData? = null,
+        catalogItemGroup: CatalogItemGroupModel? = null,
     ): OfferModel = OfferModel(
         campaignId = "campaignId",
         creative = CreativeModel(
@@ -251,7 +327,10 @@ class ContainerModelMapperTest {
         ),
         catalogItems = List(catalogItemCount) {
             CatalogItemModel(
-                properties = catalogItemPropertiesByItem[it] ?: HMap(),
+                properties = catalogItemPropertiesByItem[it] ?: HMap().apply {
+                    set(TypedKey<String>("catalogItemId"), "catalog-item-$it")
+                    set(TypedKey<String>("inventoryStatus"), "InStock")
+                },
                 imageWrapper = CatalogImageWrapperModel(
                     HMap().apply {
                         imageKeysByItem[it]?.forEach { imageKey ->
@@ -262,6 +341,32 @@ class ContainerModelMapperTest {
             )
         }.toImmutableList(),
         transactionData = transactionData,
+        catalogItemGroup = catalogItemGroup,
+    )
+
+    private fun createCatalogItemGroup(): CatalogItemGroupModel = CatalogItemGroupModel(
+        groupId = "group-1",
+        catalogItemIds = listOf("catalog-item-0", "catalog-item-1").toImmutableList(),
+        attributes = listOf(
+            CatalogItemGroupAttributeModel(
+                attributeId = "size",
+                label = "Select size",
+                options = listOf(
+                    CatalogItemGroupOptionModel(
+                        label = "8oz",
+                        catalogItemIds = listOf("catalog-item-0").toImmutableList(),
+                        metadata = persistentMapOf(),
+                    ),
+                    CatalogItemGroupOptionModel(
+                        label = "16oz",
+                        catalogItemIds = listOf("catalog-item-1").toImmutableList(),
+                        metadata = persistentMapOf(),
+                    ),
+                ).toImmutableList(),
+                metadata = persistentMapOf(),
+            ),
+        ).toImmutableList(),
+        metadata = persistentMapOf(),
     )
 
     private fun createOfferImage(catalogItemIndex: Int, imageKey: String): OfferImageModel = OfferImageModel(

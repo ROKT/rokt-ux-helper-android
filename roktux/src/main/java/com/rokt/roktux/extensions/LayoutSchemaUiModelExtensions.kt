@@ -36,6 +36,7 @@ fun LayoutSchemaUiModel.transformModifiers(
         is LayoutSchemaUiModel.CatalogStackedCollectionUiModel -> copy(ownModifiers = modifiedModifiers)
         is LayoutSchemaUiModel.CatalogCombinedCollectionUiModel -> copy(ownModifiers = modifiedModifiers)
         is LayoutSchemaUiModel.CatalogImageGalleryUiModel -> copy(ownModifiers = modifiedModifiers)
+        is LayoutSchemaUiModel.CatalogDropdownUiModel -> copy(ownModifiers = modifiedModifiers)
         is LayoutSchemaUiModel.ProgressIndicatorUiModel -> copy(ownModifiers = modifiedModifiers)
         is LayoutSchemaUiModel.ProgressIndicatorItemUiModel -> copy(ownModifiers = modifiedModifiers)
         is LayoutSchemaUiModel.CreativeResponseUiModel -> copy(ownModifiers = modifiedModifiers)

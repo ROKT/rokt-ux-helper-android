@@ -275,6 +275,10 @@ internal class LayoutViewModel(
                 sendViewState()
             }
 
+            is LayoutContract.LayoutEvent.SetActiveCatalogItem -> {
+                updateActiveCatalogItem(event.index)
+            }
+
             is LayoutContract.LayoutEvent.SignalViewed -> {
                 handleSignalViewed(event.offerId)
             }
@@ -596,6 +600,16 @@ internal class LayoutViewModel(
             currentUiState.copy(
                 offerUiState = currentUiState.offerUiState.copy(
                     offerCustomStates = runtimeState.immutableOfferCustomStates(),
+                ),
+            )
+        }
+    }
+
+    private fun updateActiveCatalogItem(index: Int) {
+        updateState { currentUiState ->
+            currentUiState.copy(
+                offerUiState = currentUiState.offerUiState.copy(
+                    activeCatalogItemIndex = index,
                 ),
             )
         }

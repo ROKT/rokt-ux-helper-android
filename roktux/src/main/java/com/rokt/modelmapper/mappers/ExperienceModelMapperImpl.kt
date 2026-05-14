@@ -8,6 +8,9 @@ import com.rokt.modelmapper.hmap.set
 import com.rokt.modelmapper.model.NetworkAction
 import com.rokt.modelmapper.model.NetworkAddress
 import com.rokt.modelmapper.model.NetworkCatalogItem
+import com.rokt.modelmapper.model.NetworkCatalogItemGroup
+import com.rokt.modelmapper.model.NetworkCatalogItemGroupAttribute
+import com.rokt.modelmapper.model.NetworkCatalogItemGroupOption
 import com.rokt.modelmapper.model.NetworkCreativeImage
 import com.rokt.modelmapper.model.NetworkCreativeLayout
 import com.rokt.modelmapper.model.NetworkExperienceResponse
@@ -24,6 +27,9 @@ import com.rokt.modelmapper.model.NetworkTransactionData
 import com.rokt.modelmapper.uimodel.Action
 import com.rokt.modelmapper.uimodel.Address
 import com.rokt.modelmapper.uimodel.CatalogImageWrapperModel
+import com.rokt.modelmapper.uimodel.CatalogItemGroupAttributeModel
+import com.rokt.modelmapper.uimodel.CatalogItemGroupModel
+import com.rokt.modelmapper.uimodel.CatalogItemGroupOptionModel
 import com.rokt.modelmapper.uimodel.CatalogItemModel
 import com.rokt.modelmapper.uimodel.CreativeIcon
 import com.rokt.modelmapper.uimodel.CreativeLink
@@ -101,7 +107,7 @@ class ExperienceModelMapperImpl(private val experienceResponse: String, private 
         targetElementSelector = targetElementSelector,
         instanceGuid = config.instanceGuid,
         token = config.token,
-        outerLayoutSchema = transformLayoutSchemaModel(config.outerLayoutSchema.layout),
+        outerLayoutSchema = transformOuterLayoutSchemaModel(config.outerLayoutSchema.layout),
         slots = config.slots.map { it.toSlotModel() }.toImmutableList(),
         breakpoint = config.outerLayoutSchema.breakpoints.buildBreakpoints(),
         settings = buildSettings(config.outerLayoutSchema.settings),
@@ -138,6 +144,7 @@ class ExperienceModelMapperImpl(private val experienceResponse: String, private 
             creative = creative.toCreativeModel(),
             catalogItems = catalogItems.map { it.toCatalogItemModel() }.toImmutableList(),
             transactionData = transactionData?.toTransactionDataModel(),
+            catalogItemGroup = catalogItemGroup?.toCatalogItemGroupModel(),
         )
         return offerModel
     }
@@ -229,9 +236,32 @@ class ExperienceModelMapperImpl(private val experienceResponse: String, private 
             set(TypedKey<String>(KEY_ADD_ON_PLUGIN_URL), addOnPluginUrl)
             set(TypedKey<String>(KEY_ADD_ON_PLUGIN_NAME), addOnPluginName)
             set(TypedKey<String>(KEY_TOKEN), token)
+            set(TypedKey<String>(KEY_INVENTORY_STATUS), inventoryStatus)
         },
         imageWrapper = transformImage(images),
     )
+
+    private fun NetworkCatalogItemGroup.toCatalogItemGroupModel(): CatalogItemGroupModel = CatalogItemGroupModel(
+        groupId = groupId,
+        catalogItemIds = catalogItemIds.toImmutableList(),
+        attributes = attributes.map { it.toCatalogItemGroupAttributeModel() }.toImmutableList(),
+        metadata = metadata.toImmutableMap(),
+    )
+
+    private fun NetworkCatalogItemGroupAttribute.toCatalogItemGroupAttributeModel(): CatalogItemGroupAttributeModel =
+        CatalogItemGroupAttributeModel(
+            attributeId = attributeId,
+            label = label,
+            options = options.map { it.toCatalogItemGroupOptionModel() }.toImmutableList(),
+            metadata = metadata.toImmutableMap(),
+        )
+
+    private fun NetworkCatalogItemGroupOption.toCatalogItemGroupOptionModel(): CatalogItemGroupOptionModel =
+        CatalogItemGroupOptionModel(
+            label = label,
+            catalogItemIds = catalogItemIds.toImmutableList(),
+            metadata = metadata.toImmutableMap(),
+        )
 
     private fun NetworkAction.toActionModel(): Action = when (this) {
         NetworkAction.Url -> Action.Url
@@ -262,8 +292,9 @@ class ExperienceModelMapperImpl(private val experienceResponse: String, private 
             },
         )
 
-    private fun NetworkLayoutVariant.toLayoutVariantModel(offerModel: OfferModel?): LayoutVariantModel =
-        LayoutVariantModel(
+    private fun NetworkLayoutVariant.toLayoutVariantModel(offerModel: OfferModel?): LayoutVariantModel {
+        nextCatalogDropdownAttributeIndex = 0
+        return LayoutVariantModel(
             layoutVariantId = layoutVariantId,
             moduleName = moduleName,
             layoutVariantSchema = transformLayoutSchemaModel(
@@ -272,6 +303,12 @@ class ExperienceModelMapperImpl(private val experienceResponse: String, private 
                 module = Module.fromString(moduleName),
             ),
         )
+    }
+
+    private fun transformOuterLayoutSchemaModel(layoutSchemaModel: LayoutSchemaModel): LayoutSchemaUiModel? {
+        nextCatalogDropdownAttributeIndex = 0
+        return transformLayoutSchemaModel(layoutSchemaModel)
+    }
 
     private fun transformLayoutSchemaModel(
         layoutSchemaModel: LayoutSchemaModel,
@@ -400,7 +437,11 @@ class ExperienceModelMapperImpl(private val experienceResponse: String, private 
             transformLayoutSchemaModel(child, offerModel, responseContextKey, itemIndex, module)
         }
 
-        is LayoutSchemaModel.CatalogDropdown -> TODO("CatalogDropdown mapping is not implemented")
+        is LayoutSchemaModel.CatalogDropdown -> transformCatalogDropdown(
+            layoutSchemaModel,
+            offerModel,
+            nextCatalogDropdownAttributeIndex++,
+        )
 
         is LayoutSchemaModel.CatalogImageGallery -> transformCatalogImageGallery(
             layoutSchemaModel,
@@ -418,6 +459,8 @@ class ExperienceModelMapperImpl(private val experienceResponse: String, private 
         offerModel: OfferModel?,
         itemIndex: Int,
     ): BindData = dataBinding.bindValue(value, contextKey, offerModel, itemIndex)
+
+    private var nextCatalogDropdownAttributeIndex = 0
 
     companion object {
         private const val KEY_ID = "id"
@@ -456,5 +499,6 @@ class ExperienceModelMapperImpl(private val experienceResponse: String, private 
         private const val KEY_PRICE_FORMATTED = "priceFormatted"
         private const val KEY_ADD_ON_PLUGIN_URL = "addOnPluginUrl"
         private const val KEY_ADD_ON_PLUGIN_NAME = "addOnPluginName"
+        const val KEY_INVENTORY_STATUS = "inventoryStatus"
     }
 }

@@ -9,4 +9,5 @@ data class NetworkOfferLayout(
     @SerialName("creative") val creative: NetworkCreativeLayout,
     @SerialName("catalogItems") val catalogItems: List<NetworkCatalogItem> = emptyList(),
     @SerialName("transactionData") val transactionData: NetworkTransactionData? = null,
+    @SerialName("catalogItemGroup") val catalogItemGroup: NetworkCatalogItemGroup? = null,
 )

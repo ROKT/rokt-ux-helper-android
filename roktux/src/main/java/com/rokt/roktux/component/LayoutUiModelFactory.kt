@@ -83,6 +83,8 @@ internal class LayoutUiModelFactory(modifierFactory: ModifierFactory = ModifierF
                 CatalogCombinedCollectionComponent(this, modifierFactory),
             LayoutSchemaUiModel.CatalogImageGalleryUiModel::class to
                 CatalogImageGalleryComponent(this, modifierFactory),
+            LayoutSchemaUiModel.CatalogDropdownUiModel::class to
+                CatalogDropdownComponent(modifierFactory),
             LayoutSchemaUiModel.CatalogStackedCollectionUiModel::class to
                 CatalogStackedCollectionComponent(this, modifierFactory),
         )
