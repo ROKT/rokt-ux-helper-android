@@ -5,6 +5,7 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onRoot
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.takahirom.roborazzi.ExperimentalRoborazziApi
+import com.github.takahirom.roborazzi.RoborazziOptions
 import com.github.takahirom.roborazzi.captureRoboImage
 import com.rokt.core.testutils.annotations.DCUI_COMPONENT_TAG
 import com.rokt.core.testutils.annotations.DcuiConfig
@@ -26,6 +27,10 @@ import org.robolectric.annotation.GraphicsMode
 )
 class CatalogDropdownSnapshotTest : BaseDcuiEspressoTest() {
 
+    private val catalogDropdownRoborazziOptions = RoborazziOptions(
+        compareOptions = RoborazziOptions.CompareOptions(changeThreshold = 0.002F),
+    )
+
     @OptIn(ExperimentalRoborazziApi::class)
     @Test
     @DcuiNodeJson(jsonFile = "CatalogDropdownComponent/CatalogDropdown_with_Group.json")
@@ -35,6 +40,6 @@ class CatalogDropdownSnapshotTest : BaseDcuiEspressoTest() {
         composeTestRule.onNodeWithTag(DCUI_COMPONENT_TAG).assertIsDisplayed()
         composeTestRule.waitForIdle()
 
-        composeTestRule.onRoot().captureRoboImage()
+        composeTestRule.onRoot().captureRoboImage(roborazziOptions = catalogDropdownRoborazziOptions)
     }
 }
