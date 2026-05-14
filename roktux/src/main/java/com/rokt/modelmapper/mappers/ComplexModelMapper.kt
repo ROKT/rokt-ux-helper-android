@@ -8,6 +8,7 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.ui.layout.ContentScale
 import com.rokt.modelmapper.data.BindData
 import com.rokt.modelmapper.data.bindModel
+import com.rokt.modelmapper.data.getCatalogItemImages
 import com.rokt.modelmapper.data.getOfferImages
 import com.rokt.modelmapper.hmap.TypedKey
 import com.rokt.modelmapper.hmap.get
@@ -24,6 +25,7 @@ import com.rokt.modelmapper.uimodel.DataImageTransition.Type
 import com.rokt.modelmapper.uimodel.EqualityWhenUiCondition
 import com.rokt.modelmapper.uimodel.ExistenceWhenUiCondition
 import com.rokt.modelmapper.uimodel.LayoutSchemaUiModel
+import com.rokt.modelmapper.uimodel.Module
 import com.rokt.modelmapper.uimodel.OfferModel
 import com.rokt.modelmapper.uimodel.OrderableWhenUiCondition
 import com.rokt.modelmapper.uimodel.ProgressUiDirection
@@ -35,6 +37,8 @@ import com.rokt.network.model.BasicStateStylingBlock
 import com.rokt.network.model.BooleanWhenCondition
 import com.rokt.network.model.CarouselActiveIndicatorMode
 import com.rokt.network.model.CarouselTransition
+import com.rokt.network.model.CatalogImageGalleryIndicatorStyles
+import com.rokt.network.model.CatalogImageGalleryStyles
 import com.rokt.network.model.DataImageCarouselIndicatorStyles
 import com.rokt.network.model.DataImageCarouselIndicators
 import com.rokt.network.model.DimensionHeightValue
@@ -53,10 +57,12 @@ import com.rokt.network.model.WhenPredicate
 import com.rokt.network.model.WhenTransition
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
+import kotlinx.collections.immutable.toImmutableMap
 
 private const val defaultStartPosition = 1
 private const val defaultAccessibilityHidden = true
 private const val dataImageCarouselCustomKeyPrefix = "DataImageCarousel."
+private const val catalogImageGalleryCustomStateKey = "imageCarouselPosition"
 
 internal fun transformProgressIndicator(
     progressIndicatorModel: LayoutSchemaModel.ProgressIndicator,
@@ -539,8 +545,147 @@ internal fun transformDataImageCarousel(
     )
 }
 
+internal fun transformCatalogImageGallery(
+    catalogImageGallery: LayoutSchemaModel.CatalogImageGallery,
+    offerModel: OfferModel?,
+    itemIndex: Int,
+    module: Module,
+): LayoutSchemaUiModel.CatalogImageGalleryUiModel {
+    val ownStyles = catalogImageGallery.node.styles?.elements?.own?.toImmutableList()
+    val ownModifiers = ownStyles.transformModifier(
+        transformSpacing = { ownStyle -> ownStyle.toBasicStateStylingBlock { style -> style.spacing } },
+        transformDimension = { ownStyle -> ownStyle.toBasicStateStylingBlock { style -> style.dimension } },
+        transformBackground = { ownStyle -> ownStyle.toBasicStateStylingBlock { style -> style.background } },
+        transformBorder = { ownStyle -> ownStyle.toBasicStateStylingBlock { style -> style.border } },
+        transformContainer = { ownStyle -> ownStyle.toBasicStateStylingBlock { style -> style.container } },
+    )
+
+    val mainImageStyles = catalogImageGallery.node.styles?.elements?.mainImage?.toImmutableList()
+    val width = mainImageStyles?.firstOrNull()?.default?.dimension?.width
+    val height = mainImageStyles?.firstOrNull()?.default?.dimension?.height
+    val contentScale: ContentScale = when {
+        width is DimensionWidthValue.Fit && height is DimensionHeightValue.Fit -> ContentScale.Crop
+        else -> ContentScale.FillWidth
+    }
+    val mainImageModifiers = mainImageStyles.transformModifier(
+        transformSpacing = { mainImageStyle -> mainImageStyle.toBasicStateStylingBlock { style -> style.spacing } },
+        transformDimension = { mainImageStyle -> mainImageStyle.toBasicStateStylingBlock { style -> style.dimension } },
+        transformBackground = { mainImageStyle ->
+            mainImageStyle.toBasicStateStylingBlock { style -> style.background }
+        },
+        transformBorder = { mainImageStyle -> mainImageStyle.toBasicStateStylingBlock { style -> style.border } },
+        transformContainer = { mainImageStyle -> mainImageStyle.toBasicStateStylingBlock { style -> style.container } },
+    )
+
+    val conditionalStyleTransition = catalogImageGallery.node.styles?.conditionalTransitions?.let {
+        ConditionalTransitionModifier(
+            modifier = transformModifier(
+                it.value.own?.spacing,
+                it.value.own?.dimension,
+                it.value.own?.background,
+                it.value.own?.border,
+                it.value.own?.container,
+            ),
+            predicates = it.predicates.map { predicate -> predicate.transformWhenPredicate() }.toImmutableList(),
+            duration = it.duration,
+        )
+    }
+
+    return LayoutSchemaUiModel.CatalogImageGalleryUiModel(
+        ownModifiers = ownModifiers,
+        containerProperties = ownStyles.transformContainer(
+            transformContainer = { ownStyle -> ownStyle.toBasicStateStylingBlock { style -> style.container } },
+            transformFlexChild = { ownStyle -> ownStyle.toBasicStateStylingBlock { style -> style.flexChild } },
+        ),
+        conditionalTransitionModifiers = conditionalStyleTransition,
+        images = getCatalogItemImages(
+            offerModel = offerModel,
+            itemIndex = itemIndex,
+            module = module,
+        ).mapValues { entry ->
+            LayoutSchemaUiModel.ImageUiModel(
+                ownModifiers = mainImageModifiers,
+                containerProperties = null,
+                conditionalTransitionModifiers = null,
+                alt = entry.value.properties.get<String>(TypedKey<String>(KEY_ALT)),
+                darkUrl = entry.value.properties.get<String>(TypedKey<String>(KEY_DARK))?.takeIf(String::isNotEmpty),
+                lightUrl = entry.value.properties.get<String>(TypedKey<String>(KEY_LIGHT)).orEmpty(),
+                title = entry.value.properties.get<String>(TypedKey<String>(KEY_TITLE)),
+                scaleType = contentScale,
+            )
+        }.toImmutableMap(),
+        showIndicators = catalogImageGallery.node.showIndicators ?: true,
+        indicatorStyle = catalogImageGallery.node.styles?.elements?.indicator?.let {
+            transformCatalogImageGalleryProgressIndicatorItem(it)
+        },
+        activeIndicator = catalogImageGallery.node.styles?.elements?.activeIndicator?.let {
+            transformCatalogImageGalleryProgressIndicatorItem(it)
+        },
+        seenIndicator = catalogImageGallery.node.styles?.elements?.seenIndicator?.let {
+            transformCatalogImageGalleryProgressIndicatorItem(it)
+        },
+        progressIndicatorContainer = catalogImageGallery.node.styles?.elements?.progressIndicatorContainer?.let {
+            transformCatalogImageGalleryProgressIndicatorItem(it)
+        },
+        controlButton = catalogImageGallery.node.styles?.elements?.controlButton?.let {
+            transformCatalogImageGalleryControlButton(it)
+        },
+        customStateKey = catalogImageGalleryCustomStateKey,
+        backwardIcon = catalogImageGallery.node.backwardIcon,
+        forwardIcon = catalogImageGallery.node.forwardIcon,
+        a11yLabel = catalogImageGallery.node.a11yLabel,
+    )
+}
+
+internal fun transformCatalogImageGalleryControlButton(
+    controlButton: List<BasicStateStylingBlock<CatalogImageGalleryStyles>>?,
+): LayoutSchemaUiModel.CatalogImageGalleryControlButtonUiModel {
+    val styles = controlButton?.toImmutableList()
+    val ownModifiers = styles.transformModifier(
+        transformSpacing = { ownStyle -> ownStyle.toBasicStateStylingBlock { style -> style.spacing } },
+        transformDimension = { ownStyle -> ownStyle.toBasicStateStylingBlock { style -> style.dimension } },
+        transformBackground = { ownStyle -> ownStyle.toBasicStateStylingBlock { style -> style.background } },
+        transformBorder = { ownStyle -> ownStyle.toBasicStateStylingBlock { style -> style.border } },
+        transformContainer = { ownStyle -> ownStyle.toBasicStateStylingBlock { style -> style.container } },
+    )
+
+    return LayoutSchemaUiModel.CatalogImageGalleryControlButtonUiModel(
+        ownModifiers = ownModifiers,
+        containerProperties = styles.transformContainer(
+            transformContainer = { ownStyle -> ownStyle.toBasicStateStylingBlock { style -> style.container } },
+            transformFlexChild = { ownStyle -> ownStyle.toBasicStateStylingBlock { style -> style.flexChild } },
+        ),
+        conditionalTransitionModifiers = null,
+        textStyles = styles.transformTextStyles { ownStyle ->
+            ownStyle.toBasicStateStylingBlock { style -> style.text }
+        },
+    )
+}
+
 internal fun transformCarouselProgressIndicatorItem(
     indicator: List<BasicStateStylingBlock<DataImageCarouselIndicatorStyles>>?,
+): LayoutSchemaUiModel.ProgressIndicatorItemUiModel {
+    val ownModifiers = indicator?.toImmutableList().transformModifier(
+        transformSpacing = { ownStyle -> ownStyle.toBasicStateStylingBlock { style -> style.spacing } },
+        transformDimension = { ownStyle -> ownStyle.toBasicStateStylingBlock { style -> style.dimension } },
+        transformBackground = { ownStyle -> ownStyle.toBasicStateStylingBlock { style -> style.background } },
+        transformBorder = { ownStyle -> ownStyle.toBasicStateStylingBlock { style -> style.border } },
+        transformContainer = { ownStyle -> ownStyle.toBasicStateStylingBlock { style -> style.container } },
+    )
+
+    return LayoutSchemaUiModel.ProgressIndicatorItemUiModel(
+        ownModifiers = ownModifiers,
+        containerProperties = indicator?.toImmutableList().transformContainer(
+            transformContainer = { ownStyle -> ownStyle.toBasicStateStylingBlock { style -> style.container } },
+            transformFlexChild = { ownStyle -> ownStyle.toBasicStateStylingBlock { style -> style.flexChild } },
+        ),
+        conditionalTransitionModifiers = null,
+        textStyles = null,
+    )
+}
+
+internal fun transformCatalogImageGalleryProgressIndicatorItem(
+    indicator: List<BasicStateStylingBlock<CatalogImageGalleryIndicatorStyles>>?,
 ): LayoutSchemaUiModel.ProgressIndicatorItemUiModel {
     val ownModifiers = indicator?.toImmutableList().transformModifier(
         transformSpacing = { ownStyle -> ownStyle.toBasicStateStylingBlock { style -> style.spacing } },

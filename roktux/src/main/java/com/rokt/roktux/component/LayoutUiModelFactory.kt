@@ -76,6 +76,8 @@ internal class LayoutUiModelFactory(modifierFactory: ModifierFactory = ModifierF
             LayoutSchemaUiModel.DataImageCarouselUiModel::class to DataImageCarouselComponent(this, modifierFactory),
             LayoutSchemaUiModel.CatalogCombinedCollectionUiModel::class to
                 CatalogCombinedCollectionComponent(this, modifierFactory),
+            LayoutSchemaUiModel.CatalogImageGalleryUiModel::class to
+                CatalogImageGalleryComponent(this, modifierFactory),
             LayoutSchemaUiModel.CatalogStackedCollectionUiModel::class to
                 CatalogStackedCollectionComponent(this, modifierFactory),
         )

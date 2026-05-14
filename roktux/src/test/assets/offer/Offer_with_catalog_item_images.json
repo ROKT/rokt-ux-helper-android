@@ -1,0 +1,89 @@
+{
+  "campaignId": "campaign-123",
+  "creative": {
+    "referralCreativeId": "creative-123",
+    "instanceGuid": "creative-instance-guid",
+    "token": "test",
+    "responseOptionsMap": {},
+    "copy": {},
+    "images": {},
+    "links": {},
+    "icons": {}
+  },
+  "catalogItems": [
+    {
+      "images": {
+        "catalogItemImage0": {
+          "light": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAACXBIWXMAAAsTAAALEwEAmpwYAAAA1UlEQVR4nO2WWwqDMBBFzxYGDHQX/nT3tTvoRx/QLidFGCG0oSSZUaHkgj8m3ns0GTPQ1fWtETgDA34S4AQcSyZPQASuThCDekX1LqK96AM3I0TqVfVC4gDRHJ4zeAIHyhUU3PwVpQHCLbwFYg6/e4bXQKwWngt4fUCkY7X7xQyxWfiiNPChV9R789gmCglEbkn+GyDsuQQhs+F+Vcfq4YtWhwgFpZb+gl3LMVTUuTuENBzLbv2EGIzMEGJtJiwQ4hBugpj2bkpHneh5ng/qOXt3dZHqDfFzelMExbN1AAAAAElFTkSuQmCC",
+          "dark": "",
+          "alt": "First product image",
+          "title": "First product image"
+        },
+        "catalogItemImage1": {
+          "light": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAACXBIWXMAAAsTAAALEwEAmpwYAAAA1UlEQVR4nO2WWwqDMBBFzxYGDHQX/nT3tTvoRx/QLidFGCG0oSSZUaHkgj8m3ns0GTPQ1fWtETgDA34S4AQcSyZPQASuThCDekX1LqK96AM3I0TqVfVC4gDRHJ4zeAIHyhUU3PwVpQHCLbwFYg6/e4bXQKwWngt4fUCkY7X7xQyxWfiiNPChV9R789gmCglEbkn+GyDsuQQhs+F+Vcfq4YtWhwgFpZb+gl3LMVTUuTuENBzLbv2EGIzMEGJtJiwQ4hBugpj2bkpHneh5ng/qOXt3dZHqDfFzelMExbN1AAAAAElFTkSuQmCC",
+          "dark": "",
+          "alt": "Second product image",
+          "title": "Second product image"
+        }
+      },
+      "instanceGuid": "catalog-instance-guid-1",
+      "cartItemId": "cart-item-1",
+      "catalogItemId": "catalog-item-1",
+      "title": "Everyday sneakers",
+      "description": "Lightweight daily shoes",
+      "price": 79.99,
+      "originalPrice": 99.99,
+      "originalPriceFormatted": "$99.99",
+      "currency": "USD",
+      "signalType": "SignalResponse",
+      "url": "https://example.com/products/sneakers",
+      "minItemCount": 1,
+      "maxItemCount": 3,
+      "preSelectedQuantity": 1,
+      "providerData": "{}",
+      "urlBehavior": "External",
+      "linkedProductId": "linked-product-1",
+      "quantityMustBeSynchronized": false,
+      "positiveResponseText": "Add sneakers",
+      "negativeResponseText": "Skip sneakers",
+      "priceFormatted": "$79.99",
+      "addOnPluginUrl": "",
+      "addOnPluginName": "",
+      "token": "test"
+    },
+    {
+      "images": {
+        "catalogItemImage0": {
+          "light": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAACXBIWXMAAAsTAAALEwEAmpwYAAAA1UlEQVR4nO2WWwqDMBBFzxYGDHQX/nT3tTvoRx/QLidFGCG0oSSZUaHkgj8m3ns0GTPQ1fWtETgDA34S4AQcSyZPQASuThCDekX1LqK96AM3I0TqVfVC4gDRHJ4zeAIHyhUU3PwVpQHCLbwFYg6/e4bXQKwWngt4fUCkY7X7xQyxWfiiNPChV9R789gmCglEbkn+GyDsuQQhs+F+Vcfq4YtWhwgFpZb+gl3LMVTUuTuENBzLbv2EGIzMEGJtJiwQ4hBugpj2bkpHneh5ng/qOXt3dZHqDfFzelMExbN1AAAAAElFTkSuQmCC",
+          "dark": "",
+          "alt": "Boot image",
+          "title": "Boot image"
+        }
+      },
+      "instanceGuid": "catalog-instance-guid-2",
+      "cartItemId": "cart-item-2",
+      "catalogItemId": "catalog-item-2",
+      "title": "Weekend boots",
+      "description": "Water resistant boots",
+      "price": 129.99,
+      "originalPrice": 149.99,
+      "originalPriceFormatted": "$149.99",
+      "currency": "USD",
+      "signalType": "SignalResponse",
+      "url": "https://example.com/products/boots",
+      "minItemCount": 1,
+      "maxItemCount": 2,
+      "preSelectedQuantity": 1,
+      "providerData": "{}",
+      "urlBehavior": "External",
+      "linkedProductId": "linked-product-2",
+      "quantityMustBeSynchronized": false,
+      "positiveResponseText": "Add boots",
+      "negativeResponseText": "Skip boots",
+      "priceFormatted": "$129.99",
+      "addOnPluginUrl": "",
+      "addOnPluginName": "",
+      "token": "test"
+    }
+  ]
+}

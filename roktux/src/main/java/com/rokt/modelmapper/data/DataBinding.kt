@@ -206,6 +206,25 @@ internal fun getOfferImages(inputKey: String = "", offerModel: OfferModel?): Map
     }.toMap(TreeMap())
 }
 
+internal fun getCatalogItemImages(offerModel: OfferModel?, itemIndex: Int, module: Module): Map<Int, OfferImageModel> {
+    val catalogItemIndex = if (module == Module.AddToCart) itemIndex else 0
+    val images = offerModel?.catalogItems?.getOrNull(catalogItemIndex)?.imageWrapper?.properties?.map
+        ?: return emptyMap()
+
+    return images.entries
+        .mapNotNull { (key, value) ->
+            (value as? OfferImageModel)?.let { image -> key.key to image }
+        }
+        .sortedWith(
+            compareBy<Pair<String, OfferImageModel>> { (key, _) -> key.trailingNumber() ?: Int.MAX_VALUE }
+                .thenBy { (key, _) -> key },
+        )
+        .mapIndexed { index, (_, image) -> index to image }
+        .toMap()
+}
+
+private fun String.trailingNumber(): Int? = Regex("(\\d+)$").find(this)?.value?.toIntOrNull()
+
 private enum class TemplateDataPrefix(val value: String) {
     DATA("DATA"),
     STATE("STATE"),

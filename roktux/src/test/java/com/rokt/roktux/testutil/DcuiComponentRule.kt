@@ -5,6 +5,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.junit4.ComposeContentTestRule
+import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import com.rokt.core.testutils.BaseComponentRule
 import com.rokt.core.testutils.annotations.DcuiBreakpoint
@@ -14,6 +15,8 @@ import com.rokt.core.testutils.annotations.WindowSize
 import com.rokt.modelmapper.data.DataBindingImpl
 import com.rokt.modelmapper.mappers.ExperienceModelMapperImpl
 import com.rokt.modelmapper.uimodel.LayoutSchemaUiModel
+import com.rokt.modelmapper.utils.ROKT_ICONS_FONT_FAMILY
+import com.rokt.roktux.R
 import com.rokt.roktux.component.LayoutUiModelFactory
 import com.rokt.roktux.di.layout.LayoutComponent
 import com.rokt.roktux.di.layout.LocalFontFamilyProvider
@@ -73,7 +76,10 @@ class DcuiComponentRule(val composeTestRule: ComposeContentTestRule) : BaseCompo
                     mainDispatcher = Dispatchers.Main,
                     ioDispatcher = Dispatchers.IO,
                 ),
-                LocalFontFamilyProvider provides persistentMapOf("roboto" to FontFamily.Default),
+                LocalFontFamilyProvider provides persistentMapOf(
+                    "roboto" to FontFamily.Default,
+                    ROKT_ICONS_FONT_FAMILY to FontFamily(Font(resId = R.font.rokt_icons)),
+                ),
             ) {
                 factory.CreateComposable(
                     model = uiModel,

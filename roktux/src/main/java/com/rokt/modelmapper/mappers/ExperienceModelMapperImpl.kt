@@ -364,7 +364,12 @@ class ExperienceModelMapperImpl(private val experienceResponse: String, private 
 
         is LayoutSchemaModel.CatalogDropdown -> TODO("CatalogDropdown mapping is not implemented")
 
-        is LayoutSchemaModel.CatalogImageGallery -> TODO("CatalogImageGallery mapping is not implemented")
+        is LayoutSchemaModel.CatalogImageGallery -> transformCatalogImageGallery(
+            layoutSchemaModel,
+            offerModel,
+            itemIndex,
+            module,
+        )
 
         is LayoutSchemaModel.SlideStateTrigger -> TODO("SlideStateTrigger mapping is not implemented")
     }

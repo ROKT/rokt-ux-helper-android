@@ -88,6 +88,30 @@ sealed class LayoutSchemaUiModel(
         val childrenByCatalogItem: ImmutableMap<Int, ImmutableList<LayoutSchemaUiModel?>>,
     ) : LayoutSchemaUiModel(ownModifiers, containerProperties, conditionalTransitionModifiers)
 
+    data class CatalogImageGalleryUiModel(
+        override val ownModifiers: ImmutableList<StateBlock<ModifierProperties>>?,
+        override val containerProperties: ImmutableList<StateBlock<ContainerProperties>>?,
+        override val conditionalTransitionModifiers: ConditionalTransitionModifier?,
+        val images: ImmutableMap<Int, ImageUiModel>,
+        val showIndicators: Boolean,
+        val indicatorStyle: ProgressIndicatorItemUiModel?,
+        val activeIndicator: ProgressIndicatorItemUiModel?,
+        val seenIndicator: ProgressIndicatorItemUiModel?,
+        val progressIndicatorContainer: ProgressIndicatorItemUiModel?,
+        val controlButton: CatalogImageGalleryControlButtonUiModel?,
+        val customStateKey: String,
+        val backwardIcon: String?,
+        val forwardIcon: String?,
+        val a11yLabel: String?,
+    ) : LayoutSchemaUiModel(ownModifiers, containerProperties, conditionalTransitionModifiers)
+
+    data class CatalogImageGalleryControlButtonUiModel(
+        val ownModifiers: ImmutableList<StateBlock<ModifierProperties>>?,
+        val containerProperties: ImmutableList<StateBlock<ContainerProperties>>?,
+        val conditionalTransitionModifiers: ConditionalTransitionModifier?,
+        val textStyles: ImmutableList<StateBlock<TextStylingUiProperties>>?,
+    )
+
     data class ProgressIndicatorUiModel(
         override val ownModifiers: ImmutableList<StateBlock<ModifierProperties>>?,
         override val containerProperties: ImmutableList<StateBlock<ContainerProperties>>?,
