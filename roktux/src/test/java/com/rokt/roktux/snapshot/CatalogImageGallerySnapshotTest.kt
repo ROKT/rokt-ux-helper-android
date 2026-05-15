@@ -36,7 +36,7 @@ class CatalogImageGallerySnapshotTest : BaseDcuiEspressoTest() {
         composeTestRule.waitForIdle()
         Thread.sleep(SNAPSHOT_IMAGE_LOAD_DELAY_MS)
 
-        composeTestRule.onRoot().captureRoboImage()
+        composeTestRule.onRoot().captureRoboImage(roborazziOptions = snapshotRoborazziOptions)
     }
 
     private companion object {
