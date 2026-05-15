@@ -15,7 +15,6 @@ import org.junit.experimental.categories.Category
 import org.junit.runner.RunWith
 import org.robolectric.annotation.Config
 import org.robolectric.annotation.GraphicsMode
-import java.io.File
 
 @RunWith(AndroidJUnit4::class)
 @Category(SnapshotTest::class)
@@ -35,23 +34,6 @@ class CatalogDevicePayButtonSnapshotTest : BaseDcuiEspressoTest() {
         composeTestRule.onNodeWithText("Buy with Google Pay").assertIsDisplayed()
         composeTestRule.waitForIdle()
 
-        composeTestRule.onRoot().captureRoboImage(filePath = snapshotFilePath())
-    }
-
-    private fun snapshotFilePath(): String {
-        val userDir = File(System.getProperty("user.dir").orEmpty())
-        val snapshotDirectory = if (userDir.name == MODULE_NAME) {
-            File(userDir, SNAPSHOT_DIRECTORY)
-        } else {
-            File(userDir, "$MODULE_NAME/$SNAPSHOT_DIRECTORY")
-        }
-        return File(snapshotDirectory, SNAPSHOT_FILE_NAME).path
-    }
-
-    private companion object {
-        const val MODULE_NAME = "roktux"
-        const val SNAPSHOT_DIRECTORY = "src/test/snapshots/images"
-        const val SNAPSHOT_FILE_NAME =
-            "com.rokt.roktux.snapshot.CatalogDevicePayButtonSnapshotTest.testCatalogDevicePayGooglePayButton.png"
+        composeTestRule.onRoot().captureRoboImage()
     }
 }
