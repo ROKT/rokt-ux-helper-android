@@ -3,27 +3,39 @@ package com.rokt.roktux.component
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.requiredWidth
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.BiasAlignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.layout.positionInWindow
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.unit.IntOffset
+import androidx.compose.ui.unit.IntSize
+import androidx.compose.ui.window.Popup
+import androidx.compose.ui.window.PopupProperties
 import com.rokt.modelmapper.hmap.get
 import com.rokt.modelmapper.uimodel.CatalogItemGroupOptionModel
 import com.rokt.modelmapper.uimodel.CatalogItemModel
 import com.rokt.modelmapper.uimodel.LayoutSchemaUiModel
 import com.rokt.roktux.viewmodel.layout.LayoutContract
 import com.rokt.roktux.viewmodel.layout.OfferUiState
+import kotlin.math.roundToInt
 
 internal class CatalogDropdownComponent(private val modifierFactory: ModifierFactory) :
     ComposableComponent<LayoutSchemaUiModel.CatalogDropdownUiModel> {
@@ -45,6 +57,11 @@ internal class CatalogDropdownComponent(private val modifierFactory: ModifierFac
         val selectedIndex = offerState.customState[model.customStateKey]
             ?.takeIf { it in options.indices }
         var isExpanded by remember { mutableStateOf(false) }
+        var headSize by remember { mutableStateOf(IntSize.Zero) }
+        var headTopInWindow by remember { mutableStateOf(0) }
+        var popupSize by remember { mutableStateOf(IntSize.Zero) }
+        val density = LocalDensity.current
+        val view = LocalView.current
         val rootContainer = modifierFactory.createContainerUiProperties(
             containerProperties = model.containerProperties,
             index = breakpointIndex,
@@ -65,36 +82,78 @@ internal class CatalogDropdownComponent(private val modifierFactory: ModifierFac
             horizontalAlignment = BiasAlignment.Horizontal(rootContainer.alignmentBias),
             verticalArrangement = rootContainer.verticalArrangement,
         ) {
-            DropdownHead(
-                model = model,
-                displayText = displayText(model, selectedIndex, offerState),
-                isExpanded = isExpanded,
-                isSelected = selectedIndex != null,
-                isDarkModeEnabled = isDarkModeEnabled,
-                breakpointIndex = breakpointIndex,
-                offerState = offerState,
-                onEventSent = onEventSent,
-                onClick = { isExpanded = !isExpanded },
-            )
-
-            if (isExpanded) {
-                OptionList(
+            Box(
+                modifier = Modifier.onGloballyPositioned { coordinates ->
+                    headSize = coordinates.size
+                    headTopInWindow = coordinates.positionInWindow().y.roundToInt()
+                },
+            ) {
+                DropdownHead(
                     model = model,
-                    selectedIndex = selectedIndex,
+                    displayText = displayText(model, selectedIndex, offerState),
+                    isExpanded = isExpanded,
+                    isSelected = selectedIndex != null,
                     isDarkModeEnabled = isDarkModeEnabled,
                     breakpointIndex = breakpointIndex,
                     offerState = offerState,
                     onEventSent = onEventSent,
-                    onSelected = { optionIndex ->
-                        val updatedSelections =
-                            selectedIndices(model, offerState) + (model.attributeIndex to optionIndex)
-                        onEventSent(LayoutContract.LayoutEvent.SetCustomState(model.customStateKey, optionIndex))
-                        resolveActiveCatalogItemIndex(model, updatedSelections)?.let { activeItemIndex ->
-                            onEventSent(LayoutContract.LayoutEvent.SetActiveCatalogItem(activeItemIndex))
-                        }
-                        isExpanded = false
-                    },
+                    modifier = Modifier,
+                    onClick = { isExpanded = !isExpanded },
                 )
+
+                if (isExpanded) {
+                    val viewLocationOnScreen = IntArray(2).also(view::getLocationOnScreen)
+                    val popupOffset = catalogDropdownPopupOffset(
+                        anchorTop = headTopInWindow,
+                        anchorHeight = headSize.height,
+                        windowHeight = view.height,
+                        popupHeight = popupSize.height,
+                        windowTopOnScreen = viewLocationOnScreen[1],
+                    )
+                    Popup(
+                        alignment = Alignment.TopStart,
+                        offset = popupOffset,
+                        onDismissRequest = { isExpanded = false },
+                        properties = PopupProperties(
+                            dismissOnBackPress = true,
+                            dismissOnClickOutside = true,
+                            focusable = true,
+                        ),
+                    ) {
+                        val headWidth = with(density) { headSize.width.toDp() }
+                        Box(
+                            modifier = Modifier
+                                .requiredWidth(headWidth)
+                                .onGloballyPositioned { coordinates ->
+                                    popupSize = coordinates.size
+                                },
+                        ) {
+                            OptionList(
+                                model = model,
+                                selectedIndex = selectedIndex,
+                                isDarkModeEnabled = isDarkModeEnabled,
+                                breakpointIndex = breakpointIndex,
+                                offerState = offerState,
+                                onEventSent = onEventSent,
+                                modifier = Modifier.fillMaxWidth(),
+                                onSelected = { optionIndex ->
+                                    val updatedSelections =
+                                        selectedIndices(model, offerState) + (model.attributeIndex to optionIndex)
+                                    onEventSent(
+                                        LayoutContract.LayoutEvent.SetCustomState(
+                                            model.customStateKey,
+                                            optionIndex,
+                                        ),
+                                    )
+                                    resolveActiveCatalogItemIndex(model, updatedSelections)?.let { activeItemIndex ->
+                                        onEventSent(LayoutContract.LayoutEvent.SetActiveCatalogItem(activeItemIndex))
+                                    }
+                                    isExpanded = false
+                                },
+                            )
+                        }
+                    }
+                }
             }
         }
     }
@@ -109,6 +168,7 @@ internal class CatalogDropdownComponent(private val modifierFactory: ModifierFac
         breakpointIndex: Int,
         offerState: OfferUiState,
         onEventSent: (LayoutContract.LayoutEvent) -> Unit,
+        modifier: Modifier = Modifier,
         onClick: () -> Unit,
     ) {
         val interactionSource = remember { MutableInteractionSource() }
@@ -155,6 +215,7 @@ internal class CatalogDropdownComponent(private val modifierFactory: ModifierFac
                     offerState = offerState,
                     basePropertiesList = resolvedStyle.baseStyle?.ownModifiers,
                 )
+                .then(modifier)
                 .clickable(
                     interactionSource = interactionSource,
                     indication = null,
@@ -187,6 +248,7 @@ internal class CatalogDropdownComponent(private val modifierFactory: ModifierFac
         breakpointIndex: Int,
         offerState: OfferUiState,
         onEventSent: (LayoutContract.LayoutEvent) -> Unit,
+        modifier: Modifier = Modifier,
         onSelected: (Int) -> Unit,
     ) {
         val resolvedStyle = model.optionList.resolve(isSelected = false, isDisabled = false, isErrored = false)
@@ -208,7 +270,8 @@ internal class CatalogDropdownComponent(private val modifierFactory: ModifierFac
                     isDarkModeEnabled = isDarkModeEnabled,
                     offerState = offerState,
                     basePropertiesList = resolvedStyle.baseStyle?.ownModifiers,
-                ),
+                )
+                .then(modifier),
             horizontalAlignment = BiasAlignment.Horizontal(container.alignmentBias),
             verticalArrangement = container.verticalArrangement,
         ) {
@@ -429,4 +492,25 @@ internal class CatalogDropdownComponent(private val modifierFactory: ModifierFac
         const val ExpandedIcon = "^"
         const val SelectedOptionMarker = "*"
     }
+}
+
+internal fun catalogDropdownPopupOffset(
+    anchorTop: Int,
+    anchorHeight: Int,
+    windowHeight: Int,
+    popupHeight: Int,
+    windowTopOnScreen: Int,
+): IntOffset {
+    if (windowHeight <= 0 || popupHeight <= 0) {
+        return IntOffset(x = 0, y = windowTopOnScreen + anchorHeight)
+    }
+
+    val spaceBelow = windowHeight - (anchorTop + anchorHeight)
+    val shouldShowBelow = spaceBelow >= popupHeight || spaceBelow >= anchorTop
+    val y = if (shouldShowBelow) {
+        windowTopOnScreen + anchorHeight
+    } else {
+        windowTopOnScreen - popupHeight
+    }
+    return IntOffset(x = 0, y = y)
 }
