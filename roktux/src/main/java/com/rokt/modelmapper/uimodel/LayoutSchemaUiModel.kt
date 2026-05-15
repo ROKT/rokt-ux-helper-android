@@ -19,6 +19,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.DpOffset
 import com.rokt.modelmapper.data.BindData
 import com.rokt.modelmapper.hmap.HMap
+import com.rokt.network.model.PaymentProvider
 import com.rokt.network.model.TransitionSpeedSetting
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.ImmutableMap
@@ -154,6 +155,18 @@ sealed class LayoutSchemaUiModel(
         override val conditionalTransitionModifiers: ConditionalTransitionModifier?,
         override val children: ImmutableList<LayoutSchemaUiModel?>,
         val catalogItemModel: HMap?,
+    ) : ButtonUiModel(ownModifiers, containerProperties, conditionalTransitionModifiers, children)
+
+    data class CatalogDevicePayButtonUiModel(
+        override val ownModifiers: ImmutableList<StateBlock<ModifierProperties>>?,
+        override val containerProperties: ImmutableList<StateBlock<ContainerProperties>>?,
+        override val conditionalTransitionModifiers: ConditionalTransitionModifier?,
+        override val children: ImmutableList<LayoutSchemaUiModel?>,
+        val catalogItemModel: HMap?,
+        val paymentProvider: PaymentProvider,
+        val validatorFieldKeys: ImmutableList<String>,
+        val transactionData: TransactionData?,
+        val a11yLabel: String?,
     ) : ButtonUiModel(ownModifiers, containerProperties, conditionalTransitionModifiers, children)
 
     data class StaticLinkUiModel(

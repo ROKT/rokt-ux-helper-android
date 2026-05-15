@@ -232,6 +232,55 @@ internal fun transformCatalogResponseButton(
     )
 }
 
+internal fun transformCatalogDevicePayButton(
+    catalogDevicePayButton: LayoutSchemaModel.CatalogDevicePayButton,
+    offerModel: OfferModel?,
+    itemIndex: Int,
+    transformLayoutSchemaChildren: (LayoutSchemaModel) -> LayoutSchemaUiModel?,
+): LayoutSchemaUiModel.CatalogDevicePayButtonUiModel {
+    val ownStyles = catalogDevicePayButton.node.styles?.elements?.own?.toImmutableList()
+    val ownModifiers = ownStyles.transformModifier(
+        transformSpacing = { ownStyle -> ownStyle.toBasicStateStylingBlock { style -> style.spacing } },
+        transformDimension = { ownStyle -> ownStyle.toBasicStateStylingBlock { style -> style.dimension } },
+        transformBackground = { ownStyle -> ownStyle.toBasicStateStylingBlock { style -> style.background } },
+        transformBorder = { ownStyle -> ownStyle.toBasicStateStylingBlock { style -> style.border } },
+        transformContainer = { ownStyle -> ownStyle.toBasicStateStylingBlock { style -> style.container } },
+    )
+    val conditionalStyleTransition = catalogDevicePayButton.node.styles?.conditionalTransitions?.let {
+        ConditionalTransitionModifier(
+            modifier = transformModifier(
+                it.value.own?.spacing,
+                it.value.own?.dimension,
+                it.value.own?.background,
+                it.value.own?.border,
+                it.value.own?.container,
+            ),
+            predicates = it.predicates.map { predicate -> predicate.transformWhenPredicate() }.toImmutableList(),
+            duration = it.duration,
+        )
+    }
+
+    return LayoutSchemaUiModel.CatalogDevicePayButtonUiModel(
+        ownModifiers = ownModifiers,
+        containerProperties = ownStyles.transformContainer(
+            transformContainer = { ownStyle -> ownStyle.toBasicStateStylingBlock { style -> style.container } },
+            transformFlexChild = { ownStyle -> ownStyle.toBasicStateStylingBlock { style -> style.flexChild } },
+        ),
+        conditionalTransitionModifiers = conditionalStyleTransition,
+        children = catalogDevicePayButton.node.children.mapNotNull { child ->
+            transformLayoutSchemaChildren(child)
+        }.toImmutableList(),
+        catalogItemModel = bindModel<CatalogItemModel>(offerModel = offerModel, itemIndex = itemIndex)?.properties,
+        paymentProvider = catalogDevicePayButton.node.provider,
+        validatorFieldKeys = catalogDevicePayButton.node.validatorTriggerConfig
+            ?.validatorFieldKeys
+            .orEmpty()
+            .toImmutableList(),
+        transactionData = offerModel?.transactionData,
+        a11yLabel = catalogDevicePayButton.node.a11yLabel,
+    )
+}
+
 internal fun transformCloseButton(
     closeButtonModel: LayoutSchemaModel.CloseButton,
     transformLayoutSchemaChildren: (LayoutSchemaModel) -> LayoutSchemaUiModel?,

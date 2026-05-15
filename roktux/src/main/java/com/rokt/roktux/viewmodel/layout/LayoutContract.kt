@@ -2,6 +2,9 @@ package com.rokt.roktux.viewmodel.layout
 
 import com.rokt.modelmapper.hmap.HMap
 import com.rokt.modelmapper.uimodel.OpenLinks
+import com.rokt.modelmapper.uimodel.TransactionData
+import com.rokt.network.model.PaymentProvider
+import com.rokt.roktux.event.DevicePayResult
 import com.rokt.roktux.viewmodel.base.BaseContract
 
 internal class LayoutContract {
@@ -31,6 +34,15 @@ internal class LayoutContract {
         data class OfferVisibilityChanged(val offerId: Int, val visible: Boolean) : LayoutEvent
         data class UiException(val throwable: Throwable, val closeLayout: Boolean) : LayoutEvent
         data class CartItemInstantPurchaseSelected(val catalogItemModel: HMap) : LayoutEvent
+        data class CartItemDevicePaySelected(
+            val offerId: Int,
+            val catalogItemModel: HMap?,
+            val paymentProvider: PaymentProvider,
+            val transactionData: TransactionData?,
+            val validatorFieldKeys: List<String>,
+        ) : LayoutEvent
+
+        data class CartItemDevicePayResultReceived(val offerId: Int, val result: DevicePayResult) : LayoutEvent
     }
 
     sealed interface LayoutEffect : BaseContract.BaseEffect {

@@ -23,6 +23,7 @@ import com.rokt.modelmapper.utils.DEFAULT_VIEWABLE_ITEMS
 import com.rokt.modelmapper.utils.FIRST_OFFER_INDEX
 import com.rokt.modelmapper.utils.roktDateFormat
 import com.rokt.roktux.RoktViewState
+import com.rokt.roktux.event.DevicePayResult
 import com.rokt.roktux.event.EventNameValue
 import com.rokt.roktux.event.EventType
 import com.rokt.roktux.event.RoktPlatformEvent
@@ -33,6 +34,7 @@ import com.rokt.roktux.logging.RoktUXLogger
 import com.rokt.roktux.state.LayoutRuntimeState
 import com.rokt.roktux.utils.chunk
 import com.rokt.roktux.utils.isEmbedded
+import com.rokt.roktux.validation.ValidationCoordinator
 import com.rokt.roktux.viewmodel.base.BaseViewModel
 import com.rokt.roktux.viewmodel.layout.LayoutContract.LayoutEvent.ResponseOptionSelected
 import kotlinx.collections.immutable.persistentMapOf
@@ -60,6 +62,7 @@ internal class LayoutViewModel(
     private var currentOffer: Int,
     customStates: Map<String, Int>,
     offerCustomStates: Map<String, Map<String, Int>>,
+    validationCoordinator: ValidationCoordinator = ValidationCoordinator(),
     private var edgeToEdgeDisplay: Boolean,
 ) : BaseViewModel<LayoutContract.LayoutEvent, LayoutUiState, LayoutContract.LayoutEffect>() {
 
@@ -71,6 +74,7 @@ internal class LayoutViewModel(
     private val runtimeState = LayoutRuntimeState(
         customStates = customStates,
         offerCustomStates = offerCustomStates,
+        validationCoordinator = validationCoordinator,
     )
 
     // SDK's internal thread-safe structure to track URL states
@@ -316,6 +320,14 @@ internal class LayoutViewModel(
                 handleCartItemInstancePurchaseSelected(event.catalogItemModel)
             }
 
+            is LayoutContract.LayoutEvent.CartItemDevicePaySelected -> {
+                handleCartItemDevicePaySelected(event)
+            }
+
+            is LayoutContract.LayoutEvent.CartItemDevicePayResultReceived -> {
+                handleCartItemDevicePayResult(event.offerId, event.result)
+            }
+
             else -> {}
         }
     }
@@ -407,6 +419,70 @@ internal class LayoutViewModel(
             )
         }
         setEvent(LayoutContract.LayoutEvent.CloseSelected(isDismissed = false))
+    }
+
+    private fun handleCartItemDevicePaySelected(event: LayoutContract.LayoutEvent.CartItemDevicePaySelected) {
+        if (!runtimeState.validationCoordinator.validate(event.validatorFieldKeys)) {
+            return
+        }
+
+        val catalogItemProperties = event.catalogItemModel ?: return
+        with(catalogItemProperties) {
+            val salePrice = get<Double>(KEY_PRICE) ?: get<Double>(KEY_ORIGINAL_PRICE) ?: 0.0
+            uxEvent(
+                RoktUxEvent.CartItemDevicePay(
+                    layoutId = pluginId,
+                    name = get<String>(KEY_TITLE).orEmpty(),
+                    cartItemId = get<String>(KEY_CART_ITEM_ID).orEmpty(),
+                    catalogItemId = get<String>(KEY_CATALOG_ITEM_ID).orEmpty(),
+                    currency = get<String>(KEY_CURRENCY).orEmpty(),
+                    description = get<String>(KEY_DESCRIPTION).orEmpty(),
+                    linkedProductId = get<String>(KEY_LINKED_PRODUCT_ID).orEmpty(),
+                    providerData = get<String>(KEY_PROVIDER_DATA).orEmpty(),
+                    totalPrice = salePrice,
+                    quantity = 1,
+                    unitPrice = salePrice,
+                    paymentProvider = event.paymentProvider,
+                    transactionData = event.transactionData,
+                    onResult = { result ->
+                        setEvent(LayoutContract.LayoutEvent.CartItemDevicePayResultReceived(event.offerId, result))
+                    },
+                ),
+            )
+            handlePlatformEvent(
+                RoktPlatformEvent(
+                    eventType = EventType.SignalCartItemInstantPurchaseInitiated,
+                    sessionId = experienceModel.sessionId,
+                    parentGuid = get<String>(KEY_INSTANCE_GUID).orEmpty(),
+                    eventData = mapOf(
+                        KEY_CART_ITEM_ID to get<String>(KEY_CART_ITEM_ID).orEmpty(),
+                        KEY_CATALOG_ITEM_ID to get<String>(KEY_CATALOG_ITEM_ID).orEmpty(),
+                        KEY_CURRENCY to get<String>(KEY_CURRENCY).orEmpty(),
+                        KEY_DESCRIPTION to get<String>(KEY_DESCRIPTION).orEmpty(),
+                        KEY_LINKED_PRODUCT_ID to get<String>(KEY_LINKED_PRODUCT_ID).orEmpty(),
+                        KEY_TOTAL_PRICE to salePrice.toString(),
+                        KEY_QUANTITY to "1",
+                        KEY_UNIT_PRICE to salePrice.toString(),
+                    ),
+                ),
+            )
+        }
+    }
+
+    private fun handleCartItemDevicePayResult(offerId: Int, result: DevicePayResult) {
+        when (result) {
+            DevicePayResult.Success -> updateOfferCustomState(offerId, PAYMENT_RESULT_CUSTOM_STATE_KEY, 1)
+
+            DevicePayResult.Failure,
+            DevicePayResult.Retry,
+            -> updateOfferCustomState(offerId, PAYMENT_RESULT_CUSTOM_STATE_KEY, -1)
+
+            is DevicePayResult.PendingConfirmation -> {
+                runtimeState.setCatalogRuntimeData(result.catalogRuntimeData)
+                updateOfferCustomState(offerId, DEVICE_PAY_STATE_CUSTOM_STATE_KEY, 1)
+            }
+        }
+        sendViewState()
     }
 
     private fun handleResponseOptionSelected(
@@ -509,6 +585,17 @@ internal class LayoutViewModel(
             currentUiState.copy(
                 offerUiState = currentUiState.offerUiState.copy(
                     customState = runtimeState.globalCustomStates().toImmutableMap(),
+                ),
+            )
+        }
+    }
+
+    private fun updateOfferCustomState(offerId: Int, key: String, value: Int) {
+        runtimeState.setOfferCustomState(offerId, key, value)
+        updateState { currentUiState ->
+            currentUiState.copy(
+                offerUiState = currentUiState.offerUiState.copy(
+                    offerCustomStates = runtimeState.immutableOfferCustomStates(),
                 ),
             )
         }
@@ -681,10 +768,15 @@ internal class LayoutViewModel(
         private const val KEY_CURRENCY = "currency"
         private const val KEY_DESCRIPTION = "description"
         private const val KEY_LINKED_PRODUCT_ID = "linkedProductId"
+        private const val KEY_TITLE = "title"
+        private const val KEY_PRICE = "price"
         private const val KEY_ORIGINAL_PRICE = "originalPrice"
+        private const val KEY_PROVIDER_DATA = "providerData"
         private const val KEY_TOTAL_PRICE = "totalPrice"
         private const val KEY_QUANTITY = "quantity"
         private const val KEY_UNIT_PRICE = "unitPrice"
+        private const val PAYMENT_RESULT_CUSTOM_STATE_KEY = "paymentResult"
+        private const val DEVICE_PAY_STATE_CUSTOM_STATE_KEY = "devicePayState"
     }
 
     class RoktViewModelFactory(

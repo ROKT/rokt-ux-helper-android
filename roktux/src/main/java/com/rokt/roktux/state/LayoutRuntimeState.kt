@@ -8,6 +8,8 @@ internal class LayoutRuntimeState(
     val customStateMap: CustomStateMap = CustomStateMap(),
     val validationCoordinator: ValidationCoordinator = ValidationCoordinator(),
 ) {
+    private var catalogRuntimeData: Map<String, String> = emptyMap()
+
     // Convenience constructor for seeding from the public RoktViewState shape,
     // where offer positions arrive as String keys from persisted JSON.
     constructor(
@@ -45,6 +47,12 @@ internal class LayoutRuntimeState(
     fun effectiveCustomStates(position: Int): Map<String, Int> = customStateMap.effectiveStates(position)
 
     fun allOfferCustomStates(): Map<String, Map<String, Int>> = customStateMap.allOfferStates()
+
+    fun setCatalogRuntimeData(data: Map<String, String>) {
+        catalogRuntimeData = data
+    }
+
+    fun catalogRuntimeData(): Map<String, String> = catalogRuntimeData
 }
 
 // Tolerant conversion: non-numeric position keys from persisted state are dropped rather than crashing.
