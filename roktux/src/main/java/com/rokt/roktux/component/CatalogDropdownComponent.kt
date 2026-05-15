@@ -41,6 +41,7 @@ import com.rokt.modelmapper.uimodel.CatalogItemModel
 import com.rokt.modelmapper.uimodel.LayoutSchemaUiModel
 import com.rokt.modelmapper.uimodel.ModifierProperties
 import com.rokt.modelmapper.uimodel.StateBlock
+import com.rokt.modelmapper.utils.ROKT_ICONS_FONT_FAMILY
 import com.rokt.roktux.viewmodel.layout.LayoutContract
 import com.rokt.roktux.viewmodel.layout.OfferUiState
 import kotlin.math.roundToInt
@@ -224,6 +225,7 @@ internal class CatalogDropdownComponent(private val modifierFactory: ModifierFac
             breakpointIndex = breakpointIndex,
             isPressed = isPressed,
             isDarkModeEnabled = isDarkModeEnabled,
+            defaultFontFamily = ROKT_ICONS_FONT_FAMILY,
             baseStyles = resolvedIconStyle.baseStyle?.textStyles,
             offerState = offerState,
             onEventSent = onEventSent,
@@ -355,6 +357,17 @@ internal class CatalogDropdownComponent(private val modifierFactory: ModifierFac
             offerState = offerState,
             onEventSent = onEventSent,
         )
+        val selectedIconTextStyle = modifierFactory.createTextStyle(
+            text = SelectedOptionMarker,
+            textStyles = style?.textStyles,
+            breakpointIndex = breakpointIndex,
+            isPressed = isPressed,
+            isDarkModeEnabled = isDarkModeEnabled,
+            defaultFontFamily = ROKT_ICONS_FONT_FAMILY,
+            baseStyles = resolvedStyle.baseStyle?.textStyles,
+            offerState = offerState,
+            onEventSent = onEventSent,
+        )
 
         Row(
             modifier = modifierFactory
@@ -384,7 +397,7 @@ internal class CatalogDropdownComponent(private val modifierFactory: ModifierFac
             )
             if (isSelected) {
                 Spacer(modifier = Modifier.weight(0.05f))
-                Text(text = SelectedOptionMarker, style = textStyle.textStyle)
+                Text(text = selectedIconTextStyle.value, style = selectedIconTextStyle.textStyle)
             }
         }
     }
@@ -550,9 +563,9 @@ internal class CatalogDropdownComponent(private val modifierFactory: ModifierFac
         const val KEY_CATALOG_ITEM_ID = "catalogItemId"
         const val KEY_INVENTORY_STATUS = "inventoryStatus"
         const val OUT_OF_STOCK = "OutOfStock"
-        const val CollapsedIcon = "v"
-        const val ExpandedIcon = "^"
-        const val SelectedOptionMarker = "*"
+        const val CollapsedIcon = "ExpandMore"
+        const val ExpandedIcon = "ExpandLess"
+        const val SelectedOptionMarker = "Check"
     }
 }
 
