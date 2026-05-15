@@ -5,7 +5,6 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.onRoot
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.takahirom.roborazzi.ExperimentalRoborazziApi
-import com.github.takahirom.roborazzi.RoborazziOptions
 import com.github.takahirom.roborazzi.captureRoboImage
 import com.rokt.core.testutils.annotations.DcuiConfig
 import com.rokt.core.testutils.annotations.DcuiNodeJson
@@ -36,12 +35,7 @@ class CatalogDevicePayButtonSnapshotTest : BaseDcuiEspressoTest() {
         composeTestRule.onNodeWithText("Buy with Google Pay").assertIsDisplayed()
         composeTestRule.waitForIdle()
 
-        composeTestRule.onRoot().captureRoboImage(
-            filePath = snapshotFilePath(),
-            roborazziOptions = RoborazziOptions(
-                compareOptions = RoborazziOptions.CompareOptions(changeThreshold = SNAPSHOT_CHANGE_THRESHOLD),
-            ),
-        )
+        composeTestRule.onRoot().captureRoboImage(filePath = snapshotFilePath())
     }
 
     private fun snapshotFilePath(): String {
@@ -57,7 +51,6 @@ class CatalogDevicePayButtonSnapshotTest : BaseDcuiEspressoTest() {
     private companion object {
         const val MODULE_NAME = "roktux"
         const val SNAPSHOT_DIRECTORY = "src/test/snapshots/images"
-        const val SNAPSHOT_CHANGE_THRESHOLD = 0.05F
         const val SNAPSHOT_FILE_NAME =
             "com.rokt.roktux.snapshot.CatalogDevicePayButtonSnapshotTest.testCatalogDevicePayGooglePayButton.png"
     }
