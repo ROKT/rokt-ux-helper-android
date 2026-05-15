@@ -1,5 +1,6 @@
 package com.rokt.roktux.component
 
+import androidx.compose.ui.semantics.SemanticsActions
 import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertHeightIsEqualTo
 import androidx.compose.ui.test.assertIsDisplayed
@@ -11,7 +12,9 @@ import androidx.compose.ui.test.isRoot
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performSemanticsAction
 import androidx.compose.ui.unit.IntOffset
+import androidx.compose.ui.unit.IntRect
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -67,35 +70,65 @@ class CatalogDropdownComponentTest : BaseDcuiEspressoTest() {
         val popupSize = IntSize(width = 220, height = 120)
 
         assertEquals(
-            IntOffset(0, -120),
+            IntOffset(50, 230),
             catalogDropdownPopupOffset(
-                anchorTop = 350,
+                anchorBounds = IntRect(
+                    offset = IntOffset(50, 350),
+                    size = IntSize.Zero,
+                ),
                 anchorHeight = 44,
-                windowHeight = windowSize.height,
-                popupHeight = popupSize.height,
-                windowTopOnScreen = 0,
+                windowSize = windowSize,
+                popupContentSize = popupSize,
+            ),
+        )
+        assertEquals(
+            CatalogDropdownPopupPlacement.Above,
+            catalogDropdownPopupPlacement(
+                anchorBounds = IntRect(
+                    offset = IntOffset(50, 350),
+                    size = IntSize.Zero,
+                ),
+                anchorHeight = 44,
+                windowSize = windowSize,
+                popupContentSize = popupSize,
             ),
         )
 
         assertEquals(
-            IntOffset(0, 44),
+            IntOffset(50, 144),
             catalogDropdownPopupOffset(
-                anchorTop = 100,
+                anchorBounds = IntRect(
+                    offset = IntOffset(50, 100),
+                    size = IntSize.Zero,
+                ),
                 anchorHeight = 44,
-                windowHeight = windowSize.height,
-                popupHeight = popupSize.height,
-                windowTopOnScreen = 0,
+                windowSize = windowSize,
+                popupContentSize = popupSize,
+            ),
+        )
+        assertEquals(
+            CatalogDropdownPopupPlacement.Below,
+            catalogDropdownPopupPlacement(
+                anchorBounds = IntRect(
+                    offset = IntOffset(50, 100),
+                    size = IntSize.Zero,
+                ),
+                anchorHeight = 44,
+                windowSize = windowSize,
+                popupContentSize = popupSize,
             ),
         )
 
         assertEquals(
-            IntOffset(0, 68),
+            IntOffset(50, 394),
             catalogDropdownPopupOffset(
-                anchorTop = 100,
+                anchorBounds = IntRect(
+                    offset = IntOffset(50, 350),
+                    size = IntSize(width = 220, height = 44),
+                ),
                 anchorHeight = 44,
-                windowHeight = windowSize.height,
-                popupHeight = popupSize.height,
-                windowTopOnScreen = 24,
+                windowSize = IntSize(width = 400, height = 800),
+                popupContentSize = popupSize,
             ),
         )
     }
@@ -106,7 +139,9 @@ class CatalogDropdownComponentTest : BaseDcuiEspressoTest() {
     @DcuiOfferJson(jsonFile = "offer/Offer_with_catalog_item_group.json")
     fun testCatalogDropdownSelectionUpdatesActiveCatalogItem() {
         composeTestRule.onNodeWithText("Select size").performClick()
-        composeTestRule.onNodeWithText("16oz").assertIsDisplayed().performClick()
+        composeTestRule.onNodeWithText("16oz")
+            .assertIsDisplayed()
+            .performSemanticsAction(SemanticsActions.OnClick)
 
         composeTestRule.waitUntil(timeoutMillis = 5_000) {
             getCapturedEvents().contains(

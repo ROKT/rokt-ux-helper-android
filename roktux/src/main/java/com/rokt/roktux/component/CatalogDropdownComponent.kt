@@ -5,6 +5,7 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -15,24 +16,31 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.BiasAlignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.LayoutCoordinates
+import androidx.compose.ui.layout.boundsInWindow
 import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.layout.positionInWindow
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.IntOffset
+import androidx.compose.ui.unit.IntRect
 import androidx.compose.ui.unit.IntSize
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.window.Popup
+import androidx.compose.ui.window.PopupPositionProvider
 import androidx.compose.ui.window.PopupProperties
 import com.rokt.modelmapper.hmap.get
 import com.rokt.modelmapper.uimodel.CatalogItemGroupOptionModel
 import com.rokt.modelmapper.uimodel.CatalogItemModel
 import com.rokt.modelmapper.uimodel.LayoutSchemaUiModel
+import com.rokt.modelmapper.uimodel.ModifierProperties
+import com.rokt.modelmapper.uimodel.StateBlock
 import com.rokt.roktux.viewmodel.layout.LayoutContract
 import com.rokt.roktux.viewmodel.layout.OfferUiState
 import kotlin.math.roundToInt
@@ -58,9 +66,17 @@ internal class CatalogDropdownComponent(private val modifierFactory: ModifierFac
             ?.takeIf { it in options.indices }
         var isExpanded by remember { mutableStateOf(false) }
         var headSize by remember { mutableStateOf(IntSize.Zero) }
-        var headTopInWindow by remember { mutableStateOf(0) }
-        var popupSize by remember { mutableStateOf(IntSize.Zero) }
+        var boxBounds by remember { mutableStateOf<IntRect?>(null) }
+        var headBounds by remember { mutableStateOf<IntRect?>(null) }
+        var popupPlacement by remember { mutableStateOf(CatalogDropdownPopupPlacement.Below) }
+        var popupWindowOffset by remember { mutableStateOf(IntOffset.Zero) }
+        val headBoundsInBox = remember(headBounds, boxBounds) {
+            headBounds?.let { bounds ->
+                boxBounds?.let(bounds::relativeTo)
+            }
+        }
         val density = LocalDensity.current
+        val layoutDirection = LocalLayoutDirection.current
         val view = LocalView.current
         val rootContainer = modifierFactory.createContainerUiProperties(
             containerProperties = model.containerProperties,
@@ -84,8 +100,7 @@ internal class CatalogDropdownComponent(private val modifierFactory: ModifierFac
         ) {
             Box(
                 modifier = Modifier.onGloballyPositioned { coordinates ->
-                    headSize = coordinates.size
-                    headTopInWindow = coordinates.positionInWindow().y.roundToInt()
+                    boxBounds = coordinates.boundsInWindowIntRect()
                 },
             ) {
                 DropdownHead(
@@ -97,22 +112,33 @@ internal class CatalogDropdownComponent(private val modifierFactory: ModifierFac
                     breakpointIndex = breakpointIndex,
                     offerState = offerState,
                     onEventSent = onEventSent,
+                    onPositioned = { coordinates, padding ->
+                        val bounds = coordinates.boundsInWindowIntRect()
+                            .inflate(padding = padding, density = density, layoutDirection = layoutDirection)
+                        popupWindowOffset = view.windowToScreenOffset()
+                        headSize = IntSize(width = bounds.width, height = bounds.height)
+                        headBounds = bounds
+                    },
                     modifier = Modifier,
                     onClick = { isExpanded = !isExpanded },
                 )
 
                 if (isExpanded) {
-                    val viewLocationOnScreen = IntArray(2).also(view::getLocationOnScreen)
-                    val popupOffset = catalogDropdownPopupOffset(
-                        anchorTop = headTopInWindow,
-                        anchorHeight = headSize.height,
-                        windowHeight = view.height,
-                        popupHeight = popupSize.height,
-                        windowTopOnScreen = viewLocationOnScreen[1],
-                    )
                     Popup(
-                        alignment = Alignment.TopStart,
-                        offset = popupOffset,
+                        popupPositionProvider = remember(
+                            headSize.height,
+                            headBoundsInBox,
+                            popupWindowOffset,
+                        ) {
+                            CatalogDropdownPopupPositionProvider(
+                                anchorHeight = headSize.height,
+                                measuredAnchorBoundsInParent = headBoundsInBox,
+                                windowOffset = popupWindowOffset,
+                                onPlacementCalculated = { placement ->
+                                    popupPlacement = placement
+                                },
+                            )
+                        },
                         onDismissRequest = { isExpanded = false },
                         properties = PopupProperties(
                             dismissOnBackPress = true,
@@ -123,10 +149,7 @@ internal class CatalogDropdownComponent(private val modifierFactory: ModifierFac
                         val headWidth = with(density) { headSize.width.toDp() }
                         Box(
                             modifier = Modifier
-                                .requiredWidth(headWidth)
-                                .onGloballyPositioned { coordinates ->
-                                    popupSize = coordinates.size
-                                },
+                                .requiredWidth(headWidth),
                         ) {
                             OptionList(
                                 model = model,
@@ -135,6 +158,7 @@ internal class CatalogDropdownComponent(private val modifierFactory: ModifierFac
                                 breakpointIndex = breakpointIndex,
                                 offerState = offerState,
                                 onEventSent = onEventSent,
+                                borderCornerRadiusMode = popupPlacement.borderCornerRadiusMode,
                                 modifier = Modifier.fillMaxWidth(),
                                 onSelected = { optionIndex ->
                                     val updatedSelections =
@@ -168,6 +192,7 @@ internal class CatalogDropdownComponent(private val modifierFactory: ModifierFac
         breakpointIndex: Int,
         offerState: OfferUiState,
         onEventSent: (LayoutContract.LayoutEvent) -> Unit,
+        onPositioned: (LayoutCoordinates, PaddingValues?) -> Unit,
         modifier: Modifier = Modifier,
         onClick: () -> Unit,
     ) {
@@ -203,6 +228,10 @@ internal class CatalogDropdownComponent(private val modifierFactory: ModifierFac
             offerState = offerState,
             onEventSent = onEventSent,
         )
+        val padding = resolvedStyle.resolvedPadding(
+            breakpointIndex = breakpointIndex,
+            isPressed = isPressed,
+        )
 
         Row(
             modifier = modifierFactory
@@ -216,6 +245,7 @@ internal class CatalogDropdownComponent(private val modifierFactory: ModifierFac
                     basePropertiesList = resolvedStyle.baseStyle?.ownModifiers,
                 )
                 .then(modifier)
+                .onGloballyPositioned { coordinates -> onPositioned(coordinates, padding) }
                 .clickable(
                     interactionSource = interactionSource,
                     indication = null,
@@ -248,6 +278,7 @@ internal class CatalogDropdownComponent(private val modifierFactory: ModifierFac
         breakpointIndex: Int,
         offerState: OfferUiState,
         onEventSent: (LayoutContract.LayoutEvent) -> Unit,
+        borderCornerRadiusMode: BorderCornerRadiusMode,
         modifier: Modifier = Modifier,
         onSelected: (Int) -> Unit,
     ) {
@@ -270,6 +301,7 @@ internal class CatalogDropdownComponent(private val modifierFactory: ModifierFac
                     isDarkModeEnabled = isDarkModeEnabled,
                     offerState = offerState,
                     basePropertiesList = resolvedStyle.baseStyle?.ownModifiers,
+                    borderCornerRadiusMode = borderCornerRadiusMode,
                 )
                 .then(modifier),
             horizontalAlignment = BiasAlignment.Horizontal(container.alignmentBias),
@@ -482,6 +514,36 @@ internal class CatalogDropdownComponent(private val modifierFactory: ModifierFac
         val baseStyle: LayoutSchemaUiModel.CatalogDropdownStyleUiModel?,
     )
 
+    private fun ResolvedCatalogDropdownStyle.resolvedPadding(
+        breakpointIndex: Int,
+        isPressed: Boolean,
+    ): PaddingValues? {
+        var padding: PaddingValues? = null
+
+        fun applyPadding(properties: ModifierProperties?) {
+            padding = padding ?: properties?.padding
+        }
+
+        fun applyPaddingFromModifierList(modifierProperties: List<StateBlock<ModifierProperties>>?) {
+            for (iteration in 0..1) {
+                val usePressed = isPressed && iteration == 0
+                for (i in breakpointIndex downTo 0) {
+                    modifierProperties?.getOrNull(i)?.let { stateBlock ->
+                        applyPadding(if (usePressed) stateBlock.pressed else stateBlock.default)
+                        if (usePressed && i == 0) {
+                            applyPadding(stateBlock.default)
+                        }
+                    }
+                }
+                if (!usePressed) break
+            }
+        }
+
+        applyPaddingFromModifierList(style?.ownModifiers)
+        applyPaddingFromModifierList(baseStyle?.ownModifiers)
+        return padding
+    }
+
     private companion object {
         const val MIN_VISIBLE_OPTIONS = 2
         const val CatalogDropdownCustomStateKeyPrefix = "CatalogDropdown."
@@ -494,23 +556,138 @@ internal class CatalogDropdownComponent(private val modifierFactory: ModifierFac
     }
 }
 
-internal fun catalogDropdownPopupOffset(
-    anchorTop: Int,
+internal enum class CatalogDropdownPopupPlacement {
+    Above,
+    Below,
+}
+
+internal fun catalogDropdownPopupPlacement(
+    anchorBounds: IntRect,
     anchorHeight: Int,
-    windowHeight: Int,
-    popupHeight: Int,
-    windowTopOnScreen: Int,
-): IntOffset {
-    if (windowHeight <= 0 || popupHeight <= 0) {
-        return IntOffset(x = 0, y = windowTopOnScreen + anchorHeight)
+    windowSize: IntSize,
+    popupContentSize: IntSize,
+): CatalogDropdownPopupPlacement {
+    if (windowSize.height <= 0 || popupContentSize.height <= 0) {
+        return CatalogDropdownPopupPlacement.Below
     }
 
-    val spaceBelow = windowHeight - (anchorTop + anchorHeight)
-    val shouldShowBelow = spaceBelow >= popupHeight || spaceBelow >= anchorTop
-    val y = if (shouldShowBelow) {
-        windowTopOnScreen + anchorHeight
+    val anchorBottom = maxOf(anchorBounds.bottom, anchorBounds.top + anchorHeight)
+    val spaceBelow = windowSize.height - anchorBottom
+    val spaceAbove = anchorBounds.top
+    val shouldShowBelow = spaceBelow >= popupContentSize.height || spaceBelow >= spaceAbove
+    return if (shouldShowBelow) {
+        CatalogDropdownPopupPlacement.Below
     } else {
-        windowTopOnScreen - popupHeight
+        CatalogDropdownPopupPlacement.Above
     }
-    return IntOffset(x = 0, y = y)
+}
+
+internal fun catalogDropdownPopupOffset(
+    anchorBounds: IntRect,
+    anchorHeight: Int,
+    windowSize: IntSize,
+    popupContentSize: IntSize,
+    layoutDirection: LayoutDirection = LayoutDirection.Ltr,
+): IntOffset {
+    val x = if (layoutDirection == LayoutDirection.Ltr) {
+        anchorBounds.left
+    } else {
+        anchorBounds.right - popupContentSize.width
+    }
+    val anchorBottom = maxOf(anchorBounds.bottom, anchorBounds.top + anchorHeight)
+    val placement = catalogDropdownPopupPlacement(
+        anchorBounds = anchorBounds,
+        anchorHeight = anchorHeight,
+        windowSize = windowSize,
+        popupContentSize = popupContentSize,
+    )
+    val y = when (placement) {
+        CatalogDropdownPopupPlacement.Below -> anchorBottom
+        CatalogDropdownPopupPlacement.Above -> anchorBounds.top - popupContentSize.height
+    }
+    return IntOffset(x = x, y = y)
+}
+
+private val CatalogDropdownPopupPlacement.borderCornerRadiusMode: BorderCornerRadiusMode
+    get() = when (this) {
+        CatalogDropdownPopupPlacement.Above -> BorderCornerRadiusMode.Top
+        CatalogDropdownPopupPlacement.Below -> BorderCornerRadiusMode.Bottom
+    }
+
+private class CatalogDropdownPopupPositionProvider(
+    private val anchorHeight: Int,
+    private val measuredAnchorBoundsInParent: IntRect?,
+    private val windowOffset: IntOffset,
+    private val onPlacementCalculated: (CatalogDropdownPopupPlacement) -> Unit,
+) : PopupPositionProvider {
+    override fun calculatePosition(
+        anchorBounds: IntRect,
+        windowSize: IntSize,
+        layoutDirection: LayoutDirection,
+        popupContentSize: IntSize,
+    ): IntOffset {
+        val resolvedAnchorBounds = measuredAnchorBoundsInParent?.toWindowBounds(anchorBounds) ?: anchorBounds
+        onPlacementCalculated(
+            catalogDropdownPopupPlacement(
+                anchorBounds = resolvedAnchorBounds,
+                anchorHeight = anchorHeight,
+                windowSize = windowSize,
+                popupContentSize = popupContentSize,
+            ),
+        )
+        return catalogDropdownPopupOffset(
+            anchorBounds = resolvedAnchorBounds,
+            anchorHeight = anchorHeight,
+            windowSize = windowSize,
+            popupContentSize = popupContentSize,
+            layoutDirection = layoutDirection,
+        ) + windowOffset
+    }
+}
+
+private fun android.view.View.windowToScreenOffset(): IntOffset {
+    val locationOnScreen = IntArray(2)
+    val locationInWindow = IntArray(2)
+    getLocationOnScreen(locationOnScreen)
+    getLocationInWindow(locationInWindow)
+    return IntOffset(
+        x = locationOnScreen[0] - locationInWindow[0],
+        y = locationOnScreen[1] - locationInWindow[1],
+    )
+}
+
+private fun IntRect.toWindowBounds(parentBounds: IntRect): IntRect = IntRect(
+    left = parentBounds.left + left,
+    top = parentBounds.top + top,
+    right = parentBounds.left + right,
+    bottom = parentBounds.top + bottom,
+)
+
+private fun IntRect.relativeTo(parentBounds: IntRect): IntRect = IntRect(
+    left = left - parentBounds.left,
+    top = top - parentBounds.top,
+    right = right - parentBounds.left,
+    bottom = bottom - parentBounds.top,
+)
+
+private fun IntRect.inflate(padding: PaddingValues?, density: Density, layoutDirection: LayoutDirection): IntRect {
+    if (padding == null) return this
+    return with(density) {
+        IntRect(
+            left = left - padding.calculateLeftPadding(layoutDirection).roundToPx(),
+            top = top - padding.calculateTopPadding().roundToPx(),
+            right = right + padding.calculateRightPadding(layoutDirection).roundToPx(),
+            bottom = bottom + padding.calculateBottomPadding().roundToPx(),
+        )
+    }
+}
+
+private fun LayoutCoordinates.boundsInWindowIntRect(): IntRect {
+    val bounds = boundsInWindow()
+    return IntRect(
+        left = bounds.left.roundToInt(),
+        top = bounds.top.roundToInt(),
+        right = bounds.right.roundToInt(),
+        bottom = bounds.bottom.roundToInt(),
+    )
 }
