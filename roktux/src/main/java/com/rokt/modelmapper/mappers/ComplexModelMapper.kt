@@ -37,6 +37,7 @@ import com.rokt.network.model.BasicStateStylingBlock
 import com.rokt.network.model.BooleanWhenCondition
 import com.rokt.network.model.CarouselActiveIndicatorMode
 import com.rokt.network.model.CarouselTransition
+import com.rokt.network.model.CatalogDropdownStyles
 import com.rokt.network.model.CatalogImageGalleryIndicatorStyles
 import com.rokt.network.model.CatalogImageGalleryStyles
 import com.rokt.network.model.DataImageCarouselIndicatorStyles
@@ -45,8 +46,10 @@ import com.rokt.network.model.DimensionHeightValue
 import com.rokt.network.model.DimensionWidthValue
 import com.rokt.network.model.EqualityWhenCondition
 import com.rokt.network.model.ExistenceWhenCondition
+import com.rokt.network.model.FormStateStylingBlock
 import com.rokt.network.model.InTransition
 import com.rokt.network.model.IndicatorStyles
+import com.rokt.network.model.InputValidation
 import com.rokt.network.model.LayoutSchemaModel
 import com.rokt.network.model.OrderableWhenCondition
 import com.rokt.network.model.OutTransition
@@ -63,6 +66,7 @@ private const val defaultStartPosition = 1
 private const val defaultAccessibilityHidden = true
 private const val dataImageCarouselCustomKeyPrefix = "DataImageCarousel."
 private const val catalogImageGalleryCustomStateKey = "imageCarouselPosition"
+private const val catalogDropdownCustomStateKeyPrefix = "CatalogDropdown."
 
 internal fun transformProgressIndicator(
     progressIndicatorModel: LayoutSchemaModel.ProgressIndicator,
@@ -591,6 +595,110 @@ internal fun transformDataImageCarousel(
             )
         },
         customStateKey = "$dataImageCarouselCustomKeyPrefix${dataImageCarousel.node.imageKey}",
+    )
+}
+
+internal fun transformCatalogDropdown(
+    catalogDropdown: LayoutSchemaModel.CatalogDropdown,
+    offerModel: OfferModel?,
+    attributeIndex: Int,
+): LayoutSchemaUiModel.CatalogDropdownUiModel {
+    val elements = catalogDropdown.node.styles?.elements
+    val own = transformCatalogDropdownElement(elements?.own)
+    val ownDefault = own?.default
+
+    val conditionalStyleTransition = catalogDropdown.node.styles?.conditionalTransitions?.let {
+        ConditionalTransitionModifier(
+            modifier = transformModifier(
+                it.value.own?.spacing,
+                it.value.own?.dimension,
+                it.value.own?.background,
+                it.value.own?.border,
+                it.value.own?.container,
+            ),
+            predicates = it.predicates.map { predicate -> predicate.transformWhenPredicate() }.toImmutableList(),
+            duration = it.duration,
+        )
+    }
+
+    return LayoutSchemaUiModel.CatalogDropdownUiModel(
+        ownModifiers = ownDefault?.ownModifiers,
+        containerProperties = ownDefault?.containerProperties,
+        conditionalTransitionModifiers = conditionalStyleTransition,
+        head = transformCatalogDropdownElement(elements?.head),
+        icon = transformCatalogDropdownElement(elements?.icon),
+        optionList = transformCatalogDropdownElement(elements?.optionList),
+        option = transformCatalogDropdownElement(elements?.option),
+        error = transformCatalogDropdownElement(elements?.error),
+        placeholderValue = catalogDropdown.node.placeholderValue,
+        unavailableValue = catalogDropdown.node.unavailableValue,
+        validationFieldKey = catalogDropdown.node.validatorFieldConfig?.validationFieldKey,
+        validationErrorMessage = catalogDropdown.node.validatorFieldConfig?.validators
+            ?.firstNotNullOfOrNull { validation ->
+                (validation as? InputValidation.Required)?.value?.message
+            },
+        validateOnChange = catalogDropdown.node.validatorFieldConfig?.validateOnChange ?: false,
+        a11yLabel = catalogDropdown.node.a11yLabel,
+        attributeIndex = attributeIndex,
+        customStateKey = "$catalogDropdownCustomStateKeyPrefix$attributeIndex.selectedIndex",
+        catalogItemGroup = offerModel?.catalogItemGroup,
+        catalogItems = offerModel?.catalogItems ?: emptyList<CatalogItemModel>().toImmutableList(),
+    )
+}
+
+private fun transformCatalogDropdownElement(
+    styles: List<FormStateStylingBlock<CatalogDropdownStyles>>?,
+): LayoutSchemaUiModel.CatalogDropdownElementUiModel? {
+    if (styles.isNullOrEmpty()) return null
+
+    return LayoutSchemaUiModel.CatalogDropdownElementUiModel(
+        default = transformCatalogDropdownStyle(
+            styles.map { style ->
+                BasicStateStylingBlock(
+                    default = style.default,
+                    pressed = style.pressed,
+                )
+            }.toImmutableList(),
+        ),
+        selected = styles.toCatalogDropdownStateStyle { it.selected },
+        disabled = styles.toCatalogDropdownStateStyle { it.disabled },
+        errored = styles.toCatalogDropdownStateStyle { it.errored },
+    )
+}
+
+private fun List<FormStateStylingBlock<CatalogDropdownStyles>>.toCatalogDropdownStateStyle(
+    stateStyle: (FormStateStylingBlock<CatalogDropdownStyles>) -> CatalogDropdownStyles?,
+): LayoutSchemaUiModel.CatalogDropdownStyleUiModel? {
+    if (none { stateStyle(it) != null }) return null
+    return transformCatalogDropdownStyle(
+        map { style ->
+            BasicStateStylingBlock(
+                default = stateStyle(style) ?: style.default,
+            )
+        }.toImmutableList(),
+    )
+}
+
+private fun transformCatalogDropdownStyle(
+    styles: ImmutableList<BasicStateStylingBlock<CatalogDropdownStyles>>?,
+): LayoutSchemaUiModel.CatalogDropdownStyleUiModel {
+    val ownModifiers = styles.transformModifier(
+        transformSpacing = { ownStyle -> ownStyle.toBasicStateStylingBlock { style -> style.spacing } },
+        transformDimension = { ownStyle -> ownStyle.toBasicStateStylingBlock { style -> style.dimension } },
+        transformBackground = { ownStyle -> ownStyle.toBasicStateStylingBlock { style -> style.background } },
+        transformBorder = { ownStyle -> ownStyle.toBasicStateStylingBlock { style -> style.border } },
+        transformContainer = { ownStyle -> ownStyle.toBasicStateStylingBlock { style -> style.container } },
+    )
+
+    return LayoutSchemaUiModel.CatalogDropdownStyleUiModel(
+        ownModifiers = ownModifiers,
+        containerProperties = styles.transformContainer(
+            transformContainer = { ownStyle -> ownStyle.toBasicStateStylingBlock { style -> style.container } },
+            transformFlexChild = { ownStyle -> ownStyle.toBasicStateStylingBlock { style -> style.flexChild } },
+        ),
+        textStyles = styles.transformTextStyles { ownStyle ->
+            ownStyle.toBasicStateStylingBlock { style -> style.text }
+        },
     )
 }
 

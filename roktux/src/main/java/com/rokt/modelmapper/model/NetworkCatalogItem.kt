@@ -30,4 +30,5 @@ data class NetworkCatalogItem(
     @SerialName("addOnPluginUrl") val addOnPluginUrl: String,
     @SerialName("addOnPluginName") val addOnPluginName: String,
     @SerialName("token") val token: String,
+    @SerialName("inventoryStatus") val inventoryStatus: String? = null,
 )

@@ -113,6 +113,40 @@ sealed class LayoutSchemaUiModel(
         val textStyles: ImmutableList<StateBlock<TextStylingUiProperties>>?,
     )
 
+    data class CatalogDropdownUiModel(
+        override val ownModifiers: ImmutableList<StateBlock<ModifierProperties>>?,
+        override val containerProperties: ImmutableList<StateBlock<ContainerProperties>>?,
+        override val conditionalTransitionModifiers: ConditionalTransitionModifier?,
+        val head: CatalogDropdownElementUiModel?,
+        val icon: CatalogDropdownElementUiModel?,
+        val optionList: CatalogDropdownElementUiModel?,
+        val option: CatalogDropdownElementUiModel?,
+        val error: CatalogDropdownElementUiModel?,
+        val placeholderValue: String?,
+        val unavailableValue: String?,
+        val validationFieldKey: String?,
+        val validationErrorMessage: String?,
+        val validateOnChange: Boolean,
+        val a11yLabel: String?,
+        val attributeIndex: Int,
+        val customStateKey: String,
+        val catalogItemGroup: CatalogItemGroupModel?,
+        val catalogItems: ImmutableList<CatalogItemModel>,
+    ) : LayoutSchemaUiModel(ownModifiers, containerProperties, conditionalTransitionModifiers)
+
+    data class CatalogDropdownElementUiModel(
+        val default: CatalogDropdownStyleUiModel?,
+        val selected: CatalogDropdownStyleUiModel?,
+        val disabled: CatalogDropdownStyleUiModel?,
+        val errored: CatalogDropdownStyleUiModel?,
+    )
+
+    data class CatalogDropdownStyleUiModel(
+        val ownModifiers: ImmutableList<StateBlock<ModifierProperties>>?,
+        val containerProperties: ImmutableList<StateBlock<ContainerProperties>>?,
+        val textStyles: ImmutableList<StateBlock<TextStylingUiProperties>>?,
+    )
+
     data class ProgressIndicatorUiModel(
         override val ownModifiers: ImmutableList<StateBlock<ModifierProperties>>?,
         override val containerProperties: ImmutableList<StateBlock<ContainerProperties>>?,

@@ -61,6 +61,6 @@ class BasicSnapshotTest {
                     .build(),
             )
         }
-        captureScreenRoboImage()
+        captureScreenRoboImage(roborazziOptions = snapshotRoborazziOptions)
     }
 }

@@ -1,0 +1,192 @@
+{
+  "type": "CatalogDropdown",
+  "node": {
+    "a11yLabel": "Select shoe size",
+    "placeholderValue": "Select size",
+    "unavailableValue": "Unavailable",
+    "styles": {
+      "elements": {
+        "own": [
+          {
+            "default": {
+              "dimension": {
+                "width": {
+                  "type": "fixed",
+                  "value": 220
+                },
+                "height": {
+                  "type": "fit",
+                  "value": "wrap-content"
+                }
+              }
+            }
+          }
+        ],
+        "head": [
+          {
+            "default": {
+              "background": {
+                "backgroundColor": {
+                  "light": "#ffffff",
+                  "dark": "#111827"
+                }
+              },
+              "border": {
+                "borderColor": {
+                  "light": "#1a5fb4",
+                  "dark": "#cfe8ff"
+                },
+                "borderStyle": "solid",
+                "borderWidth": "1",
+                "borderRadius": 6
+              },
+              "container": {
+                "alignItems": "center",
+                "justifyContent": "center"
+              },
+              "dimension": {
+                "width": {
+                  "type": "fit",
+                  "value": "fit-width"
+                },
+                "height": {
+                  "type": "fixed",
+                  "value": 44
+                }
+              },
+              "spacing": {
+                "padding": "0 12 0 12"
+              },
+              "text": {
+                "fontSize": 14,
+                "fontWeight": "600",
+                "textColor": {
+                  "light": "#111827",
+                  "dark": "#ffffff"
+                }
+              }
+            },
+            "selected": {
+              "background": {
+                "backgroundColor": {
+                  "light": "#eef7ff",
+                  "dark": "#102030"
+                }
+              }
+            }
+          }
+        ],
+        "icon": [
+          {
+            "default": {
+              "text": {
+                "fontSize": 16,
+                "fontWeight": "700",
+                "textColor": {
+                  "light": "#1a5fb4",
+                  "dark": "#cfe8ff"
+                }
+              }
+            }
+          }
+        ],
+        "optionList": [
+          {
+            "default": {
+              "background": {
+                "backgroundColor": {
+                  "light": "#ffffff",
+                  "dark": "#111827"
+                }
+              },
+              "border": {
+                "borderColor": {
+                  "light": "#d1d5db",
+                  "dark": "#4b5563"
+                },
+                "borderStyle": "solid",
+                "borderWidth": "1",
+                "borderRadius": 6
+              },
+              "dimension": {
+                "width": {
+                  "type": "fit",
+                  "value": "fit-width"
+                },
+                "height": {
+                  "type": "fit",
+                  "value": "wrap-content"
+                }
+              },
+              "spacing": {
+                "margin": "0 0 0 0"
+              }
+            }
+          }
+        ],
+        "option": [
+          {
+            "default": {
+              "dimension": {
+                "width": {
+                  "type": "fit",
+                  "value": "fit-width"
+                },
+                "height": {
+                  "type": "fixed",
+                  "value": 36
+                }
+              },
+              "spacing": {
+                "padding": "0 12 0 12"
+              },
+              "text": {
+                "fontSize": 14,
+                "fontWeight": "500",
+                "textColor": {
+                  "light": "#111827",
+                  "dark": "#ffffff"
+                }
+              }
+            },
+            "selected": {
+              "background": {
+                "backgroundColor": {
+                  "light": "#eef7ff",
+                  "dark": "#102030"
+                }
+              }
+            },
+            "disabled": {
+              "text": {
+                "fontSize": 14,
+                "fontWeight": "500",
+                "textColor": {
+                  "light": "#9ca3af",
+                  "dark": "#9ca3af"
+                }
+              }
+            }
+          }
+        ],
+        "error": [
+          {
+            "default": {
+              "spacing": {
+                "padding": "4 0 0 0"
+              },
+              "text": {
+                "fontSize": 12,
+                "fontWeight": "400",
+                "textColor": {
+                  "light": "#b91c1c",
+                  "dark": "#fca5a5"
+                }
+              }
+            }
+          }
+        ]
+      }
+    }
+  }
+}

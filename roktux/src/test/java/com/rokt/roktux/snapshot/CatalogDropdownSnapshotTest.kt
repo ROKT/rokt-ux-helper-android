@@ -2,7 +2,9 @@ package com.rokt.roktux.snapshot
 
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.onRoot
+import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.takahirom.roborazzi.ExperimentalRoborazziApi
 import com.github.takahirom.roborazzi.captureRoboImage
@@ -24,22 +26,30 @@ import org.robolectric.annotation.GraphicsMode
     sdk = [33],
     qualifiers = "xxhdpi",
 )
-class CatalogImageGallerySnapshotTest : BaseDcuiEspressoTest() {
+class CatalogDropdownSnapshotTest : BaseDcuiEspressoTest() {
 
     @OptIn(ExperimentalRoborazziApi::class)
     @Test
-    @DcuiNodeJson(jsonFile = "CatalogImageGalleryComponent/CatalogImageGallery_with_Images_Indicators.json")
+    @DcuiNodeJson(jsonFile = "CatalogDropdownComponent/CatalogDropdown_with_Group.json")
     @DcuiConfig(testInInnerLayout = true)
-    @DcuiOfferJson(jsonFile = "offer/Offer_with_catalog_item_images.json")
-    fun testCatalogImageGalleryWithImagesAndIndicators() {
+    @DcuiOfferJson(jsonFile = "offer/Offer_with_catalog_item_group.json")
+    fun testCatalogDropdownWithCatalogItemGroup() {
         composeTestRule.onNodeWithTag(DCUI_COMPONENT_TAG).assertIsDisplayed()
         composeTestRule.waitForIdle()
-        Thread.sleep(SNAPSHOT_IMAGE_LOAD_DELAY_MS)
 
         composeTestRule.onRoot().captureRoboImage(roborazziOptions = snapshotRoborazziOptions)
     }
 
-    private companion object {
-        const val SNAPSHOT_IMAGE_LOAD_DELAY_MS = 1_000L
+    @OptIn(ExperimentalRoborazziApi::class)
+    @Test
+    @DcuiNodeJson(jsonFile = "CatalogDropdownComponent/CatalogDropdown_with_Group.json")
+    @DcuiConfig(testInInnerLayout = true)
+    @DcuiOfferJson(jsonFile = "offer/Offer_with_catalog_item_group.json")
+    fun testCatalogDropdownOpenWithCatalogItemGroup() {
+        composeTestRule.onNodeWithText("Select size").performClick()
+        composeTestRule.onNodeWithText("8oz").assertIsDisplayed()
+        composeTestRule.waitForIdle()
+
+        composeTestRule.onRoot().captureRoboImage(roborazziOptions = snapshotRoborazziOptions)
     }
 }

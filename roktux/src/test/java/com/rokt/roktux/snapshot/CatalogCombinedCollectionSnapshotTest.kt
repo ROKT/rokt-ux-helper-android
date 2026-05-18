@@ -35,6 +35,6 @@ class CatalogCombinedCollectionSnapshotTest : BaseDcuiEspressoTest() {
     fun testCatalogCombinedCollectionWithBackgroundBorderAndText() {
         composeTestRule.onNodeWithText("Everyday sneakers").assertIsDisplayed()
 
-        composeTestRule.onRoot().captureRoboImage()
+        composeTestRule.onRoot().captureRoboImage(roborazziOptions = snapshotRoborazziOptions)
     }
 }
