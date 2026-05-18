@@ -6,6 +6,7 @@ import com.rokt.modelmapper.hmap.HMap
 import com.rokt.modelmapper.hmap.TypedKey
 import com.rokt.modelmapper.hmap.set
 import com.rokt.modelmapper.model.NetworkAction
+import com.rokt.modelmapper.model.NetworkAddress
 import com.rokt.modelmapper.model.NetworkCatalogItem
 import com.rokt.modelmapper.model.NetworkCreativeImage
 import com.rokt.modelmapper.model.NetworkCreativeLayout
@@ -14,11 +15,14 @@ import com.rokt.modelmapper.model.NetworkLayoutVariant
 import com.rokt.modelmapper.model.NetworkOfferLayout
 import com.rokt.modelmapper.model.NetworkOptions
 import com.rokt.modelmapper.model.NetworkPageContext
+import com.rokt.modelmapper.model.NetworkPaymentMethod
 import com.rokt.modelmapper.model.NetworkPlugin
 import com.rokt.modelmapper.model.NetworkResponseOption
 import com.rokt.modelmapper.model.NetworkSignalType
 import com.rokt.modelmapper.model.NetworkSlotLayout
+import com.rokt.modelmapper.model.NetworkTransactionData
 import com.rokt.modelmapper.uimodel.Action
+import com.rokt.modelmapper.uimodel.Address
 import com.rokt.modelmapper.uimodel.CatalogImageWrapperModel
 import com.rokt.modelmapper.uimodel.CatalogItemModel
 import com.rokt.modelmapper.uimodel.CreativeIcon
@@ -32,11 +36,13 @@ import com.rokt.modelmapper.uimodel.Module
 import com.rokt.modelmapper.uimodel.OfferImageModel
 import com.rokt.modelmapper.uimodel.OfferModel
 import com.rokt.modelmapper.uimodel.OptionsModel
+import com.rokt.modelmapper.uimodel.PaymentMethod
 import com.rokt.modelmapper.uimodel.PlacementContextModel
 import com.rokt.modelmapper.uimodel.PluginModel
 import com.rokt.modelmapper.uimodel.ResponseOptionModel
 import com.rokt.modelmapper.uimodel.SignalType
 import com.rokt.modelmapper.uimodel.SlotModel
+import com.rokt.modelmapper.uimodel.TransactionData
 import com.rokt.network.model.LayoutSchemaModel
 import com.rokt.roktux.logging.RoktUXLogger
 import kotlinx.collections.immutable.ImmutableMap
@@ -131,9 +137,35 @@ class ExperienceModelMapperImpl(private val experienceResponse: String, private 
             campaignId = campaignId,
             creative = creative.toCreativeModel(),
             catalogItems = catalogItems.map { it.toCatalogItemModel() }.toImmutableList(),
+            transactionData = transactionData?.toTransactionDataModel(),
         )
         return offerModel
     }
+
+    private fun NetworkTransactionData.toTransactionDataModel(): TransactionData = TransactionData(
+        shippingAddress = shippingAddress?.toAddressModel(),
+        billingAddress = billingAddress?.toAddressModel(),
+        paymentType = paymentType,
+        supportedPaymentMethods = supportedPaymentMethods?.map { it.toPaymentMethodModel() },
+        isPartnerManagedPurchase = isPartnerManagedPurchase,
+        partnerPaymentReference = partnerPaymentReference,
+        confirmationRef = confirmationRef,
+        metadata = metadata,
+    )
+
+    private fun NetworkPaymentMethod.toPaymentMethodModel(): PaymentMethod = PaymentMethod(type = type)
+
+    private fun NetworkAddress.toAddressModel(): Address = Address(
+        name = name,
+        address1 = address1,
+        address2 = address2,
+        city = city,
+        state = state,
+        stateCode = stateCode,
+        country = country,
+        countryCode = countryCode,
+        zip = zip,
+    )
 
     private fun NetworkCreativeLayout.toCreativeModel(): CreativeModel = CreativeModel(
         referralCreativeId = referralCreativeId,
@@ -360,7 +392,13 @@ class ExperienceModelMapperImpl(private val experienceResponse: String, private 
 
         is LayoutSchemaModel.AccessibilityGrouped -> TODO("AccessibilityGrouped mapping is not implemented")
 
-        is LayoutSchemaModel.CatalogDevicePayButton -> TODO("CatalogDevicePayButton mapping is not implemented")
+        is LayoutSchemaModel.CatalogDevicePayButton -> transformCatalogDevicePayButton(
+            layoutSchemaModel,
+            offerModel,
+            itemIndex,
+        ) { child ->
+            transformLayoutSchemaModel(child, offerModel, responseContextKey, itemIndex, module)
+        }
 
         is LayoutSchemaModel.CatalogDropdown -> TODO("CatalogDropdown mapping is not implemented")
 

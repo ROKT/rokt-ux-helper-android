@@ -42,6 +42,7 @@ data class OfferModel(
     val campaignId: String,
     val creative: CreativeModel,
     val catalogItems: ImmutableList<CatalogItemModel>,
+    val transactionData: TransactionData? = null,
 )
 
 data class CreativeModel(

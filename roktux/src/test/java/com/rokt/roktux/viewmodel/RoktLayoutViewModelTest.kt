@@ -9,17 +9,25 @@ import com.rokt.modelmapper.uimodel.Action
 import com.rokt.modelmapper.uimodel.LayoutSettings
 import com.rokt.modelmapper.uimodel.OpenLinks
 import com.rokt.modelmapper.uimodel.OptionsModel
+import com.rokt.modelmapper.uimodel.PaymentMethod
 import com.rokt.modelmapper.uimodel.PlacementContextModel
 import com.rokt.modelmapper.uimodel.SignalType
+import com.rokt.modelmapper.uimodel.TransactionData
+import com.rokt.network.model.PaymentProvider
 import com.rokt.roktux.RoktViewState
+import com.rokt.roktux.event.DevicePayResult
 import com.rokt.roktux.event.EventType
 import com.rokt.roktux.event.RoktPlatformEvent
 import com.rokt.roktux.event.RoktUxEvent
+import com.rokt.roktux.validation.ValidationCoordinator
+import com.rokt.roktux.validation.ValidationStatus
 import com.rokt.roktux.viewmodel.layout.LayoutContract
 import com.rokt.roktux.viewmodel.layout.LayoutViewModel
+import io.mockk.clearMocks
 import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.mockk
+import io.mockk.slot
 import io.mockk.verify
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -83,7 +91,10 @@ class RoktLayoutViewModelTest : BaseViewModelTest() {
         layoutViewModel.setEvent(LayoutContract.LayoutEvent.LayoutInitialised)
     }
 
-    private fun initialize(handleUrlByApp: Boolean = true) {
+    private fun initialize(
+        handleUrlByApp: Boolean = true,
+        validationCoordinator: ValidationCoordinator = ValidationCoordinator(),
+    ) {
         layoutViewModel = LayoutViewModel(
             location = "location1",
             startTimeStamp = System.currentTimeMillis(),
@@ -97,6 +108,7 @@ class RoktLayoutViewModelTest : BaseViewModelTest() {
             viewStateChange = viewStateChange,
             customStates = mapOf(),
             offerCustomStates = mapOf(),
+            validationCoordinator = validationCoordinator,
             edgeToEdgeDisplay = false,
         )
     }
@@ -368,6 +380,169 @@ class RoktLayoutViewModelTest : BaseViewModelTest() {
     }
 
     @Test
+    fun `CartItemDevicePaySelected sends event with sale price and platform signal`() = runTest {
+        // Arrange
+        val transactionData = TransactionData(
+            paymentType = "GooglePay",
+            supportedPaymentMethods = listOf(PaymentMethod("GOOGLE_PAY")),
+        )
+        clearMocks(uxEvent, platformEvent, viewStateChange)
+
+        // Act
+        layoutViewModel.setEvent(
+            LayoutContract.LayoutEvent.CartItemDevicePaySelected(
+                offerId = 0,
+                catalogItemModel = createCatalogItemProperties(),
+                paymentProvider = PaymentProvider.GooglePay,
+                transactionData = transactionData,
+                validatorFieldKeys = emptyList(),
+            ),
+        )
+
+        // Assert
+        val event = captureDevicePayEvent()
+        assertThat(event.layoutId).isEqualTo("pluginId")
+        assertThat(event.name).isEqualTo("Everyday sneakers")
+        assertThat(event.cartItemId).isEqualTo("cart-item-1")
+        assertThat(event.catalogItemId).isEqualTo("catalog-item-1")
+        assertThat(event.currency).isEqualTo("USD")
+        assertThat(event.description).isEqualTo("Lightweight daily shoes")
+        assertThat(event.linkedProductId).isEqualTo("linked-product-1")
+        assertThat(event.providerData).isEqualTo("{\"merchant\":\"rokt\"}")
+        assertThat(event.totalPrice).isEqualTo(79.99)
+        assertThat(event.unitPrice).isEqualTo(79.99)
+        assertThat(event.paymentProvider).isEqualTo(PaymentProvider.GooglePay)
+        assertThat(event.transactionData).isEqualTo(transactionData)
+        verify(timeout = 2000) {
+            platformEvent.invoke(
+                withArg { events ->
+                    assertThat(events).anyMatch {
+                        it.eventType == EventType.SignalCartItemInstantPurchaseInitiated &&
+                            it.parentGuid == "catalog-instance-guid-1" &&
+                            it.eventData?.get("totalPrice") == "79.99" &&
+                            it.eventData?.get("unitPrice") == "79.99"
+                    }
+                },
+            )
+        }
+    }
+
+    @Test
+    fun `CartItemDevicePay callback updates payment result custom state`() = runTest {
+        // Arrange
+        clearMocks(uxEvent, viewStateChange)
+        layoutViewModel.setEvent(
+            LayoutContract.LayoutEvent.CartItemDevicePaySelected(
+                offerId = 0,
+                catalogItemModel = createCatalogItemProperties(),
+                paymentProvider = PaymentProvider.GooglePay,
+                transactionData = null,
+                validatorFieldKeys = emptyList(),
+            ),
+        )
+        val event = captureDevicePayEvent()
+
+        // Act
+        clearMocks(viewStateChange)
+        event.onResult(DevicePayResult.Success)
+
+        // Assert
+        verify(timeout = 2000) {
+            viewStateChange.invoke(
+                withArg { state ->
+                    assertThat(state.offerCustomStates["0"]).containsEntry("paymentResult", 1)
+                },
+            )
+        }
+
+        // Act
+        clearMocks(viewStateChange)
+        event.onResult(DevicePayResult.Failure)
+
+        // Assert
+        verify(timeout = 2000) {
+            viewStateChange.invoke(
+                withArg { state ->
+                    assertThat(state.offerCustomStates["0"]).containsEntry("paymentResult", -1)
+                },
+            )
+        }
+
+        // Act
+        clearMocks(viewStateChange)
+        event.onResult(DevicePayResult.Retry)
+
+        // Assert
+        verify(timeout = 2000) {
+            viewStateChange.invoke(
+                withArg { state ->
+                    assertThat(state.offerCustomStates["0"]).containsEntry("paymentResult", -1)
+                },
+            )
+        }
+    }
+
+    @Test
+    fun `CartItemDevicePay pending confirmation updates device pay state`() = runTest {
+        // Arrange
+        clearMocks(uxEvent, viewStateChange)
+        layoutViewModel.setEvent(
+            LayoutContract.LayoutEvent.CartItemDevicePaySelected(
+                offerId = 0,
+                catalogItemModel = createCatalogItemProperties(),
+                paymentProvider = PaymentProvider.GooglePay,
+                transactionData = null,
+                validatorFieldKeys = emptyList(),
+            ),
+        )
+        val event = captureDevicePayEvent()
+
+        // Act
+        clearMocks(viewStateChange)
+        event.onResult(DevicePayResult.PendingConfirmation(mapOf("confirmationRef" to "confirmation-123")))
+
+        // Assert
+        verify(timeout = 2000) {
+            viewStateChange.invoke(
+                withArg { state ->
+                    assertThat(state.offerCustomStates["0"]).containsEntry("devicePayState", 1)
+                },
+            )
+        }
+    }
+
+    @Test
+    fun `CartItemDevicePaySelected does not emit event when validation fails`() = runTest {
+        // Arrange
+        val validationCoordinator = ValidationCoordinator()
+        validationCoordinator.registerField(
+            key = "dropDownSelection",
+            owner = this,
+            validation = { ValidationStatus.INVALID },
+            onStatusChange = {},
+        )
+        initialize(validationCoordinator = validationCoordinator)
+        layoutViewModel.setEvent(LayoutContract.LayoutEvent.LayoutInitialised)
+        clearMocks(uxEvent)
+
+        // Act
+        layoutViewModel.setEvent(
+            LayoutContract.LayoutEvent.CartItemDevicePaySelected(
+                offerId = 0,
+                catalogItemModel = createCatalogItemProperties(),
+                paymentProvider = PaymentProvider.GooglePay,
+                transactionData = null,
+                validatorFieldKeys = listOf("dropDownSelection"),
+            ),
+        )
+
+        // Assert
+        verify(exactly = 0, timeout = 500) {
+            uxEvent.invoke(match { event -> event is RoktUxEvent.CartItemDevicePay })
+        }
+    }
+
+    @Test
     fun `FirstOfferLoaded should send the RoktPlatformEvent with SignalImpression for the layout and required metadata`() {
         // Act
         layoutViewModel.setEvent(LayoutContract.LayoutEvent.FirstOfferLoaded)
@@ -402,5 +577,29 @@ class RoktLayoutViewModelTest : BaseViewModelTest() {
                 },
             )
         }
+    }
+
+    private fun captureDevicePayEvent(): RoktUxEvent.CartItemDevicePay {
+        val eventSlot = slot<RoktUxEvent>()
+        verify(timeout = 2000) {
+            uxEvent.invoke(capture(eventSlot))
+        }
+        return eventSlot.captured as RoktUxEvent.CartItemDevicePay
+    }
+
+    private fun createCatalogItemProperties(
+        price: Double = 79.99,
+        originalPrice: Double = 99.99,
+    ): HMap = HMap().apply {
+        set(TypedKey<String>("instanceGuid"), "catalog-instance-guid-1")
+        set(TypedKey<String>("title"), "Everyday sneakers")
+        set(TypedKey<String>("cartItemId"), "cart-item-1")
+        set(TypedKey<String>("catalogItemId"), "catalog-item-1")
+        set(TypedKey<String>("currency"), "USD")
+        set(TypedKey<String>("description"), "Lightweight daily shoes")
+        set(TypedKey<String>("linkedProductId"), "linked-product-1")
+        set(TypedKey<String>("providerData"), "{\"merchant\":\"rokt\"}")
+        set(TypedKey<Double>("price"), price)
+        set(TypedKey<Double>("originalPrice"), originalPrice)
     }
 }

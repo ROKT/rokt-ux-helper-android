@@ -2,7 +2,9 @@ package com.rokt.roktux.event
 
 import com.rokt.modelmapper.uimodel.OpenLinks
 import com.rokt.modelmapper.uimodel.SignalType
+import com.rokt.modelmapper.uimodel.TransactionData
 import com.rokt.modelmapper.utils.roktDateFormat
+import com.rokt.network.model.PaymentProvider
 import com.rokt.roktux.RoktIntegrationConfig
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -88,6 +90,30 @@ sealed interface RoktUxEvent {
         val onClose: (id: String) -> Unit,
         val onError: (id: String, throwable: Throwable) -> Unit,
     ) : RoktUxEvent
+
+    data class CartItemDevicePay(
+        val layoutId: String,
+        val name: String,
+        val cartItemId: String,
+        val catalogItemId: String,
+        val currency: String,
+        val description: String,
+        val linkedProductId: String,
+        val providerData: String,
+        val totalPrice: Double,
+        val quantity: Int,
+        val unitPrice: Double,
+        val paymentProvider: PaymentProvider,
+        val transactionData: TransactionData?,
+        val onResult: (DevicePayResult) -> Unit,
+    ) : RoktUxEvent
+}
+
+sealed interface DevicePayResult {
+    object Success : DevicePayResult
+    object Failure : DevicePayResult
+    object Retry : DevicePayResult
+    data class PendingConfirmation(val catalogRuntimeData: Map<String, String>) : DevicePayResult
 }
 
 @Serializable

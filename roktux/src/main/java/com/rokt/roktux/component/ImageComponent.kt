@@ -34,7 +34,13 @@ internal class ImageComponent(private val modifierFactory: ModifierFactory) :
         onEventSent: (LayoutContract.LayoutEvent) -> Unit,
     ) {
         var onImageError by remember(isDarkModeEnabled) { mutableStateOf(false) }
-        val url = if (isDarkModeEnabled) model.darkUrl ?: model.lightUrl else model.lightUrl
+        val url = if (isDarkModeEnabled) {
+            model.darkUrl?.takeIf { it.isNotBlank() } ?: model.lightUrl
+        } else {
+            model.lightUrl
+        }
+        if (url.isBlank()) return
+
         if (!onImageError) {
             AsyncImage(
                 model = ImageRequest.Builder(LocalContext.current).data(url).build(),

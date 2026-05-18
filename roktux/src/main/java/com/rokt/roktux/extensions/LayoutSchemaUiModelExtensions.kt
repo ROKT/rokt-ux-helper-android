@@ -41,6 +41,7 @@ fun LayoutSchemaUiModel.transformModifiers(
         is LayoutSchemaUiModel.CreativeResponseUiModel -> copy(ownModifiers = modifiedModifiers)
         is LayoutSchemaUiModel.CloseButtonUiModel -> copy(ownModifiers = modifiedModifiers)
         is LayoutSchemaUiModel.CatalogResponseButtonUiModel -> copy(ownModifiers = modifiedModifiers)
+        is LayoutSchemaUiModel.CatalogDevicePayButtonUiModel -> copy(ownModifiers = modifiedModifiers)
         is LayoutSchemaUiModel.StaticLinkUiModel -> copy(ownModifiers = modifiedModifiers)
         is LayoutSchemaUiModel.ToggleButtonStateTriggerUiModel -> copy(ownModifiers = modifiedModifiers)
         is LayoutSchemaUiModel.ProgressControlUiModel -> copy(ownModifiers = modifiedModifiers)
