@@ -35,6 +35,7 @@ class RoktUxTest {
         }
         with(sdkConfig.layoutSchemaVersion) {
             assertEquals(BuildConfig.SCHEMA_VERSION, this)
+            assertEquals(RoktUx.getLayoutSchemaVersion(), this)
             assertTrue(isValidSemver(this))
         }
         assertEquals("com.rokt.roktux.test", sdkConfig.packageName)
@@ -46,6 +47,11 @@ class RoktUxTest {
         assertEquals("Phone", sdkConfig.deviceType)
         assertEquals("en_US", sdkConfig.deviceLocale)
         assertTrue(isValidJson(sdkConfig.toJsonString()))
+    }
+
+    @Test
+    fun `getLayoutSchemaVersion should return schema version`() {
+        assertEquals(BuildConfig.SCHEMA_VERSION, RoktUx.getLayoutSchemaVersion())
     }
 
     private fun isValidJson(data: String): Boolean = try {
