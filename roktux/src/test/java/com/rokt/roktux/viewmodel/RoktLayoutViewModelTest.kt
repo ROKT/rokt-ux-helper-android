@@ -9,18 +9,22 @@ import com.rokt.modelmapper.uimodel.Action
 import com.rokt.modelmapper.uimodel.LayoutSettings
 import com.rokt.modelmapper.uimodel.OpenLinks
 import com.rokt.modelmapper.uimodel.OptionsModel
+import com.rokt.modelmapper.uimodel.OrderableWhenUiCondition
 import com.rokt.modelmapper.uimodel.PaymentMethod
 import com.rokt.modelmapper.uimodel.PlacementContextModel
 import com.rokt.modelmapper.uimodel.SignalType
 import com.rokt.modelmapper.uimodel.TransactionData
+import com.rokt.modelmapper.uimodel.WhenUiPredicate
 import com.rokt.network.model.PaymentProvider
 import com.rokt.roktux.RoktViewState
+import com.rokt.roktux.component.evaluatePredicates
 import com.rokt.roktux.event.DevicePayResult
 import com.rokt.roktux.event.EventType
 import com.rokt.roktux.event.RoktPlatformEvent
 import com.rokt.roktux.event.RoktUxEvent
 import com.rokt.roktux.validation.ValidationCoordinator
 import com.rokt.roktux.validation.ValidationStatus
+import com.rokt.roktux.viewmodel.base.BaseContract
 import com.rokt.roktux.viewmodel.layout.LayoutContract
 import com.rokt.roktux.viewmodel.layout.LayoutViewModel
 import io.mockk.clearMocks
@@ -93,6 +97,7 @@ class RoktLayoutViewModelTest : BaseViewModelTest() {
 
     private fun initialize(
         handleUrlByApp: Boolean = true,
+        domainStates: Map<String, Int> = emptyMap(),
         validationCoordinator: ValidationCoordinator = ValidationCoordinator(),
     ) {
         layoutViewModel = LayoutViewModel(
@@ -108,6 +113,7 @@ class RoktLayoutViewModelTest : BaseViewModelTest() {
             viewStateChange = viewStateChange,
             customStates = mapOf(),
             offerCustomStates = mapOf(),
+            domainStates = domainStates,
             validationCoordinator = validationCoordinator,
             edgeToEdgeDisplay = false,
         )
@@ -377,6 +383,79 @@ class RoktLayoutViewModelTest : BaseViewModelTest() {
                 },
             )
         }
+    }
+
+    @Test
+    fun `initial domain states seed offer state and view state`() = runTest {
+        // Arrange
+        clearMocks(viewStateChange)
+        initialize(domainStates = mapOf("checkout" to 2))
+
+        // Act
+        layoutViewModel.setEvent(LayoutContract.LayoutEvent.LayoutInitialised)
+
+        // Assert
+        val successState = layoutViewModel.viewState.first {
+            it is BaseContract.BaseViewState.Success && it.value.offerUiState.domainStates["checkout"] == 2
+        }
+            as BaseContract.BaseViewState.Success
+        assertThat(successState.value.offerUiState.domainStates).containsEntry("checkout", 2)
+        verify {
+            viewStateChange.invoke(
+                withArg { state ->
+                    assertThat(state.domainStates).containsEntry("checkout", 2)
+                },
+            )
+        }
+    }
+
+    @Test
+    fun `SetDomainState Event should update domain state and propagate the event`() = runTest {
+        // Arrange
+        clearMocks(viewStateChange)
+
+        // Act
+        layoutViewModel.setEvent(LayoutContract.LayoutEvent.SetDomainState("offerComplete", 1))
+
+        // Assert
+        val successState = layoutViewModel.viewState.first {
+            it is BaseContract.BaseViewState.Success && it.value.offerUiState.domainStates["offerComplete"] == 1
+        }
+            as BaseContract.BaseViewState.Success
+        assertThat(successState.value.offerUiState.domainStates).containsEntry("offerComplete", 1)
+        verify {
+            viewStateChange.invoke(
+                withArg { state ->
+                    assertThat(state.domainStates).containsEntry("offerComplete", 1)
+                },
+            )
+        }
+    }
+
+    @Test
+    fun `domain state updates affect when evaluation`() = runTest {
+        // Act
+        layoutViewModel.setEvent(LayoutContract.LayoutEvent.SetDomainState("checkout", 2))
+
+        // Assert
+        val successState = layoutViewModel.viewState.first {
+            it is BaseContract.BaseViewState.Success && it.value.offerUiState.domainStates["checkout"] == 2
+        }
+            as BaseContract.BaseViewState.Success
+        val evaluationResult = evaluatePredicates(
+            predicates = persistentListOf(
+                WhenUiPredicate.DomainState(
+                    condition = OrderableWhenUiCondition.IsAbove,
+                    key = "checkout",
+                    value = 1,
+                ),
+            ),
+            breakpointIndex = 0,
+            isDarkModeEnabled = false,
+            offerState = successState.value.offerUiState,
+        )
+
+        assertTrue(evaluationResult)
     }
 
     @Test

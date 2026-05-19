@@ -27,6 +27,7 @@ internal class LayoutContract {
         data class LayoutVariantSwiped(val currentOffer: Int) : LayoutEvent
         data class ViewableItemsChanged(val viewableItems: Int) : LayoutEvent
         data class SetCustomState(val key: String, val value: Int) : LayoutEvent
+        data class SetDomainState(val key: String, val value: Int) : LayoutEvent
         data class SetOfferCustomState(val offerId: Int, val customState: Map<String, Int>) : LayoutEvent
         data class SetActiveCatalogItem(val index: Int) : LayoutEvent
         data class LayoutVariantNavigated(val targetOffer: Int) : LayoutEvent

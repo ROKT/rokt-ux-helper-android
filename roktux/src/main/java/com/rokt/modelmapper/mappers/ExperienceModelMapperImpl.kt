@@ -394,7 +394,13 @@ class ExperienceModelMapperImpl(private val experienceResponse: String, private 
 
         is LayoutSchemaModel.When -> transformWhen(
             layoutSchemaModel,
-        ) { child -> transformLayoutSchemaModel(child, offerModel, responseContextKey, itemIndex, module) }
+            transformLayoutSchemaChildren = { child ->
+                transformLayoutSchemaModel(child, offerModel, responseContextKey, itemIndex, module)
+            },
+            bindPlaceholderValue = { value ->
+                bindValue(value, responseContextKey, offerModel, itemIndex)
+            },
+        )
 
         is LayoutSchemaModel.DataIcon -> transformDataIcon(layoutSchemaModel, offerModel, module, itemIndex)
 

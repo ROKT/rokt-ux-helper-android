@@ -25,6 +25,7 @@ internal class LayoutModule(
     private val currentOffer: Int,
     private val customStates: Map<String, Int>,
     private val offerCustomStates: Map<String, Map<String, Int>>,
+    private val domainStates: Map<String, Int>,
     private val edgeToEdgeDisplay: Boolean,
     private val mainDispatcher: CoroutineDispatcher,
     private val ioDispatcher: CoroutineDispatcher,
@@ -54,6 +55,7 @@ internal class LayoutModule(
                 currentOffer = currentOffer,
                 customStates = customStates,
                 offerCustomStates = offerCustomStates,
+                domainStates = domainStates,
                 edgeToEdgeDisplay = edgeToEdgeDisplay,
             )
         }

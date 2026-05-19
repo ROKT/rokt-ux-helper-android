@@ -62,6 +62,7 @@ internal class LayoutViewModel(
     private var currentOffer: Int,
     customStates: Map<String, Int>,
     offerCustomStates: Map<String, Map<String, Int>>,
+    domainStates: Map<String, Int>,
     validationCoordinator: ValidationCoordinator = ValidationCoordinator(),
     private var edgeToEdgeDisplay: Boolean,
 ) : BaseViewModel<LayoutContract.LayoutEvent, LayoutUiState, LayoutContract.LayoutEffect>() {
@@ -74,6 +75,7 @@ internal class LayoutViewModel(
     private val runtimeState = LayoutRuntimeState(
         customStates = customStates,
         offerCustomStates = offerCustomStates,
+        domainStates = domainStates,
         validationCoordinator = validationCoordinator,
     )
 
@@ -176,6 +178,7 @@ internal class LayoutViewModel(
                         creativeCopy = persistentMapOf(),
                         breakpoints = pluginModel.breakpoint,
                         customState = runtimeState.globalCustomStates().toImmutableMap(),
+                        domainStates = runtimeState.domainStates().toImmutableMap(),
                         offerCustomStates = runtimeState.immutableOfferCustomStates(),
                     ),
                 ),
@@ -272,6 +275,11 @@ internal class LayoutViewModel(
 
             is LayoutContract.LayoutEvent.SetCustomState -> {
                 updateCustomState(event.key, event.value)
+                sendViewState()
+            }
+
+            is LayoutContract.LayoutEvent.SetDomainState -> {
+                updateDomainState(event.key, event.value)
                 sendViewState()
             }
 
@@ -594,6 +602,17 @@ internal class LayoutViewModel(
         }
     }
 
+    private fun updateDomainState(key: String, value: Int) {
+        runtimeState.setDomainState(key, value)
+        updateState { currentUiState ->
+            currentUiState.copy(
+                offerUiState = currentUiState.offerUiState.copy(
+                    domainStates = runtimeState.domainStates().toImmutableMap(),
+                ),
+            )
+        }
+    }
+
     private fun updateOfferCustomState(offerId: Int, key: String, value: Int) {
         runtimeState.setOfferCustomState(offerId, key, value)
         updateState { currentUiState ->
@@ -752,6 +771,7 @@ internal class LayoutViewModel(
             pluginId = pluginId,
             customStates = runtimeState.globalCustomStates().toImmutableMap(),
             offerCustomStates = runtimeState.allOfferCustomStates().toImmutableMap(),
+            domainStates = runtimeState.domainStates().toImmutableMap(),
             offerIndex = currentOffer,
             pluginDismissed = isDismissed,
         )
@@ -806,6 +826,7 @@ internal class LayoutViewModel(
         private val currentOffer: Int,
         private val customStates: Map<String, Int>,
         private val offerCustomStates: Map<String, Map<String, Int>>,
+        private val domainStates: Map<String, Int>,
         private val edgeToEdgeDisplay: Boolean,
     ) : ViewModelProvider.Factory {
         @Suppress("UNCHECKED_CAST")
@@ -824,6 +845,7 @@ internal class LayoutViewModel(
                     currentOffer = currentOffer,
                     customStates = customStates,
                     offerCustomStates = offerCustomStates,
+                    domainStates = domainStates,
                     edgeToEdgeDisplay = edgeToEdgeDisplay,
                 ) as T
             }

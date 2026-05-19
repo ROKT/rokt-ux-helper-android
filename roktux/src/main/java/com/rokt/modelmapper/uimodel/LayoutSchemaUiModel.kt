@@ -599,7 +599,19 @@ sealed class WhenUiPredicate {
     data class StaticBoolean(val condition: BooleanWhenUiCondition, val value: Boolean) : WhenUiPredicate()
     data class DarkMode(val condition: EqualityWhenUiCondition, val value: Boolean) : WhenUiPredicate()
     data class CustomState(val condition: OrderableWhenUiCondition, val key: String, val value: Int) : WhenUiPredicate()
+    data class DomainState(val condition: OrderableWhenUiCondition, val key: String, val value: Int) :
+        WhenUiPredicate()
+
     data class StaticString(val condition: EqualityWhenUiCondition, val input: String, val value: String) :
+        WhenUiPredicate()
+
+    data class PlaceholderTextValue(val condition: StringWhenUiCondition, val input: BindData, val value: String) :
+        WhenUiPredicate()
+
+    data class PlaceholderTextLength(val condition: OrderableWhenUiCondition, val input: BindData, val value: String) :
+        WhenUiPredicate()
+
+    data class PlaceholderNumeric(val condition: OrderableWhenUiCondition, val input: BindData, val value: String) :
         WhenUiPredicate()
 }
 
@@ -616,6 +628,13 @@ enum class EqualityWhenUiCondition {
 }
 
 enum class ExistenceWhenUiCondition {
+    Exists,
+    NotExists,
+}
+
+enum class StringWhenUiCondition {
+    Is,
+    IsNot,
     Exists,
     NotExists,
 }

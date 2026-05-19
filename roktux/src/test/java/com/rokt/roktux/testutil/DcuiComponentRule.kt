@@ -72,6 +72,7 @@ class DcuiComponentRule(val composeTestRule: ComposeContentTestRule) : BaseCompo
                     currentOffer = 0,
                     customStates = mapOf(),
                     offerCustomStates = mapOf(),
+                    domainStates = mapOf(),
                     edgeToEdgeDisplay = false,
                     mainDispatcher = Dispatchers.Main,
                     ioDispatcher = Dispatchers.IO,
