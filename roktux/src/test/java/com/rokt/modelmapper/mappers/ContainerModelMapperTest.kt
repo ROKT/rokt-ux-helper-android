@@ -176,6 +176,30 @@ class ContainerModelMapperTest {
     }
 
     @Test
+    fun `transformWhenPredicate strips unsupported placeholder namespace fallbacks before binding`() {
+        val result = WhenPredicate.Placeholder(
+            PlaceholderPredicate.TextValue(
+                DynamicStringPredicate(
+                    condition = StringWhenCondition.Is,
+                    input = "%^UNSUPPORTED.foo|DATA.transactionData.confirmationRef|DATA.creativeCopy.title|defaultValue^%",
+                    value = "resolved title",
+                ),
+            ),
+        ).transformWhenPredicate { input ->
+            assertThat(input).isEqualTo("%^DATA.creativeCopy.title|defaultValue^%")
+            BindData.Value("resolved title")
+        }
+
+        assertThat(result).isEqualTo(
+            WhenUiPredicate.PlaceholderTextValue(
+                condition = StringWhenUiCondition.Is,
+                input = BindData.Value("resolved title"),
+                value = "resolved title",
+            ),
+        )
+    }
+
+    @Test
     fun `transformCatalogCombinedCollection builds one template per catalog item`() {
         val collection = LayoutSchemaModel.CatalogCombinedCollection(
             CatalogCombinedCollectionModel<CatalogCombinedCollectionLayoutSchemaTemplateNode, WhenPredicate>(

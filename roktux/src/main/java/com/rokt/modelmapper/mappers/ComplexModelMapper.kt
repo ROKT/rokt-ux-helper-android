@@ -555,11 +555,7 @@ private fun String.toSupportedPredicatePlaceholder(): String? {
     val content = trimmed.removeSurrounding("%^", "^%")
     val paths = content.split('|').map { it.trim() }
     if (paths.none { it.isSupportedPredicatePlaceholderPath() }) return null
-    return if (trimmed.startsWith("%^") && trimmed.endsWith("^%")) {
-        trimmed
-    } else {
-        "%^$trimmed^%"
-    }
+    return "%^${paths.filterNot { it.isUnsupportedPredicatePlaceholderPath() }.joinToString("|") }^%"
 }
 
 private fun String.isSupportedPredicatePlaceholderPath(): Boolean = startsWith("DATA.creativeCopy.") ||
@@ -567,6 +563,14 @@ private fun String.isSupportedPredicatePlaceholderPath(): Boolean = startsWith("
     startsWith("DATA.creativeLink.") ||
     startsWith("DATA.catalogItem.") ||
     startsWith("STATE.")
+
+private fun String.isUnsupportedPredicatePlaceholderPath(): Boolean = !isSupportedPredicatePlaceholderPath() && (
+    startsWith("DATA.") ||
+        startsWith("STATE.") ||
+        unsupportedNamespacePattern.containsMatchIn(this)
+    )
+
+private val unsupportedNamespacePattern = Regex("^[A-Z][A-Z0-9_]*\\.")
 
 internal fun transformDataImageCarousel(
     dataImageCarousel: LayoutSchemaModel.DataImageCarousel,
