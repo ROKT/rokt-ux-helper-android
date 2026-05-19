@@ -7,14 +7,17 @@ import com.rokt.roktux.validation.ValidationCoordinator
 internal class LayoutRuntimeState(
     val customStateMap: CustomStateMap = CustomStateMap(),
     val validationCoordinator: ValidationCoordinator = ValidationCoordinator(),
+    initialDomainStates: Map<String, Int> = emptyMap(),
 ) {
     private var catalogRuntimeData: Map<String, String> = emptyMap()
+    private var domainStates: Map<String, Int> = initialDomainStates
 
     // Convenience constructor for seeding from the public RoktViewState shape,
     // where offer positions arrive as String keys from persisted JSON.
     constructor(
         customStates: Map<String, Int>,
         offerCustomStates: Map<String, Map<String, Int>>,
+        domainStates: Map<String, Int> = emptyMap(),
         validationCoordinator: ValidationCoordinator = ValidationCoordinator(),
     ) : this(
         customStateMap = CustomStateMap(
@@ -22,6 +25,7 @@ internal class LayoutRuntimeState(
             initialOfferStates = offerCustomStates.toPositionedOfferStates(),
         ),
         validationCoordinator = validationCoordinator,
+        initialDomainStates = domainStates,
     )
 
     fun setGlobalCustomState(key: String, value: Int) {
@@ -47,6 +51,16 @@ internal class LayoutRuntimeState(
     fun effectiveCustomStates(position: Int): Map<String, Int> = customStateMap.effectiveStates(position)
 
     fun allOfferCustomStates(): Map<String, Map<String, Int>> = customStateMap.allOfferStates()
+
+    fun setDomainState(key: String, value: Int) {
+        domainStates = domainStates + (key to value)
+    }
+
+    fun replaceDomainStates(states: Map<String, Int>) {
+        domainStates = states
+    }
+
+    fun domainStates(): Map<String, Int> = domainStates
 
     fun setCatalogRuntimeData(data: Map<String, String>) {
         catalogRuntimeData = data

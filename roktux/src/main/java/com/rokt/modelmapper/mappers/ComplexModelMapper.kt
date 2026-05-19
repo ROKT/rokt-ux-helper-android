@@ -7,6 +7,11 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.ui.layout.ContentScale
 import com.rokt.modelmapper.data.BindData
+import com.rokt.modelmapper.data.CATALOG_ITEM_NAMESPACE
+import com.rokt.modelmapper.data.CREATIVE_COPY_NAMESPACE
+import com.rokt.modelmapper.data.CREATIVE_LINKS_NAMESPACE
+import com.rokt.modelmapper.data.CREATIVE_RESPONSE_NAMESPACE
+import com.rokt.modelmapper.data.TemplateDataPrefix
 import com.rokt.modelmapper.data.bindModel
 import com.rokt.modelmapper.data.getCatalogItemImages
 import com.rokt.modelmapper.data.getOfferImages
@@ -30,6 +35,7 @@ import com.rokt.modelmapper.uimodel.OfferModel
 import com.rokt.modelmapper.uimodel.OrderableWhenUiCondition
 import com.rokt.modelmapper.uimodel.ProgressUiDirection
 import com.rokt.modelmapper.uimodel.ResponseOptionModel
+import com.rokt.modelmapper.uimodel.StringWhenUiCondition
 import com.rokt.modelmapper.uimodel.WhenUiHidden
 import com.rokt.modelmapper.uimodel.WhenUiPredicate
 import com.rokt.modelmapper.uimodel.WhenUiTransition
@@ -53,8 +59,10 @@ import com.rokt.network.model.InputValidation
 import com.rokt.network.model.LayoutSchemaModel
 import com.rokt.network.model.OrderableWhenCondition
 import com.rokt.network.model.OutTransition
+import com.rokt.network.model.PlaceholderPredicate
 import com.rokt.network.model.ProgressIndicatorStyles
 import com.rokt.network.model.ProgressionDirection
+import com.rokt.network.model.StringWhenCondition
 import com.rokt.network.model.WhenHidden
 import com.rokt.network.model.WhenPredicate
 import com.rokt.network.model.WhenTransition
@@ -460,8 +468,9 @@ internal fun transformProgressControl(
 internal fun transformWhen(
     whenModel: LayoutSchemaModel.When,
     transformLayoutSchemaChildren: (LayoutSchemaModel) -> LayoutSchemaUiModel?,
+    bindPlaceholderValue: (String) -> BindData = { BindData.Undefined },
 ): LayoutSchemaUiModel.WhenUiModel = LayoutSchemaUiModel.WhenUiModel(
-    predicates = whenModel.node.predicates.map { it.transformWhenPredicate() }.toImmutableList(),
+    predicates = whenModel.node.predicates.map { it.transformWhenPredicate(bindPlaceholderValue) }.toImmutableList(),
     children = whenModel.node.children.mapNotNull { child ->
         transformLayoutSchemaChildren(child)
     }.toImmutableList(),
@@ -472,7 +481,9 @@ internal fun transformWhen(
     hide = whenModel.node.hide?.toHideUiModel(),
 )
 
-internal fun WhenPredicate.transformWhenPredicate(): WhenUiPredicate = when (this) {
+internal fun WhenPredicate.transformWhenPredicate(
+    bindPlaceholderValue: (String) -> BindData = { BindData.Undefined },
+): WhenUiPredicate = when (this) {
     is WhenPredicate.Breakpoint -> WhenUiPredicate.Breakpoint(
         condition = predicate.condition.toUiModel(),
         value = predicate.value,
@@ -515,10 +526,62 @@ internal fun WhenPredicate.transformWhenPredicate(): WhenUiPredicate = when (thi
         value = predicate.value,
     )
 
-    is WhenPredicate.DomainState -> TODO("DomainState predicate mapping is not implemented")
+    is WhenPredicate.DomainState -> WhenUiPredicate.DomainState(
+        condition = predicate.condition.toUiModel(),
+        key = predicate.key.string,
+        value = predicate.value,
+    )
 
-    is WhenPredicate.Placeholder -> TODO("Placeholder predicate mapping is not implemented")
+    is WhenPredicate.Placeholder -> predicate.toUiModel(bindPlaceholderValue)
 }
+
+private fun PlaceholderPredicate.toUiModel(bindPlaceholderValue: (String) -> BindData): WhenUiPredicate = when (this) {
+    is PlaceholderPredicate.TextValue -> WhenUiPredicate.PlaceholderTextValue(
+        condition = content.condition.toUiModel(),
+        input = content.input.toSupportedPredicatePlaceholder()?.let(bindPlaceholderValue) ?: BindData.Undefined,
+        value = content.value,
+    )
+
+    is PlaceholderPredicate.TextLength -> WhenUiPredicate.PlaceholderTextLength(
+        condition = content.condition.toUiModel(),
+        input = content.input.toSupportedPredicatePlaceholder()?.let(bindPlaceholderValue) ?: BindData.Undefined,
+        value = content.value,
+    )
+
+    is PlaceholderPredicate.Numeric -> WhenUiPredicate.PlaceholderNumeric(
+        condition = content.condition.toUiModel(),
+        input = content.input.toSupportedPredicatePlaceholder()?.let(bindPlaceholderValue) ?: BindData.Undefined,
+        value = content.value,
+    )
+}
+
+private fun String.toSupportedPredicatePlaceholder(): String? {
+    val trimmed = trim()
+    val content = trimmed.removeSurrounding("%^", "^%")
+    val paths = content.split('|').map { it.trim() }
+    if (paths.none { it.isSupportedPredicatePlaceholderPath() }) return null
+    return "%^${paths.filterNot { it.isUnsupportedPredicatePlaceholderPath() }.joinToString("|") }^%"
+}
+
+private fun String.isSupportedPredicatePlaceholderPath(): Boolean =
+    startsWithDataPlaceholderNamespace(CREATIVE_COPY_NAMESPACE) ||
+        startsWithDataPlaceholderNamespace(CREATIVE_RESPONSE_NAMESPACE) ||
+        startsWithDataPlaceholderNamespace(CREATIVE_LINKS_NAMESPACE) ||
+        startsWithDataPlaceholderNamespace(CATALOG_ITEM_NAMESPACE) ||
+        startsWithTemplateDataPrefix(TemplateDataPrefix.STATE)
+
+private fun String.isUnsupportedPredicatePlaceholderPath(): Boolean = !isSupportedPredicatePlaceholderPath() && (
+    startsWithTemplateDataPrefix(TemplateDataPrefix.DATA) ||
+        startsWithTemplateDataPrefix(TemplateDataPrefix.STATE) ||
+        unsupportedNamespacePattern.containsMatchIn(this)
+    )
+
+private fun String.startsWithDataPlaceholderNamespace(namespace: String): Boolean =
+    startsWith("${TemplateDataPrefix.DATA.value}.$namespace.")
+
+private fun String.startsWithTemplateDataPrefix(prefix: TemplateDataPrefix): Boolean = startsWith("${prefix.value}.")
+
+private val unsupportedNamespacePattern = Regex("^[A-Z][A-Z0-9_]*\\.")
 
 internal fun transformDataImageCarousel(
     dataImageCarousel: LayoutSchemaModel.DataImageCarousel,
@@ -913,6 +976,13 @@ private fun BooleanWhenCondition.toUiModel() = when (this) {
 private fun ExistenceWhenCondition.toUiModel() = when (this) {
     ExistenceWhenCondition.Exists -> ExistenceWhenUiCondition.Exists
     ExistenceWhenCondition.NotExists -> ExistenceWhenUiCondition.NotExists
+}
+
+private fun StringWhenCondition.toUiModel() = when (this) {
+    StringWhenCondition.Is -> StringWhenUiCondition.Is
+    StringWhenCondition.IsNot -> StringWhenUiCondition.IsNot
+    StringWhenCondition.Exists -> StringWhenUiCondition.Exists
+    StringWhenCondition.NotExists -> StringWhenUiCondition.NotExists
 }
 
 private fun WhenTransition.toTransitionUiModel(): WhenUiTransition {

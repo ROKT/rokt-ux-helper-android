@@ -124,6 +124,19 @@ internal fun RoktLayout(
     ) {
         roktUxConfig.viewStateConfig?.viewState?.customStates?.let { mutableStateOf(it) } ?: mutableStateOf(mapOf())
     }
+    var domainStates by rememberSaveable(
+        key = experienceHash,
+        saver = mapSaver(
+            save = { it.value },
+            restore = {
+                mutableStateOf(
+                    it.filterValues { value -> value is Int }.mapValues { (_, value) -> value as Int },
+                )
+            },
+        ),
+    ) {
+        roktUxConfig.viewStateConfig?.viewState?.domainStates?.let { mutableStateOf(it) } ?: mutableStateOf(mapOf())
+    }
     val offerCustomStates by remember {
         roktUxConfig.viewStateConfig?.viewState?.offerCustomStates?.let { mutableStateOf(it) }
             ?: mutableStateOf(mapOf())
@@ -153,6 +166,7 @@ internal fun RoktLayout(
                     currentOffer = currentOffer,
                     customStates = customState,
                     offerCustomStates = offerCustomStates,
+                    domainStates = domainStates,
                     handleUrlByApp = roktUxConfig.handleUrlByApp,
                     edgeToEdgeDisplay = roktUxConfig.edgeToEdgeDisplay,
                     mainDispatcher = mainDispatcher,
@@ -165,9 +179,10 @@ internal fun RoktLayout(
                 modifier = modifier,
                 fontMap = roktUxConfig.composeFontMap?.toImmutableMap() ?: persistentMapOf(),
                 colorMode = roktUxConfig.colorMode,
-                updateSavedState = { offer, state ->
+                updateSavedState = { offer, state, updatedDomainStates ->
                     currentOffer = offer
                     customState = state
+                    domainStates = updatedDomainStates
                 },
             )
         }
@@ -183,7 +198,7 @@ private fun DIComponentInjector(
     fontMap: ImmutableMap<String, FontFamily>,
     modifier: Modifier = Modifier,
     colorMode: ColorMode? = null,
-    updateSavedState: (currentOffer: Int, customState: Map<String, Int>) -> Unit,
+    updateSavedState: (currentOffer: Int, customState: Map<String, Int>, domainStates: Map<String, Int>) -> Unit,
 ) {
     CompositionLocalProvider(
         LocalLayoutComponent provides viewModel.component,
@@ -209,7 +224,7 @@ private fun RoktLayout(
     fontMap: ImmutableMap<String, FontFamily>,
     modifier: Modifier = Modifier,
     colorMode: ColorMode? = null,
-    updateSavedState: (currentOffer: Int, customState: Map<String, Int>) -> Unit,
+    updateSavedState: (currentOffer: Int, customState: Map<String, Int>, domainStates: Map<String, Int>) -> Unit,
 ) {
     val component = LocalLayoutComponent.current
     val context = LocalContext.current
@@ -285,7 +300,11 @@ private fun RoktLayout(
                 LaunchedEffect(Unit) {
                     viewModel.setEvent(LayoutContract.LayoutEvent.LayoutReady)
                 }
-                updateSavedState(state.value.offerUiState.currentOfferIndex, state.value.offerUiState.customState)
+                updateSavedState(
+                    state.value.offerUiState.currentOfferIndex,
+                    state.value.offerUiState.customState,
+                    state.value.offerUiState.domainStates,
+                )
                 var isLayoutInteractive by remember { mutableStateOf(false) }
                 var hasUserInteracted by remember { mutableStateOf(false) }
                 CompositionLocalProvider(

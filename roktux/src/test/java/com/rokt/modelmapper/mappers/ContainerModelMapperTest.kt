@@ -17,8 +17,11 @@ import com.rokt.modelmapper.uimodel.LayoutSchemaUiModel
 import com.rokt.modelmapper.uimodel.Module
 import com.rokt.modelmapper.uimodel.OfferImageModel
 import com.rokt.modelmapper.uimodel.OfferModel
+import com.rokt.modelmapper.uimodel.OrderableWhenUiCondition
 import com.rokt.modelmapper.uimodel.PaymentMethod
+import com.rokt.modelmapper.uimodel.StringWhenUiCondition
 import com.rokt.modelmapper.uimodel.TransactionData
+import com.rokt.modelmapper.uimodel.WhenUiPredicate
 import com.rokt.modelmapper.uimodel.WidthUiModel
 import com.rokt.network.model.BackgroundStylingProperties
 import com.rokt.network.model.BasicStateStylingBlock
@@ -39,12 +42,19 @@ import com.rokt.network.model.ContainerStylingProperties
 import com.rokt.network.model.DimensionHeightValue
 import com.rokt.network.model.DimensionStylingProperties
 import com.rokt.network.model.DimensionWidthValue
+import com.rokt.network.model.DomainStateKey
+import com.rokt.network.model.DynamicIntegerPredicate
+import com.rokt.network.model.DynamicStringPredicate
 import com.rokt.network.model.FlexAlignment
 import com.rokt.network.model.FlexJustification
 import com.rokt.network.model.FormStateStylingBlock
+import com.rokt.network.model.LayoutSchemaDomainStatePredicate
 import com.rokt.network.model.LayoutSchemaModel
 import com.rokt.network.model.LayoutStyle
+import com.rokt.network.model.OrderableWhenCondition
 import com.rokt.network.model.PaymentProvider
+import com.rokt.network.model.PlaceholderPredicate
+import com.rokt.network.model.StringWhenCondition
 import com.rokt.network.model.TextStylingProperties
 import com.rokt.network.model.ThemeColor
 import com.rokt.network.model.ValidationTriggerConfig
@@ -55,6 +65,139 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.Test
 
 class ContainerModelMapperTest {
+
+    @Test
+    fun `transformWhenPredicate maps domain state predicates`() {
+        val result = WhenPredicate.DomainState(
+            LayoutSchemaDomainStatePredicate(
+                key = DomainStateKey.OfferComplete,
+                condition = OrderableWhenCondition.Is,
+                value = 1,
+            ),
+        ).transformWhenPredicate()
+
+        assertThat(result).isEqualTo(
+            WhenUiPredicate.DomainState(
+                condition = OrderableWhenUiCondition.Is,
+                key = "offerComplete",
+                value = 1,
+            ),
+        )
+    }
+
+    @Test
+    fun `transformWhenPredicate maps placeholder text value predicates`() {
+        val result = WhenPredicate.Placeholder(
+            PlaceholderPredicate.TextValue(
+                DynamicStringPredicate(
+                    condition = StringWhenCondition.Exists,
+                    input = "DATA.creativeCopy.title",
+                    value = "",
+                ),
+            ),
+        ).transformWhenPredicate { input ->
+            assertThat(input).isEqualTo("%^DATA.creativeCopy.title^%")
+            BindData.Value("resolved title")
+        }
+
+        assertThat(result).isEqualTo(
+            WhenUiPredicate.PlaceholderTextValue(
+                condition = StringWhenUiCondition.Exists,
+                input = BindData.Value("resolved title"),
+                value = "",
+            ),
+        )
+    }
+
+    @Test
+    fun `transformWhenPredicate maps placeholder text length and numeric predicates`() {
+        val textLength = WhenPredicate.Placeholder(
+            PlaceholderPredicate.TextLength(
+                DynamicIntegerPredicate(
+                    condition = OrderableWhenCondition.IsAbove,
+                    input = "STATE.indicatorPosition",
+                    value = "1",
+                ),
+            ),
+        ).transformWhenPredicate { input ->
+            assertThat(input).isEqualTo("%^STATE.indicatorPosition^%")
+            BindData.Value("12")
+        }
+        val numeric = WhenPredicate.Placeholder(
+            PlaceholderPredicate.Numeric(
+                DynamicIntegerPredicate(
+                    condition = OrderableWhenCondition.IsBelow,
+                    input = "DATA.catalogItem.price",
+                    value = "100",
+                ),
+            ),
+        ).transformWhenPredicate { input ->
+            assertThat(input).isEqualTo("%^DATA.catalogItem.price^%")
+            BindData.Value("49")
+        }
+
+        assertThat(textLength).isEqualTo(
+            WhenUiPredicate.PlaceholderTextLength(
+                condition = OrderableWhenUiCondition.IsAbove,
+                input = BindData.Value("12"),
+                value = "1",
+            ),
+        )
+        assertThat(numeric).isEqualTo(
+            WhenUiPredicate.PlaceholderNumeric(
+                condition = OrderableWhenUiCondition.IsBelow,
+                input = BindData.Value("49"),
+                value = "100",
+            ),
+        )
+    }
+
+    @Test
+    fun `transformWhenPredicate does not resolve unsupported placeholder namespaces`() {
+        val result = WhenPredicate.Placeholder(
+            PlaceholderPredicate.TextValue(
+                DynamicStringPredicate(
+                    condition = StringWhenCondition.Exists,
+                    input = "DATA.transactionData.confirmationRef",
+                    value = "",
+                ),
+            ),
+        ).transformWhenPredicate {
+            BindData.Value("should not resolve")
+        }
+
+        assertThat(result).isEqualTo(
+            WhenUiPredicate.PlaceholderTextValue(
+                condition = StringWhenUiCondition.Exists,
+                input = BindData.Undefined,
+                value = "",
+            ),
+        )
+    }
+
+    @Test
+    fun `transformWhenPredicate strips unsupported placeholder namespace fallbacks before binding`() {
+        val result = WhenPredicate.Placeholder(
+            PlaceholderPredicate.TextValue(
+                DynamicStringPredicate(
+                    condition = StringWhenCondition.Is,
+                    input = " %^ UNSUPPORTED.foo | DATA.transactionData.confirmationRef | DATA.creativeCopy.title | defaultValue ^% ",
+                    value = "resolved title",
+                ),
+            ),
+        ).transformWhenPredicate { input ->
+            assertThat(input).isEqualTo("%^DATA.creativeCopy.title|defaultValue^%")
+            BindData.Value("resolved title")
+        }
+
+        assertThat(result).isEqualTo(
+            WhenUiPredicate.PlaceholderTextValue(
+                condition = StringWhenUiCondition.Is,
+                input = BindData.Value("resolved title"),
+                value = "resolved title",
+            ),
+        )
+    }
 
     @Test
     fun `transformCatalogCombinedCollection builds one template per catalog item`() {
