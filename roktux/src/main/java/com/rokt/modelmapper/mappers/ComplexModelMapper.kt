@@ -7,6 +7,11 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.ui.layout.ContentScale
 import com.rokt.modelmapper.data.BindData
+import com.rokt.modelmapper.data.CATALOG_ITEM_NAMESPACE
+import com.rokt.modelmapper.data.CREATIVE_COPY_NAMESPACE
+import com.rokt.modelmapper.data.CREATIVE_LINKS_NAMESPACE
+import com.rokt.modelmapper.data.CREATIVE_RESPONSE_NAMESPACE
+import com.rokt.modelmapper.data.TemplateDataPrefix
 import com.rokt.modelmapper.data.bindModel
 import com.rokt.modelmapper.data.getCatalogItemImages
 import com.rokt.modelmapper.data.getOfferImages
@@ -558,17 +563,23 @@ private fun String.toSupportedPredicatePlaceholder(): String? {
     return "%^${paths.filterNot { it.isUnsupportedPredicatePlaceholderPath() }.joinToString("|") }^%"
 }
 
-private fun String.isSupportedPredicatePlaceholderPath(): Boolean = startsWith("DATA.creativeCopy.") ||
-    startsWith("DATA.creativeResponse.") ||
-    startsWith("DATA.creativeLink.") ||
-    startsWith("DATA.catalogItem.") ||
-    startsWith("STATE.")
+private fun String.isSupportedPredicatePlaceholderPath(): Boolean =
+    startsWithDataPlaceholderNamespace(CREATIVE_COPY_NAMESPACE) ||
+        startsWithDataPlaceholderNamespace(CREATIVE_RESPONSE_NAMESPACE) ||
+        startsWithDataPlaceholderNamespace(CREATIVE_LINKS_NAMESPACE) ||
+        startsWithDataPlaceholderNamespace(CATALOG_ITEM_NAMESPACE) ||
+        startsWithTemplateDataPrefix(TemplateDataPrefix.STATE)
 
 private fun String.isUnsupportedPredicatePlaceholderPath(): Boolean = !isSupportedPredicatePlaceholderPath() && (
-    startsWith("DATA.") ||
-        startsWith("STATE.") ||
+    startsWithTemplateDataPrefix(TemplateDataPrefix.DATA) ||
+        startsWithTemplateDataPrefix(TemplateDataPrefix.STATE) ||
         unsupportedNamespacePattern.containsMatchIn(this)
     )
+
+private fun String.startsWithDataPlaceholderNamespace(namespace: String): Boolean =
+    startsWith("${TemplateDataPrefix.DATA.value}.$namespace.")
+
+private fun String.startsWithTemplateDataPrefix(prefix: TemplateDataPrefix): Boolean = startsWith("${prefix.value}.")
 
 private val unsupportedNamespacePattern = Regex("^[A-Z][A-Z0-9_]*\\.")
 

@@ -225,11 +225,6 @@ internal fun getCatalogItemImages(offerModel: OfferModel?, itemIndex: Int, modul
 
 private fun String.trailingNumber(): Int? = Regex("(\\d+)$").find(this)?.value?.toIntOrNull()
 
-private enum class TemplateDataPrefix(val value: String) {
-    DATA("DATA"),
-    STATE("STATE"),
-}
-
 private val startsWithNamespace = Regex("^(${TemplateDataPrefix.DATA}|${TemplateDataPrefix.STATE})")
 private val isDataTemplate = Regex("^${TemplateDataPrefix.DATA}")
 private val isStateTemplate = Regex("%\\^(${TemplateDataPrefix.STATE})\\.[a-zA-Z0-9]+[a-zA-Z0-9.]*(?:\\|.*?)?\\^%")
@@ -237,10 +232,5 @@ private val templatePattern = Regex(
     "%\\^(?:${TemplateDataPrefix.DATA}|${TemplateDataPrefix.STATE})\\.[a-zA-Z0-9]+[a-zA-Z0-9.]*(?:\\|.*?)?\\^%",
 )
 
-private const val CREATIVE_RESPONSE_NAMESPACE = "creativeResponse"
-private const val CREATIVE_COPY_NAMESPACE = "creativeCopy"
-private const val CREATIVE_LINKS_NAMESPACE = "creativeLink"
-private const val CATALOG_ITEM_NAMESPACE = "catalogItem"
-private const val CREATIVE_IMAGE_NAMESPACE = "creativeImage"
 private val INDICATOR_POSITION = listOf("IndicatorPosition", "indicatorPosition")
 private val TOTAL_OFFERS = listOf("TotalOffers", "totalOffers")
