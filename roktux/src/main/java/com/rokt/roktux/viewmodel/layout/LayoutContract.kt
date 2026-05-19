@@ -36,6 +36,12 @@ internal class LayoutContract {
         data class OfferVisibilityChanged(val offerId: Int, val visible: Boolean) : LayoutEvent
         data class UiException(val throwable: Throwable, val closeLayout: Boolean) : LayoutEvent
         data class CartItemInstantPurchaseSelected(val catalogItemModel: HMap) : LayoutEvent
+        data class CartItemForwardPaymentSelected(
+            val offerId: Int,
+            val catalogItemModel: HMap,
+            val transactionData: TransactionData?,
+        ) : LayoutEvent
+
         data class CartItemDevicePaySelected(
             val offerId: Int,
             val catalogItemModel: HMap?,
@@ -45,6 +51,7 @@ internal class LayoutContract {
         ) : LayoutEvent
 
         data class CartItemDevicePayResultReceived(val offerId: Int, val result: DevicePayResult) : LayoutEvent
+        data class CartItemForwardPaymentResultReceived(val offerId: Int, val result: DevicePayResult) : LayoutEvent
     }
 
     sealed interface LayoutEffect : BaseContract.BaseEffect {

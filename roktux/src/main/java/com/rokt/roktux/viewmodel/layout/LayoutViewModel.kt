@@ -332,12 +332,20 @@ internal class LayoutViewModel(
                 handleCartItemInstancePurchaseSelected(event.catalogItemModel)
             }
 
+            is LayoutContract.LayoutEvent.CartItemForwardPaymentSelected -> {
+                handleCartItemForwardPaymentSelected(event)
+            }
+
             is LayoutContract.LayoutEvent.CartItemDevicePaySelected -> {
                 handleCartItemDevicePaySelected(event)
             }
 
             is LayoutContract.LayoutEvent.CartItemDevicePayResultReceived -> {
                 handleCartItemDevicePayResult(event.offerId, event.result)
+            }
+
+            is LayoutContract.LayoutEvent.CartItemForwardPaymentResultReceived -> {
+                handleCartItemForwardPaymentResult(event.offerId, event.result)
             }
 
             else -> {}
@@ -433,6 +441,53 @@ internal class LayoutViewModel(
         setEvent(LayoutContract.LayoutEvent.CloseSelected(isDismissed = false))
     }
 
+    private fun handleCartItemForwardPaymentSelected(event: LayoutContract.LayoutEvent.CartItemForwardPaymentSelected) {
+        with(event.catalogItemModel) {
+            val salePrice = get<Double>(KEY_PRICE) ?: get<Double>(KEY_ORIGINAL_PRICE) ?: 0.0
+            uxEvent(
+                RoktUxEvent.CartItemForwardPayment(
+                    layoutId = pluginId,
+                    name = get<String>(KEY_TITLE).orEmpty(),
+                    cartItemId = get<String>(KEY_CART_ITEM_ID).orEmpty(),
+                    catalogItemId = get<String>(KEY_CATALOG_ITEM_ID).orEmpty(),
+                    currency = get<String>(KEY_CURRENCY).orEmpty(),
+                    description = get<String>(KEY_DESCRIPTION).orEmpty(),
+                    linkedProductId = get<String>(KEY_LINKED_PRODUCT_ID).orEmpty(),
+                    providerData = get<String>(KEY_PROVIDER_DATA).orEmpty(),
+                    totalPrice = salePrice,
+                    quantity = 1,
+                    unitPrice = salePrice,
+                    transactionData = event.transactionData,
+                    onResult = { result ->
+                        setEvent(
+                            LayoutContract.LayoutEvent.CartItemForwardPaymentResultReceived(
+                                event.offerId,
+                                result,
+                            ),
+                        )
+                    },
+                ),
+            )
+            handlePlatformEvent(
+                RoktPlatformEvent(
+                    eventType = EventType.SignalCartItemInstantPurchaseInitiated,
+                    sessionId = experienceModel.sessionId,
+                    parentGuid = get<String>(KEY_INSTANCE_GUID).orEmpty(),
+                    eventData = mapOf(
+                        KEY_CART_ITEM_ID to get<String>(KEY_CART_ITEM_ID).orEmpty(),
+                        KEY_CATALOG_ITEM_ID to get<String>(KEY_CATALOG_ITEM_ID).orEmpty(),
+                        KEY_CURRENCY to get<String>(KEY_CURRENCY).orEmpty(),
+                        KEY_DESCRIPTION to get<String>(KEY_DESCRIPTION).orEmpty(),
+                        KEY_LINKED_PRODUCT_ID to get<String>(KEY_LINKED_PRODUCT_ID).orEmpty(),
+                        KEY_TOTAL_PRICE to salePrice.toString(),
+                        KEY_QUANTITY to "1",
+                        KEY_UNIT_PRICE to salePrice.toString(),
+                    ),
+                ),
+            )
+        }
+    }
+
     private fun handleCartItemDevicePaySelected(event: LayoutContract.LayoutEvent.CartItemDevicePaySelected) {
         if (!runtimeState.validationCoordinator.validate(event.validatorFieldKeys)) {
             return
@@ -492,6 +547,21 @@ internal class LayoutViewModel(
             is DevicePayResult.PendingConfirmation -> {
                 runtimeState.setCatalogRuntimeData(result.catalogRuntimeData)
                 updateOfferCustomState(offerId, DEVICE_PAY_STATE_CUSTOM_STATE_KEY, 1)
+            }
+        }
+        sendViewState()
+    }
+
+    private fun handleCartItemForwardPaymentResult(offerId: Int, result: DevicePayResult) {
+        when (result) {
+            DevicePayResult.Success -> updateOfferCustomState(offerId, PAYMENT_RESULT_CUSTOM_STATE_KEY, 1)
+
+            DevicePayResult.Failure,
+            DevicePayResult.Retry,
+            -> updateOfferCustomState(offerId, PAYMENT_RESULT_CUSTOM_STATE_KEY, -1)
+
+            is DevicePayResult.PendingConfirmation -> {
+                runtimeState.setCatalogRuntimeData(result.catalogRuntimeData)
             }
         }
         sendViewState()

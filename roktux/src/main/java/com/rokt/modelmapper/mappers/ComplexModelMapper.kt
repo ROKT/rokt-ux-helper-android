@@ -241,6 +241,7 @@ internal fun transformCatalogResponseButton(
             )
         }.toImmutableList(),
         catalogItemModel = bindModel<CatalogItemModel>(offerModel = offerModel, itemIndex = itemIndex)?.properties,
+        transactionData = offerModel?.transactionData,
     )
 }
 
