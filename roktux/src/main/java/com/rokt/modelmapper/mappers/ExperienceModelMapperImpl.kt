@@ -418,12 +418,11 @@ class ExperienceModelMapperImpl(private val experienceResponse: String, private 
             transformLayoutSchemaModel(child, offerModel, responseContextKey, index, catalogItemModule)
         }
 
-        is LayoutSchemaModel.CatalogCombinedCollection -> transformCatalogCombinedCollection(
+        is LayoutSchemaModel.CatalogCombinedCollection -> transformCatalogCombinedCollectionWithScopedDropdowns(
             layoutSchemaModel,
             offerModel,
-        ) { index, catalogItemModule, child ->
-            transformLayoutSchemaModel(child, offerModel, responseContextKey, index, catalogItemModule)
-        }
+            responseContextKey,
+        )
 
         is LayoutSchemaModel.CatalogResponseButton -> transformCatalogResponseButton(
             layoutSchemaModel,
@@ -467,6 +466,31 @@ class ExperienceModelMapperImpl(private val experienceResponse: String, private 
     ): BindData = dataBinding.bindValue(value, contextKey, offerModel, itemIndex)
 
     private var nextCatalogDropdownAttributeIndex = 0
+
+    private fun transformCatalogCombinedCollectionWithScopedDropdowns(
+        layoutSchemaModel: LayoutSchemaModel.CatalogCombinedCollection,
+        offerModel: OfferModel?,
+        responseContextKey: String?,
+    ): LayoutSchemaUiModel.CatalogCombinedCollectionUiModel {
+        val dropdownIndexBeforeCollection = nextCatalogDropdownAttributeIndex
+        var dropdownIndexAfterTemplate: Int? = null
+
+        val result = transformCatalogCombinedCollection(
+            layoutSchemaModel,
+            offerModel,
+        ) { index, catalogItemModule, child ->
+            nextCatalogDropdownAttributeIndex = dropdownIndexBeforeCollection
+            transformLayoutSchemaModel(child, offerModel, responseContextKey, index, catalogItemModule)
+                .also {
+                    if (dropdownIndexAfterTemplate == null) {
+                        dropdownIndexAfterTemplate = nextCatalogDropdownAttributeIndex
+                    }
+                }
+        }
+
+        nextCatalogDropdownAttributeIndex = dropdownIndexAfterTemplate ?: dropdownIndexBeforeCollection
+        return result
+    }
 
     companion object {
         private const val KEY_ID = "id"
