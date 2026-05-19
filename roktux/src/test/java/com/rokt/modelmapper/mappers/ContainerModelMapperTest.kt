@@ -181,7 +181,7 @@ class ContainerModelMapperTest {
             PlaceholderPredicate.TextValue(
                 DynamicStringPredicate(
                     condition = StringWhenCondition.Is,
-                    input = "%^UNSUPPORTED.foo|DATA.transactionData.confirmationRef|DATA.creativeCopy.title|defaultValue^%",
+                    input = " %^ UNSUPPORTED.foo | DATA.transactionData.confirmationRef | DATA.creativeCopy.title | defaultValue ^% ",
                     value = "resolved title",
                 ),
             ),
