@@ -827,6 +827,7 @@ internal class LayoutViewModel(
         private val customStates: Map<String, Int>,
         private val offerCustomStates: Map<String, Map<String, Int>>,
         private val domainStates: Map<String, Int>,
+        private val validationCoordinator: ValidationCoordinator = ValidationCoordinator(),
         private val edgeToEdgeDisplay: Boolean,
     ) : ViewModelProvider.Factory {
         @Suppress("UNCHECKED_CAST")
@@ -846,6 +847,7 @@ internal class LayoutViewModel(
                     customStates = customStates,
                     offerCustomStates = offerCustomStates,
                     domainStates = domainStates,
+                    validationCoordinator = validationCoordinator,
                     edgeToEdgeDisplay = edgeToEdgeDisplay,
                 ) as T
             }
