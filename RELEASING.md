@@ -8,17 +8,17 @@ title: UX Helper releases overview
 gitGraph
     commit
     commit tag: "4.7.0"
-    branch release/4.7.x
-    checkout release/4.7.x
+    branch workstation/4.7.x
+    checkout workstation/4.7.x
     commit tag: "4.7.1"
     checkout main
-    merge release/4.7.x
+    merge workstation/4.7.x
     commit
     commit
-    checkout release/4.7.x
+    checkout workstation/4.7.x
     commit tag: "4.7.2"
     checkout main
-    merge release/4.7.x
+    merge workstation/4.7.x
     commit
     commit tag: "4.8.0"
     commit
@@ -78,57 +78,45 @@ Hotfix / patch version e.g. releases that increase Z in the format X.Y.Z consist
 ```mermaid
 gitGraph
     commit tag: "4.7.0"
-    branch release/4.7.x
-    commit  tag: "4.7.1"
-    branch workstation/4.7.2
+    branch workstation/4.7.x
     checkout main
     commit
-    merge release/4.7.x
     commit id: "Bug fix"
-    checkout workstation/4.7.2
+    checkout workstation/4.7.x
     cherry-pick id:"Bug fix"
-    commit
-    commit
-    checkout release/4.7.x
-    merge workstation/4.7.2 tag: "4.7.2"
+    commit tag: "4.7.1"
     checkout main
     commit
     commit
-    merge release/4.7.x
 ```
 
-1. Find and create a working branch (e.g. `workstation/4.7.2`) from the tagged
-   commit you need to patch either:
-    - On the `main` branch for the first patch commit
-    - On a floating release branch with name in the format `release/4.7.x` for
-      subsequent patches
-2. On your working branch make the required changes.
-3. Create a pull request that targets the relevant release branch
-   (`release/4.7.x`).
-4. Approve and merge the pull request.
-5. Run "Release – Draft" **with the branch selector set to `release/4.7.x`**
-   (the "Use workflow from" dropdown). The draft workflow now respects the
-   dispatch branch and will:
-    - Check out, bump, and changelog against `release/4.7.x`.
-    - Open a PR targeting `release/4.7.x` (not `main`).
-6. Once merged, `Release – Publish` will run from `release/4.7.x` and:
+1. Find and create a working branch in the format `workstation/X.Y.x` (e.g.
+   `workstation/4.7.x`) from the tagged commit you need to patch.
+2. On the workstation branch, make or cherry-pick the required changes.
+3. Run "Release – Draft" **with the branch selector set to `workstation/4.7.x`**
+   (the "Use workflow from" dropdown). The draft workflow respects the dispatch
+   branch and will:
+    - Check out, bump, and changelog against `workstation/4.7.x`.
+    - Open a PR targeting `workstation/4.7.x` (not `main`).
+4. Approve and merge the resulting `release-prep/...` PR into the workstation
+   branch.
+5. Once merged, `Release – Publish` will run from `workstation/4.7.x` and:
     - Upload the build to Maven Central.
     - Create a GitHub release with the relevant build files.
     - Tag the commit with the version number (e.g. `4.7.2`).
 
 > [!NOTE]
-> `Release – Publish` is triggered by pushes to `main` and floating
-> maintenance branches matching `release/*.x` (e.g. `release/4.7.x`). Pushes
-> to `workstation/*` branches do **not** publish snapshots — workstation
-> branches must merge into a `release/*.x` branch before producing a release.
+> `Release – Publish` is triggered by pushes to `main` and `workstation/*`
+> branches only. Any other branch (e.g. `feat/...`, `chore/...`) will not
+> publish.
 >
 > Snapshot version logic:
 >
-> - On `release/*.x`, snapshots use a `patch` bump from the current `VERSION`
->   (so `release/4.7.x` at VERSION `4.7.1` produces `4.7.2-SNAPSHOT`).
+> - On `workstation/*`, snapshots use a `patch` bump from the current `VERSION`
+>   (so `workstation/4.7.x` at VERSION `4.7.1` produces `4.7.2-SNAPSHOT`).
 > - On `main`, snapshots use a `minor` bump (VERSION `4.7.1` → `4.8.0-SNAPSHOT`).
 > - If `VERSION` is already a pre-release (e.g. `1.0.0-rc1`), snapshots track
 >   the in-progress stable and emit `1.0.0-SNAPSHOT` instead of bumping further.
 >
 > The PR branch created by `Release – Draft` is named `release-prep/<version>`
-> (not `release/<version>`) so it does not collide with the publish trigger.
+> so it does not collide with workstation or release branches.

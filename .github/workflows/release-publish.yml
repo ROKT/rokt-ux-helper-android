@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - main
-      - release/*.x
+      - workstation/*
 
 permissions:
   contents: write
@@ -44,7 +44,7 @@ jobs:
         env:
           BRANCH: ${{ github.ref_name }}
         run: |
-          if [[ "$BRANCH" == release/* ]]; then
+          if [[ "$BRANCH" == workstation/* ]]; then
             echo "level=patch" >> $GITHUB_OUTPUT
           else
             echo "level=minor" >> $GITHUB_OUTPUT
