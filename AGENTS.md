@@ -9,7 +9,7 @@ Instructions for AI coding agents (Claude Code, Codex, etc.) working in this rep
 ## Repository layout
 
 - `roktux/` — main library module (the artifact published to Maven Central).
-- `core/`, `converter/`, `modelmapper/`, `networkhelper/` — supporting modules.
+- `networkhelper/` — supporting module.
 - `testutils/` — shared test utilities.
 - `demoapp/` — demo app used to validate changes locally (see `demoapp/README.md`).
 - `build-logic/` — convention plugins for Gradle builds.
