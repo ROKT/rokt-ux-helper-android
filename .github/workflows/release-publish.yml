@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+      - workstation/*
 
 permissions:
   contents: write
@@ -14,6 +15,7 @@ jobs:
     outputs:
       full_release_needed: ${{ steps.version-changed.outputs.any_changed }}
       full_release_version: ${{ steps.version-file.outputs.release-version }}
+      is_prerelease: ${{ steps.version-file.outputs.is-prerelease }}
       next_snapshot_version: ${{ steps.next-version.outputs.next-version }}
     steps:
       - name: Checkout repository
@@ -30,16 +32,45 @@ jobs:
         run: |
           version_from_file=$(head -n 1 VERSION)
           echo "release-version=$version_from_file" >> $GITHUB_OUTPUT
+          base_version="${version_from_file%%-*}"
+          echo "base-version=$base_version" >> $GITHUB_OUTPUT
+          if [[ "$version_from_file" == *"-"* ]]; then
+            echo "is-prerelease=true" >> $GITHUB_OUTPUT
+          else
+            echo "is-prerelease=false" >> $GITHUB_OUTPUT
+          fi
+      - name: Determine snapshot bump level
+        id: snapshot-level
+        env:
+          BRANCH: ${{ github.ref_name }}
+        run: |
+          if [[ "$BRANCH" == workstation/* ]]; then
+            echo "level=patch" >> $GITHUB_OUTPUT
+          else
+            echo "level=minor" >> $GITHUB_OUTPUT
+          fi
       - name: Bump version if necessary
         id: bump-semver
+        if: steps.version-file.outputs.is-prerelease == 'false'
         uses: actions-ecosystem/action-bump-semver@34e334551143a5301f38c830e44a22273c6ff5c5 # v1.0.0
         with:
-          current_version: ${{ steps.version-file.outputs.release-version }}
-          level: minor
+          current_version: ${{ steps.version-file.outputs.base-version }}
+          level: ${{ steps.snapshot-level.outputs.level }}
       - name: Determine next snapshot version
         id: next-version
+        env:
+          BASE: ${{ steps.version-file.outputs.base-version }}
+          BUMPED: ${{ steps.bump-semver.outputs.new_version }}
+          IS_PRERELEASE: ${{ steps.version-file.outputs.is-prerelease }}
         run: |
-          echo "next-version=${{ steps.bump-semver.outputs.new_version }}-SNAPSHOT" >> $GITHUB_OUTPUT
+          if [ "$IS_PRERELEASE" = "true" ]; then
+            # VERSION is a pre-release (e.g. 1.0.0-rc1) — snapshots should track
+            # the in-progress stable, so use the base (1.0.0-SNAPSHOT) rather
+            # than bumping to the next minor/patch.
+            echo "next-version=${BASE}-SNAPSHOT" >> $GITHUB_OUTPUT
+          else
+            echo "next-version=${BUMPED}-SNAPSHOT" >> $GITHUB_OUTPUT
+          fi
 
   generate-next-snapshot:
     needs: setup-and-version
@@ -161,7 +192,8 @@ jobs:
         uses: ncipollo/release-action@339a81892b84b4eeb0f6e744e4574d79d0d9b8dd # v1.21.0
         with:
           artifacts: ${{ steps.concat-files.outputs.concatenated_files }}
-          makeLatest: true
+          makeLatest: ${{ needs.setup-and-version.outputs.is_prerelease == 'true' && 'false' || 'true' }}
+          prerelease: ${{ needs.setup-and-version.outputs.is_prerelease == 'true' }}
           tag: ${{ needs.setup-and-version.outputs.full_release_version }}
           body: |
             ## Release notes:
