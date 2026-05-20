@@ -37,11 +37,16 @@ gitGraph
 
 1. Run the workflow called "Release – Draft" which will:
     - Open a PR targeting main branch
+    - Auto-generate `CHANGELOG.md` from git history (conventional commit PR titles)
 2. Once tested and approved by the relevant owners, merge the PR to main
 3. Once merged the following will occur:
     - Update changelog - unreleased section moved to correct version number
     - Release made on Github with relevant build files
     - Commit tagged with version number
+
+## CHANGELOG.md
+
+`CHANGELOG.md` is generated automatically by the `Release – Draft` workflow from the git history (conventional commit PR titles). **Do not edit `CHANGELOG.md` in feature branches** — any manual entries will be overwritten when the release PR is drafted. Write clear, conventional commit-style PR titles (e.g. `feat(catalog-dropdown): use icon font markers`) and the changelog entry will be produced for you at release time.
 
 ## Hotfix / patch version release
 
