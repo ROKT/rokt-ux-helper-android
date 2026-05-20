@@ -2,8 +2,7 @@
 androidGradlePlugin = "8.6.1"
 androidxActivity = "1.10.1"
 androidxAppCompat = "1.7.1"
-androidxComposeBom = "2024.09.02"
-androidxComposeCompiler = "1.4.7"
+androidxComposeBom = "2026.05.01"
 androidxCore = "1.16.0"
 androidxCoreSplashscreen = "1.0.1"
 androidxEspresso = "3.6.1"
@@ -14,7 +13,7 @@ androidXbrowser = "1.8.0"
 coil = "2.3.0"
 junit4 = "4.13.2"
 junitParams = "1.1.1"
-kotlin = "1.8.21"
+kotlin = "2.1.20"
 kotlinxCoroutines = "1.7.3"
 kotlinxSerializationJson = "1.6.3"         # Newer versions require kotlin 2+
 kotlinxCollectionsImmutable = "0.3.7"
@@ -49,6 +48,7 @@ androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version
 androidx-compose-bom = { group = "androidx.compose", name = "compose-bom", version.ref = "androidxComposeBom" }
 androidx-compose-foundation = { group = "androidx.compose.foundation", name = "foundation" }
 androidx-compose-foundation-layout = { group = "androidx.compose.foundation", name = "foundation-layout" }
+androidx-compose-material-icons-extended = { group = "androidx.compose.material", name = "material-icons-extended" }
 androidx-compose-material3 = { group = "androidx.compose.material3", name = "material3" }
 androidx-compose-runtime = { group = "androidx.compose.runtime", name = "runtime" }
 androidx-ui = { group = "androidx.compose.ui", name = "ui" }
@@ -116,6 +116,7 @@ mockk = ["mockk-android", "mockk-agent"]
 android-application = { id = "com.android.application", version.ref = "androidGradlePlugin" }
 android-library = { id = "com.android.library", version.ref = "androidGradlePlugin" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 kotlinKapt = { id = "org.jetbrains.kotlin.kapt", version.ref = "kotlin" }

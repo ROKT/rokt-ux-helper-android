@@ -41,9 +41,10 @@ dependencies {
 
 As `roktux` uses Jetpack Compose, consuming projects should use Compose libraries with compatible versions:
 
-| roktux          | Compose BOM |
-| --------------- | ----------- |
-| 0.1.0 - current | 2024.09.02  |
+| roktux        | Compose BOM |
+| ------------- | ----------- |
+| Unreleased    | 2026.05.01  |
+| 0.1.0 - 0.9.3 | 2024.09.02  |
 
 You can view the [BOM to library version mapping](https://developer.android.com/develop/ui/compose/bom/bom-mapping).
 

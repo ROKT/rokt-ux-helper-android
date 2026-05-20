@@ -1,6 +1,5 @@
 package com.rokt.roktux.viewmodel.layout
 
-import androidx.lifecycle.AtomicReference
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
@@ -45,6 +44,7 @@ import kotlinx.coroutines.withContext
 import java.util.Date
 import java.util.UUID
 import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.atomic.AtomicReference
 
 internal class LayoutViewModel(
     private val location: String,
