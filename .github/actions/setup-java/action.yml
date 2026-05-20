@@ -1,5 +1,5 @@
 name: Setup Java composite
-description: Sets up Java for CI. Gradle/Kotlin memory and daemon settings live in the project's gradle.properties.
+description: Sets up Java and stable Gradle defaults for CI
 runs:
   using: composite
   steps:
@@ -8,3 +8,16 @@ runs:
       with:
         java-version: 17
         distribution: temurin
+
+    - name: Configure Gradle properties
+      shell: bash
+      run: |
+        mkdir -p ~/.gradle
+        {
+          echo "org.gradle.jvmargs=-Xmx2g -XX:MaxMetaspaceSize=1g -Dfile.encoding=UTF-8"
+          echo "kotlin.daemon.jvmargs=-Xmx3g"
+          echo "org.gradle.workers.max=1"
+          echo "org.gradle.parallel=false"
+          echo "kotlin.incremental=true"
+          echo "org.gradle.daemon=false"
+        } >> ~/.gradle/gradle.properties

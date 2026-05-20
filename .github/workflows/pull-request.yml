@@ -62,6 +62,15 @@ jobs:
           cache-provider: basic
       - name: Run tests
         run: ./gradlew test
+      - name: Upload unit test reports
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: unit-test-reports
+          path: |
+            **/build/reports/tests
+            **/build/test-results
+          retention-days: 7
       - name: Generate coverage
         run: ./gradlew koverXmlReport
       - name: Upload Test Report
