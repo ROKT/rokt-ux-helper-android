@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+      - workstation**
 
 permissions:
   contents: write
@@ -65,7 +66,9 @@ jobs:
 
   build-full-release:
     needs: setup-and-version
-    if: needs.setup-and-version.outputs.full_release_needed == 'true'
+    if: >
+      github.ref_name == 'main' &&
+      needs.setup-and-version.outputs.full_release_needed == 'true'
     runs-on: ubuntu-latest
     env:
       ORG_GRADLE_PROJECT_signingInMemoryKey: ${{ secrets.MAVEN_SIGNING_KEY }}
