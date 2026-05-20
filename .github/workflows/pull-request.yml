@@ -70,6 +70,7 @@ jobs:
           path: |
             **/build/reports/tests
             **/build/test-results
+            **/build/outputs/roborazzi
           retention-days: 7
       - name: Generate coverage
         run: ./gradlew koverXmlReport
