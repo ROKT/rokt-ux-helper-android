@@ -35,7 +35,7 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.semantics.clearAndSetSemantics
-import androidx.compose.ui.semantics.invisibleToUser
+import androidx.compose.ui.semantics.hideFromAccessibility
 import androidx.compose.ui.semantics.semantics
 import coil.ImageLoader
 import coil.request.ImageRequest
@@ -219,7 +219,7 @@ internal class DataImageCarouselComponent(
                                 .then(selfAlignment)
                                 .semantics(mergeDescendants = true) {}
                                 .clearAndSetSemantics {
-                                    invisibleToUser()
+                                    hideFromAccessibility()
                                 },
                             horizontalArrangement = wrapperContainer.horizontalArrangement,
                             verticalAlignment = BiasAlignment.Vertical(

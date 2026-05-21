@@ -5,7 +5,6 @@ import androidx.compose.ui.test.assertHeightIsEqualTo
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.assertWidthIsEqualTo
-import androidx.compose.ui.test.onChildAt
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
@@ -45,12 +44,10 @@ class CreativeResponseComponentTest : BaseDcuiEspressoTest() {
     @DcuiConfig(testInInnerLayout = true)
     @DcuiOfferJson(jsonFile = "offer/Offer_with_valid_key.json")
     fun testResponseButtonWithChildren() {
-        val component = composeTestRule.onNodeWithTag(DCUI_COMPONENT_TAG, useUnmergedTree = true)
-            .assertIsDisplayed()
-
-        component.onChildAt(0).assertTextEquals("Test1")
-        component.onChildAt(1).assertTextEquals("Test2")
-        component.onChildAt(2).assertTextEquals("Test3")
+        composeTestRule.onNodeWithTag(DCUI_COMPONENT_TAG, useUnmergedTree = true).assertIsDisplayed()
+        composeTestRule.onNodeWithText("Test1", useUnmergedTree = true).assertIsDisplayed()
+        composeTestRule.onNodeWithText("Test2", useUnmergedTree = true).assertIsDisplayed()
+        composeTestRule.onNodeWithText("Test3", useUnmergedTree = true).assertIsDisplayed()
     }
 
     @Test

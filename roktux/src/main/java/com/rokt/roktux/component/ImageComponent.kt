@@ -9,7 +9,7 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.semantics.invisibleToUser
+import androidx.compose.ui.semantics.hideFromAccessibility
 import androidx.compose.ui.semantics.semantics
 import coil.ImageLoader
 import coil.compose.AsyncImage
@@ -53,7 +53,7 @@ internal class ImageComponent(private val modifierFactory: ModifierFactory) :
                         )
                         .semantics {
                             if (model.alt.isNullOrBlank()) {
-                                invisibleToUser()
+                                hideFromAccessibility()
                             }
                         },
                 ),

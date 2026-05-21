@@ -1,21 +1,21 @@
 package com.rokt.core.testutils.rule
 
-import android.graphics.Bitmap
-import android.os.Build
-import androidx.compose.ui.graphics.asAndroidBitmap
-import androidx.compose.ui.test.captureToImage
 import androidx.compose.ui.test.junit4.ComposeContentTestRule
 import androidx.compose.ui.test.onRoot
-import androidx.test.platform.app.InstrumentationRegistry
+import com.github.takahirom.roborazzi.captureRoboImage
 import org.junit.rules.TestWatcher
 import org.junit.runner.Description
-import java.io.FileOutputStream
 
 /**
- * Test rule to capture the screenshot of a Compose test.
- * The screenshot of the root node will be captured and saved in the device files directory.
- * Screenshot of failed test will be captured by default.
- * Enable `@ScreenshotConfig(captureOnSuccess = true)` annotation in order to capture screenshot of success as well
+ * Test rule to capture the screenshot of a Compose test on failure (and on success when
+ * `@ScreenshotConfig(captureOnSuccess = true)` is set).
+ *
+ * Uses Roborazzi's `captureRoboImage` rather than Compose's `captureToImage` because the latter
+ * requires a real Android `Window` / `Surface` (PixelCopy + forceRedraw) and times out after 2s
+ * under Robolectric, masking the underlying test failure with a noisy `ComposeTimeoutException`.
+ *
+ * Images are written to the module's `build/outputs/roborazzi/` directory so they are picked up
+ * by the existing roborazzi artifact upload in CI.
  */
 class TestScreenshotCaptureRule(private val composeTestRule: ComposeContentTestRule) : TestWatcher() {
 
@@ -30,17 +30,16 @@ class TestScreenshotCaptureRule(private val composeTestRule: ComposeContentTestR
     }
 
     private fun captureScreenshot(description: Description?) {
-        val fileName = description?.let { "${it.className}.${it.methodName}" } ?: System.currentTimeMillis().toString()
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val currentUiStateImage = composeTestRule.onRoot().captureToImage().asAndroidBitmap()
-            currentUiStateImage.save(fileName)
+        val fileName = description?.let { "${it.className}.${it.methodName}" }
+            ?: System.currentTimeMillis().toString()
+        runCatching {
+            composeTestRule.onRoot().captureRoboImage(filePath = "build/outputs/roborazzi/$fileName.png")
+        }.onFailure { error ->
+            // Don't let capture failures shadow the test's real assertion error. Robolectric in
+            // LEGACY graphics mode can still struggle to render certain trees; log and move on.
+            println(
+                "TestScreenshotCaptureRule: failed to capture $fileName (${error.javaClass.simpleName}: ${error.message})",
+            )
         }
-    }
-}
-
-private fun Bitmap.save(file: String) {
-    val path = InstrumentationRegistry.getInstrumentation().targetContext.filesDir.canonicalPath
-    FileOutputStream("$path/$file.png").use { out ->
-        compress(Bitmap.CompressFormat.PNG, 100, out)
     }
 }
