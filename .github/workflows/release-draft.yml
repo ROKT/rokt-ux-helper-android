@@ -4,13 +4,24 @@ on:
   workflow_dispatch: # checkov:skip=CKV_GHA_7
     inputs:
       bump-type:
-        description: Specify if the version should be bumped as patch, minor, or major
+        description: |
+          How to bump the base version (X.Y.Z). Use `none` to keep the base unchanged
+          and only re-qualify an existing pre-release (e.g. rc1 -> rc2).
         required: true
         type: choice
         options:
           - patch
           - minor
           - major
+          - none
+      qualifier:
+        description: |
+          Optional pre-release qualifier to append, without the leading hyphen
+          (e.g. `rc1`, `alpha2`, `beta`). Leave blank for a stable release.
+          Allowed characters: alphanumerics, dot, hyphen.
+        required: false
+        type: string
+        default: ""
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -34,7 +45,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
-          ref: main
+          ref: ${{ github.ref_name }}
           fetch-depth: 0
       - name: Setup JDK
         uses: ./.github/actions/setup-java
@@ -43,30 +54,67 @@ jobs:
         with:
           cache-provider: basic
 
+      - name: Validate qualifier input
+        env:
+          QUALIFIER: ${{ github.event.inputs.qualifier }}
+        run: |
+          if [ -n "$QUALIFIER" ] && ! [[ "$QUALIFIER" =~ ^[A-Za-z0-9][A-Za-z0-9.-]*$ ]]; then
+            echo "::error::qualifier '$QUALIFIER' is invalid. It must start with an alphanumeric character and may only contain alphanumerics, dot, and hyphen."
+            exit 1
+          fi
+
       - name: Get current version
         id: version-file
         run: |
           version_from_file=$(head -n 1 VERSION)
           echo "release-version=$version_from_file" >> $GITHUB_OUTPUT
+          base_version="${version_from_file%%-*}"
+          echo "base-version=$base_version" >> $GITHUB_OUTPUT
 
-      - name: Bump version
+      - name: Bump base version
         id: bump-version
+        if: ${{ github.event.inputs.bump-type != 'none' }}
         uses: actions-ecosystem/action-bump-semver@34e334551143a5301f38c830e44a22273c6ff5c5 # v1.0.0
         with:
-          current_version: ${{ steps.version-file.outputs.release-version }}
-          level: ${{ github.event.inputs.bump-type || 'patch' }}
+          current_version: ${{ steps.version-file.outputs.base-version }}
+          level: ${{ github.event.inputs.bump-type }}
+
+      - name: Compose new version
+        id: compose-version
+        env:
+          CURRENT: ${{ steps.version-file.outputs.release-version }}
+          BUMPED: ${{ steps.bump-version.outputs.new_version }}
+          BASE: ${{ steps.version-file.outputs.base-version }}
+          BUMP_TYPE: ${{ github.event.inputs.bump-type }}
+          QUALIFIER: ${{ github.event.inputs.qualifier }}
+        run: |
+          if [ "$BUMP_TYPE" = "none" ]; then
+            new_base="$BASE"
+          else
+            new_base="$BUMPED"
+          fi
+          if [ -n "$QUALIFIER" ]; then
+            new_version="${new_base}-${QUALIFIER}"
+          else
+            new_version="$new_base"
+          fi
+          if [ "$new_version" = "$CURRENT" ]; then
+            echo "::error::Computed version '$new_version' is identical to the current VERSION. Pick a different bump-type or qualifier."
+            exit 1
+          fi
+          echo "new-version=$new_version" >> $GITHUB_OUTPUT
 
       - name: Save updated version to file
         run: |
-          echo "${{ steps.bump-version.outputs.new_version }}" > VERSION
+          echo "${{ steps.compose-version.outputs.new-version }}" > VERSION
 
       - name: Generate changelog from git history
         id: changelog
         uses: ROKT/rokt-workflows/actions/generate-changelog@1859338d7c2c2b873233505c751acbf09fb218d5 # main
         with:
-          version: ${{ steps.bump-version.outputs.new_version }}
+          version: ${{ steps.compose-version.outputs.new-version }}
       - name: Publish to Maven local
-        run: ./gradlew publishMavenPublicationToMavenLocal -PVERSION=${{ steps.bump-version.outputs.new_version }}
+        run: ./gradlew publishMavenPublicationToMavenLocal -PVERSION=${{ steps.compose-version.outputs.new-version }}
       - name: Upload AAR artifacts
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
@@ -86,13 +134,13 @@ jobs:
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@5f6978faf089d4d20b00c7766989d076bb2fc7f1 # v8.1.1
         with:
-          commit-message: Create ${{ steps.bump-version.outputs.new_version }}
-          branch: release/${{ steps.bump-version.outputs.new_version }}
-          title: Prepare release ${{ steps.bump-version.outputs.new_version }}
-          base: main
+          commit-message: Create ${{ steps.compose-version.outputs.new-version }}
+          branch: release-prep/${{ steps.compose-version.outputs.new-version }}
+          title: Prepare release ${{ steps.compose-version.outputs.new-version }}
+          base: ${{ github.ref_name }}
           token: ${{ steps.generate-token.outputs.token }}
           body: |
-            Preparing for release ${{ steps.bump-version.outputs.new_version }}
-            - Bumped version
+            Preparing for release ${{ steps.compose-version.outputs.new-version }} from `${{ github.ref_name }}`.
+            - Bumped version (`${{ github.event.inputs.bump-type }}`${{ github.event.inputs.qualifier && format(' + qualifier `{0}`', github.event.inputs.qualifier) || '' }})
             - Updated changelog
-            - Generated release build ${{ steps.bump-version.outputs.new_version }}
+            - Generated release build ${{ steps.compose-version.outputs.new-version }}
