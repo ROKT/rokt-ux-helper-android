@@ -5,6 +5,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.junit4.ComposeContentTestRule
+import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import com.rokt.core.testutils.BaseComponentRule
 import com.rokt.core.testutils.annotations.DcuiBreakpoint
@@ -14,6 +15,8 @@ import com.rokt.core.testutils.annotations.WindowSize
 import com.rokt.modelmapper.data.DataBindingImpl
 import com.rokt.modelmapper.mappers.ExperienceModelMapperImpl
 import com.rokt.modelmapper.uimodel.LayoutSchemaUiModel
+import com.rokt.modelmapper.utils.ROKT_ICONS_FONT_FAMILY
+import com.rokt.roktux.R
 import com.rokt.roktux.component.LayoutUiModelFactory
 import com.rokt.roktux.di.layout.LayoutComponent
 import com.rokt.roktux.di.layout.LocalFontFamilyProvider
@@ -27,7 +30,10 @@ import kotlinx.collections.immutable.persistentMapOf
 import kotlinx.collections.immutable.toImmutableMap
 import kotlinx.coroutines.Dispatchers
 
-class DcuiComponentRule(val composeTestRule: ComposeContentTestRule) : BaseComponentRule(composeTestRule, true) {
+class DcuiComponentRule(
+    val composeTestRule: ComposeContentTestRule,
+    private val extraFontMap: ImmutableMap<String, FontFamily> = persistentMapOf(),
+) : BaseComponentRule(composeTestRule, true) {
 
     lateinit var uiModel: LayoutSchemaUiModel
 
@@ -73,7 +79,16 @@ class DcuiComponentRule(val composeTestRule: ComposeContentTestRule) : BaseCompo
                     mainDispatcher = Dispatchers.Main,
                     ioDispatcher = Dispatchers.IO,
                 ),
-                LocalFontFamilyProvider provides persistentMapOf("roboto" to FontFamily.Default),
+                LocalFontFamilyProvider provides (
+                    persistentMapOf(
+                        "roboto" to FontFamily.Default,
+                        // Mirror what `RoktLayout` provides in production so StaticIcon /
+                        // DataIcon components render real glyphs from rokt_icons.otf rather
+                        // than falling back to FontFamily.Default (which renders the icon
+                        // name as plain text).
+                        ROKT_ICONS_FONT_FAMILY to FontFamily(Font(resId = R.font.rokt_icons)),
+                    ) + extraFontMap
+                    ).toImmutableMap(),
             ) {
                 factory.CreateComposable(
                     model = uiModel,

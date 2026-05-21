@@ -1,7 +1,6 @@
 package com.rokt.roktux.snapshot
 
 import android.graphics.drawable.ColorDrawable
-import androidx.compose.ui.test.junit4.createComposeRule
 import coil.ImageLoader
 import coil.annotation.ExperimentalCoilApi
 import coil.test.FakeImageLoaderEngine
@@ -9,16 +8,13 @@ import com.rokt.core.testutils.TestJsonLoader
 import com.rokt.roktux.RoktLayout
 import com.rokt.roktux.RoktUxConfig
 import com.rokt.roktux.imagehandler.ImageLoaderStrategy
+import com.rokt.roktux.testutil.BaseDcuiEspressoTest
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
-import org.junit.Rule
 import org.robolectric.RuntimeEnvironment
 
-abstract class RoktLayoutSnapshotTest {
+abstract class RoktLayoutSnapshotTest : BaseDcuiEspressoTest() {
 
     protected val testDispatcher = UnconfinedTestDispatcher()
-
-    @get:Rule
-    val composeTestRule = createComposeRule()
 
     @OptIn(ExperimentalCoilApi::class)
     protected fun renderLayout(fileName: String) {
