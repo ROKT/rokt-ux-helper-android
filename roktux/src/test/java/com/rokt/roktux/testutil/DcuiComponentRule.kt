@@ -30,7 +30,10 @@ import kotlinx.collections.immutable.persistentMapOf
 import kotlinx.collections.immutable.toImmutableMap
 import kotlinx.coroutines.Dispatchers
 
-class DcuiComponentRule(val composeTestRule: ComposeContentTestRule) : BaseComponentRule(composeTestRule, true) {
+class DcuiComponentRule(
+    val composeTestRule: ComposeContentTestRule,
+    private val extraFontMap: ImmutableMap<String, FontFamily> = persistentMapOf(),
+) : BaseComponentRule(composeTestRule, true) {
 
     lateinit var uiModel: LayoutSchemaUiModel
 
@@ -76,14 +79,16 @@ class DcuiComponentRule(val composeTestRule: ComposeContentTestRule) : BaseCompo
                     mainDispatcher = Dispatchers.Main,
                     ioDispatcher = Dispatchers.IO,
                 ),
-                LocalFontFamilyProvider provides persistentMapOf(
-                    "roboto" to FontFamily.Default,
-                    // Mirror what `RoktLayout` provides in production so StaticIcon /
-                    // DataIcon components render real glyphs from rokt_icons.otf rather
-                    // than falling back to FontFamily.Default (which renders the icon
-                    // name as plain text).
-                    ROKT_ICONS_FONT_FAMILY to FontFamily(Font(resId = R.font.rokt_icons)),
-                ),
+                LocalFontFamilyProvider provides (
+                    persistentMapOf(
+                        "roboto" to FontFamily.Default,
+                        // Mirror what `RoktLayout` provides in production so StaticIcon /
+                        // DataIcon components render real glyphs from rokt_icons.otf rather
+                        // than falling back to FontFamily.Default (which renders the icon
+                        // name as plain text).
+                        ROKT_ICONS_FONT_FAMILY to FontFamily(Font(resId = R.font.rokt_icons)),
+                    ) + extraFontMap
+                    ).toImmutableMap(),
             ) {
                 factory.CreateComposable(
                     model = uiModel,
