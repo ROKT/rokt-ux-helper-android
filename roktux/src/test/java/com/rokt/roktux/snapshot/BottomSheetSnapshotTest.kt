@@ -5,7 +5,7 @@ import com.github.takahirom.roborazzi.ExperimentalRoborazziApi
 import com.github.takahirom.roborazzi.captureScreenRoboImage
 import com.rokt.core.testutils.annotations.DcuiConfig
 import com.rokt.core.testutils.annotations.DcuiNodeJson
-import com.rokt.roktux.testutil.BaseDcuiEspressoTest
+import kotlinx.coroutines.test.runTest
 import org.junit.Test
 import org.junit.experimental.categories.Category
 import org.junit.runner.RunWith
@@ -13,20 +13,39 @@ import org.robolectric.annotation.Config
 import org.robolectric.annotation.GraphicsMode
 
 /**
- * Visual regression coverage for the BottomSheet component which wraps
- * Material3's ModalBottomSheet. This is a critical surface for Compose
- * BOM upgrades because Material3 sheet APIs (state, drag handle,
- * scrim, sheet shape) frequently change between releases.
+ * Visual regression coverage for the BottomSheet component, plus full RoktLayout
+ * fixtures for the bottom sheet placements used by partner experiences.
  *
- * Uses captureScreenRoboImage() because the bottom sheet renders in a
- * separate window/popup that is not part of the compose root.
+ * Uses captureScreenRoboImage() because the bottom sheet renders in a separate
+ * window/popup that is not part of the compose root.
  */
 @RunWith(AndroidJUnit4::class)
 @Category(SnapshotTest::class)
 @GraphicsMode(GraphicsMode.Mode.NATIVE)
-@Config(sdk = [33], qualifiers = "xxhdpi")
+@Config(
+    sdk = [33],
+    qualifiers = "xxhdpi",
+)
 @OptIn(ExperimentalRoborazziApi::class)
-class BottomSheetSnapshotTest : BaseDcuiEspressoTest() {
+class BottomSheetSnapshotTest : RoktLayoutSnapshotTest() {
+
+    @Test
+    fun testBottomSheetOneByOne() = runTest(testDispatcher) {
+        renderLayout("BottomSheetOneByOne.json")
+        capture()
+    }
+
+    @Test
+    fun testBottomSheetModern() = runTest(testDispatcher) {
+        renderLayout("BottomSheetModern.json")
+        capture()
+    }
+
+    @Test
+    fun testBottomSheetCarousel() = runTest(testDispatcher) {
+        renderLayout("BottomSheetCarousel.json")
+        capture()
+    }
 
     @Test
     @DcuiNodeJson(jsonString = BOTTOM_SHEET_DEFAULT)
@@ -46,9 +65,8 @@ class BottomSheetSnapshotTest : BaseDcuiEspressoTest() {
     fun testBottomSheetDarkMode() = capture()
 
     private fun capture() {
-        // ModalBottomSheet's appear animation must settle before capture.
         composeTestRule.waitForIdle()
-        captureScreenRoboImage()
+        captureScreenRoboImage(roborazziOptions = snapshotRoborazziOptions)
     }
 
     private companion object {

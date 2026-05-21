@@ -1,0 +1,581 @@
+{
+  "sessionId": "",
+  "pageContext": {
+    "pageInstanceGuid": "",
+    "pageId": "",
+    "language": "en",
+    "isPageDetected": true,
+    "pageVariantName": "",
+    "token": ""
+  },
+  "plugins": [
+    {
+      "plugin": {
+        "id": "embedded-compact",
+        "name": "Embedded Compact",
+        "targetElementSelector": "Location1",
+        "config": {
+          "slots": [
+            {
+              "instanceGuid": "embedded-compact-slot-1",
+              "layoutVariant": {
+                "layoutVariantId": "embedded-compact-layout-1",
+                "moduleName": "standard-marketing",
+                "layoutVariantSchema": "{\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"container\":{\"gap\":8},\"dimension\":{\"width\":{\"type\":\"fit\",\"value\":\"fit-width\"},\"height\":{\"type\":\"fit\",\"value\":\"wrap-content\"}}}}]}},\"children\":[{\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"container\":{\"gap\":8},\"dimension\":{\"width\":{\"type\":\"fit\",\"value\":\"fit-width\"},\"height\":{\"type\":\"fit\",\"value\":\"wrap-content\"}}}}]}},\"children\":[{\"node\":{\"children\":[{\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"border\":{\"borderColor\":null,\"borderStyle\":null,\"borderWidth\":null,\"borderRadius\":null},\"spacing\":{\"margin\":null,\"padding\":null},\"dimension\":{\"width\":{\"type\":\"fixed\",\"value\":40},\"height\":{\"type\":\"fixed\",\"value\":21}},\"flexChild\":{\"alignSelf\":\"center\"}}}]}},\"imageKey\":\"creativeImage\"},\"type\":\"DataImage\"}],\"predicates\":[{\"type\":\"StaticString\",\"predicate\":{\"input\":\"left\",\"value\":\"left\",\"condition\":\"is\"}}]},\"type\":\"When\"},{\"node\":{\"value\":\"%^DATA.creativeCopy.creative.headline.standalone|DATA.creativeCopy.creative.title|^%\",\"styles\":{\"elements\":{\"own\":[{\"default\":{\"text\":{\"fontSize\":14,\"fontStyle\":null,\"textColor\":{\"light\":\"#262626\",\"dark\":null},\"fontFamily\":null,\"fontWeight\":\"500\",\"lineHeight\":20,\"textDecoration\":null,\"horizontalTextAlign\":\"left\"},\"spacing\":{\"margin\":\"0 0 0 0\",\"padding\":\"0 0 0 0\"},\"dimension\":{\"width\":{\"type\":\"fit\",\"value\":\"fit-width\"},\"height\":{\"type\":\"fit\",\"value\":\"wrap-content\"}},\"flexChild\":{\"weight\":1}}}]}}},\"type\":\"RichText\"},{\"node\":{\"children\":[{\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"border\":{\"borderColor\":null,\"borderStyle\":null,\"borderWidth\":null,\"borderRadius\":null},\"spacing\":{\"margin\":null,\"padding\":null},\"dimension\":{\"width\":{\"type\":\"fixed\",\"value\":40},\"height\":{\"type\":\"fixed\",\"value\":21}},\"flexChild\":{\"alignSelf\":\"center\"}}}]}},\"imageKey\":\"creativeImage\"},\"type\":\"DataImage\"}],\"predicates\":[{\"type\":\"StaticString\",\"predicate\":{\"input\":\"left\",\"value\":\"right\",\"condition\":\"is\"}}]},\"type\":\"When\"}]},\"type\":\"Row\"},{\"node\":{\"value\":\"%^DATA.creativeCopy.creative.confirmation.message|^% %^DATA.creativeCopy.creative.disclaimer|^% %^DATA.creativeLink.termsAndConditions|^% %^DATA.creativeLink.privacyPolicy|^%\",\"styles\":{\"elements\":{\"own\":[{\"default\":{\"text\":{\"fontSize\":12,\"fontStyle\":null,\"textColor\":{\"light\":\"#757575\",\"dark\":null},\"fontFamily\":null,\"fontWeight\":null,\"lineHeight\":12,\"textDecoration\":null,\"horizontalTextAlign\":\"left\"},\"spacing\":{\"margin\":\"0 0 0 0\",\"padding\":\"0 0 0 0\"}}}],\"link\":[{\"default\":{\"text\":{\"fontSize\":null,\"fontStyle\":null,\"textColor\":{\"light\":\"#757575\",\"dark\":null},\"fontFamily\":null,\"fontWeight\":null,\"textDecoration\":\"underline\"}},\"hovered\":{\"text\":{\"textColor\":null,\"textDecoration\":null}}}]}}},\"type\":\"RichText\"},{\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"border\":{\"borderColor\":{\"light\":\"#222222\",\"dark\":null},\"borderStyle\":\"solid\",\"borderWidth\":\"1\",\"borderRadius\":4},\"spacing\":{\"margin\":null,\"padding\":\"8 16\"},\"container\":{\"shadow\":{\"offsetX\":0,\"offsetY\":0,\"blurRadius\":0,\"spreadRadius\":0,\"color\":{\"light\":\"#00000000\",\"dark\":null}}},\"dimension\":{\"width\":{\"type\":\"fit\",\"value\":\"fit-width\"},\"minHeight\":32},\"background\":{\"backgroundColor\":{\"light\":\"#222222\",\"dark\":null}}},\"hovered\":{\"border\":{\"borderColor\":{\"light\":\"#222222\",\"dark\":null}},\"container\":{\"shadow\":{\"offsetX\":0,\"offsetY\":0,\"blurRadius\":0,\"spreadRadius\":0,\"color\":{\"light\":\"#00000000\",\"dark\":null}}},\"background\":{\"backgroundColor\":{\"light\":\"#222222\",\"dark\":null}}}}]}},\"children\":[{\"node\":{\"value\":\"%^DATA.creativeResponse.longLabel^%\",\"styles\":{\"elements\":{\"own\":[{\"default\":{\"text\":{\"fontSize\":14,\"fontStyle\":\"normal\",\"textColor\":{\"light\":\"#FFFFFF\",\"dark\":null},\"fontFamily\":null,\"fontWeight\":null,\"lineHeight\":null,\"textTransform\":\"none\",\"textDecoration\":\"none\",\"horizontalTextAlign\":\"center\"},\"dimension\":{\"width\":{\"type\":\"fit\",\"value\":\"fit-width\"}}},\"hovered\":{\"text\":{\"fontStyle\":\"normal\",\"textColor\":{\"light\":\"#FFFFFF\",\"dark\":null},\"fontWeight\":null,\"textDecoration\":\"none\"}}}]}}},\"type\":\"BasicText\"}],\"responseKey\":\"positive\"},\"type\":\"CreativeResponse\"}]},\"type\":\"Column\"}",
+                "childLayouts": []
+              },
+              "offer": {
+                "campaignId": "embedded-compact-campaign-1",
+                "creativeId": "embedded-compact-creative-1",
+                "maxTotalItemsQtyInOffer": 0,
+                "creative": {
+                  "referralCreativeId": "embedded-compact-referral-creative-1",
+                  "instanceGuid": "embedded-compact-creative-guid-1",
+                  "copy": {
+                    "creative.disclaimer": "Statement credit will be received 8-12 weeks after a qualifying purchase with card. test",
+                    "creative.title": "Earn 20K sample points with Example Rewards on hotels and rental cars booked through Example Travel.",
+                    "creative.copy": "Statement credit will be received 8-12 weeks after a qualifying purchase with card. test",
+                    "creative.callout": "Example Travel",
+                    "creative.headline.standalone": "Earn 20K sample points with Example Rewards on hotels and rental cars booked through Example Travel.",
+                    "creative.privacyPolicy.close.copy": "Close",
+                    "creative.privacyPolicy.title": "Privacy Policy",
+                    "creative.tag": "Sample Category",
+                    "creative.success.title": "Success",
+                    "creative.success.copy": "We have sent a confirmation to your email.",
+                    "creative.image.src": "https://example.com/images/embedded-compact-offer-1.png",
+                    "creative.termsAndConditions.close.copy": "Close",
+                    "creative.termsAndConditions.title": "Terms & Conditions",
+                    "creative.privacyPolicy.link": "https://example.com/legal/embedded-compact/privacy-policy-1",
+                    "creative.termsAndConditions.link": "https://example.com/legal/embedded-compact/terms-1",
+                    "creative.brandName": "Sample Brand",
+                    "creative.socialProof.number": "1000"
+                  },
+                  "responseOptionsMap": {
+                    "positive": {
+                      "id": "embedded-compact-positive-response-1",
+                      "action": "CaptureOnly",
+                      "instanceGuid": "embedded-compact-positive-response-guid-1",
+                      "signalType": "SignalResponse",
+                      "shortLabel": "Yes Please",
+                      "longLabel": "Yes Please",
+                      "shortSuccessLabel": "Subscribed",
+                      "isPositive": true,
+                      "url": "",
+                      "ignoreBranch": false,
+                      "urlBehavior": "newTab",
+                      "token": "token",
+                      "rclid": "embedded-compact-test-rclid-1",
+                      "conversionType": "Default"
+                    },
+                    "negative": {
+                      "id": "embedded-compact-negative-response-1",
+                      "action": "CaptureOnly",
+                      "instanceGuid": "embedded-compact-negative-response-guid-1",
+                      "signalType": "SignalResponse",
+                      "shortLabel": "No Thanks",
+                      "longLabel": "No Thanks",
+                      "shortSuccessLabel": "",
+                      "isPositive": false,
+                      "url": "",
+                      "ignoreBranch": false,
+                      "urlBehavior": "newTab",
+                      "token": "token",
+                      "conversionType": "Default"
+                    }
+                  },
+                  "links": {
+                    "privacyPolicy": {
+                      "url": "https://example.com/legal/embedded-compact/privacy-policy-1",
+                      "title": "Privacy Policy"
+                    },
+                    "termsAndConditions": {
+                      "url": "https://example.com/legal/embedded-compact/terms-1",
+                      "title": "Terms & Conditions"
+                    }
+                  },
+                  "images": {
+                    "creativeImage": {
+                      "light": "https://example.com/images/embedded-compact-offer-1.png",
+                      "dark": "",
+                      "alt": "Sample embedded offer 1 image",
+                      "title": "Sample embedded offer 1"
+                    },
+                    "creativeImage.transparent": {
+                      "light": "https://example.com/images/embedded-compact-offer-1.png",
+                      "dark": "",
+                      "alt": "Sample embedded offer 1 image",
+                      "title": "Sample embedded offer 1"
+                    },
+                    "creativeImage.1_91to1": {
+                      "light": "https://example.com/images/embedded-compact-offer-1.png",
+                      "dark": "",
+                      "alt": "Sample embedded offer 1 image",
+                      "title": "Sample embedded offer 1"
+                    },
+                    "creativeImage.1_91to1.transparent": {
+                      "light": "https://example.com/images/embedded-compact-offer-1.png",
+                      "dark": "",
+                      "alt": "Sample embedded offer 1 image",
+                      "title": "Sample embedded offer 1"
+                    },
+                    "creativeImage.logo": {
+                      "light": "https://example.com/images/embedded-compact-offer-1.png",
+                      "dark": "",
+                      "alt": "Sample embedded offer 1 image",
+                      "title": "Sample embedded offer 1"
+                    },
+                    "creativeImage.logo.transparent": {
+                      "light": "https://example.com/images/embedded-compact-offer-1.png",
+                      "dark": "",
+                      "alt": "Sample embedded offer 1 image",
+                      "title": "Sample embedded offer 1"
+                    },
+                    "creativeImage.logo.1_91to1": {
+                      "light": "https://example.com/images/embedded-compact-offer-1.png",
+                      "dark": "",
+                      "alt": "Sample embedded offer 1 image",
+                      "title": "Sample embedded offer 1"
+                    },
+                    "creativeImage.logo.1_91to1.transparent": {
+                      "light": "https://example.com/images/embedded-compact-offer-1.png",
+                      "dark": "",
+                      "alt": "Sample embedded offer 1 image",
+                      "title": "Sample embedded offer 1"
+                    }
+                  },
+                  "icons": {},
+                  "token": "token",
+                  "advertiser": {
+                    "name": "Sample Advertiser 1",
+                    "brand": "Sample Brand"
+                  }
+                }
+              },
+              "token": "token"
+            },
+            {
+              "instanceGuid": "embedded-compact-slot-2",
+              "layoutVariant": {
+                "layoutVariantId": "embedded-compact-layout-2",
+                "moduleName": "standard-marketing",
+                "layoutVariantSchema": "{\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"container\":{\"gap\":8},\"dimension\":{\"width\":{\"type\":\"fit\",\"value\":\"fit-width\"},\"height\":{\"type\":\"fit\",\"value\":\"wrap-content\"}}}}]}},\"children\":[{\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"container\":{\"gap\":8},\"dimension\":{\"width\":{\"type\":\"fit\",\"value\":\"fit-width\"},\"height\":{\"type\":\"fit\",\"value\":\"wrap-content\"}}}}]}},\"children\":[{\"node\":{\"children\":[{\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"border\":{\"borderColor\":null,\"borderStyle\":null,\"borderWidth\":null,\"borderRadius\":null},\"spacing\":{\"margin\":null,\"padding\":null},\"dimension\":{\"width\":{\"type\":\"fixed\",\"value\":40},\"height\":{\"type\":\"fixed\",\"value\":21}},\"flexChild\":{\"alignSelf\":\"center\"}}}]}},\"imageKey\":\"creativeImage\"},\"type\":\"DataImage\"}],\"predicates\":[{\"type\":\"StaticString\",\"predicate\":{\"input\":\"left\",\"value\":\"left\",\"condition\":\"is\"}}]},\"type\":\"When\"},{\"node\":{\"value\":\"%^DATA.creativeCopy.creative.headline.standalone|DATA.creativeCopy.creative.title|^%\",\"styles\":{\"elements\":{\"own\":[{\"default\":{\"text\":{\"fontSize\":14,\"fontStyle\":null,\"textColor\":{\"light\":\"#262626\",\"dark\":null},\"fontFamily\":null,\"fontWeight\":\"500\",\"lineHeight\":20,\"textDecoration\":null,\"horizontalTextAlign\":\"left\"},\"spacing\":{\"margin\":\"0 0 0 0\",\"padding\":\"0 0 0 0\"},\"dimension\":{\"width\":{\"type\":\"fit\",\"value\":\"fit-width\"},\"height\":{\"type\":\"fit\",\"value\":\"wrap-content\"}},\"flexChild\":{\"weight\":1}}}]}}},\"type\":\"RichText\"},{\"node\":{\"children\":[{\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"border\":{\"borderColor\":null,\"borderStyle\":null,\"borderWidth\":null,\"borderRadius\":null},\"spacing\":{\"margin\":null,\"padding\":null},\"dimension\":{\"width\":{\"type\":\"fixed\",\"value\":40},\"height\":{\"type\":\"fixed\",\"value\":21}},\"flexChild\":{\"alignSelf\":\"center\"}}}]}},\"imageKey\":\"creativeImage\"},\"type\":\"DataImage\"}],\"predicates\":[{\"type\":\"StaticString\",\"predicate\":{\"input\":\"left\",\"value\":\"right\",\"condition\":\"is\"}}]},\"type\":\"When\"}]},\"type\":\"Row\"},{\"node\":{\"value\":\"%^DATA.creativeCopy.creative.confirmation.message|^% %^DATA.creativeCopy.creative.disclaimer|^% %^DATA.creativeLink.termsAndConditions|^% %^DATA.creativeLink.privacyPolicy|^%\",\"styles\":{\"elements\":{\"own\":[{\"default\":{\"text\":{\"fontSize\":12,\"fontStyle\":null,\"textColor\":{\"light\":\"#757575\",\"dark\":null},\"fontFamily\":null,\"fontWeight\":null,\"lineHeight\":12,\"textDecoration\":null,\"horizontalTextAlign\":\"left\"},\"spacing\":{\"margin\":\"0 0 0 0\",\"padding\":\"0 0 0 0\"}}}],\"link\":[{\"default\":{\"text\":{\"fontSize\":null,\"fontStyle\":null,\"textColor\":{\"light\":\"#757575\",\"dark\":null},\"fontFamily\":null,\"fontWeight\":null,\"textDecoration\":\"underline\"}},\"hovered\":{\"text\":{\"textColor\":null,\"textDecoration\":null}}}]}}},\"type\":\"RichText\"},{\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"border\":{\"borderColor\":{\"light\":\"#222222\",\"dark\":null},\"borderStyle\":\"solid\",\"borderWidth\":\"1\",\"borderRadius\":4},\"spacing\":{\"margin\":null,\"padding\":\"8 16\"},\"container\":{\"shadow\":{\"offsetX\":0,\"offsetY\":0,\"blurRadius\":0,\"spreadRadius\":0,\"color\":{\"light\":\"#00000000\",\"dark\":null}}},\"dimension\":{\"width\":{\"type\":\"fit\",\"value\":\"fit-width\"},\"minHeight\":32},\"background\":{\"backgroundColor\":{\"light\":\"#222222\",\"dark\":null}}},\"hovered\":{\"border\":{\"borderColor\":{\"light\":\"#222222\",\"dark\":null}},\"container\":{\"shadow\":{\"offsetX\":0,\"offsetY\":0,\"blurRadius\":0,\"spreadRadius\":0,\"color\":{\"light\":\"#00000000\",\"dark\":null}}},\"background\":{\"backgroundColor\":{\"light\":\"#222222\",\"dark\":null}}}}]}},\"children\":[{\"node\":{\"value\":\"%^DATA.creativeResponse.longLabel^%\",\"styles\":{\"elements\":{\"own\":[{\"default\":{\"text\":{\"fontSize\":14,\"fontStyle\":\"normal\",\"textColor\":{\"light\":\"#FFFFFF\",\"dark\":null},\"fontFamily\":null,\"fontWeight\":null,\"lineHeight\":null,\"textTransform\":\"none\",\"textDecoration\":\"none\",\"horizontalTextAlign\":\"center\"},\"dimension\":{\"width\":{\"type\":\"fit\",\"value\":\"fit-width\"}}},\"hovered\":{\"text\":{\"fontStyle\":\"normal\",\"textColor\":{\"light\":\"#FFFFFF\",\"dark\":null},\"fontWeight\":null,\"textDecoration\":\"none\"}}}]}}},\"type\":\"BasicText\"}],\"responseKey\":\"positive\"},\"type\":\"CreativeResponse\"}]},\"type\":\"Column\"}",
+                "childLayouts": []
+              },
+              "offer": {
+                "campaignId": "embedded-compact-campaign-2",
+                "creativeId": "embedded-compact-creative-2",
+                "maxTotalItemsQtyInOffer": 0,
+                "creative": {
+                  "referralCreativeId": "embedded-compact-referral-creative-2",
+                  "instanceGuid": "embedded-compact-creative-guid-2",
+                  "copy": {
+                    "creative.disclaimer": "Statement credit will be received 8-12 weeks after a qualifying purchase with card. test",
+                    "creative.title": "Earn 20K sample points with Example Rewards on hotels and rental cars booked through Example Travel.",
+                    "creative.copy": "Statement credit will be received 8-12 weeks after a qualifying purchase with card. test",
+                    "creative.callout": "Example Travel",
+                    "creative.headline.standalone": "Earn 20K sample points with Example Rewards on hotels and rental cars booked through Example Travel.",
+                    "creative.privacyPolicy.close.copy": "Close",
+                    "creative.privacyPolicy.title": "Privacy Policy",
+                    "creative.tag": "Sample Category",
+                    "creative.success.title": "Success",
+                    "creative.success.copy": "We have sent a confirmation to your email.",
+                    "creative.image.src": "https://example.com/images/embedded-compact-offer-2.png",
+                    "creative.termsAndConditions.close.copy": "Close",
+                    "creative.termsAndConditions.title": "Terms & Conditions",
+                    "creative.privacyPolicy.link": "https://example.com/legal/embedded-compact/privacy-policy-2",
+                    "creative.termsAndConditions.link": "https://example.com/legal/embedded-compact/terms-2",
+                    "creative.brandName": "Sample Brand",
+                    "creative.socialProof.number": "1000"
+                  },
+                  "responseOptionsMap": {
+                    "positive": {
+                      "id": "embedded-compact-positive-response-2",
+                      "action": "CaptureOnly",
+                      "instanceGuid": "embedded-compact-positive-response-guid-2",
+                      "signalType": "SignalResponse",
+                      "shortLabel": "Yes Please",
+                      "longLabel": "Yes Please",
+                      "shortSuccessLabel": "Subscribed",
+                      "isPositive": true,
+                      "url": "",
+                      "ignoreBranch": false,
+                      "urlBehavior": "newTab",
+                      "token": "token",
+                      "rclid": "embedded-compact-test-rclid-2",
+                      "conversionType": "Default"
+                    },
+                    "negative": {
+                      "id": "embedded-compact-negative-response-2",
+                      "action": "CaptureOnly",
+                      "instanceGuid": "embedded-compact-negative-response-guid-2",
+                      "signalType": "SignalResponse",
+                      "shortLabel": "No Thanks",
+                      "longLabel": "No Thanks",
+                      "shortSuccessLabel": "",
+                      "isPositive": false,
+                      "url": "",
+                      "ignoreBranch": false,
+                      "urlBehavior": "newTab",
+                      "token": "token",
+                      "conversionType": "Default"
+                    }
+                  },
+                  "links": {
+                    "privacyPolicy": {
+                      "url": "https://example.com/legal/embedded-compact/privacy-policy-2",
+                      "title": "Privacy Policy"
+                    },
+                    "termsAndConditions": {
+                      "url": "https://example.com/legal/embedded-compact/terms-2",
+                      "title": "Terms & Conditions"
+                    }
+                  },
+                  "images": {
+                    "creativeImage": {
+                      "light": "https://example.com/images/embedded-compact-offer-2.png",
+                      "dark": "",
+                      "alt": "Sample embedded offer 2 image",
+                      "title": "Sample embedded offer 2"
+                    },
+                    "creativeImage.transparent": {
+                      "light": "https://example.com/images/embedded-compact-offer-2.png",
+                      "dark": "",
+                      "alt": "Sample embedded offer 2 image",
+                      "title": "Sample embedded offer 2"
+                    },
+                    "creativeImage.1_91to1": {
+                      "light": "https://example.com/images/embedded-compact-offer-2.png",
+                      "dark": "",
+                      "alt": "Sample embedded offer 2 image",
+                      "title": "Sample embedded offer 2"
+                    },
+                    "creativeImage.1_91to1.transparent": {
+                      "light": "https://example.com/images/embedded-compact-offer-2.png",
+                      "dark": "",
+                      "alt": "Sample embedded offer 2 image",
+                      "title": "Sample embedded offer 2"
+                    },
+                    "creativeImage.logo": {
+                      "light": "https://example.com/images/embedded-compact-offer-2.png",
+                      "dark": "",
+                      "alt": "Sample embedded offer 2 image",
+                      "title": "Sample embedded offer 2"
+                    },
+                    "creativeImage.logo.transparent": {
+                      "light": "https://example.com/images/embedded-compact-offer-2.png",
+                      "dark": "",
+                      "alt": "Sample embedded offer 2 image",
+                      "title": "Sample embedded offer 2"
+                    },
+                    "creativeImage.logo.1_91to1": {
+                      "light": "https://example.com/images/embedded-compact-offer-2.png",
+                      "dark": "",
+                      "alt": "Sample embedded offer 2 image",
+                      "title": "Sample embedded offer 2"
+                    },
+                    "creativeImage.logo.1_91to1.transparent": {
+                      "light": "https://example.com/images/embedded-compact-offer-2.png",
+                      "dark": "",
+                      "alt": "Sample embedded offer 2 image",
+                      "title": "Sample embedded offer 2"
+                    }
+                  },
+                  "icons": {},
+                  "token": "token",
+                  "advertiser": {
+                    "name": "Sample Advertiser 2",
+                    "brand": "Sample Brand"
+                  }
+                }
+              },
+              "token": "token"
+            },
+            {
+              "instanceGuid": "embedded-compact-slot-3",
+              "layoutVariant": {
+                "layoutVariantId": "embedded-compact-layout-3",
+                "moduleName": "standard-marketing",
+                "layoutVariantSchema": "{\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"container\":{\"gap\":8},\"dimension\":{\"width\":{\"type\":\"fit\",\"value\":\"fit-width\"},\"height\":{\"type\":\"fit\",\"value\":\"wrap-content\"}}}}]}},\"children\":[{\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"container\":{\"gap\":8},\"dimension\":{\"width\":{\"type\":\"fit\",\"value\":\"fit-width\"},\"height\":{\"type\":\"fit\",\"value\":\"wrap-content\"}}}}]}},\"children\":[{\"node\":{\"children\":[{\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"border\":{\"borderColor\":null,\"borderStyle\":null,\"borderWidth\":null,\"borderRadius\":null},\"spacing\":{\"margin\":null,\"padding\":null},\"dimension\":{\"width\":{\"type\":\"fixed\",\"value\":40},\"height\":{\"type\":\"fixed\",\"value\":21}},\"flexChild\":{\"alignSelf\":\"center\"}}}]}},\"imageKey\":\"creativeImage\"},\"type\":\"DataImage\"}],\"predicates\":[{\"type\":\"StaticString\",\"predicate\":{\"input\":\"left\",\"value\":\"left\",\"condition\":\"is\"}}]},\"type\":\"When\"},{\"node\":{\"value\":\"%^DATA.creativeCopy.creative.headline.standalone|DATA.creativeCopy.creative.title|^%\",\"styles\":{\"elements\":{\"own\":[{\"default\":{\"text\":{\"fontSize\":14,\"fontStyle\":null,\"textColor\":{\"light\":\"#262626\",\"dark\":null},\"fontFamily\":null,\"fontWeight\":\"500\",\"lineHeight\":20,\"textDecoration\":null,\"horizontalTextAlign\":\"left\"},\"spacing\":{\"margin\":\"0 0 0 0\",\"padding\":\"0 0 0 0\"},\"dimension\":{\"width\":{\"type\":\"fit\",\"value\":\"fit-width\"},\"height\":{\"type\":\"fit\",\"value\":\"wrap-content\"}},\"flexChild\":{\"weight\":1}}}]}}},\"type\":\"RichText\"},{\"node\":{\"children\":[{\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"border\":{\"borderColor\":null,\"borderStyle\":null,\"borderWidth\":null,\"borderRadius\":null},\"spacing\":{\"margin\":null,\"padding\":null},\"dimension\":{\"width\":{\"type\":\"fixed\",\"value\":40},\"height\":{\"type\":\"fixed\",\"value\":21}},\"flexChild\":{\"alignSelf\":\"center\"}}}]}},\"imageKey\":\"creativeImage\"},\"type\":\"DataImage\"}],\"predicates\":[{\"type\":\"StaticString\",\"predicate\":{\"input\":\"left\",\"value\":\"right\",\"condition\":\"is\"}}]},\"type\":\"When\"}]},\"type\":\"Row\"},{\"node\":{\"value\":\"%^DATA.creativeCopy.creative.confirmation.message|^% %^DATA.creativeCopy.creative.disclaimer|^% %^DATA.creativeLink.termsAndConditions|^% %^DATA.creativeLink.privacyPolicy|^%\",\"styles\":{\"elements\":{\"own\":[{\"default\":{\"text\":{\"fontSize\":12,\"fontStyle\":null,\"textColor\":{\"light\":\"#757575\",\"dark\":null},\"fontFamily\":null,\"fontWeight\":null,\"lineHeight\":12,\"textDecoration\":null,\"horizontalTextAlign\":\"left\"},\"spacing\":{\"margin\":\"0 0 0 0\",\"padding\":\"0 0 0 0\"}}}],\"link\":[{\"default\":{\"text\":{\"fontSize\":null,\"fontStyle\":null,\"textColor\":{\"light\":\"#757575\",\"dark\":null},\"fontFamily\":null,\"fontWeight\":null,\"textDecoration\":\"underline\"}},\"hovered\":{\"text\":{\"textColor\":null,\"textDecoration\":null}}}]}}},\"type\":\"RichText\"},{\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"border\":{\"borderColor\":{\"light\":\"#222222\",\"dark\":null},\"borderStyle\":\"solid\",\"borderWidth\":\"1\",\"borderRadius\":4},\"spacing\":{\"margin\":null,\"padding\":\"8 16\"},\"container\":{\"shadow\":{\"offsetX\":0,\"offsetY\":0,\"blurRadius\":0,\"spreadRadius\":0,\"color\":{\"light\":\"#00000000\",\"dark\":null}}},\"dimension\":{\"width\":{\"type\":\"fit\",\"value\":\"fit-width\"},\"minHeight\":32},\"background\":{\"backgroundColor\":{\"light\":\"#222222\",\"dark\":null}}},\"hovered\":{\"border\":{\"borderColor\":{\"light\":\"#222222\",\"dark\":null}},\"container\":{\"shadow\":{\"offsetX\":0,\"offsetY\":0,\"blurRadius\":0,\"spreadRadius\":0,\"color\":{\"light\":\"#00000000\",\"dark\":null}}},\"background\":{\"backgroundColor\":{\"light\":\"#222222\",\"dark\":null}}}}]}},\"children\":[{\"node\":{\"value\":\"%^DATA.creativeResponse.longLabel^%\",\"styles\":{\"elements\":{\"own\":[{\"default\":{\"text\":{\"fontSize\":14,\"fontStyle\":\"normal\",\"textColor\":{\"light\":\"#FFFFFF\",\"dark\":null},\"fontFamily\":null,\"fontWeight\":null,\"lineHeight\":null,\"textTransform\":\"none\",\"textDecoration\":\"none\",\"horizontalTextAlign\":\"center\"},\"dimension\":{\"width\":{\"type\":\"fit\",\"value\":\"fit-width\"}}},\"hovered\":{\"text\":{\"fontStyle\":\"normal\",\"textColor\":{\"light\":\"#FFFFFF\",\"dark\":null},\"fontWeight\":null,\"textDecoration\":\"none\"}}}]}}},\"type\":\"BasicText\"}],\"responseKey\":\"positive\"},\"type\":\"CreativeResponse\"}]},\"type\":\"Column\"}",
+                "childLayouts": []
+              },
+              "offer": {
+                "campaignId": "embedded-compact-campaign-3",
+                "creativeId": "embedded-compact-creative-3",
+                "maxTotalItemsQtyInOffer": 0,
+                "creative": {
+                  "referralCreativeId": "embedded-compact-referral-creative-3",
+                  "instanceGuid": "embedded-compact-creative-guid-3",
+                  "copy": {
+                    "creative.disclaimer": "Statement credit will be received 8-12 weeks after a qualifying purchase with card. test",
+                    "creative.title": "Earn 20K sample points with Example Rewards on hotels and rental cars booked through Example Travel.",
+                    "creative.copy": "Statement credit will be received 8-12 weeks after a qualifying purchase with card. test",
+                    "creative.callout": "Example Travel",
+                    "creative.headline.standalone": "Earn 20K sample points with Example Rewards on hotels and rental cars booked through Example Travel.",
+                    "creative.privacyPolicy.close.copy": "Close",
+                    "creative.privacyPolicy.title": "Privacy Policy",
+                    "creative.tag": "Sample Category",
+                    "creative.success.title": "Success",
+                    "creative.success.copy": "We have sent a confirmation to your email.",
+                    "creative.image.src": "https://example.com/images/embedded-compact-offer-3.png",
+                    "creative.termsAndConditions.close.copy": "Close",
+                    "creative.termsAndConditions.title": "Terms & Conditions",
+                    "creative.privacyPolicy.link": "https://example.com/legal/embedded-compact/privacy-policy-3",
+                    "creative.termsAndConditions.link": "https://example.com/legal/embedded-compact/terms-3",
+                    "creative.brandName": "Sample Brand",
+                    "creative.socialProof.number": "1000"
+                  },
+                  "responseOptionsMap": {
+                    "positive": {
+                      "id": "embedded-compact-positive-response-3",
+                      "action": "CaptureOnly",
+                      "instanceGuid": "embedded-compact-positive-response-guid-3",
+                      "signalType": "SignalResponse",
+                      "shortLabel": "Yes Please",
+                      "longLabel": "Yes Please",
+                      "shortSuccessLabel": "Subscribed",
+                      "isPositive": true,
+                      "url": "",
+                      "ignoreBranch": false,
+                      "urlBehavior": "newTab",
+                      "token": "token",
+                      "rclid": "embedded-compact-test-rclid-3",
+                      "conversionType": "Default"
+                    },
+                    "negative": {
+                      "id": "embedded-compact-negative-response-3",
+                      "action": "CaptureOnly",
+                      "instanceGuid": "embedded-compact-negative-response-guid-3",
+                      "signalType": "SignalResponse",
+                      "shortLabel": "No Thanks",
+                      "longLabel": "No Thanks",
+                      "shortSuccessLabel": "",
+                      "isPositive": false,
+                      "url": "",
+                      "ignoreBranch": false,
+                      "urlBehavior": "newTab",
+                      "token": "token",
+                      "conversionType": "Default"
+                    }
+                  },
+                  "links": {
+                    "privacyPolicy": {
+                      "url": "https://example.com/legal/embedded-compact/privacy-policy-3",
+                      "title": "Privacy Policy"
+                    },
+                    "termsAndConditions": {
+                      "url": "https://example.com/legal/embedded-compact/terms-3",
+                      "title": "Terms & Conditions"
+                    }
+                  },
+                  "images": {
+                    "creativeImage": {
+                      "light": "https://example.com/images/embedded-compact-offer-3.png",
+                      "dark": "",
+                      "alt": "Sample embedded offer 3 image",
+                      "title": "Sample embedded offer 3"
+                    },
+                    "creativeImage.transparent": {
+                      "light": "https://example.com/images/embedded-compact-offer-3.png",
+                      "dark": "",
+                      "alt": "Sample embedded offer 3 image",
+                      "title": "Sample embedded offer 3"
+                    },
+                    "creativeImage.1_91to1": {
+                      "light": "https://example.com/images/embedded-compact-offer-3.png",
+                      "dark": "",
+                      "alt": "Sample embedded offer 3 image",
+                      "title": "Sample embedded offer 3"
+                    },
+                    "creativeImage.1_91to1.transparent": {
+                      "light": "https://example.com/images/embedded-compact-offer-3.png",
+                      "dark": "",
+                      "alt": "Sample embedded offer 3 image",
+                      "title": "Sample embedded offer 3"
+                    },
+                    "creativeImage.logo": {
+                      "light": "https://example.com/images/embedded-compact-offer-3.png",
+                      "dark": "",
+                      "alt": "Sample embedded offer 3 image",
+                      "title": "Sample embedded offer 3"
+                    },
+                    "creativeImage.logo.transparent": {
+                      "light": "https://example.com/images/embedded-compact-offer-3.png",
+                      "dark": "",
+                      "alt": "Sample embedded offer 3 image",
+                      "title": "Sample embedded offer 3"
+                    },
+                    "creativeImage.logo.1_91to1": {
+                      "light": "https://example.com/images/embedded-compact-offer-3.png",
+                      "dark": "",
+                      "alt": "Sample embedded offer 3 image",
+                      "title": "Sample embedded offer 3"
+                    },
+                    "creativeImage.logo.1_91to1.transparent": {
+                      "light": "https://example.com/images/embedded-compact-offer-3.png",
+                      "dark": "",
+                      "alt": "Sample embedded offer 3 image",
+                      "title": "Sample embedded offer 3"
+                    }
+                  },
+                  "icons": {},
+                  "token": "token",
+                  "advertiser": {
+                    "name": "Sample Advertiser 3",
+                    "brand": "Sample Brand"
+                  }
+                }
+              },
+              "token": "token"
+            },
+            {
+              "instanceGuid": "embedded-compact-slot-4",
+              "layoutVariant": {
+                "layoutVariantId": "embedded-compact-layout-4",
+                "moduleName": "standard-marketing",
+                "layoutVariantSchema": "{\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"container\":{\"gap\":8},\"dimension\":{\"width\":{\"type\":\"fit\",\"value\":\"fit-width\"},\"height\":{\"type\":\"fit\",\"value\":\"wrap-content\"}}}}]}},\"children\":[{\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"container\":{\"gap\":8},\"dimension\":{\"width\":{\"type\":\"fit\",\"value\":\"fit-width\"},\"height\":{\"type\":\"fit\",\"value\":\"wrap-content\"}}}}]}},\"children\":[{\"node\":{\"children\":[{\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"border\":{\"borderColor\":null,\"borderStyle\":null,\"borderWidth\":null,\"borderRadius\":null},\"spacing\":{\"margin\":null,\"padding\":null},\"dimension\":{\"width\":{\"type\":\"fixed\",\"value\":40},\"height\":{\"type\":\"fixed\",\"value\":21}},\"flexChild\":{\"alignSelf\":\"center\"}}}]}},\"imageKey\":\"creativeImage\"},\"type\":\"DataImage\"}],\"predicates\":[{\"type\":\"StaticString\",\"predicate\":{\"input\":\"left\",\"value\":\"left\",\"condition\":\"is\"}}]},\"type\":\"When\"},{\"node\":{\"value\":\"%^DATA.creativeCopy.creative.headline.standalone|DATA.creativeCopy.creative.title|^%\",\"styles\":{\"elements\":{\"own\":[{\"default\":{\"text\":{\"fontSize\":14,\"fontStyle\":null,\"textColor\":{\"light\":\"#262626\",\"dark\":null},\"fontFamily\":null,\"fontWeight\":\"500\",\"lineHeight\":20,\"textDecoration\":null,\"horizontalTextAlign\":\"left\"},\"spacing\":{\"margin\":\"0 0 0 0\",\"padding\":\"0 0 0 0\"},\"dimension\":{\"width\":{\"type\":\"fit\",\"value\":\"fit-width\"},\"height\":{\"type\":\"fit\",\"value\":\"wrap-content\"}},\"flexChild\":{\"weight\":1}}}]}}},\"type\":\"RichText\"},{\"node\":{\"children\":[{\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"border\":{\"borderColor\":null,\"borderStyle\":null,\"borderWidth\":null,\"borderRadius\":null},\"spacing\":{\"margin\":null,\"padding\":null},\"dimension\":{\"width\":{\"type\":\"fixed\",\"value\":40},\"height\":{\"type\":\"fixed\",\"value\":21}},\"flexChild\":{\"alignSelf\":\"center\"}}}]}},\"imageKey\":\"creativeImage\"},\"type\":\"DataImage\"}],\"predicates\":[{\"type\":\"StaticString\",\"predicate\":{\"input\":\"left\",\"value\":\"right\",\"condition\":\"is\"}}]},\"type\":\"When\"}]},\"type\":\"Row\"},{\"node\":{\"value\":\"%^DATA.creativeCopy.creative.confirmation.message|^% %^DATA.creativeCopy.creative.disclaimer|^% %^DATA.creativeLink.termsAndConditions|^% %^DATA.creativeLink.privacyPolicy|^%\",\"styles\":{\"elements\":{\"own\":[{\"default\":{\"text\":{\"fontSize\":12,\"fontStyle\":null,\"textColor\":{\"light\":\"#757575\",\"dark\":null},\"fontFamily\":null,\"fontWeight\":null,\"lineHeight\":12,\"textDecoration\":null,\"horizontalTextAlign\":\"left\"},\"spacing\":{\"margin\":\"0 0 0 0\",\"padding\":\"0 0 0 0\"}}}],\"link\":[{\"default\":{\"text\":{\"fontSize\":null,\"fontStyle\":null,\"textColor\":{\"light\":\"#757575\",\"dark\":null},\"fontFamily\":null,\"fontWeight\":null,\"textDecoration\":\"underline\"}},\"hovered\":{\"text\":{\"textColor\":null,\"textDecoration\":null}}}]}}},\"type\":\"RichText\"},{\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"border\":{\"borderColor\":{\"light\":\"#222222\",\"dark\":null},\"borderStyle\":\"solid\",\"borderWidth\":\"1\",\"borderRadius\":4},\"spacing\":{\"margin\":null,\"padding\":\"8 16\"},\"container\":{\"shadow\":{\"offsetX\":0,\"offsetY\":0,\"blurRadius\":0,\"spreadRadius\":0,\"color\":{\"light\":\"#00000000\",\"dark\":null}}},\"dimension\":{\"width\":{\"type\":\"fit\",\"value\":\"fit-width\"},\"minHeight\":32},\"background\":{\"backgroundColor\":{\"light\":\"#222222\",\"dark\":null}}},\"hovered\":{\"border\":{\"borderColor\":{\"light\":\"#222222\",\"dark\":null}},\"container\":{\"shadow\":{\"offsetX\":0,\"offsetY\":0,\"blurRadius\":0,\"spreadRadius\":0,\"color\":{\"light\":\"#00000000\",\"dark\":null}}},\"background\":{\"backgroundColor\":{\"light\":\"#222222\",\"dark\":null}}}}]}},\"children\":[{\"node\":{\"value\":\"%^DATA.creativeResponse.longLabel^%\",\"styles\":{\"elements\":{\"own\":[{\"default\":{\"text\":{\"fontSize\":14,\"fontStyle\":\"normal\",\"textColor\":{\"light\":\"#FFFFFF\",\"dark\":null},\"fontFamily\":null,\"fontWeight\":null,\"lineHeight\":null,\"textTransform\":\"none\",\"textDecoration\":\"none\",\"horizontalTextAlign\":\"center\"},\"dimension\":{\"width\":{\"type\":\"fit\",\"value\":\"fit-width\"}}},\"hovered\":{\"text\":{\"fontStyle\":\"normal\",\"textColor\":{\"light\":\"#FFFFFF\",\"dark\":null},\"fontWeight\":null,\"textDecoration\":\"none\"}}}]}}},\"type\":\"BasicText\"}],\"responseKey\":\"positive\"},\"type\":\"CreativeResponse\"}]},\"type\":\"Column\"}",
+                "childLayouts": []
+              },
+              "offer": {
+                "campaignId": "embedded-compact-campaign-4",
+                "creativeId": "embedded-compact-creative-4",
+                "maxTotalItemsQtyInOffer": 0,
+                "creative": {
+                  "referralCreativeId": "embedded-compact-referral-creative-4",
+                  "instanceGuid": "embedded-compact-creative-guid-4",
+                  "copy": {
+                    "creative.disclaimer": "Statement credit will be received 8-12 weeks after a qualifying purchase with card. test",
+                    "creative.title": "Earn 20K sample points with Example Rewards on hotels and rental cars booked through Example Travel.",
+                    "creative.copy": "Statement credit will be received 8-12 weeks after a qualifying purchase with card. test",
+                    "creative.callout": "Example Travel",
+                    "creative.headline.standalone": "Earn 20K sample points with Example Rewards on hotels and rental cars booked through Example Travel.",
+                    "creative.privacyPolicy.close.copy": "Close",
+                    "creative.privacyPolicy.title": "Privacy Policy",
+                    "creative.tag": "Sample Category",
+                    "creative.success.title": "Success",
+                    "creative.success.copy": "We have sent a confirmation to your email.",
+                    "creative.image.src": "https://example.com/images/embedded-compact-offer-4.png",
+                    "creative.termsAndConditions.close.copy": "Close",
+                    "creative.termsAndConditions.title": "Terms & Conditions",
+                    "creative.privacyPolicy.link": "https://example.com/legal/embedded-compact/privacy-policy-4",
+                    "creative.termsAndConditions.link": "https://example.com/legal/embedded-compact/terms-4",
+                    "creative.brandName": "Sample Brand",
+                    "creative.socialProof.number": "1000"
+                  },
+                  "responseOptionsMap": {
+                    "positive": {
+                      "id": "embedded-compact-positive-response-4",
+                      "action": "CaptureOnly",
+                      "instanceGuid": "embedded-compact-positive-response-guid-4",
+                      "signalType": "SignalResponse",
+                      "shortLabel": "Yes Please",
+                      "longLabel": "Yes Please",
+                      "shortSuccessLabel": "Subscribed",
+                      "isPositive": true,
+                      "url": "",
+                      "ignoreBranch": false,
+                      "urlBehavior": "newTab",
+                      "token": "token",
+                      "rclid": "embedded-compact-test-rclid-4",
+                      "conversionType": "Default"
+                    },
+                    "negative": {
+                      "id": "embedded-compact-negative-response-4",
+                      "action": "CaptureOnly",
+                      "instanceGuid": "embedded-compact-negative-response-guid-4",
+                      "signalType": "SignalResponse",
+                      "shortLabel": "No Thanks",
+                      "longLabel": "No Thanks",
+                      "shortSuccessLabel": "",
+                      "isPositive": false,
+                      "url": "",
+                      "ignoreBranch": false,
+                      "urlBehavior": "newTab",
+                      "token": "token",
+                      "conversionType": "Default"
+                    }
+                  },
+                  "links": {
+                    "privacyPolicy": {
+                      "url": "https://example.com/legal/embedded-compact/privacy-policy-4",
+                      "title": "Privacy Policy"
+                    },
+                    "termsAndConditions": {
+                      "url": "https://example.com/legal/embedded-compact/terms-4",
+                      "title": "Terms & Conditions"
+                    }
+                  },
+                  "images": {
+                    "creativeImage": {
+                      "light": "https://example.com/images/embedded-compact-offer-4.png",
+                      "dark": "",
+                      "alt": "Sample embedded offer 4 image",
+                      "title": "Sample embedded offer 4"
+                    },
+                    "creativeImage.transparent": {
+                      "light": "https://example.com/images/embedded-compact-offer-4.png",
+                      "dark": "",
+                      "alt": "Sample embedded offer 4 image",
+                      "title": "Sample embedded offer 4"
+                    },
+                    "creativeImage.1_91to1": {
+                      "light": "https://example.com/images/embedded-compact-offer-4.png",
+                      "dark": "",
+                      "alt": "Sample embedded offer 4 image",
+                      "title": "Sample embedded offer 4"
+                    },
+                    "creativeImage.1_91to1.transparent": {
+                      "light": "https://example.com/images/embedded-compact-offer-4.png",
+                      "dark": "",
+                      "alt": "Sample embedded offer 4 image",
+                      "title": "Sample embedded offer 4"
+                    },
+                    "creativeImage.logo": {
+                      "light": "https://example.com/images/embedded-compact-offer-4.png",
+                      "dark": "",
+                      "alt": "Sample embedded offer 4 image",
+                      "title": "Sample embedded offer 4"
+                    },
+                    "creativeImage.logo.transparent": {
+                      "light": "https://example.com/images/embedded-compact-offer-4.png",
+                      "dark": "",
+                      "alt": "Sample embedded offer 4 image",
+                      "title": "Sample embedded offer 4"
+                    },
+                    "creativeImage.logo.1_91to1": {
+                      "light": "https://example.com/images/embedded-compact-offer-4.png",
+                      "dark": "",
+                      "alt": "Sample embedded offer 4 image",
+                      "title": "Sample embedded offer 4"
+                    },
+                    "creativeImage.logo.1_91to1.transparent": {
+                      "light": "https://example.com/images/embedded-compact-offer-4.png",
+                      "dark": "",
+                      "alt": "Sample embedded offer 4 image",
+                      "title": "Sample embedded offer 4"
+                    }
+                  },
+                  "icons": {},
+                  "token": "token",
+                  "advertiser": {
+                    "name": "Sample Advertiser 4",
+                    "brand": "Sample Brand"
+                  }
+                }
+              },
+              "token": "token"
+            }
+          ],
+          "instanceGuid": "embedded-compact-instance",
+          "outerLayoutSchema": "{\"layout\":{\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"spacing\":{\"margin\":null,\"padding\":null},\"container\":{\"alignItems\":\"center\",\"justifyContent\":\"center\"},\"dimension\":{\"width\":{\"type\":\"fit\",\"value\":\"fit-width\"},\"height\":{\"type\":\"fit\",\"value\":\"wrap-content\"}}}}]}},\"children\":[{\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"border\":{\"borderColor\":null,\"borderStyle\":null,\"borderWidth\":null,\"borderRadius\":null},\"spacing\":{\"margin\":null,\"padding\":null},\"container\":{\"shadow\":null},\"dimension\":{\"width\":{\"type\":\"fit\",\"value\":\"fit-width\"},\"height\":{\"type\":\"fit\",\"value\":\"wrap-content\"}},\"background\":{\"backgroundColor\":{\"light\":\"#00000000\",\"dark\":null}}}}]}},\"children\":[{\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"border\":{\"borderColor\":{\"light\":\"#D9D9D9\",\"dark\":null},\"borderStyle\":null,\"borderWidth\":\"1\",\"borderRadius\":6},\"spacing\":{\"margin\":\"0 0 0 0\",\"padding\":\"16 16 16 16\"},\"container\":{\"shadow\":null,\"justifyContent\":\"center\"},\"background\":{\"backgroundColor\":{\"light\":\"#FFFFFF\",\"dark\":null}}}}]}},\"children\":[{\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"container\":{\"gap\":16,\"alignItems\":\"center\",\"justifyContent\":\"center\"}}}]}},\"children\":[{\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"dimension\":{\"width\":{\"type\":\"fit\",\"value\":\"fit-width\"}}}}]}},\"children\":[{\"node\":{\"children\":[{\"node\":{\"value\":\"\",\"styles\":{\"elements\":{\"own\":[{\"default\":{\"text\":{\"fontSize\":14,\"fontStyle\":null,\"textColor\":{\"light\":\"#262626\",\"dark\":null},\"fontFamily\":null,\"fontWeight\":null,\"lineHeight\":20,\"textDecoration\":null,\"horizontalTextAlign\":\"left\"},\"spacing\":{\"margin\":\"0 0 10 0\",\"padding\":\"0 0 0 0\"},\"dimension\":{\"width\":{\"type\":\"fit\",\"value\":\"fit-width\"}},\"background\":{\"backgroundColor\":null}}}]}}},\"type\":\"RichText\"}],\"predicates\":[{\"type\":\"Progression\",\"predicate\":{\"value\":\"0\",\"condition\":\"is\"}},{\"type\":\"StaticBoolean\",\"predicate\":{\"value\":false,\"condition\":\"is-false\"}}]},\"type\":\"When\"},{\"node\":{\"children\":[{\"node\":{\"value\":\"\",\"styles\":{\"elements\":{\"own\":[{\"default\":{\"text\":{\"fontSize\":14,\"fontStyle\":null,\"textColor\":{\"light\":\"#262626\",\"dark\":null},\"fontFamily\":null,\"fontWeight\":null,\"lineHeight\":20,\"textDecoration\":null,\"horizontalTextAlign\":\"left\"},\"spacing\":{\"margin\":\"0 0 10 0\",\"padding\":\"0 0 0 0\"},\"dimension\":{\"width\":{\"type\":\"fit\",\"value\":\"fit-width\"}},\"background\":{\"backgroundColor\":null}}}]}}},\"type\":\"RichText\"}],\"predicates\":[{\"type\":\"StaticBoolean\",\"predicate\":{\"value\":false,\"condition\":\"is-true\"}}]},\"type\":\"When\"},{\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"border\":{\"borderColor\":null,\"borderStyle\":null,\"borderWidth\":null,\"borderRadius\":null},\"spacing\":{\"margin\":null,\"padding\":null},\"container\":{\"overflow\":\"hidden\"},\"dimension\":{\"height\":{\"type\":\"fit\",\"value\":\"wrap-content\"}},\"background\":{\"backgroundColor\":null}}}]}},\"transition\":{\"type\":\"FadeInOut\",\"settings\":{\"duration\":0}}},\"type\":\"OneByOneDistribution\"},{\"node\":{\"children\":[{\"node\":{\"value\":\"\",\"styles\":{\"elements\":{\"own\":[{\"default\":{\"text\":{\"fontSize\":12,\"fontStyle\":null,\"textColor\":{\"light\":\"#757575\",\"dark\":null},\"fontFamily\":null,\"fontWeight\":null,\"lineHeight\":12,\"textDecoration\":null,\"horizontalTextAlign\":\"left\"},\"spacing\":{\"margin\":\"0 0 0 0\",\"padding\":\"0 0 0 0\"},\"dimension\":{\"width\":{\"type\":\"fit\",\"value\":\"fit-width\"}}}}]}}},\"type\":\"RichText\"}],\"predicates\":[{\"type\":\"Progression\",\"predicate\":{\"value\":\"0\",\"condition\":\"is\"}},{\"type\":\"StaticBoolean\",\"predicate\":{\"value\":false,\"condition\":\"is-false\"}}]},\"type\":\"When\"},{\"node\":{\"children\":[{\"node\":{\"value\":\"\",\"styles\":{\"elements\":{\"own\":[{\"default\":{\"text\":{\"fontSize\":12,\"fontStyle\":null,\"textColor\":{\"light\":\"#757575\",\"dark\":null},\"fontFamily\":null,\"fontWeight\":null,\"lineHeight\":12,\"textDecoration\":null,\"horizontalTextAlign\":\"left\"},\"spacing\":{\"margin\":\"0 0 0 0\",\"padding\":\"0 0 0 0\"},\"dimension\":{\"width\":{\"type\":\"fit\",\"value\":\"fit-width\"}}}}]}}},\"type\":\"RichText\"}],\"predicates\":[{\"type\":\"StaticBoolean\",\"predicate\":{\"value\":false,\"condition\":\"is-true\"}}]},\"type\":\"When\"}]},\"type\":\"Column\"}]},\"type\":\"Row\"}]},\"type\":\"Column\"},{\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"border\":{\"borderColor\":{\"light\":\"#D7D7D7\",\"dark\":null},\"borderStyle\":null,\"borderWidth\":null,\"borderRadius\":null},\"spacing\":{\"margin\":\"4 0 0 0\",\"padding\":null},\"container\":{\"justifyContent\":\"flex-end\"},\"dimension\":{\"width\":{\"type\":\"fit\",\"value\":\"fit-width\"}},\"background\":{\"backgroundColor\":null}}}]}},\"children\":[{\"node\":{\"value\":\"Powered by <a target=\\\"_blank\\\" href=\\\"https://rokt.com\\\">Rokt</a> - <a target=\\\"_blank\\\" href=\\\"https://rokt.com/privacy-policy/\\\">Privacy Policy</a>\",\"styles\":{\"elements\":{\"own\":[{\"default\":{\"text\":{\"fontSize\":12,\"fontStyle\":null,\"textColor\":{\"light\":\"#757575\",\"dark\":null},\"fontFamily\":null,\"fontWeight\":null,\"lineHeight\":18,\"textDecoration\":null,\"horizontalTextAlign\":\"right\"},\"spacing\":{\"margin\":null,\"padding\":null}}}],\"link\":[{\"default\":{\"text\":{\"fontSize\":null,\"fontStyle\":null,\"textColor\":{\"light\":\"#757575\",\"dark\":null},\"fontFamily\":null,\"fontWeight\":null,\"textDecoration\":\"underline\"}},\"hovered\":{\"text\":{\"fontStyle\":null,\"textColor\":{\"light\":\"#222222\",\"dark\":null},\"fontWeight\":null,\"textDecoration\":null}}}]}},\"openLinks\":\"externally\"},\"type\":\"RichText\"}]},\"type\":\"Row\"}]},\"type\":\"Column\"}]},\"type\":\"Row\"},\"display\":\"EMBEDDED\",\"settings\":{\"closeOnComplete\":true},\"breakpoints\":{}}",
+          "layoutVersion": "1.9",
+          "layoutSchemaVersion": "1.9",
+          "token": "token"
+        }
+      }
+    }
+  ],
+  "options": {
+    "useDiagnosticEvents": false
+  },
+  "success": true
+}
