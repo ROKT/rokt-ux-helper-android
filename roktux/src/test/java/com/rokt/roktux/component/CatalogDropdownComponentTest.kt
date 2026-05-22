@@ -23,7 +23,9 @@ import com.rokt.core.testutils.annotations.DcuiConfig
 import com.rokt.core.testutils.annotations.DcuiNodeJson
 import com.rokt.core.testutils.annotations.DcuiOfferJson
 import com.rokt.roktux.testutil.BaseDcuiEspressoTest
+import com.rokt.roktux.validation.ValidationCoordinator
 import com.rokt.roktux.viewmodel.layout.LayoutContract
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -163,5 +165,32 @@ class CatalogDropdownComponentTest : BaseDcuiEspressoTest() {
         composeTestRule.onNodeWithText("32oz")
             .assertIsDisplayed()
             .assertIsNotEnabled()
+    }
+
+    @Test
+    @DcuiNodeJson(jsonFile = "CatalogDropdownComponent/CatalogDropdown_with_Group.json")
+    @DcuiConfig(testInInnerLayout = true)
+    @DcuiOfferJson(jsonFile = "offer/Offer_with_catalog_item_group.json")
+    fun testCatalogDropdownRequiredValidationShowsAndClearsError() {
+        val validationCoordinator = dcuiComponentRule.layoutComponent[ValidationCoordinator::class.java]
+
+        composeTestRule.waitUntil(timeoutMillis = 5_000) {
+            validationCoordinator.isRegistered("dropDownSelection")
+        }
+        composeTestRule.runOnIdle {
+            assertThat(validationCoordinator.validate("dropDownSelection")).isFalse()
+        }
+        composeTestRule.onNodeWithText("Select a size before paying").assertIsDisplayed()
+
+        composeTestRule.onNodeWithText("Select size").performClick()
+        composeTestRule.onNodeWithText("16oz")
+            .assertIsDisplayed()
+            .performSemanticsAction(SemanticsActions.OnClick)
+
+        composeTestRule.waitForIdle()
+        composeTestRule.onNodeWithText("Select a size before paying").assertDoesNotExist()
+        composeTestRule.runOnIdle {
+            assertThat(validationCoordinator.validate("dropDownSelection")).isTrue()
+        }
     }
 }

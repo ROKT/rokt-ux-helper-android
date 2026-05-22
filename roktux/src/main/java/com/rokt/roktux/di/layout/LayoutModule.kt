@@ -10,6 +10,7 @@ import com.rokt.roktux.RoktViewState
 import com.rokt.roktux.component.LayoutUiModelFactory
 import com.rokt.roktux.event.RoktPlatformEvent
 import com.rokt.roktux.event.RoktUxEvent
+import com.rokt.roktux.validation.ValidationCoordinator
 import com.rokt.roktux.viewmodel.layout.LayoutViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 
@@ -36,6 +37,7 @@ internal class LayoutModule(
 
         this.provideModuleScoped { DataBindingImpl() }
         this.provideModuleScoped { LayoutUiModelFactory() }
+        this.provideModuleScoped { ValidationCoordinator() }
         this.provideModuleScoped { ExperienceModelMapperImpl(get(EXPERIENCE), get()) }
         this.provideModuleScoped(EXPERIENCE) { experience }
         this.provideModuleScoped(LOCATION) { location }
@@ -56,6 +58,7 @@ internal class LayoutModule(
                 customStates = customStates,
                 offerCustomStates = offerCustomStates,
                 domainStates = domainStates,
+                validationCoordinator = get(),
                 edgeToEdgeDisplay = edgeToEdgeDisplay,
             )
         }

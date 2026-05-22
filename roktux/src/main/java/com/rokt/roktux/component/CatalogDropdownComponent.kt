@@ -12,9 +12,12 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.requiredWidth
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.BiasAlignment
 import androidx.compose.ui.Modifier
@@ -42,6 +45,9 @@ import com.rokt.modelmapper.uimodel.LayoutSchemaUiModel
 import com.rokt.modelmapper.uimodel.ModifierProperties
 import com.rokt.modelmapper.uimodel.StateBlock
 import com.rokt.modelmapper.utils.ROKT_ICONS_FONT_FAMILY
+import com.rokt.roktux.di.layout.LocalLayoutComponent
+import com.rokt.roktux.validation.ValidationCoordinator
+import com.rokt.roktux.validation.ValidationStatus
 import com.rokt.roktux.viewmodel.layout.LayoutContract
 import com.rokt.roktux.viewmodel.layout.OfferUiState
 import kotlin.math.roundToInt
@@ -65,6 +71,11 @@ internal class CatalogDropdownComponent(private val modifierFactory: ModifierFac
 
         val selectedIndex = offerState.customState[model.customStateKey]
             ?.takeIf { it in options.indices }
+        val validationFieldKey = model.validationFieldKey?.takeIf { it.isNotBlank() }
+        val validationCoordinator = LocalLayoutComponent.current[ValidationCoordinator::class.java]
+        val selectedIndexState = rememberUpdatedState(selectedIndex)
+        var pendingSelectedIndex by remember(model.customStateKey) { mutableStateOf<Int?>(null) }
+        var validationStatus by remember(validationFieldKey) { mutableStateOf(ValidationStatus.VALID) }
         var isExpanded by remember { mutableStateOf(false) }
         var headSize by remember { mutableStateOf(IntSize.Zero) }
         var boxBounds by remember { mutableStateOf<IntRect?>(null) }
@@ -79,10 +90,26 @@ internal class CatalogDropdownComponent(private val modifierFactory: ModifierFac
         val density = LocalDensity.current
         val layoutDirection = LocalLayoutDirection.current
         val view = LocalView.current
+        val showValidationError = validationStatus == ValidationStatus.INVALID
         val rootContainer = modifierFactory.createContainerUiProperties(
             containerProperties = model.containerProperties,
             index = breakpointIndex,
             isPressed = isPressed,
+        )
+        LaunchedEffect(selectedIndex) {
+            pendingSelectedIndex = null
+        }
+        RegisterValidator(
+            validationCoordinator = validationCoordinator,
+            validationFieldKey = validationFieldKey,
+            validation = {
+                if ((pendingSelectedIndex ?: selectedIndexState.value) == null) {
+                    ValidationStatus.INVALID
+                } else {
+                    ValidationStatus.VALID
+                }
+            },
+            onStatusChange = { status -> validationStatus = status },
         )
 
         Column(
@@ -109,6 +136,7 @@ internal class CatalogDropdownComponent(private val modifierFactory: ModifierFac
                     displayText = displayText(model, selectedIndex, offerState),
                     isExpanded = isExpanded,
                     isSelected = selectedIndex != null,
+                    showValidationError = showValidationError,
                     isDarkModeEnabled = isDarkModeEnabled,
                     breakpointIndex = breakpointIndex,
                     offerState = offerState,
@@ -164,6 +192,7 @@ internal class CatalogDropdownComponent(private val modifierFactory: ModifierFac
                                 onSelected = { optionIndex ->
                                     val updatedSelections =
                                         selectedIndices(model, offerState) + (model.attributeIndex to optionIndex)
+                                    pendingSelectedIndex = optionIndex
                                     onEventSent(
                                         LayoutContract.LayoutEvent.SetCustomState(
                                             model.customStateKey,
@@ -174,11 +203,50 @@ internal class CatalogDropdownComponent(private val modifierFactory: ModifierFac
                                         onEventSent(LayoutContract.LayoutEvent.SetActiveCatalogItem(activeItemIndex))
                                     }
                                     isExpanded = false
+                                    if (validationFieldKey != null &&
+                                        (model.validateOnChange || validationStatus == ValidationStatus.INVALID)
+                                    ) {
+                                        validationCoordinator.validate(validationFieldKey)
+                                    }
                                 },
                             )
                         }
                     }
                 }
+            }
+            ValidationError(
+                model = model,
+                isVisible = showValidationError,
+                isDarkModeEnabled = isDarkModeEnabled,
+                breakpointIndex = breakpointIndex,
+                offerState = offerState,
+                onEventSent = onEventSent,
+            )
+        }
+    }
+
+    @Composable
+    private fun RegisterValidator(
+        validationCoordinator: ValidationCoordinator,
+        validationFieldKey: String?,
+        validation: () -> ValidationStatus,
+        onStatusChange: (ValidationStatus) -> Unit,
+    ) {
+        val owner = remember(validationFieldKey) { Any() }
+        DisposableEffect(validationCoordinator, validationFieldKey, owner) {
+            if (validationFieldKey != null) {
+                validationCoordinator.registerField(
+                    key = validationFieldKey,
+                    owner = owner,
+                    validation = validation,
+                    onStatusChange = onStatusChange,
+                )
+            }
+            onDispose {
+                if (validationFieldKey != null) {
+                    validationCoordinator.unregisterField(key = validationFieldKey, owner = owner)
+                }
+                onStatusChange(ValidationStatus.VALID)
             }
         }
     }
@@ -189,6 +257,7 @@ internal class CatalogDropdownComponent(private val modifierFactory: ModifierFac
         displayText: String,
         isExpanded: Boolean,
         isSelected: Boolean,
+        showValidationError: Boolean,
         isDarkModeEnabled: Boolean,
         breakpointIndex: Int,
         offerState: OfferUiState,
@@ -199,7 +268,11 @@ internal class CatalogDropdownComponent(private val modifierFactory: ModifierFac
     ) {
         val interactionSource = remember { MutableInteractionSource() }
         val isPressed by interactionSource.collectIsPressedAsState()
-        val resolvedStyle = model.head.resolve(isSelected = isSelected, isDisabled = false, isErrored = false)
+        val resolvedStyle = model.head.resolve(
+            isSelected = isSelected,
+            isDisabled = false,
+            isErrored = showValidationError,
+        )
         val style = resolvedStyle.style
         val resolvedIconStyle = model.icon.resolve(isSelected = isSelected, isDisabled = false, isErrored = false)
         val iconStyle = resolvedIconStyle.style
@@ -270,6 +343,46 @@ internal class CatalogDropdownComponent(private val modifierFactory: ModifierFac
                 style = iconTextStyle.textStyle,
             )
         }
+    }
+
+    @Composable
+    private fun ValidationError(
+        model: LayoutSchemaUiModel.CatalogDropdownUiModel,
+        isVisible: Boolean,
+        isDarkModeEnabled: Boolean,
+        breakpointIndex: Int,
+        offerState: OfferUiState,
+        onEventSent: (LayoutContract.LayoutEvent) -> Unit,
+    ) {
+        val message = model.validationErrorMessage
+        if (!isVisible || message.isNullOrEmpty()) return
+
+        val resolvedStyle = model.error.resolve(isSelected = false, isDisabled = false, isErrored = false)
+        val style = resolvedStyle.style
+        val textStyle = modifierFactory.createTextStyle(
+            text = message,
+            textStyles = style?.textStyles,
+            breakpointIndex = breakpointIndex,
+            isPressed = false,
+            isDarkModeEnabled = isDarkModeEnabled,
+            baseStyles = resolvedStyle.baseStyle?.textStyles,
+            offerState = offerState,
+            onEventSent = onEventSent,
+        )
+
+        Text(
+            modifier = modifierFactory.createModifier(
+                modifierPropertiesList = style?.ownModifiers,
+                conditionalTransitionModifier = null,
+                breakpointIndex = breakpointIndex,
+                isPressed = false,
+                isDarkModeEnabled = isDarkModeEnabled,
+                offerState = offerState,
+                basePropertiesList = resolvedStyle.baseStyle?.ownModifiers,
+            ),
+            text = textStyle.value,
+            style = textStyle.textStyle,
+        )
     }
 
     @Composable

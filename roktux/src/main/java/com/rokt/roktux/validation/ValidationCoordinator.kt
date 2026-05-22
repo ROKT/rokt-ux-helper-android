@@ -45,6 +45,8 @@ internal class ValidationCoordinator {
         }
     }
 
+    fun isRegistered(key: String): Boolean = synchronized(lock) { registrations.containsKey(key) }
+
     // Eagerly validates every key (no short-circuit) so all `onStatusChange` callbacks fire and
     // every invalid field surfaces its error on a single submit attempt.
     fun validate(fields: List<String>): Boolean = fields.map { key -> validate(key) }.all { isValid -> isValid }

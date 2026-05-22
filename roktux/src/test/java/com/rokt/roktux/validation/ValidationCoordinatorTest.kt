@@ -13,6 +13,25 @@ class ValidationCoordinatorTest {
     }
 
     @Test
+    fun `is registered reflects field lifecycle`() {
+        val coordinator = ValidationCoordinator()
+        val owner = Any()
+
+        coordinator.registerField(
+            key = "field",
+            owner = owner,
+            validation = { ValidationStatus.VALID },
+            onStatusChange = {},
+        )
+
+        assertThat(coordinator.isRegistered("field")).isTrue()
+
+        coordinator.unregisterField(key = "field", owner = owner)
+
+        assertThat(coordinator.isRegistered("field")).isFalse()
+    }
+
+    @Test
     fun `validate runs every requested field before returning aggregate result`() {
         val coordinator = ValidationCoordinator()
         val owner = Any()
