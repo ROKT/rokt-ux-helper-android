@@ -189,6 +189,7 @@ sealed class LayoutSchemaUiModel(
         override val conditionalTransitionModifiers: ConditionalTransitionModifier?,
         override val children: ImmutableList<LayoutSchemaUiModel?>,
         val catalogItemModel: HMap?,
+        val transactionData: TransactionData?,
     ) : ButtonUiModel(ownModifiers, containerProperties, conditionalTransitionModifiers, children)
 
     data class CatalogDevicePayButtonUiModel(

@@ -22,6 +22,7 @@ import com.rokt.roktux.event.DevicePayResult
 import com.rokt.roktux.event.EventType
 import com.rokt.roktux.event.RoktPlatformEvent
 import com.rokt.roktux.event.RoktUxEvent
+import com.rokt.roktux.state.LayoutRuntimeState
 import com.rokt.roktux.validation.ValidationCoordinator
 import com.rokt.roktux.validation.ValidationStatus
 import com.rokt.roktux.viewmodel.base.BaseContract
@@ -459,6 +460,129 @@ class RoktLayoutViewModelTest : BaseViewModelTest() {
     }
 
     @Test
+    fun `CartItemForwardPaymentSelected sends event with sale price transaction data and platform signal`() = runTest {
+        // Arrange
+        val transactionData = TransactionData(
+            paymentType = "Card",
+            supportedPaymentMethods = listOf(PaymentMethod("CARD")),
+            isPartnerManagedPurchase = false,
+            partnerPaymentReference = "partner-reference",
+        )
+        clearMocks(uxEvent, platformEvent, viewStateChange)
+
+        // Act
+        layoutViewModel.setEvent(
+            LayoutContract.LayoutEvent.CartItemForwardPaymentSelected(
+                offerId = 0,
+                catalogItemModel = createCatalogItemProperties(),
+                transactionData = transactionData,
+            ),
+        )
+
+        // Assert
+        val event = captureForwardPaymentEvent()
+        assertThat(event.layoutId).isEqualTo("pluginId")
+        assertThat(event.name).isEqualTo("Everyday sneakers")
+        assertThat(event.cartItemId).isEqualTo("cart-item-1")
+        assertThat(event.catalogItemId).isEqualTo("catalog-item-1")
+        assertThat(event.currency).isEqualTo("USD")
+        assertThat(event.description).isEqualTo("Lightweight daily shoes")
+        assertThat(event.linkedProductId).isEqualTo("linked-product-1")
+        assertThat(event.providerData).isEqualTo("{\"merchant\":\"rokt\"}")
+        assertThat(event.totalPrice).isEqualTo(79.99)
+        assertThat(event.unitPrice).isEqualTo(79.99)
+        assertThat(event.transactionData).isEqualTo(transactionData)
+        verify(timeout = 2000) {
+            platformEvent.invoke(
+                withArg { events ->
+                    assertThat(events).anyMatch {
+                        it.eventType == EventType.SignalCartItemInstantPurchaseInitiated &&
+                            it.parentGuid == "catalog-instance-guid-1" &&
+                            it.eventData?.get("totalPrice") == "79.99" &&
+                            it.eventData?.get("unitPrice") == "79.99"
+                    }
+                },
+            )
+        }
+        verify(exactly = 0, timeout = 500) {
+            platformEvent.invoke(match { events -> events.any { it.eventType == EventType.SignalDismissal } })
+        }
+    }
+
+    @Test
+    fun `CartItemForwardPayment callback updates payment result custom state`() = runTest {
+        // Arrange
+        clearMocks(uxEvent, viewStateChange)
+        layoutViewModel.setEvent(
+            LayoutContract.LayoutEvent.CartItemForwardPaymentSelected(
+                offerId = 0,
+                catalogItemModel = createCatalogItemProperties(),
+                transactionData = TransactionData(isPartnerManagedPurchase = false),
+            ),
+        )
+        val event = captureForwardPaymentEvent()
+
+        // Act
+        clearMocks(viewStateChange)
+        event.onResult(DevicePayResult.Success)
+
+        // Assert
+        verify(timeout = 2000) {
+            viewStateChange.invoke(
+                withArg { state ->
+                    assertThat(state.offerCustomStates["0"]).containsEntry("paymentResult", 1)
+                },
+            )
+        }
+
+        // Act
+        clearMocks(viewStateChange)
+        event.onResult(DevicePayResult.Failure)
+
+        // Assert
+        verify(timeout = 2000) {
+            viewStateChange.invoke(
+                withArg { state ->
+                    assertThat(state.offerCustomStates["0"]).containsEntry("paymentResult", -1)
+                },
+            )
+        }
+
+        // Act
+        clearMocks(viewStateChange)
+        event.onResult(DevicePayResult.Retry)
+
+        // Assert
+        verify(timeout = 2000) {
+            viewStateChange.invoke(
+                withArg { state ->
+                    assertThat(state.offerCustomStates["0"]).containsEntry("paymentResult", -1)
+                },
+            )
+        }
+    }
+
+    @Test
+    fun `CartItemForwardPayment pending confirmation stores catalog runtime data`() = runTest {
+        // Arrange
+        clearMocks(uxEvent, viewStateChange)
+        layoutViewModel.setEvent(
+            LayoutContract.LayoutEvent.CartItemForwardPaymentSelected(
+                offerId = 0,
+                catalogItemModel = createCatalogItemProperties(),
+                transactionData = TransactionData(isPartnerManagedPurchase = false),
+            ),
+        )
+        val event = captureForwardPaymentEvent()
+
+        // Act
+        event.onResult(DevicePayResult.PendingConfirmation(mapOf("total" to "86.79")))
+
+        // Assert
+        assertThat(runtimeState().catalogRuntimeData()).containsEntry("total", "86.79")
+    }
+
+    @Test
     fun `CartItemDevicePaySelected sends event with sale price and platform signal`() = runTest {
         // Arrange
         val transactionData = TransactionData(
@@ -664,6 +788,20 @@ class RoktLayoutViewModelTest : BaseViewModelTest() {
             uxEvent.invoke(capture(eventSlot))
         }
         return eventSlot.captured as RoktUxEvent.CartItemDevicePay
+    }
+
+    private fun captureForwardPaymentEvent(): RoktUxEvent.CartItemForwardPayment {
+        val eventSlot = slot<RoktUxEvent>()
+        verify(timeout = 2000) {
+            uxEvent.invoke(capture(eventSlot))
+        }
+        return eventSlot.captured as RoktUxEvent.CartItemForwardPayment
+    }
+
+    private fun runtimeState(): LayoutRuntimeState {
+        val runtimeStateField = LayoutViewModel::class.java.getDeclaredField("runtimeState")
+        runtimeStateField.isAccessible = true
+        return runtimeStateField.get(layoutViewModel) as LayoutRuntimeState
     }
 
     private fun createCatalogItemProperties(

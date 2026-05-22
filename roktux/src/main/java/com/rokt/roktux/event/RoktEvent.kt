@@ -107,6 +107,22 @@ sealed interface RoktUxEvent {
         val transactionData: TransactionData?,
         val onResult: (DevicePayResult) -> Unit,
     ) : RoktUxEvent
+
+    data class CartItemForwardPayment(
+        val layoutId: String,
+        val name: String,
+        val cartItemId: String,
+        val catalogItemId: String,
+        val currency: String,
+        val description: String,
+        val linkedProductId: String,
+        val providerData: String,
+        val totalPrice: Double,
+        val quantity: Int,
+        val unitPrice: Double,
+        val transactionData: TransactionData?,
+        val onResult: (DevicePayResult) -> Unit,
+    ) : RoktUxEvent
 }
 
 sealed interface DevicePayResult {

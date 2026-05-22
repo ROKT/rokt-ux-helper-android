@@ -332,12 +332,20 @@ internal class LayoutViewModel(
                 handleCartItemInstancePurchaseSelected(event.catalogItemModel)
             }
 
+            is LayoutContract.LayoutEvent.CartItemForwardPaymentSelected -> {
+                handleCartItemForwardPaymentSelected(event)
+            }
+
             is LayoutContract.LayoutEvent.CartItemDevicePaySelected -> {
                 handleCartItemDevicePaySelected(event)
             }
 
             is LayoutContract.LayoutEvent.CartItemDevicePayResultReceived -> {
                 handleCartItemDevicePayResult(event.offerId, event.result)
+            }
+
+            is LayoutContract.LayoutEvent.CartItemForwardPaymentResultReceived -> {
+                handleCartItemForwardPaymentResult(event.offerId, event.result)
             }
 
             else -> {}
@@ -398,39 +406,66 @@ internal class LayoutViewModel(
     }
 
     private fun handleCartItemInstancePurchaseSelected(catalogItemProperties: HMap) {
-        with(catalogItemProperties) {
-            uxEvent(
-                RoktUxEvent.CartItemInstantPurchase(
-                    layoutId = pluginId,
-                    cartItemId = get<String>(KEY_CART_ITEM_ID).orEmpty(),
-                    catalogItemId = get<String>(KEY_CATALOG_ITEM_ID).orEmpty(),
-                    currency = get<String>(KEY_CURRENCY).orEmpty(),
-                    description = get<String>(KEY_DESCRIPTION).orEmpty(),
-                    linkedProductId = get<String>(KEY_LINKED_PRODUCT_ID).orEmpty(),
-                    totalPrice = get<Double>(KEY_ORIGINAL_PRICE) ?: 0.0,
-                    quantity = 1,
-                    unitPrice = get<Double>(KEY_ORIGINAL_PRICE) ?: 0.0,
-                ),
-            )
-            handlePlatformEvent(
-                RoktPlatformEvent(
-                    eventType = EventType.SignalCartItemInstantPurchaseInitiated,
-                    sessionId = experienceModel.sessionId,
-                    parentGuid = get<String>("instanceGuid").orEmpty(),
-                    eventData = mapOf(
-                        KEY_CART_ITEM_ID to get<String>(KEY_CART_ITEM_ID).orEmpty(),
-                        KEY_CATALOG_ITEM_ID to get<String>(KEY_CATALOG_ITEM_ID).orEmpty(),
-                        KEY_CURRENCY to get<String>(KEY_CURRENCY).orEmpty(),
-                        KEY_DESCRIPTION to get<String>(KEY_DESCRIPTION).orEmpty(),
-                        KEY_LINKED_PRODUCT_ID to get<String>(KEY_LINKED_PRODUCT_ID).orEmpty(),
-                        KEY_TOTAL_PRICE to (get<Double>(KEY_ORIGINAL_PRICE) ?: 0.0).toString(),
-                        KEY_QUANTITY to "1",
-                        KEY_UNIT_PRICE to (get<Double>(KEY_ORIGINAL_PRICE) ?: 0.0).toString(),
-                    ),
-                ),
-            )
-        }
+        val originalPrice = catalogItemProperties.originalPrice()
+        uxEvent(
+            RoktUxEvent.CartItemInstantPurchase(
+                layoutId = pluginId,
+                cartItemId = catalogItemProperties.cartItemId(),
+                catalogItemId = catalogItemProperties.catalogItemId(),
+                currency = catalogItemProperties.currency(),
+                description = catalogItemProperties.description(),
+                linkedProductId = catalogItemProperties.linkedProductId(),
+                totalPrice = originalPrice,
+                quantity = 1,
+                unitPrice = originalPrice,
+            ),
+        )
+        handlePlatformEvent(
+            RoktPlatformEvent(
+                eventType = EventType.SignalCartItemInstantPurchaseInitiated,
+                sessionId = experienceModel.sessionId,
+                parentGuid = catalogItemProperties.instanceGuid(),
+                eventData = catalogItemProperties.cartItemEventData(originalPrice),
+            ),
+        )
         setEvent(LayoutContract.LayoutEvent.CloseSelected(isDismissed = false))
+    }
+
+    private fun handleCartItemForwardPaymentSelected(event: LayoutContract.LayoutEvent.CartItemForwardPaymentSelected) {
+        val catalogItemProperties = event.catalogItemModel
+        val salePrice = catalogItemProperties.salePrice()
+        uxEvent(
+            RoktUxEvent.CartItemForwardPayment(
+                layoutId = pluginId,
+                name = catalogItemProperties.name(),
+                cartItemId = catalogItemProperties.cartItemId(),
+                catalogItemId = catalogItemProperties.catalogItemId(),
+                currency = catalogItemProperties.currency(),
+                description = catalogItemProperties.description(),
+                linkedProductId = catalogItemProperties.linkedProductId(),
+                providerData = catalogItemProperties.providerData(),
+                totalPrice = salePrice,
+                quantity = 1,
+                unitPrice = salePrice,
+                transactionData = event.transactionData,
+                onResult = { result ->
+                    setEvent(
+                        LayoutContract.LayoutEvent.CartItemForwardPaymentResultReceived(
+                            event.offerId,
+                            result,
+                        ),
+                    )
+                },
+            ),
+        )
+        handlePlatformEvent(
+            RoktPlatformEvent(
+                eventType = EventType.SignalCartItemInstantPurchaseInitiated,
+                sessionId = experienceModel.sessionId,
+                parentGuid = catalogItemProperties.instanceGuid(),
+                eventData = catalogItemProperties.cartItemEventData(salePrice),
+            ),
+        )
     }
 
     private fun handleCartItemDevicePaySelected(event: LayoutContract.LayoutEvent.CartItemDevicePaySelected) {
@@ -439,46 +474,35 @@ internal class LayoutViewModel(
         }
 
         val catalogItemProperties = event.catalogItemModel ?: return
-        with(catalogItemProperties) {
-            val salePrice = get<Double>(KEY_PRICE) ?: get<Double>(KEY_ORIGINAL_PRICE) ?: 0.0
-            uxEvent(
-                RoktUxEvent.CartItemDevicePay(
-                    layoutId = pluginId,
-                    name = get<String>(KEY_TITLE).orEmpty(),
-                    cartItemId = get<String>(KEY_CART_ITEM_ID).orEmpty(),
-                    catalogItemId = get<String>(KEY_CATALOG_ITEM_ID).orEmpty(),
-                    currency = get<String>(KEY_CURRENCY).orEmpty(),
-                    description = get<String>(KEY_DESCRIPTION).orEmpty(),
-                    linkedProductId = get<String>(KEY_LINKED_PRODUCT_ID).orEmpty(),
-                    providerData = get<String>(KEY_PROVIDER_DATA).orEmpty(),
-                    totalPrice = salePrice,
-                    quantity = 1,
-                    unitPrice = salePrice,
-                    paymentProvider = event.paymentProvider,
-                    transactionData = event.transactionData,
-                    onResult = { result ->
-                        setEvent(LayoutContract.LayoutEvent.CartItemDevicePayResultReceived(event.offerId, result))
-                    },
-                ),
-            )
-            handlePlatformEvent(
-                RoktPlatformEvent(
-                    eventType = EventType.SignalCartItemInstantPurchaseInitiated,
-                    sessionId = experienceModel.sessionId,
-                    parentGuid = get<String>(KEY_INSTANCE_GUID).orEmpty(),
-                    eventData = mapOf(
-                        KEY_CART_ITEM_ID to get<String>(KEY_CART_ITEM_ID).orEmpty(),
-                        KEY_CATALOG_ITEM_ID to get<String>(KEY_CATALOG_ITEM_ID).orEmpty(),
-                        KEY_CURRENCY to get<String>(KEY_CURRENCY).orEmpty(),
-                        KEY_DESCRIPTION to get<String>(KEY_DESCRIPTION).orEmpty(),
-                        KEY_LINKED_PRODUCT_ID to get<String>(KEY_LINKED_PRODUCT_ID).orEmpty(),
-                        KEY_TOTAL_PRICE to salePrice.toString(),
-                        KEY_QUANTITY to "1",
-                        KEY_UNIT_PRICE to salePrice.toString(),
-                    ),
-                ),
-            )
-        }
+        val salePrice = catalogItemProperties.salePrice()
+        uxEvent(
+            RoktUxEvent.CartItemDevicePay(
+                layoutId = pluginId,
+                name = catalogItemProperties.name(),
+                cartItemId = catalogItemProperties.cartItemId(),
+                catalogItemId = catalogItemProperties.catalogItemId(),
+                currency = catalogItemProperties.currency(),
+                description = catalogItemProperties.description(),
+                linkedProductId = catalogItemProperties.linkedProductId(),
+                providerData = catalogItemProperties.providerData(),
+                totalPrice = salePrice,
+                quantity = 1,
+                unitPrice = salePrice,
+                paymentProvider = event.paymentProvider,
+                transactionData = event.transactionData,
+                onResult = { result ->
+                    setEvent(LayoutContract.LayoutEvent.CartItemDevicePayResultReceived(event.offerId, result))
+                },
+            ),
+        )
+        handlePlatformEvent(
+            RoktPlatformEvent(
+                eventType = EventType.SignalCartItemInstantPurchaseInitiated,
+                sessionId = experienceModel.sessionId,
+                parentGuid = catalogItemProperties.instanceGuid(),
+                eventData = catalogItemProperties.cartItemEventData(salePrice),
+            ),
+        )
     }
 
     private fun handleCartItemDevicePayResult(offerId: Int, result: DevicePayResult) {
@@ -492,6 +516,21 @@ internal class LayoutViewModel(
             is DevicePayResult.PendingConfirmation -> {
                 runtimeState.setCatalogRuntimeData(result.catalogRuntimeData)
                 updateOfferCustomState(offerId, DEVICE_PAY_STATE_CUSTOM_STATE_KEY, 1)
+            }
+        }
+        sendViewState()
+    }
+
+    private fun handleCartItemForwardPaymentResult(offerId: Int, result: DevicePayResult) {
+        when (result) {
+            DevicePayResult.Success -> updateOfferCustomState(offerId, PAYMENT_RESULT_CUSTOM_STATE_KEY, 1)
+
+            DevicePayResult.Failure,
+            DevicePayResult.Retry,
+            -> updateOfferCustomState(offerId, PAYMENT_RESULT_CUSTOM_STATE_KEY, -1)
+
+            is DevicePayResult.PendingConfirmation -> {
+                runtimeState.setCatalogRuntimeData(result.catalogRuntimeData)
             }
         }
         sendViewState()
@@ -780,6 +819,37 @@ internal class LayoutViewModel(
 
     private fun LayoutRuntimeState.immutableOfferCustomStates() =
         allOfferCustomStates().mapValues { (_, value) -> value.toImmutableMap() }.toImmutableMap()
+
+    private fun HMap.name(): String = get<String>(KEY_TITLE).orEmpty()
+
+    private fun HMap.cartItemId(): String = get<String>(KEY_CART_ITEM_ID).orEmpty()
+
+    private fun HMap.catalogItemId(): String = get<String>(KEY_CATALOG_ITEM_ID).orEmpty()
+
+    private fun HMap.currency(): String = get<String>(KEY_CURRENCY).orEmpty()
+
+    private fun HMap.description(): String = get<String>(KEY_DESCRIPTION).orEmpty()
+
+    private fun HMap.linkedProductId(): String = get<String>(KEY_LINKED_PRODUCT_ID).orEmpty()
+
+    private fun HMap.providerData(): String = get<String>(KEY_PROVIDER_DATA).orEmpty()
+
+    private fun HMap.instanceGuid(): String = get<String>(KEY_INSTANCE_GUID).orEmpty()
+
+    private fun HMap.originalPrice(): Double = get<Double>(KEY_ORIGINAL_PRICE) ?: 0.0
+
+    private fun HMap.salePrice(): Double = get<Double>(KEY_PRICE) ?: originalPrice()
+
+    private fun HMap.cartItemEventData(price: Double): Map<String, String> = mapOf(
+        KEY_CART_ITEM_ID to cartItemId(),
+        KEY_CATALOG_ITEM_ID to catalogItemId(),
+        KEY_CURRENCY to currency(),
+        KEY_DESCRIPTION to description(),
+        KEY_LINKED_PRODUCT_ID to linkedProductId(),
+        KEY_TOTAL_PRICE to price.toString(),
+        KEY_QUANTITY to "1",
+        KEY_UNIT_PRICE to price.toString(),
+    )
 
     companion object {
         private const val KEY_INITIATOR = "initiator"
