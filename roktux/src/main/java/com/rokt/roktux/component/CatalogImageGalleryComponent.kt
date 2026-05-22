@@ -20,7 +20,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.BiasAlignment
 import androidx.compose.ui.ExperimentalComposeUiApi
@@ -34,6 +36,8 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import com.rokt.modelmapper.uimodel.LayoutSchemaUiModel
 import com.rokt.modelmapper.utils.ROKT_ICONS_FONT_FAMILY
+import com.rokt.roktux.event.RoktUserInteractionAction
+import com.rokt.roktux.event.RoktUserInteractionContext
 import com.rokt.roktux.viewmodel.layout.LayoutContract
 import com.rokt.roktux.viewmodel.layout.OfferUiState
 
@@ -104,10 +108,29 @@ internal class CatalogImageGalleryComponent(
             contentAlignment = BiasAlignment(container.arrangementBias, container.alignmentBias),
         ) {
             val pagerState = rememberPagerState { galleryImages.size }
+            val isScrollInProgress = pagerState.isScrollInProgress
+            var scrollStartPage by remember { mutableStateOf<Int?>(null) }
+            var explicitNavigationTargetPage by remember { mutableStateOf<Int?>(null) }
+            var stateSyncTargetPage by remember { mutableStateOf<Int?>(null) }
 
-            fun navigateToPage(targetPage: Int) {
+            fun sendUserInteraction(action: RoktUserInteractionAction) {
+                onEventSent(
+                    LayoutContract.LayoutEvent.UserInteractionSelected(
+                        offerId = offerState.currentOfferIndex,
+                        action = action,
+                        context = RoktUserInteractionContext.CatalogImageGallery,
+                        catalogItemIndex = offerState.activeCatalogItemIndex,
+                    ),
+                )
+            }
+
+            fun navigateToPage(targetPage: Int, action: RoktUserInteractionAction? = null) {
                 val page = targetPage.coerceIn(0, galleryImages.lastIndex)
                 if (page != pagerState.currentPage) {
+                    action?.let {
+                        explicitNavigationTargetPage = page
+                        sendUserInteraction(it)
+                    }
                     onEventSent(
                         LayoutContract.LayoutEvent.SetCustomState(
                             model.customStateKey,
@@ -117,8 +140,38 @@ internal class CatalogImageGalleryComponent(
                 }
             }
 
+            LaunchedEffect(isScrollInProgress) {
+                if (isScrollInProgress) {
+                    scrollStartPage = pagerState.currentPage
+                } else {
+                    val startPage = scrollStartPage
+                    val endPage = pagerState.currentPage
+                    if (startPage != null &&
+                        endPage != startPage &&
+                        endPage != explicitNavigationTargetPage &&
+                        endPage != stateSyncTargetPage
+                    ) {
+                        sendUserInteraction(
+                            if (endPage > startPage) {
+                                RoktUserInteractionAction.MainImageSwipeLeft
+                            } else {
+                                RoktUserInteractionAction.MainImageSwipeRight
+                            },
+                        )
+                    }
+                    scrollStartPage = null
+                    if (explicitNavigationTargetPage == endPage) {
+                        explicitNavigationTargetPage = null
+                    }
+                    if (stateSyncTargetPage == endPage) {
+                        stateSyncTargetPage = null
+                    }
+                }
+            }
+
             LaunchedEffect(selectedPage, galleryImages.size) {
                 if (pagerState.currentPage != selectedPage) {
+                    stateSyncTargetPage = selectedPage
                     pagerState.requestScrollToPage(selectedPage)
                 }
             }
@@ -139,8 +192,18 @@ internal class CatalogImageGalleryComponent(
                 state = pagerState,
                 modifier = Modifier.catalogGalleryTapNavigation(
                     enabled = pagerState.pageCount > 1,
-                    onTapBackward = { navigateToPage(pagerState.currentPage - 1) },
-                    onTapForward = { navigateToPage(pagerState.currentPage + 1) },
+                    onTapBackward = {
+                        navigateToPage(
+                            pagerState.currentPage - 1,
+                            RoktUserInteractionAction.MainImageScrollIconLeftClick,
+                        )
+                    },
+                    onTapForward = {
+                        navigateToPage(
+                            pagerState.currentPage + 1,
+                            RoktUserInteractionAction.MainImageScrollIconRightClick,
+                        )
+                    },
                 ),
                 flingBehavior = PagerDefaults.flingBehavior(
                     state = pagerState,
@@ -166,8 +229,18 @@ internal class CatalogImageGalleryComponent(
                 breakpointIndex = breakpointIndex,
                 offerState = offerState,
                 onEventSent = onEventSent,
-                onBackwardSelected = { navigateToPage(pagerState.currentPage - 1) },
-                onForwardSelected = { navigateToPage(pagerState.currentPage + 1) },
+                onBackwardSelected = {
+                    navigateToPage(
+                        pagerState.currentPage - 1,
+                        RoktUserInteractionAction.MainImageScrollIconLeftClick,
+                    )
+                },
+                onForwardSelected = {
+                    navigateToPage(
+                        pagerState.currentPage + 1,
+                        RoktUserInteractionAction.MainImageScrollIconRightClick,
+                    )
+                },
             )
 
             if (model.showIndicators && pagerState.pageCount > 1 && model.indicatorStyle != null) {
@@ -179,7 +252,9 @@ internal class CatalogImageGalleryComponent(
                     offerState = offerState,
                     isDarkModeEnabled = isDarkModeEnabled,
                     breakpointIndex = breakpointIndex,
-                    onIndicatorSelected = ::navigateToPage,
+                    onIndicatorSelected = { page ->
+                        navigateToPage(page, RoktUserInteractionAction.ThumbnailClick)
+                    },
                 )
             }
         }

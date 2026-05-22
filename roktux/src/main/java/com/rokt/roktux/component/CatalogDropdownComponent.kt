@@ -46,6 +46,8 @@ import com.rokt.modelmapper.uimodel.ModifierProperties
 import com.rokt.modelmapper.uimodel.StateBlock
 import com.rokt.modelmapper.utils.ROKT_ICONS_FONT_FAMILY
 import com.rokt.roktux.di.layout.LocalLayoutComponent
+import com.rokt.roktux.event.RoktUserInteractionAction
+import com.rokt.roktux.event.RoktUserInteractionContext
 import com.rokt.roktux.validation.ValidationCoordinator
 import com.rokt.roktux.validation.ValidationStatus
 import com.rokt.roktux.viewmodel.layout.LayoutContract
@@ -192,6 +194,7 @@ internal class CatalogDropdownComponent(private val modifierFactory: ModifierFac
                                 onSelected = { optionIndex ->
                                     val updatedSelections =
                                         selectedIndices(model, offerState) + (model.attributeIndex to optionIndex)
+                                    val activeItemIndex = resolveActiveCatalogItemIndex(model, updatedSelections)
                                     pendingSelectedIndex = optionIndex
                                     onEventSent(
                                         LayoutContract.LayoutEvent.SetCustomState(
@@ -199,8 +202,16 @@ internal class CatalogDropdownComponent(private val modifierFactory: ModifierFac
                                             optionIndex,
                                         ),
                                     )
-                                    resolveActiveCatalogItemIndex(model, updatedSelections)?.let { activeItemIndex ->
+                                    activeItemIndex?.let {
                                         onEventSent(LayoutContract.LayoutEvent.SetActiveCatalogItem(activeItemIndex))
+                                        onEventSent(
+                                            LayoutContract.LayoutEvent.UserInteractionSelected(
+                                                offerId = offerState.currentOfferIndex,
+                                                action = RoktUserInteractionAction.DropDownItemSelected,
+                                                context = RoktUserInteractionContext.CatalogDropDown,
+                                                catalogItemIndex = activeItemIndex,
+                                            ),
+                                        )
                                     }
                                     isExpanded = false
                                     if (validationFieldKey != null &&

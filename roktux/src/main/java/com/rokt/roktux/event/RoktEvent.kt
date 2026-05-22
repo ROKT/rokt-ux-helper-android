@@ -140,6 +140,7 @@ data class RoktPlatformEvent(
     @SerialName("pageInstanceGuid") val pageInstanceGuid: String = "",
     @SerialName("eventTime") val eventTime: String = roktDateFormat.format(Date()),
     @SerialName("eventData") val eventData: Map<String, String>? = null,
+    @SerialName("objectData") val objectData: Map<String, String>? = null,
     @SerialName("metadata") var metadata: List<EventNameValue> = emptyList(),
 ) : RoktEvent {
     init {
@@ -186,10 +187,32 @@ enum class EventType {
 
     @SerialName("SignalCartItemInstantPurchaseInitiated")
     SignalCartItemInstantPurchaseInitiated,
+
+    @SerialName("SignalInstantPurchaseDismissal")
+    SignalInstantPurchaseDismissal,
+
+    @SerialName("SignalUserInteraction")
+    SignalUserInteraction,
 }
 
 @Serializable
 data class EventNameValue(@SerialName("name") val name: String, @SerialName("value") val value: String)
+
+internal enum class RoktUserInteractionAction {
+    ValidationTriggerFailed,
+    DropDownItemSelected,
+    ThumbnailClick,
+    MainImageScrollIconLeftClick,
+    MainImageScrollIconRightClick,
+    MainImageSwipeLeft,
+    MainImageSwipeRight,
+}
+
+internal enum class RoktUserInteractionContext {
+    CustomStateValidationTriggerButton,
+    CatalogDropDown,
+    CatalogImageGallery,
+}
 
 internal fun SignalType.toEventType(): EventType = when (this) {
     SignalType.SignalResponse -> EventType.SignalResponse
