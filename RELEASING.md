@@ -37,6 +37,7 @@ gitGraph
 
 1. Run the workflow called "Release – Draft" against the `main` branch which will:
     - Open a PR targeting `main`
+    - Auto-generate `CHANGELOG.md` from git history (conventional commit PR titles)
 2. Once tested and approved by the relevant owners, merge the PR to `main`
 3. Once merged the following will occur:
     - Update changelog - unreleased section moved to correct version number
@@ -70,6 +71,10 @@ To cut a qualified release such as `1.0.0-rc1` or `0.10.0-alpha2`:
     - Create a GitHub release marked as pre-release and **not** marked as
       "Latest" so the stable release keeps the badge.
     - Tag the commit with the qualified version (e.g. `1.0.0-rc1`).
+
+## CHANGELOG.md
+
+`CHANGELOG.md` is generated automatically by the `Release – Draft` workflow from the git history (conventional commit PR titles). **Do not edit `CHANGELOG.md` in feature branches** — any manual entries will be overwritten when the release PR is drafted. Write clear, conventional commit-style PR titles (e.g. `feat(catalog-dropdown): use icon font markers`) and the changelog entry will be produced for you at release time.
 
 ## Hotfix / patch version release
 
