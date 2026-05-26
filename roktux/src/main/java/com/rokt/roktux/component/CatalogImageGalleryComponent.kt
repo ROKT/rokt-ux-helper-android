@@ -20,9 +20,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.BiasAlignment
 import androidx.compose.ui.ExperimentalComposeUiApi
@@ -109,9 +107,7 @@ internal class CatalogImageGalleryComponent(
         ) {
             val pagerState = rememberPagerState { galleryImages.size }
             val isScrollInProgress = pagerState.isScrollInProgress
-            var scrollStartPage by remember { mutableStateOf<Int?>(null) }
-            var explicitNavigationTargetPage by remember { mutableStateOf<Int?>(null) }
-            var stateSyncTargetPage by remember { mutableStateOf<Int?>(null) }
+            val swipeTracker = remember { CatalogImageGallerySwipeTracker() }
 
             fun sendUserInteraction(action: RoktUserInteractionAction) {
                 onEventSent(
@@ -128,7 +124,7 @@ internal class CatalogImageGalleryComponent(
                 val page = targetPage.coerceIn(0, galleryImages.lastIndex)
                 if (page != pagerState.currentPage) {
                     action?.let {
-                        explicitNavigationTargetPage = page
+                        swipeTracker.markExplicitNavigationTarget(page)
                         sendUserInteraction(it)
                     }
                     onEventSent(
@@ -140,38 +136,17 @@ internal class CatalogImageGalleryComponent(
                 }
             }
 
-            LaunchedEffect(isScrollInProgress) {
-                if (isScrollInProgress) {
-                    scrollStartPage = pagerState.currentPage
-                } else {
-                    val startPage = scrollStartPage
-                    val endPage = pagerState.currentPage
-                    if (startPage != null &&
-                        endPage != startPage &&
-                        endPage != explicitNavigationTargetPage &&
-                        endPage != stateSyncTargetPage
-                    ) {
-                        sendUserInteraction(
-                            if (endPage > startPage) {
-                                RoktUserInteractionAction.MainImageSwipeLeft
-                            } else {
-                                RoktUserInteractionAction.MainImageSwipeRight
-                            },
-                        )
-                    }
-                    scrollStartPage = null
-                    if (explicitNavigationTargetPage == endPage) {
-                        explicitNavigationTargetPage = null
-                    }
-                    if (stateSyncTargetPage == endPage) {
-                        stateSyncTargetPage = null
-                    }
-                }
+            LaunchedEffect(isScrollInProgress, pagerState.currentPage) {
+                swipeTracker.onPagerScrollChanged(
+                    isScrollInProgress = isScrollInProgress,
+                    settledPage = pagerState.settledPage,
+                    currentPage = pagerState.currentPage,
+                )?.let(::sendUserInteraction)
             }
 
             LaunchedEffect(selectedPage, galleryImages.size) {
                 if (pagerState.currentPage != selectedPage) {
-                    stateSyncTargetPage = selectedPage
+                    swipeTracker.markStateSyncTarget(selectedPage)
                     pagerState.requestScrollToPage(selectedPage)
                 }
             }
@@ -483,5 +458,60 @@ internal class CatalogImageGalleryComponent(
     private companion object {
         const val PreviousImageContentDescription = "Previous image"
         const val NextImageContentDescription = "Next image"
+    }
+}
+
+internal class CatalogImageGallerySwipeTracker {
+    private var scrollStartPage: Int? = null
+    private var explicitNavigationTargetPage: Int? = null
+    private var stateSyncTargetPage: Int? = null
+
+    fun markExplicitNavigationTarget(page: Int) {
+        explicitNavigationTargetPage = page
+    }
+
+    fun markStateSyncTarget(page: Int) {
+        stateSyncTargetPage = page
+    }
+
+    fun onPagerScrollChanged(
+        isScrollInProgress: Boolean,
+        settledPage: Int,
+        currentPage: Int,
+    ): RoktUserInteractionAction? {
+        if (isScrollInProgress) {
+            if (scrollStartPage == null) {
+                scrollStartPage = settledPage
+            }
+            return null
+        }
+
+        val startPage = scrollStartPage
+        val action = if (startPage != null &&
+            currentPage != startPage &&
+            currentPage != explicitNavigationTargetPage &&
+            currentPage != stateSyncTargetPage
+        ) {
+            if (currentPage > startPage) {
+                RoktUserInteractionAction.MainImageSwipeLeft
+            } else {
+                RoktUserInteractionAction.MainImageSwipeRight
+            }
+        } else {
+            null
+        }
+
+        scrollStartPage = null
+        clearConsumedTargets(currentPage)
+        return action
+    }
+
+    private fun clearConsumedTargets(page: Int) {
+        if (explicitNavigationTargetPage == page) {
+            explicitNavigationTargetPage = null
+        }
+        if (stateSyncTargetPage == page) {
+            stateSyncTargetPage = null
+        }
     }
 }
