@@ -2,7 +2,9 @@ package com.rokt.roktux.event
 
 import com.rokt.modelmapper.uimodel.OpenLinks
 import com.rokt.modelmapper.uimodel.SignalType
+import com.rokt.modelmapper.uimodel.TransactionData
 import com.rokt.modelmapper.utils.roktDateFormat
+import com.rokt.network.model.PaymentProvider
 import com.rokt.roktux.RoktIntegrationConfig
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -88,6 +90,46 @@ sealed interface RoktUxEvent {
         val onClose: (id: String) -> Unit,
         val onError: (id: String, throwable: Throwable) -> Unit,
     ) : RoktUxEvent
+
+    data class CartItemDevicePay(
+        val layoutId: String,
+        val name: String,
+        val cartItemId: String,
+        val catalogItemId: String,
+        val currency: String,
+        val description: String,
+        val linkedProductId: String,
+        val providerData: String,
+        val totalPrice: Double,
+        val quantity: Int,
+        val unitPrice: Double,
+        val paymentProvider: PaymentProvider,
+        val transactionData: TransactionData?,
+        val onResult: (DevicePayResult) -> Unit,
+    ) : RoktUxEvent
+
+    data class CartItemForwardPayment(
+        val layoutId: String,
+        val name: String,
+        val cartItemId: String,
+        val catalogItemId: String,
+        val currency: String,
+        val description: String,
+        val linkedProductId: String,
+        val providerData: String,
+        val totalPrice: Double,
+        val quantity: Int,
+        val unitPrice: Double,
+        val transactionData: TransactionData?,
+        val onResult: (DevicePayResult) -> Unit,
+    ) : RoktUxEvent
+}
+
+sealed interface DevicePayResult {
+    object Success : DevicePayResult
+    object Failure : DevicePayResult
+    object Retry : DevicePayResult
+    data class PendingConfirmation(val catalogRuntimeData: Map<String, String>) : DevicePayResult
 }
 
 @Serializable
@@ -98,6 +140,7 @@ data class RoktPlatformEvent(
     @SerialName("pageInstanceGuid") val pageInstanceGuid: String = "",
     @SerialName("eventTime") val eventTime: String = roktDateFormat.format(Date()),
     @SerialName("eventData") val eventData: Map<String, String>? = null,
+    @SerialName("objectData") val objectData: Map<String, String>? = null,
     @SerialName("metadata") var metadata: List<EventNameValue> = emptyList(),
 ) : RoktEvent {
     init {
@@ -144,10 +187,32 @@ enum class EventType {
 
     @SerialName("SignalCartItemInstantPurchaseInitiated")
     SignalCartItemInstantPurchaseInitiated,
+
+    @SerialName("SignalInstantPurchaseDismissal")
+    SignalInstantPurchaseDismissal,
+
+    @SerialName("SignalUserInteraction")
+    SignalUserInteraction,
 }
 
 @Serializable
 data class EventNameValue(@SerialName("name") val name: String, @SerialName("value") val value: String)
+
+internal enum class RoktUserInteractionAction {
+    ValidationTriggerFailed,
+    DropDownItemSelected,
+    ThumbnailClick,
+    MainImageScrollIconLeftClick,
+    MainImageScrollIconRightClick,
+    MainImageSwipeLeft,
+    MainImageSwipeRight,
+}
+
+internal enum class RoktUserInteractionContext {
+    CustomStateValidationTriggerButton,
+    CatalogDropDown,
+    CatalogImageGallery,
+}
 
 internal fun SignalType.toEventType(): EventType = when (this) {
     SignalType.SignalResponse -> EventType.SignalResponse

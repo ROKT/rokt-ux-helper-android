@@ -19,8 +19,10 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.DpOffset
 import com.rokt.modelmapper.data.BindData
 import com.rokt.modelmapper.hmap.HMap
+import com.rokt.network.model.PaymentProvider
 import com.rokt.network.model.TransitionSpeedSetting
 import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.ImmutableMap
 
 @Immutable
 sealed class LayoutSchemaUiModel(
@@ -80,6 +82,71 @@ sealed class LayoutSchemaUiModel(
         val children: ImmutableList<LayoutSchemaUiModel?>, // the type of it is either RowUiModel or ColumnUiModel
     ) : LayoutSchemaUiModel(ownModifiers, containerProperties, conditionalTransitionModifiers)
 
+    data class CatalogCombinedCollectionUiModel(
+        override val ownModifiers: ImmutableList<StateBlock<ModifierProperties>>?,
+        override val containerProperties: ImmutableList<StateBlock<ContainerProperties>>?,
+        override val conditionalTransitionModifiers: ConditionalTransitionModifier?,
+        val childrenByCatalogItem: ImmutableMap<Int, ImmutableList<LayoutSchemaUiModel?>>,
+    ) : LayoutSchemaUiModel(ownModifiers, containerProperties, conditionalTransitionModifiers)
+
+    data class CatalogImageGalleryUiModel(
+        override val ownModifiers: ImmutableList<StateBlock<ModifierProperties>>?,
+        override val containerProperties: ImmutableList<StateBlock<ContainerProperties>>?,
+        override val conditionalTransitionModifiers: ConditionalTransitionModifier?,
+        val images: ImmutableMap<Int, ImageUiModel>,
+        val showIndicators: Boolean,
+        val indicatorStyle: ProgressIndicatorItemUiModel?,
+        val activeIndicator: ProgressIndicatorItemUiModel?,
+        val seenIndicator: ProgressIndicatorItemUiModel?,
+        val progressIndicatorContainer: ProgressIndicatorItemUiModel?,
+        val controlButton: CatalogImageGalleryControlButtonUiModel?,
+        val customStateKey: String,
+        val backwardIcon: String?,
+        val forwardIcon: String?,
+        val a11yLabel: String?,
+    ) : LayoutSchemaUiModel(ownModifiers, containerProperties, conditionalTransitionModifiers)
+
+    data class CatalogImageGalleryControlButtonUiModel(
+        val ownModifiers: ImmutableList<StateBlock<ModifierProperties>>?,
+        val containerProperties: ImmutableList<StateBlock<ContainerProperties>>?,
+        val conditionalTransitionModifiers: ConditionalTransitionModifier?,
+        val textStyles: ImmutableList<StateBlock<TextStylingUiProperties>>?,
+    )
+
+    data class CatalogDropdownUiModel(
+        override val ownModifiers: ImmutableList<StateBlock<ModifierProperties>>?,
+        override val containerProperties: ImmutableList<StateBlock<ContainerProperties>>?,
+        override val conditionalTransitionModifiers: ConditionalTransitionModifier?,
+        val head: CatalogDropdownElementUiModel?,
+        val icon: CatalogDropdownElementUiModel?,
+        val optionList: CatalogDropdownElementUiModel?,
+        val option: CatalogDropdownElementUiModel?,
+        val error: CatalogDropdownElementUiModel?,
+        val placeholderValue: String?,
+        val unavailableValue: String?,
+        val validationFieldKey: String?,
+        val validationErrorMessage: String?,
+        val validateOnChange: Boolean,
+        val a11yLabel: String?,
+        val attributeIndex: Int,
+        val customStateKey: String,
+        val catalogItemGroup: CatalogItemGroupModel?,
+        val catalogItems: ImmutableList<CatalogItemModel>,
+    ) : LayoutSchemaUiModel(ownModifiers, containerProperties, conditionalTransitionModifiers)
+
+    data class CatalogDropdownElementUiModel(
+        val default: CatalogDropdownStyleUiModel?,
+        val selected: CatalogDropdownStyleUiModel?,
+        val disabled: CatalogDropdownStyleUiModel?,
+        val errored: CatalogDropdownStyleUiModel?,
+    )
+
+    data class CatalogDropdownStyleUiModel(
+        val ownModifiers: ImmutableList<StateBlock<ModifierProperties>>?,
+        val containerProperties: ImmutableList<StateBlock<ContainerProperties>>?,
+        val textStyles: ImmutableList<StateBlock<TextStylingUiProperties>>?,
+    )
+
     data class ProgressIndicatorUiModel(
         override val ownModifiers: ImmutableList<StateBlock<ModifierProperties>>?,
         override val containerProperties: ImmutableList<StateBlock<ContainerProperties>>?,
@@ -122,6 +189,19 @@ sealed class LayoutSchemaUiModel(
         override val conditionalTransitionModifiers: ConditionalTransitionModifier?,
         override val children: ImmutableList<LayoutSchemaUiModel?>,
         val catalogItemModel: HMap?,
+        val transactionData: TransactionData?,
+    ) : ButtonUiModel(ownModifiers, containerProperties, conditionalTransitionModifiers, children)
+
+    data class CatalogDevicePayButtonUiModel(
+        override val ownModifiers: ImmutableList<StateBlock<ModifierProperties>>?,
+        override val containerProperties: ImmutableList<StateBlock<ContainerProperties>>?,
+        override val conditionalTransitionModifiers: ConditionalTransitionModifier?,
+        override val children: ImmutableList<LayoutSchemaUiModel?>,
+        val catalogItemModel: HMap?,
+        val paymentProvider: PaymentProvider,
+        val validatorFieldKeys: ImmutableList<String>,
+        val transactionData: TransactionData?,
+        val a11yLabel: String?,
     ) : ButtonUiModel(ownModifiers, containerProperties, conditionalTransitionModifiers, children)
 
     data class StaticLinkUiModel(
@@ -520,7 +600,19 @@ sealed class WhenUiPredicate {
     data class StaticBoolean(val condition: BooleanWhenUiCondition, val value: Boolean) : WhenUiPredicate()
     data class DarkMode(val condition: EqualityWhenUiCondition, val value: Boolean) : WhenUiPredicate()
     data class CustomState(val condition: OrderableWhenUiCondition, val key: String, val value: Int) : WhenUiPredicate()
+    data class DomainState(val condition: OrderableWhenUiCondition, val key: String, val value: Int) :
+        WhenUiPredicate()
+
     data class StaticString(val condition: EqualityWhenUiCondition, val input: String, val value: String) :
+        WhenUiPredicate()
+
+    data class PlaceholderTextValue(val condition: StringWhenUiCondition, val input: BindData, val value: String) :
+        WhenUiPredicate()
+
+    data class PlaceholderTextLength(val condition: OrderableWhenUiCondition, val input: BindData, val value: String) :
+        WhenUiPredicate()
+
+    data class PlaceholderNumeric(val condition: OrderableWhenUiCondition, val input: BindData, val value: String) :
         WhenUiPredicate()
 }
 
@@ -537,6 +629,13 @@ enum class EqualityWhenUiCondition {
 }
 
 enum class ExistenceWhenUiCondition {
+    Exists,
+    NotExists,
+}
+
+enum class StringWhenUiCondition {
+    Is,
+    IsNot,
     Exists,
     NotExists,
 }

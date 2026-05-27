@@ -1,0 +1,69 @@
+{
+  "type": "CatalogDevicePayButton",
+  "node": {
+    "a11yLabel": "Buy with Google Pay",
+    "provider": "GooglePay",
+    "validatorTriggerConfig": {
+      "validatorFieldKeys": ["dropDownSelection"]
+    },
+    "styles": {
+      "elements": {
+        "own": [
+          {
+            "default": {
+              "container": {
+                "alignItems": "center",
+                "justifyContent": "center"
+              },
+              "dimension": {
+                "width": {
+                  "type": "fixed",
+                  "value": 220
+                },
+                "height": {
+                  "type": "fixed",
+                  "value": 48
+                }
+              },
+              "background": {
+                "backgroundColor": {
+                  "light": "#000000",
+                  "dark": "#ffffff"
+                }
+              },
+              "border": {
+                "borderRadius": 4
+              }
+            }
+          }
+        ]
+      }
+    },
+    "children": [
+      {
+        "type": "BasicText",
+        "node": {
+          "value": "Buy with Google Pay",
+          "styles": {
+            "elements": {
+              "own": [
+                {
+                  "default": {
+                    "text": {
+                      "fontSize": 16,
+                      "fontWeight": "700",
+                      "textColor": {
+                        "light": "#ffffff",
+                        "dark": "#000000"
+                      }
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        }
+      }
+    ]
+  }
+}

@@ -36,9 +36,16 @@ internal class CatalogResponseComponent(
             onEventSent = onEventSent,
         ) {
             model.catalogItemModel?.let { catalogItemModel ->
-                onEventSent.invoke(
-                    LayoutContract.LayoutEvent.CartItemInstantPurchaseSelected(catalogItemModel),
-                )
+                val event = if (model.transactionData?.isPartnerManagedPurchase == false) {
+                    LayoutContract.LayoutEvent.CartItemForwardPaymentSelected(
+                        offerId = offerState.currentOfferIndex,
+                        catalogItemModel = catalogItemModel,
+                        transactionData = model.transactionData,
+                    )
+                } else {
+                    LayoutContract.LayoutEvent.CartItemInstantPurchaseSelected(catalogItemModel)
+                }
+                onEventSent.invoke(event)
             }
         }
     }

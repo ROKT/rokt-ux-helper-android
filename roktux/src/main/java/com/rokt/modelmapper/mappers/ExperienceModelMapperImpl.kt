@@ -6,7 +6,11 @@ import com.rokt.modelmapper.hmap.HMap
 import com.rokt.modelmapper.hmap.TypedKey
 import com.rokt.modelmapper.hmap.set
 import com.rokt.modelmapper.model.NetworkAction
+import com.rokt.modelmapper.model.NetworkAddress
 import com.rokt.modelmapper.model.NetworkCatalogItem
+import com.rokt.modelmapper.model.NetworkCatalogItemGroup
+import com.rokt.modelmapper.model.NetworkCatalogItemGroupAttribute
+import com.rokt.modelmapper.model.NetworkCatalogItemGroupOption
 import com.rokt.modelmapper.model.NetworkCreativeImage
 import com.rokt.modelmapper.model.NetworkCreativeLayout
 import com.rokt.modelmapper.model.NetworkExperienceResponse
@@ -14,12 +18,18 @@ import com.rokt.modelmapper.model.NetworkLayoutVariant
 import com.rokt.modelmapper.model.NetworkOfferLayout
 import com.rokt.modelmapper.model.NetworkOptions
 import com.rokt.modelmapper.model.NetworkPageContext
+import com.rokt.modelmapper.model.NetworkPaymentMethod
 import com.rokt.modelmapper.model.NetworkPlugin
 import com.rokt.modelmapper.model.NetworkResponseOption
 import com.rokt.modelmapper.model.NetworkSignalType
 import com.rokt.modelmapper.model.NetworkSlotLayout
+import com.rokt.modelmapper.model.NetworkTransactionData
 import com.rokt.modelmapper.uimodel.Action
+import com.rokt.modelmapper.uimodel.Address
 import com.rokt.modelmapper.uimodel.CatalogImageWrapperModel
+import com.rokt.modelmapper.uimodel.CatalogItemGroupAttributeModel
+import com.rokt.modelmapper.uimodel.CatalogItemGroupModel
+import com.rokt.modelmapper.uimodel.CatalogItemGroupOptionModel
 import com.rokt.modelmapper.uimodel.CatalogItemModel
 import com.rokt.modelmapper.uimodel.CreativeIcon
 import com.rokt.modelmapper.uimodel.CreativeLink
@@ -32,11 +42,13 @@ import com.rokt.modelmapper.uimodel.Module
 import com.rokt.modelmapper.uimodel.OfferImageModel
 import com.rokt.modelmapper.uimodel.OfferModel
 import com.rokt.modelmapper.uimodel.OptionsModel
+import com.rokt.modelmapper.uimodel.PaymentMethod
 import com.rokt.modelmapper.uimodel.PlacementContextModel
 import com.rokt.modelmapper.uimodel.PluginModel
 import com.rokt.modelmapper.uimodel.ResponseOptionModel
 import com.rokt.modelmapper.uimodel.SignalType
 import com.rokt.modelmapper.uimodel.SlotModel
+import com.rokt.modelmapper.uimodel.TransactionData
 import com.rokt.network.model.LayoutSchemaModel
 import com.rokt.roktux.logging.RoktUXLogger
 import kotlinx.collections.immutable.ImmutableMap
@@ -95,7 +107,7 @@ class ExperienceModelMapperImpl(private val experienceResponse: String, private 
         targetElementSelector = targetElementSelector,
         instanceGuid = config.instanceGuid,
         token = config.token,
-        outerLayoutSchema = transformLayoutSchemaModel(config.outerLayoutSchema.layout),
+        outerLayoutSchema = transformOuterLayoutSchemaModel(config.outerLayoutSchema.layout),
         slots = config.slots.map { it.toSlotModel() }.toImmutableList(),
         breakpoint = config.outerLayoutSchema.breakpoints.buildBreakpoints(),
         settings = buildSettings(config.outerLayoutSchema.settings),
@@ -131,9 +143,36 @@ class ExperienceModelMapperImpl(private val experienceResponse: String, private 
             campaignId = campaignId,
             creative = creative.toCreativeModel(),
             catalogItems = catalogItems.map { it.toCatalogItemModel() }.toImmutableList(),
+            transactionData = transactionData?.toTransactionDataModel(),
+            catalogItemGroup = catalogItemGroup?.toCatalogItemGroupModel(),
         )
         return offerModel
     }
+
+    private fun NetworkTransactionData.toTransactionDataModel(): TransactionData = TransactionData(
+        shippingAddress = shippingAddress?.toAddressModel(),
+        billingAddress = billingAddress?.toAddressModel(),
+        paymentType = paymentType,
+        supportedPaymentMethods = supportedPaymentMethods?.map { it.toPaymentMethodModel() },
+        isPartnerManagedPurchase = isPartnerManagedPurchase,
+        partnerPaymentReference = partnerPaymentReference,
+        confirmationRef = confirmationRef,
+        metadata = metadata,
+    )
+
+    private fun NetworkPaymentMethod.toPaymentMethodModel(): PaymentMethod = PaymentMethod(type = type)
+
+    private fun NetworkAddress.toAddressModel(): Address = Address(
+        name = name,
+        address1 = address1,
+        address2 = address2,
+        city = city,
+        state = state,
+        stateCode = stateCode,
+        country = country,
+        countryCode = countryCode,
+        zip = zip,
+    )
 
     private fun NetworkCreativeLayout.toCreativeModel(): CreativeModel = CreativeModel(
         referralCreativeId = referralCreativeId,
@@ -197,9 +236,32 @@ class ExperienceModelMapperImpl(private val experienceResponse: String, private 
             set(TypedKey<String>(KEY_ADD_ON_PLUGIN_URL), addOnPluginUrl)
             set(TypedKey<String>(KEY_ADD_ON_PLUGIN_NAME), addOnPluginName)
             set(TypedKey<String>(KEY_TOKEN), token)
+            set(TypedKey<String>(KEY_INVENTORY_STATUS), inventoryStatus)
         },
         imageWrapper = transformImage(images),
     )
+
+    private fun NetworkCatalogItemGroup.toCatalogItemGroupModel(): CatalogItemGroupModel = CatalogItemGroupModel(
+        groupId = groupId,
+        catalogItemIds = catalogItemIds.toImmutableList(),
+        attributes = attributes.map { it.toCatalogItemGroupAttributeModel() }.toImmutableList(),
+        metadata = metadata.toImmutableMap(),
+    )
+
+    private fun NetworkCatalogItemGroupAttribute.toCatalogItemGroupAttributeModel(): CatalogItemGroupAttributeModel =
+        CatalogItemGroupAttributeModel(
+            attributeId = attributeId,
+            label = label,
+            options = options.map { it.toCatalogItemGroupOptionModel() }.toImmutableList(),
+            metadata = metadata.toImmutableMap(),
+        )
+
+    private fun NetworkCatalogItemGroupOption.toCatalogItemGroupOptionModel(): CatalogItemGroupOptionModel =
+        CatalogItemGroupOptionModel(
+            label = label,
+            catalogItemIds = catalogItemIds.toImmutableList(),
+            metadata = metadata.toImmutableMap(),
+        )
 
     private fun NetworkAction.toActionModel(): Action = when (this) {
         NetworkAction.Url -> Action.Url
@@ -230,8 +292,9 @@ class ExperienceModelMapperImpl(private val experienceResponse: String, private 
             },
         )
 
-    private fun NetworkLayoutVariant.toLayoutVariantModel(offerModel: OfferModel?): LayoutVariantModel =
-        LayoutVariantModel(
+    private fun NetworkLayoutVariant.toLayoutVariantModel(offerModel: OfferModel?): LayoutVariantModel {
+        nextCatalogDropdownAttributeIndex = 0
+        return LayoutVariantModel(
             layoutVariantId = layoutVariantId,
             moduleName = moduleName,
             layoutVariantSchema = transformLayoutSchemaModel(
@@ -240,6 +303,12 @@ class ExperienceModelMapperImpl(private val experienceResponse: String, private 
                 module = Module.fromString(moduleName),
             ),
         )
+    }
+
+    private fun transformOuterLayoutSchemaModel(layoutSchemaModel: LayoutSchemaModel): LayoutSchemaUiModel? {
+        nextCatalogDropdownAttributeIndex = 0
+        return transformLayoutSchemaModel(layoutSchemaModel)
+    }
 
     private fun transformLayoutSchemaModel(
         layoutSchemaModel: LayoutSchemaModel,
@@ -325,7 +394,13 @@ class ExperienceModelMapperImpl(private val experienceResponse: String, private 
 
         is LayoutSchemaModel.When -> transformWhen(
             layoutSchemaModel,
-        ) { child -> transformLayoutSchemaModel(child, offerModel, responseContextKey, itemIndex, module) }
+            transformLayoutSchemaChildren = { child ->
+                transformLayoutSchemaModel(child, offerModel, responseContextKey, itemIndex, module)
+            },
+            bindPlaceholderValue = { value ->
+                bindValue(value, responseContextKey, offerModel, itemIndex)
+            },
+        )
 
         is LayoutSchemaModel.DataIcon -> transformDataIcon(layoutSchemaModel, offerModel, module, itemIndex)
 
@@ -343,6 +418,12 @@ class ExperienceModelMapperImpl(private val experienceResponse: String, private 
             transformLayoutSchemaModel(child, offerModel, responseContextKey, index, catalogItemModule)
         }
 
+        is LayoutSchemaModel.CatalogCombinedCollection -> transformCatalogCombinedCollectionWithScopedDropdowns(
+            layoutSchemaModel,
+            offerModel,
+            responseContextKey,
+        )
+
         is LayoutSchemaModel.CatalogResponseButton -> transformCatalogResponseButton(
             layoutSchemaModel,
             offerModel,
@@ -351,7 +432,30 @@ class ExperienceModelMapperImpl(private val experienceResponse: String, private 
             transformLayoutSchemaModel(child, offerModel, responseContextKey, itemIndex, module)
         }
 
-        else -> null
+        is LayoutSchemaModel.AccessibilityGrouped -> TODO("AccessibilityGrouped mapping is not implemented")
+
+        is LayoutSchemaModel.CatalogDevicePayButton -> transformCatalogDevicePayButton(
+            layoutSchemaModel,
+            offerModel,
+            itemIndex,
+        ) { child ->
+            transformLayoutSchemaModel(child, offerModel, responseContextKey, itemIndex, module)
+        }
+
+        is LayoutSchemaModel.CatalogDropdown -> transformCatalogDropdown(
+            layoutSchemaModel,
+            offerModel,
+            nextCatalogDropdownAttributeIndex++,
+        )
+
+        is LayoutSchemaModel.CatalogImageGallery -> transformCatalogImageGallery(
+            layoutSchemaModel,
+            offerModel,
+            itemIndex,
+            module,
+        )
+
+        is LayoutSchemaModel.SlideStateTrigger -> TODO("SlideStateTrigger mapping is not implemented")
     }
 
     private fun bindValue(
@@ -360,6 +464,33 @@ class ExperienceModelMapperImpl(private val experienceResponse: String, private 
         offerModel: OfferModel?,
         itemIndex: Int,
     ): BindData = dataBinding.bindValue(value, contextKey, offerModel, itemIndex)
+
+    private var nextCatalogDropdownAttributeIndex = 0
+
+    private fun transformCatalogCombinedCollectionWithScopedDropdowns(
+        layoutSchemaModel: LayoutSchemaModel.CatalogCombinedCollection,
+        offerModel: OfferModel?,
+        responseContextKey: String?,
+    ): LayoutSchemaUiModel.CatalogCombinedCollectionUiModel {
+        val dropdownIndexBeforeCollection = nextCatalogDropdownAttributeIndex
+        var dropdownIndexAfterTemplate: Int? = null
+
+        val result = transformCatalogCombinedCollection(
+            layoutSchemaModel,
+            offerModel,
+        ) { index, catalogItemModule, child ->
+            nextCatalogDropdownAttributeIndex = dropdownIndexBeforeCollection
+            transformLayoutSchemaModel(child, offerModel, responseContextKey, index, catalogItemModule)
+                .also {
+                    if (dropdownIndexAfterTemplate == null) {
+                        dropdownIndexAfterTemplate = nextCatalogDropdownAttributeIndex
+                    }
+                }
+        }
+
+        nextCatalogDropdownAttributeIndex = dropdownIndexAfterTemplate ?: dropdownIndexBeforeCollection
+        return result
+    }
 
     companion object {
         private const val KEY_ID = "id"
@@ -398,5 +529,6 @@ class ExperienceModelMapperImpl(private val experienceResponse: String, private 
         private const val KEY_PRICE_FORMATTED = "priceFormatted"
         private const val KEY_ADD_ON_PLUGIN_URL = "addOnPluginUrl"
         private const val KEY_ADD_ON_PLUGIN_NAME = "addOnPluginName"
+        const val KEY_INVENTORY_STATUS = "inventoryStatus"
     }
 }
