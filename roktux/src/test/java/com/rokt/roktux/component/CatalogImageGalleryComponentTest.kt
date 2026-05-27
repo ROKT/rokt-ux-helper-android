@@ -16,8 +16,11 @@ import com.rokt.core.testutils.annotations.DcuiConfig
 import com.rokt.core.testutils.annotations.DcuiNodeJson
 import com.rokt.core.testutils.annotations.DcuiOfferJson
 import com.rokt.core.testutils.assertion.assertBackgroundColor
+import com.rokt.roktux.event.RoktUserInteractionAction
+import com.rokt.roktux.event.RoktUserInteractionContext
 import com.rokt.roktux.testutil.BaseDcuiEspressoTest
 import com.rokt.roktux.viewmodel.layout.LayoutContract
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.Test
 import org.junit.runner.RunWith
 
@@ -34,6 +37,9 @@ class CatalogImageGalleryComponentTest : BaseDcuiEspressoTest() {
             .assertWidthIsEqualTo(180.dp)
             .assertHeightIsEqualTo(140.dp)
             .assertBackgroundColor("#eef7ff")
+
+        assertThat(getCapturedEvents())
+            .noneMatch { event -> event is LayoutContract.LayoutEvent.UserInteractionSelected }
     }
 
     @Test
@@ -50,6 +56,7 @@ class CatalogImageGalleryComponentTest : BaseDcuiEspressoTest() {
             }
 
         waitForImageCarouselPosition(2)
+        waitForGalleryInteraction(RoktUserInteractionAction.MainImageScrollIconRightClick)
     }
 
     @Test
@@ -65,12 +72,24 @@ class CatalogImageGalleryComponentTest : BaseDcuiEspressoTest() {
             .performClick()
 
         waitForImageCarouselPosition(2)
+        waitForGalleryInteraction(RoktUserInteractionAction.MainImageScrollIconRightClick)
     }
 
     private fun waitForImageCarouselPosition(position: Int) {
         composeTestRule.waitUntil(timeoutMillis = 5_000) {
             getCapturedEvents().any { event ->
                 event == LayoutContract.LayoutEvent.SetCustomState("imageCarouselPosition", position)
+            }
+        }
+    }
+
+    private fun waitForGalleryInteraction(action: RoktUserInteractionAction) {
+        composeTestRule.waitUntil(timeoutMillis = 5_000) {
+            getCapturedEvents().any { event ->
+                event is LayoutContract.LayoutEvent.UserInteractionSelected &&
+                    event.action == action &&
+                    event.context == RoktUserInteractionContext.CatalogImageGallery &&
+                    event.catalogItemIndex == 0
             }
         }
     }

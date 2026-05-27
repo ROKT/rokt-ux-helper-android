@@ -27,6 +27,8 @@ import com.rokt.roktux.event.DevicePayResult
 import com.rokt.roktux.event.EventNameValue
 import com.rokt.roktux.event.EventType
 import com.rokt.roktux.event.RoktPlatformEvent
+import com.rokt.roktux.event.RoktUserInteractionAction
+import com.rokt.roktux.event.RoktUserInteractionContext
 import com.rokt.roktux.event.RoktUxEvent
 import com.rokt.roktux.event.UrlEventState
 import com.rokt.roktux.event.toEventType
@@ -249,7 +251,11 @@ internal class LayoutViewModel(
             }
 
             is LayoutContract.LayoutEvent.CloseSelected -> {
-                sendDismissEvent(if (event.isDismissed) DISMISSED else CLOSE_BUTTON)
+                if (event.dismissalMethod == INSTANT_PURCHASE_DISMISSED) {
+                    sendInstantPurchaseDismissalEvent(event.dismissalMethod)
+                } else {
+                    sendDismissEvent(if (event.isDismissed) DISMISSED else CLOSE_BUTTON)
+                }
                 setEffect {
                     LayoutContract.LayoutEffect.CloseLayout(
                         onClose = {
@@ -330,6 +336,10 @@ internal class LayoutViewModel(
 
             is LayoutContract.LayoutEvent.CartItemInstantPurchaseSelected -> {
                 handleCartItemInstancePurchaseSelected(event.catalogItemModel)
+            }
+
+            is LayoutContract.LayoutEvent.UserInteractionSelected -> {
+                handleUserInteractionSelected(event)
             }
 
             is LayoutContract.LayoutEvent.CartItemForwardPaymentSelected -> {
@@ -470,6 +480,11 @@ internal class LayoutViewModel(
 
     private fun handleCartItemDevicePaySelected(event: LayoutContract.LayoutEvent.CartItemDevicePaySelected) {
         if (!runtimeState.validationCoordinator.validate(event.validatorFieldKeys)) {
+            sendUserInteractionEvent(
+                parentGuid = event.catalogItemModel?.instanceGuid().orEmpty(),
+                action = RoktUserInteractionAction.ValidationTriggerFailed,
+                context = RoktUserInteractionContext.CustomStateValidationTriggerButton,
+            )
             return
         }
 
@@ -534,6 +549,36 @@ internal class LayoutViewModel(
             }
         }
         sendViewState()
+    }
+
+    private fun handleUserInteractionSelected(event: LayoutContract.LayoutEvent.UserInteractionSelected) {
+        val parentGuid = event.parentGuid
+            ?: event.catalogItemIndex?.let { index -> catalogItemInstanceGuid(event.offerId, index) }
+            ?: return
+        sendUserInteractionEvent(
+            parentGuid = parentGuid,
+            action = event.action,
+            context = event.context,
+        )
+    }
+
+    private fun sendUserInteractionEvent(
+        parentGuid: String,
+        action: RoktUserInteractionAction,
+        context: RoktUserInteractionContext,
+    ) {
+        if (parentGuid.isBlank()) return
+        handlePlatformEvent(
+            RoktPlatformEvent(
+                eventType = EventType.SignalUserInteraction,
+                sessionId = experienceModel.sessionId,
+                parentGuid = parentGuid,
+                objectData = mapOf(
+                    KEY_USER_INTERACTION_ACTION to action.name,
+                    KEY_USER_INTERACTION_CONTEXT to context.name,
+                ),
+            ),
+        )
     }
 
     private fun handleResponseOptionSelected(
@@ -677,6 +722,17 @@ internal class LayoutViewModel(
         handlePlatformEvent(
             RoktPlatformEvent(
                 eventType = EventType.SignalDismissal,
+                sessionId = experienceModel.sessionId,
+                parentGuid = pluginModel.instanceGuid,
+                metadata = listOf(EventNameValue(KEY_INITIATOR, dismissReason)),
+            ),
+        )
+    }
+
+    private fun sendInstantPurchaseDismissalEvent(dismissReason: String) {
+        handlePlatformEvent(
+            RoktPlatformEvent(
+                eventType = EventType.SignalInstantPurchaseDismissal,
                 sessionId = experienceModel.sessionId,
                 parentGuid = pluginModel.instanceGuid,
                 metadata = listOf(EventNameValue(KEY_INITIATOR, dismissReason)),
@@ -836,6 +892,14 @@ internal class LayoutViewModel(
 
     private fun HMap.instanceGuid(): String = get<String>(KEY_INSTANCE_GUID).orEmpty()
 
+    private fun catalogItemInstanceGuid(offerId: Int, catalogItemIndex: Int): String? = pluginModel.slots
+        .getOrNull(offerId)
+        ?.offer
+        ?.catalogItems
+        ?.getOrNull(catalogItemIndex)
+        ?.properties
+        ?.instanceGuid()
+
     private fun HMap.originalPrice(): Double = get<Double>(KEY_ORIGINAL_PRICE) ?: 0.0
 
     private fun HMap.salePrice(): Double = get<Double>(KEY_PRICE) ?: originalPrice()
@@ -853,6 +917,8 @@ internal class LayoutViewModel(
 
     companion object {
         private const val KEY_INITIATOR = "initiator"
+        private const val KEY_USER_INTERACTION_ACTION = "action"
+        private const val KEY_USER_INTERACTION_CONTEXT = "context"
         private const val KEY_PAGE_RENDER_ENGINE = "pageRenderEngine"
         private const val KEY_PAGE_SIGNAL_LOAD_START = "pageSignalLoadStart"
         private const val KEY_PAGE_SIGNAL_LOAD_COMPLETE = "pageSignalLoadComplete"
@@ -861,6 +927,7 @@ internal class LayoutViewModel(
         private const val NO_MORE_OFFERS_TO_SHOW = "NO_MORE_OFFERS_TO_SHOW"
         private const val DISMISSED = "DISMISSED"
         private const val CLOSE_BUTTON = "CLOSE_BUTTON"
+        private const val INSTANT_PURCHASE_DISMISSED = "INSTANT_PURCHASE_DISMISSED"
         private const val LOCATION_TARGET_ELEMENT_DOES_NOT_MATCH =
             "Plugin targetElementSelector does not match the location"
         private const val QUEUE_CAPACITY = 20

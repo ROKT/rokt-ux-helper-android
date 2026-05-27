@@ -22,6 +22,8 @@ import com.rokt.core.testutils.annotations.DCUI_COMPONENT_TAG
 import com.rokt.core.testutils.annotations.DcuiConfig
 import com.rokt.core.testutils.annotations.DcuiNodeJson
 import com.rokt.core.testutils.annotations.DcuiOfferJson
+import com.rokt.roktux.event.RoktUserInteractionAction
+import com.rokt.roktux.event.RoktUserInteractionContext
 import com.rokt.roktux.testutil.BaseDcuiEspressoTest
 import com.rokt.roktux.validation.ValidationCoordinator
 import com.rokt.roktux.viewmodel.layout.LayoutContract
@@ -153,6 +155,12 @@ class CatalogDropdownComponentTest : BaseDcuiEspressoTest() {
                 ),
             ) && getCapturedEvents().contains(LayoutContract.LayoutEvent.SetActiveCatalogItem(index = 1))
         }
+        assertThat(getCapturedEvents().filterIsInstance<LayoutContract.LayoutEvent.UserInteractionSelected>())
+            .anySatisfy { event ->
+                assertThat(event.action).isEqualTo(RoktUserInteractionAction.DropDownItemSelected)
+                assertThat(event.context).isEqualTo(RoktUserInteractionContext.CatalogDropDown)
+                assertThat(event.catalogItemIndex).isEqualTo(1)
+            }
     }
 
     @Test

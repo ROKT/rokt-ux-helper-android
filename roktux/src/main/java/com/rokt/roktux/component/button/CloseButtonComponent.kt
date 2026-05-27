@@ -40,7 +40,10 @@ internal class CloseButtonComponent(
             onEventSent = onEventSent,
         ) {
             onEventSent.invoke(
-                LayoutContract.LayoutEvent.CloseSelected(isDismissed = false),
+                LayoutContract.LayoutEvent.CloseSelected(
+                    isDismissed = false,
+                    dismissalMethod = model.dismissalMethod,
+                ),
             )
         }
     }

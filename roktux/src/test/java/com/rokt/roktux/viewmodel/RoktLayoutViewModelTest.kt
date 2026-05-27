@@ -6,6 +6,8 @@ import com.rokt.modelmapper.hmap.TypedKey
 import com.rokt.modelmapper.hmap.set
 import com.rokt.modelmapper.mappers.ModelMapper
 import com.rokt.modelmapper.uimodel.Action
+import com.rokt.modelmapper.uimodel.CatalogImageWrapperModel
+import com.rokt.modelmapper.uimodel.CatalogItemModel
 import com.rokt.modelmapper.uimodel.LayoutSettings
 import com.rokt.modelmapper.uimodel.OpenLinks
 import com.rokt.modelmapper.uimodel.OptionsModel
@@ -21,6 +23,8 @@ import com.rokt.roktux.component.evaluatePredicates
 import com.rokt.roktux.event.DevicePayResult
 import com.rokt.roktux.event.EventType
 import com.rokt.roktux.event.RoktPlatformEvent
+import com.rokt.roktux.event.RoktUserInteractionAction
+import com.rokt.roktux.event.RoktUserInteractionContext
 import com.rokt.roktux.event.RoktUxEvent
 import com.rokt.roktux.state.LayoutRuntimeState
 import com.rokt.roktux.validation.ValidationCoordinator
@@ -68,6 +72,19 @@ class RoktLayoutViewModelTest : BaseViewModelTest() {
                                 every { creative } returns mockk(relaxed = true) {
                                     every { instanceGuid } returns "creativeInstanceGuid"
                                 }
+                                every { catalogItems } returns persistentListOf(
+                                    CatalogItemModel(
+                                        properties = createCatalogItemProperties(),
+                                        imageWrapper = CatalogImageWrapperModel(HMap()),
+                                    ),
+                                    CatalogItemModel(
+                                        properties = createCatalogItemProperties(
+                                            instanceGuid = "catalog-instance-guid-2",
+                                            catalogItemId = "catalog-item-2",
+                                        ),
+                                        imageWrapper = CatalogImageWrapperModel(HMap()),
+                                    ),
+                                )
                             }
                         },
                         mockk(relaxed = true) {
@@ -743,6 +760,147 @@ class RoktLayoutViewModelTest : BaseViewModelTest() {
         verify(exactly = 0, timeout = 500) {
             uxEvent.invoke(match { event -> event is RoktUxEvent.CartItemDevicePay })
         }
+        verify(timeout = 2000) {
+            platformEvent.invoke(
+                withArg { events ->
+                    assertThat(events).anySatisfy { platformEvent ->
+                        assertThat(platformEvent.eventType).isEqualTo(EventType.SignalUserInteraction)
+                        assertThat(platformEvent.parentGuid).isEqualTo("catalog-instance-guid-1")
+                        assertThat(platformEvent.objectData).isEqualTo(
+                            mapOf(
+                                "action" to "ValidationTriggerFailed",
+                                "context" to "CustomStateValidationTriggerButton",
+                            ),
+                        )
+                    }
+                },
+            )
+        }
+    }
+
+    @Test
+    fun `UserInteractionSelected sends SignalUserInteraction with object data`() = runTest {
+        // Arrange
+        clearMocks(platformEvent)
+
+        // Act
+        layoutViewModel.setEvent(
+            LayoutContract.LayoutEvent.UserInteractionSelected(
+                offerId = 0,
+                action = RoktUserInteractionAction.ThumbnailClick,
+                context = RoktUserInteractionContext.CatalogImageGallery,
+                parentGuid = "catalog-instance-guid-1",
+            ),
+        )
+
+        // Assert
+        verify(timeout = 2000) {
+            platformEvent.invoke(
+                withArg { events ->
+                    assertThat(events).anySatisfy { platformEvent ->
+                        assertThat(platformEvent.eventType).isEqualTo(EventType.SignalUserInteraction)
+                        assertThat(platformEvent.parentGuid).isEqualTo("catalog-instance-guid-1")
+                        assertThat(platformEvent.objectData).isEqualTo(
+                            mapOf(
+                                "action" to "ThumbnailClick",
+                                "context" to "CatalogImageGallery",
+                            ),
+                        )
+                    }
+                },
+            )
+        }
+    }
+
+    @Test
+    fun `UserInteractionSelected resolves catalog item parent guid from index`() = runTest {
+        // Arrange
+        clearMocks(platformEvent)
+
+        // Act
+        layoutViewModel.setEvent(
+            LayoutContract.LayoutEvent.UserInteractionSelected(
+                offerId = 0,
+                action = RoktUserInteractionAction.DropDownItemSelected,
+                context = RoktUserInteractionContext.CatalogDropDown,
+                catalogItemIndex = 1,
+            ),
+        )
+
+        // Assert
+        verify(timeout = 2000) {
+            platformEvent.invoke(
+                withArg { events ->
+                    assertThat(events).anySatisfy { platformEvent ->
+                        assertThat(platformEvent.eventType).isEqualTo(EventType.SignalUserInteraction)
+                        assertThat(platformEvent.parentGuid).isEqualTo("catalog-instance-guid-2")
+                        assertThat(platformEvent.objectData).isEqualTo(
+                            mapOf(
+                                "action" to "DropDownItemSelected",
+                                "context" to "CatalogDropDown",
+                            ),
+                        )
+                    }
+                },
+            )
+        }
+    }
+
+    @Test
+    fun `CloseSelected with instant purchase dismissal method sends SignalInstantPurchaseDismissal`() = runTest {
+        // Arrange
+        clearMocks(platformEvent)
+
+        // Act
+        layoutViewModel.setEvent(
+            LayoutContract.LayoutEvent.CloseSelected(
+                isDismissed = false,
+                dismissalMethod = "INSTANT_PURCHASE_DISMISSED",
+            ),
+        )
+
+        // Assert
+        verify(timeout = 2000) {
+            platformEvent.invoke(
+                withArg { events ->
+                    assertThat(events).anySatisfy { platformEvent ->
+                        assertThat(platformEvent.eventType).isEqualTo(EventType.SignalInstantPurchaseDismissal)
+                        assertThat(platformEvent.parentGuid).isEqualTo("pluginInstanceGuid")
+                        assertThat(platformEvent.metadata)
+                            .anySatisfy { metadata ->
+                                assertThat(metadata.name).isEqualTo("initiator")
+                                assertThat(metadata.value).isEqualTo("INSTANT_PURCHASE_DISMISSED")
+                            }
+                    }
+                },
+            )
+        }
+    }
+
+    @Test
+    fun `CloseSelected without instant purchase dismissal method still sends SignalDismissal`() = runTest {
+        // Arrange
+        clearMocks(platformEvent)
+
+        // Act
+        layoutViewModel.setEvent(LayoutContract.LayoutEvent.CloseSelected(isDismissed = false))
+
+        // Assert
+        verify(timeout = 2000) {
+            platformEvent.invoke(
+                withArg { events ->
+                    assertThat(events).anySatisfy { platformEvent ->
+                        assertThat(platformEvent.eventType).isEqualTo(EventType.SignalDismissal)
+                        assertThat(platformEvent.parentGuid).isEqualTo("pluginInstanceGuid")
+                        assertThat(platformEvent.metadata)
+                            .anySatisfy { metadata ->
+                                assertThat(metadata.name).isEqualTo("initiator")
+                                assertThat(metadata.value).isEqualTo("CLOSE_BUTTON")
+                            }
+                    }
+                },
+            )
+        }
     }
 
     @Test
@@ -805,13 +963,15 @@ class RoktLayoutViewModelTest : BaseViewModelTest() {
     }
 
     private fun createCatalogItemProperties(
+        instanceGuid: String = "catalog-instance-guid-1",
+        catalogItemId: String = "catalog-item-1",
         price: Double = 79.99,
         originalPrice: Double = 99.99,
     ): HMap = HMap().apply {
-        set(TypedKey<String>("instanceGuid"), "catalog-instance-guid-1")
+        set(TypedKey<String>("instanceGuid"), instanceGuid)
         set(TypedKey<String>("title"), "Everyday sneakers")
         set(TypedKey<String>("cartItemId"), "cart-item-1")
-        set(TypedKey<String>("catalogItemId"), "catalog-item-1")
+        set(TypedKey<String>("catalogItemId"), catalogItemId)
         set(TypedKey<String>("currency"), "USD")
         set(TypedKey<String>("description"), "Lightweight daily shoes")
         set(TypedKey<String>("linkedProductId"), "linked-product-1")
