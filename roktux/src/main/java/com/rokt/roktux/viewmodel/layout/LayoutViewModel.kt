@@ -22,15 +22,20 @@ import com.rokt.modelmapper.utils.DEFAULT_VIEWABLE_ITEMS
 import com.rokt.modelmapper.utils.FIRST_OFFER_INDEX
 import com.rokt.modelmapper.utils.roktDateFormat
 import com.rokt.roktux.RoktViewState
+import com.rokt.roktux.event.DevicePayResult
 import com.rokt.roktux.event.EventNameValue
 import com.rokt.roktux.event.EventType
 import com.rokt.roktux.event.RoktPlatformEvent
+import com.rokt.roktux.event.RoktUserInteractionAction
+import com.rokt.roktux.event.RoktUserInteractionContext
 import com.rokt.roktux.event.RoktUxEvent
 import com.rokt.roktux.event.UrlEventState
 import com.rokt.roktux.event.toEventType
 import com.rokt.roktux.logging.RoktUXLogger
+import com.rokt.roktux.state.LayoutRuntimeState
 import com.rokt.roktux.utils.chunk
 import com.rokt.roktux.utils.isEmbedded
+import com.rokt.roktux.validation.ValidationCoordinator
 import com.rokt.roktux.viewmodel.base.BaseViewModel
 import com.rokt.roktux.viewmodel.layout.LayoutContract.LayoutEvent.ResponseOptionSelected
 import kotlinx.collections.immutable.persistentMapOf
@@ -57,8 +62,10 @@ internal class LayoutViewModel(
     private val mainDispatcher: CoroutineDispatcher,
     private val handleUrlByApp: Boolean,
     private var currentOffer: Int,
-    private var customStates: Map<String, Int>,
-    private var offerCustomStates: Map<String, Map<String, Int>>,
+    customStates: Map<String, Int>,
+    offerCustomStates: Map<String, Map<String, Int>>,
+    domainStates: Map<String, Int>,
+    validationCoordinator: ValidationCoordinator = ValidationCoordinator(),
     private var edgeToEdgeDisplay: Boolean,
 ) : BaseViewModel<LayoutContract.LayoutEvent, LayoutUiState, LayoutContract.LayoutEffect>() {
 
@@ -67,6 +74,12 @@ internal class LayoutViewModel(
     private lateinit var pluginModel: PluginModel
     private lateinit var pluginViewState: RoktViewState
     private var viewableItems: AtomicReference<Int> = AtomicReference(DEFAULT_VIEWABLE_ITEMS)
+    private val runtimeState = LayoutRuntimeState(
+        customStates = customStates,
+        offerCustomStates = offerCustomStates,
+        domainStates = domainStates,
+        validationCoordinator = validationCoordinator,
+    )
 
     // SDK's internal thread-safe structure to track URL states
     private val urlEventStateMap = ConcurrentHashMap<String, UrlEventState>()
@@ -166,8 +179,9 @@ internal class LayoutViewModel(
                         targetOfferIndex = currentOffer,
                         creativeCopy = persistentMapOf(),
                         breakpoints = pluginModel.breakpoint,
-                        customState = customStates.toImmutableMap(),
-                        offerCustomStates = offerCustomStates.mapValues { it.value.toImmutableMap() }.toImmutableMap(),
+                        customState = runtimeState.globalCustomStates().toImmutableMap(),
+                        domainStates = runtimeState.domainStates().toImmutableMap(),
+                        offerCustomStates = runtimeState.immutableOfferCustomStates(),
                     ),
                 ),
             )
@@ -237,7 +251,11 @@ internal class LayoutViewModel(
             }
 
             is LayoutContract.LayoutEvent.CloseSelected -> {
-                sendDismissEvent(if (event.isDismissed) DISMISSED else CLOSE_BUTTON)
+                if (event.dismissalMethod == INSTANT_PURCHASE_DISMISSED) {
+                    sendInstantPurchaseDismissalEvent(event.dismissalMethod)
+                } else {
+                    sendDismissEvent(if (event.isDismissed) DISMISSED else CLOSE_BUTTON)
+                }
                 setEffect {
                     LayoutContract.LayoutEffect.CloseLayout(
                         onClose = {
@@ -266,12 +284,28 @@ internal class LayoutViewModel(
                 sendViewState()
             }
 
+            is LayoutContract.LayoutEvent.SetDomainState -> {
+                updateDomainState(event.key, event.value)
+                sendViewState()
+            }
+
+            is LayoutContract.LayoutEvent.SetActiveCatalogItem -> {
+                updateActiveCatalogItem(event.index)
+            }
+
             is LayoutContract.LayoutEvent.SignalViewed -> {
                 handleSignalViewed(event.offerId)
             }
 
             is LayoutContract.LayoutEvent.SetOfferCustomState -> {
-                offerCustomStates += (event.offerId.toString() to event.customState)
+                runtimeState.replaceOfferCustomStates(event.offerId, event.customState)
+                updateState { currentUiState ->
+                    currentUiState.copy(
+                        offerUiState = currentUiState.offerUiState.copy(
+                            offerCustomStates = runtimeState.immutableOfferCustomStates(),
+                        ),
+                    )
+                }
                 sendViewState()
             }
 
@@ -302,6 +336,26 @@ internal class LayoutViewModel(
 
             is LayoutContract.LayoutEvent.CartItemInstantPurchaseSelected -> {
                 handleCartItemInstancePurchaseSelected(event.catalogItemModel)
+            }
+
+            is LayoutContract.LayoutEvent.UserInteractionSelected -> {
+                handleUserInteractionSelected(event)
+            }
+
+            is LayoutContract.LayoutEvent.CartItemForwardPaymentSelected -> {
+                handleCartItemForwardPaymentSelected(event)
+            }
+
+            is LayoutContract.LayoutEvent.CartItemDevicePaySelected -> {
+                handleCartItemDevicePaySelected(event)
+            }
+
+            is LayoutContract.LayoutEvent.CartItemDevicePayResultReceived -> {
+                handleCartItemDevicePayResult(event.offerId, event.result)
+            }
+
+            is LayoutContract.LayoutEvent.CartItemForwardPaymentResultReceived -> {
+                handleCartItemForwardPaymentResult(event.offerId, event.result)
             }
 
             else -> {}
@@ -362,39 +416,169 @@ internal class LayoutViewModel(
     }
 
     private fun handleCartItemInstancePurchaseSelected(catalogItemProperties: HMap) {
-        with(catalogItemProperties) {
-            uxEvent(
-                RoktUxEvent.CartItemInstantPurchase(
-                    layoutId = pluginId,
-                    cartItemId = get<String>(KEY_CART_ITEM_ID).orEmpty(),
-                    catalogItemId = get<String>(KEY_CATALOG_ITEM_ID).orEmpty(),
-                    currency = get<String>(KEY_CURRENCY).orEmpty(),
-                    description = get<String>(KEY_DESCRIPTION).orEmpty(),
-                    linkedProductId = get<String>(KEY_LINKED_PRODUCT_ID).orEmpty(),
-                    totalPrice = get<Double>(KEY_ORIGINAL_PRICE) ?: 0.0,
-                    quantity = 1,
-                    unitPrice = get<Double>(KEY_ORIGINAL_PRICE) ?: 0.0,
-                ),
-            )
-            handlePlatformEvent(
-                RoktPlatformEvent(
-                    eventType = EventType.SignalCartItemInstantPurchaseInitiated,
-                    sessionId = experienceModel.sessionId,
-                    parentGuid = get<String>("instanceGuid").orEmpty(),
-                    eventData = mapOf(
-                        KEY_CART_ITEM_ID to get<String>(KEY_CART_ITEM_ID).orEmpty(),
-                        KEY_CATALOG_ITEM_ID to get<String>(KEY_CATALOG_ITEM_ID).orEmpty(),
-                        KEY_CURRENCY to get<String>(KEY_CURRENCY).orEmpty(),
-                        KEY_DESCRIPTION to get<String>(KEY_DESCRIPTION).orEmpty(),
-                        KEY_LINKED_PRODUCT_ID to get<String>(KEY_LINKED_PRODUCT_ID).orEmpty(),
-                        KEY_TOTAL_PRICE to (get<Double>(KEY_ORIGINAL_PRICE) ?: 0.0).toString(),
-                        KEY_QUANTITY to "1",
-                        KEY_UNIT_PRICE to (get<Double>(KEY_ORIGINAL_PRICE) ?: 0.0).toString(),
-                    ),
-                ),
-            )
-        }
+        val originalPrice = catalogItemProperties.originalPrice()
+        uxEvent(
+            RoktUxEvent.CartItemInstantPurchase(
+                layoutId = pluginId,
+                cartItemId = catalogItemProperties.cartItemId(),
+                catalogItemId = catalogItemProperties.catalogItemId(),
+                currency = catalogItemProperties.currency(),
+                description = catalogItemProperties.description(),
+                linkedProductId = catalogItemProperties.linkedProductId(),
+                totalPrice = originalPrice,
+                quantity = 1,
+                unitPrice = originalPrice,
+            ),
+        )
+        handlePlatformEvent(
+            RoktPlatformEvent(
+                eventType = EventType.SignalCartItemInstantPurchaseInitiated,
+                sessionId = experienceModel.sessionId,
+                parentGuid = catalogItemProperties.instanceGuid(),
+                eventData = catalogItemProperties.cartItemEventData(originalPrice),
+            ),
+        )
         setEvent(LayoutContract.LayoutEvent.CloseSelected(isDismissed = false))
+    }
+
+    private fun handleCartItemForwardPaymentSelected(event: LayoutContract.LayoutEvent.CartItemForwardPaymentSelected) {
+        val catalogItemProperties = event.catalogItemModel
+        val salePrice = catalogItemProperties.salePrice()
+        uxEvent(
+            RoktUxEvent.CartItemForwardPayment(
+                layoutId = pluginId,
+                name = catalogItemProperties.name(),
+                cartItemId = catalogItemProperties.cartItemId(),
+                catalogItemId = catalogItemProperties.catalogItemId(),
+                currency = catalogItemProperties.currency(),
+                description = catalogItemProperties.description(),
+                linkedProductId = catalogItemProperties.linkedProductId(),
+                providerData = catalogItemProperties.providerData(),
+                totalPrice = salePrice,
+                quantity = 1,
+                unitPrice = salePrice,
+                transactionData = event.transactionData,
+                onResult = { result ->
+                    setEvent(
+                        LayoutContract.LayoutEvent.CartItemForwardPaymentResultReceived(
+                            event.offerId,
+                            result,
+                        ),
+                    )
+                },
+            ),
+        )
+        handlePlatformEvent(
+            RoktPlatformEvent(
+                eventType = EventType.SignalCartItemInstantPurchaseInitiated,
+                sessionId = experienceModel.sessionId,
+                parentGuid = catalogItemProperties.instanceGuid(),
+                eventData = catalogItemProperties.cartItemEventData(salePrice),
+            ),
+        )
+    }
+
+    private fun handleCartItemDevicePaySelected(event: LayoutContract.LayoutEvent.CartItemDevicePaySelected) {
+        if (!runtimeState.validationCoordinator.validate(event.validatorFieldKeys)) {
+            sendUserInteractionEvent(
+                parentGuid = event.catalogItemModel?.instanceGuid().orEmpty(),
+                action = RoktUserInteractionAction.ValidationTriggerFailed,
+                context = RoktUserInteractionContext.CustomStateValidationTriggerButton,
+            )
+            return
+        }
+
+        val catalogItemProperties = event.catalogItemModel ?: return
+        val salePrice = catalogItemProperties.salePrice()
+        uxEvent(
+            RoktUxEvent.CartItemDevicePay(
+                layoutId = pluginId,
+                name = catalogItemProperties.name(),
+                cartItemId = catalogItemProperties.cartItemId(),
+                catalogItemId = catalogItemProperties.catalogItemId(),
+                currency = catalogItemProperties.currency(),
+                description = catalogItemProperties.description(),
+                linkedProductId = catalogItemProperties.linkedProductId(),
+                providerData = catalogItemProperties.providerData(),
+                totalPrice = salePrice,
+                quantity = 1,
+                unitPrice = salePrice,
+                paymentProvider = event.paymentProvider,
+                transactionData = event.transactionData,
+                onResult = { result ->
+                    setEvent(LayoutContract.LayoutEvent.CartItemDevicePayResultReceived(event.offerId, result))
+                },
+            ),
+        )
+        handlePlatformEvent(
+            RoktPlatformEvent(
+                eventType = EventType.SignalCartItemInstantPurchaseInitiated,
+                sessionId = experienceModel.sessionId,
+                parentGuid = catalogItemProperties.instanceGuid(),
+                eventData = catalogItemProperties.cartItemEventData(salePrice),
+            ),
+        )
+    }
+
+    private fun handleCartItemDevicePayResult(offerId: Int, result: DevicePayResult) {
+        when (result) {
+            DevicePayResult.Success -> updateOfferCustomState(offerId, PAYMENT_RESULT_CUSTOM_STATE_KEY, 1)
+
+            DevicePayResult.Failure,
+            DevicePayResult.Retry,
+            -> updateOfferCustomState(offerId, PAYMENT_RESULT_CUSTOM_STATE_KEY, -1)
+
+            is DevicePayResult.PendingConfirmation -> {
+                runtimeState.setCatalogRuntimeData(result.catalogRuntimeData)
+                updateOfferCustomState(offerId, DEVICE_PAY_STATE_CUSTOM_STATE_KEY, 1)
+            }
+        }
+        sendViewState()
+    }
+
+    private fun handleCartItemForwardPaymentResult(offerId: Int, result: DevicePayResult) {
+        when (result) {
+            DevicePayResult.Success -> updateOfferCustomState(offerId, PAYMENT_RESULT_CUSTOM_STATE_KEY, 1)
+
+            DevicePayResult.Failure,
+            DevicePayResult.Retry,
+            -> updateOfferCustomState(offerId, PAYMENT_RESULT_CUSTOM_STATE_KEY, -1)
+
+            is DevicePayResult.PendingConfirmation -> {
+                runtimeState.setCatalogRuntimeData(result.catalogRuntimeData)
+            }
+        }
+        sendViewState()
+    }
+
+    private fun handleUserInteractionSelected(event: LayoutContract.LayoutEvent.UserInteractionSelected) {
+        val parentGuid = event.parentGuid
+            ?: event.catalogItemIndex?.let { index -> catalogItemInstanceGuid(event.offerId, index) }
+            ?: return
+        sendUserInteractionEvent(
+            parentGuid = parentGuid,
+            action = event.action,
+            context = event.context,
+        )
+    }
+
+    private fun sendUserInteractionEvent(
+        parentGuid: String,
+        action: RoktUserInteractionAction,
+        context: RoktUserInteractionContext,
+    ) {
+        if (parentGuid.isBlank()) return
+        handlePlatformEvent(
+            RoktPlatformEvent(
+                eventType = EventType.SignalUserInteraction,
+                sessionId = experienceModel.sessionId,
+                parentGuid = parentGuid,
+                objectData = mapOf(
+                    KEY_USER_INTERACTION_ACTION to action.name,
+                    KEY_USER_INTERACTION_CONTEXT to context.name,
+                ),
+            ),
+        )
     }
 
     private fun handleResponseOptionSelected(
@@ -492,10 +676,44 @@ internal class LayoutViewModel(
     }
 
     private fun updateCustomState(key: String, value: Int) {
-        customStates += (key to value)
+        runtimeState.setGlobalCustomState(key, value)
         updateState { currentUiState ->
             currentUiState.copy(
-                offerUiState = currentUiState.offerUiState.copy(customState = customStates.toImmutableMap()),
+                offerUiState = currentUiState.offerUiState.copy(
+                    customState = runtimeState.globalCustomStates().toImmutableMap(),
+                ),
+            )
+        }
+    }
+
+    private fun updateDomainState(key: String, value: Int) {
+        runtimeState.setDomainState(key, value)
+        updateState { currentUiState ->
+            currentUiState.copy(
+                offerUiState = currentUiState.offerUiState.copy(
+                    domainStates = runtimeState.domainStates().toImmutableMap(),
+                ),
+            )
+        }
+    }
+
+    private fun updateOfferCustomState(offerId: Int, key: String, value: Int) {
+        runtimeState.setOfferCustomState(offerId, key, value)
+        updateState { currentUiState ->
+            currentUiState.copy(
+                offerUiState = currentUiState.offerUiState.copy(
+                    offerCustomStates = runtimeState.immutableOfferCustomStates(),
+                ),
+            )
+        }
+    }
+
+    private fun updateActiveCatalogItem(index: Int) {
+        updateState { currentUiState ->
+            currentUiState.copy(
+                offerUiState = currentUiState.offerUiState.copy(
+                    activeCatalogItemIndex = index,
+                ),
             )
         }
     }
@@ -504,6 +722,17 @@ internal class LayoutViewModel(
         handlePlatformEvent(
             RoktPlatformEvent(
                 eventType = EventType.SignalDismissal,
+                sessionId = experienceModel.sessionId,
+                parentGuid = pluginModel.instanceGuid,
+                metadata = listOf(EventNameValue(KEY_INITIATOR, dismissReason)),
+            ),
+        )
+    }
+
+    private fun sendInstantPurchaseDismissalEvent(dismissReason: String) {
+        handlePlatformEvent(
+            RoktPlatformEvent(
+                eventType = EventType.SignalInstantPurchaseDismissal,
                 sessionId = experienceModel.sessionId,
                 parentGuid = pluginModel.instanceGuid,
                 metadata = listOf(EventNameValue(KEY_INITIATOR, dismissReason)),
@@ -635,16 +864,61 @@ internal class LayoutViewModel(
     private fun sendViewState(currentOffer: Int = this.currentOffer, isDismissed: Boolean = false) {
         pluginViewState = RoktViewState(
             pluginId = pluginId,
-            customStates = customStates.toImmutableMap(),
-            offerCustomStates = offerCustomStates.toImmutableMap(),
+            customStates = runtimeState.globalCustomStates().toImmutableMap(),
+            offerCustomStates = runtimeState.allOfferCustomStates().toImmutableMap(),
+            domainStates = runtimeState.domainStates().toImmutableMap(),
             offerIndex = currentOffer,
             pluginDismissed = isDismissed,
         )
         viewStateChange(pluginViewState)
     }
 
+    private fun LayoutRuntimeState.immutableOfferCustomStates() =
+        allOfferCustomStates().mapValues { (_, value) -> value.toImmutableMap() }.toImmutableMap()
+
+    private fun HMap.name(): String = get<String>(KEY_TITLE).orEmpty()
+
+    private fun HMap.cartItemId(): String = get<String>(KEY_CART_ITEM_ID).orEmpty()
+
+    private fun HMap.catalogItemId(): String = get<String>(KEY_CATALOG_ITEM_ID).orEmpty()
+
+    private fun HMap.currency(): String = get<String>(KEY_CURRENCY).orEmpty()
+
+    private fun HMap.description(): String = get<String>(KEY_DESCRIPTION).orEmpty()
+
+    private fun HMap.linkedProductId(): String = get<String>(KEY_LINKED_PRODUCT_ID).orEmpty()
+
+    private fun HMap.providerData(): String = get<String>(KEY_PROVIDER_DATA).orEmpty()
+
+    private fun HMap.instanceGuid(): String = get<String>(KEY_INSTANCE_GUID).orEmpty()
+
+    private fun catalogItemInstanceGuid(offerId: Int, catalogItemIndex: Int): String? = pluginModel.slots
+        .getOrNull(offerId)
+        ?.offer
+        ?.catalogItems
+        ?.getOrNull(catalogItemIndex)
+        ?.properties
+        ?.instanceGuid()
+
+    private fun HMap.originalPrice(): Double = get<Double>(KEY_ORIGINAL_PRICE) ?: 0.0
+
+    private fun HMap.salePrice(): Double = get<Double>(KEY_PRICE) ?: originalPrice()
+
+    private fun HMap.cartItemEventData(price: Double): Map<String, String> = mapOf(
+        KEY_CART_ITEM_ID to cartItemId(),
+        KEY_CATALOG_ITEM_ID to catalogItemId(),
+        KEY_CURRENCY to currency(),
+        KEY_DESCRIPTION to description(),
+        KEY_LINKED_PRODUCT_ID to linkedProductId(),
+        KEY_TOTAL_PRICE to price.toString(),
+        KEY_QUANTITY to "1",
+        KEY_UNIT_PRICE to price.toString(),
+    )
+
     companion object {
         private const val KEY_INITIATOR = "initiator"
+        private const val KEY_USER_INTERACTION_ACTION = "action"
+        private const val KEY_USER_INTERACTION_CONTEXT = "context"
         private const val KEY_PAGE_RENDER_ENGINE = "pageRenderEngine"
         private const val KEY_PAGE_SIGNAL_LOAD_START = "pageSignalLoadStart"
         private const val KEY_PAGE_SIGNAL_LOAD_COMPLETE = "pageSignalLoadComplete"
@@ -653,6 +927,7 @@ internal class LayoutViewModel(
         private const val NO_MORE_OFFERS_TO_SHOW = "NO_MORE_OFFERS_TO_SHOW"
         private const val DISMISSED = "DISMISSED"
         private const val CLOSE_BUTTON = "CLOSE_BUTTON"
+        private const val INSTANT_PURCHASE_DISMISSED = "INSTANT_PURCHASE_DISMISSED"
         private const val LOCATION_TARGET_ELEMENT_DOES_NOT_MATCH =
             "Plugin targetElementSelector does not match the location"
         private const val QUEUE_CAPACITY = 20
@@ -664,10 +939,15 @@ internal class LayoutViewModel(
         private const val KEY_CURRENCY = "currency"
         private const val KEY_DESCRIPTION = "description"
         private const val KEY_LINKED_PRODUCT_ID = "linkedProductId"
+        private const val KEY_TITLE = "title"
+        private const val KEY_PRICE = "price"
         private const val KEY_ORIGINAL_PRICE = "originalPrice"
+        private const val KEY_PROVIDER_DATA = "providerData"
         private const val KEY_TOTAL_PRICE = "totalPrice"
         private const val KEY_QUANTITY = "quantity"
         private const val KEY_UNIT_PRICE = "unitPrice"
+        private const val PAYMENT_RESULT_CUSTOM_STATE_KEY = "paymentResult"
+        private const val DEVICE_PAY_STATE_CUSTOM_STATE_KEY = "devicePayState"
     }
 
     class RoktViewModelFactory(
@@ -683,6 +963,8 @@ internal class LayoutViewModel(
         private val currentOffer: Int,
         private val customStates: Map<String, Int>,
         private val offerCustomStates: Map<String, Map<String, Int>>,
+        private val domainStates: Map<String, Int>,
+        private val validationCoordinator: ValidationCoordinator = ValidationCoordinator(),
         private val edgeToEdgeDisplay: Boolean,
     ) : ViewModelProvider.Factory {
         @Suppress("UNCHECKED_CAST")
@@ -701,6 +983,8 @@ internal class LayoutViewModel(
                     currentOffer = currentOffer,
                     customStates = customStates,
                     offerCustomStates = offerCustomStates,
+                    domainStates = domainStates,
+                    validationCoordinator = validationCoordinator,
                     edgeToEdgeDisplay = edgeToEdgeDisplay,
                 ) as T
             }

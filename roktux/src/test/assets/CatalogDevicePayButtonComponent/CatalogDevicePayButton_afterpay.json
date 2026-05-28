@@ -1,0 +1,64 @@
+{
+  "type": "CatalogDevicePayButton",
+  "node": {
+    "a11yLabel": "Pay with Afterpay",
+    "provider": "Afterpay",
+    "styles": {
+      "elements": {
+        "own": [
+          {
+            "default": {
+              "background": {
+                "backgroundColor": {
+                  "light": "#111827"
+                }
+              },
+              "container": {
+                "alignItems": "center",
+                "justifyContent": "center"
+              },
+              "dimension": {
+                "width": {
+                  "type": "fixed",
+                  "value": 180
+                },
+                "height": {
+                  "type": "fixed",
+                  "value": 44
+                }
+              },
+              "spacing": {
+                "padding": "0 16"
+              }
+            }
+          }
+        ]
+      }
+    },
+    "children": [
+      {
+        "type": "BasicText",
+        "node": {
+          "value": "Pay with Afterpay",
+          "styles": {
+            "elements": {
+              "own": [
+                {
+                  "default": {
+                    "text": {
+                      "fontSize": 16,
+                      "fontWeight": "700",
+                      "textColor": {
+                        "light": "#ffffff"
+                      }
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        }
+      }
+    ]
+  }
+}

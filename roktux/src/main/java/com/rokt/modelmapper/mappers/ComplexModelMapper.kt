@@ -7,7 +7,13 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.ui.layout.ContentScale
 import com.rokt.modelmapper.data.BindData
+import com.rokt.modelmapper.data.CATALOG_ITEM_NAMESPACE
+import com.rokt.modelmapper.data.CREATIVE_COPY_NAMESPACE
+import com.rokt.modelmapper.data.CREATIVE_LINKS_NAMESPACE
+import com.rokt.modelmapper.data.CREATIVE_RESPONSE_NAMESPACE
+import com.rokt.modelmapper.data.TemplateDataPrefix
 import com.rokt.modelmapper.data.bindModel
+import com.rokt.modelmapper.data.getCatalogItemImages
 import com.rokt.modelmapper.data.getOfferImages
 import com.rokt.modelmapper.hmap.TypedKey
 import com.rokt.modelmapper.hmap.get
@@ -24,10 +30,12 @@ import com.rokt.modelmapper.uimodel.DataImageTransition.Type
 import com.rokt.modelmapper.uimodel.EqualityWhenUiCondition
 import com.rokt.modelmapper.uimodel.ExistenceWhenUiCondition
 import com.rokt.modelmapper.uimodel.LayoutSchemaUiModel
+import com.rokt.modelmapper.uimodel.Module
 import com.rokt.modelmapper.uimodel.OfferModel
 import com.rokt.modelmapper.uimodel.OrderableWhenUiCondition
 import com.rokt.modelmapper.uimodel.ProgressUiDirection
 import com.rokt.modelmapper.uimodel.ResponseOptionModel
+import com.rokt.modelmapper.uimodel.StringWhenUiCondition
 import com.rokt.modelmapper.uimodel.WhenUiHidden
 import com.rokt.modelmapper.uimodel.WhenUiPredicate
 import com.rokt.modelmapper.uimodel.WhenUiTransition
@@ -35,28 +43,38 @@ import com.rokt.network.model.BasicStateStylingBlock
 import com.rokt.network.model.BooleanWhenCondition
 import com.rokt.network.model.CarouselActiveIndicatorMode
 import com.rokt.network.model.CarouselTransition
+import com.rokt.network.model.CatalogDropdownStyles
+import com.rokt.network.model.CatalogImageGalleryIndicatorStyles
+import com.rokt.network.model.CatalogImageGalleryStyles
 import com.rokt.network.model.DataImageCarouselIndicatorStyles
 import com.rokt.network.model.DataImageCarouselIndicators
 import com.rokt.network.model.DimensionHeightValue
 import com.rokt.network.model.DimensionWidthValue
 import com.rokt.network.model.EqualityWhenCondition
 import com.rokt.network.model.ExistenceWhenCondition
+import com.rokt.network.model.FormStateStylingBlock
 import com.rokt.network.model.InTransition
 import com.rokt.network.model.IndicatorStyles
+import com.rokt.network.model.InputValidation
 import com.rokt.network.model.LayoutSchemaModel
 import com.rokt.network.model.OrderableWhenCondition
 import com.rokt.network.model.OutTransition
+import com.rokt.network.model.PlaceholderPredicate
 import com.rokt.network.model.ProgressIndicatorStyles
 import com.rokt.network.model.ProgressionDirection
+import com.rokt.network.model.StringWhenCondition
 import com.rokt.network.model.WhenHidden
 import com.rokt.network.model.WhenPredicate
 import com.rokt.network.model.WhenTransition
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
+import kotlinx.collections.immutable.toImmutableMap
 
 private const val defaultStartPosition = 1
 private const val defaultAccessibilityHidden = true
 private const val dataImageCarouselCustomKeyPrefix = "DataImageCarousel."
+private const val catalogImageGalleryCustomStateKey = "imageCarouselPosition"
+private const val catalogDropdownCustomStateKeyPrefix = "CatalogDropdown."
 
 internal fun transformProgressIndicator(
     progressIndicatorModel: LayoutSchemaModel.ProgressIndicator,
@@ -223,6 +241,56 @@ internal fun transformCatalogResponseButton(
             )
         }.toImmutableList(),
         catalogItemModel = bindModel<CatalogItemModel>(offerModel = offerModel, itemIndex = itemIndex)?.properties,
+        transactionData = offerModel?.transactionData,
+    )
+}
+
+internal fun transformCatalogDevicePayButton(
+    catalogDevicePayButton: LayoutSchemaModel.CatalogDevicePayButton,
+    offerModel: OfferModel?,
+    itemIndex: Int,
+    transformLayoutSchemaChildren: (LayoutSchemaModel) -> LayoutSchemaUiModel?,
+): LayoutSchemaUiModel.CatalogDevicePayButtonUiModel {
+    val ownStyles = catalogDevicePayButton.node.styles?.elements?.own?.toImmutableList()
+    val ownModifiers = ownStyles.transformModifier(
+        transformSpacing = { ownStyle -> ownStyle.toBasicStateStylingBlock { style -> style.spacing } },
+        transformDimension = { ownStyle -> ownStyle.toBasicStateStylingBlock { style -> style.dimension } },
+        transformBackground = { ownStyle -> ownStyle.toBasicStateStylingBlock { style -> style.background } },
+        transformBorder = { ownStyle -> ownStyle.toBasicStateStylingBlock { style -> style.border } },
+        transformContainer = { ownStyle -> ownStyle.toBasicStateStylingBlock { style -> style.container } },
+    )
+    val conditionalStyleTransition = catalogDevicePayButton.node.styles?.conditionalTransitions?.let {
+        ConditionalTransitionModifier(
+            modifier = transformModifier(
+                it.value.own?.spacing,
+                it.value.own?.dimension,
+                it.value.own?.background,
+                it.value.own?.border,
+                it.value.own?.container,
+            ),
+            predicates = it.predicates.map { predicate -> predicate.transformWhenPredicate() }.toImmutableList(),
+            duration = it.duration,
+        )
+    }
+
+    return LayoutSchemaUiModel.CatalogDevicePayButtonUiModel(
+        ownModifiers = ownModifiers,
+        containerProperties = ownStyles.transformContainer(
+            transformContainer = { ownStyle -> ownStyle.toBasicStateStylingBlock { style -> style.container } },
+            transformFlexChild = { ownStyle -> ownStyle.toBasicStateStylingBlock { style -> style.flexChild } },
+        ),
+        conditionalTransitionModifiers = conditionalStyleTransition,
+        children = catalogDevicePayButton.node.children.mapNotNull { child ->
+            transformLayoutSchemaChildren(child)
+        }.toImmutableList(),
+        catalogItemModel = bindModel<CatalogItemModel>(offerModel = offerModel, itemIndex = itemIndex)?.properties,
+        paymentProvider = catalogDevicePayButton.node.provider,
+        validatorFieldKeys = catalogDevicePayButton.node.validatorTriggerConfig
+            ?.validatorFieldKeys
+            .orEmpty()
+            .toImmutableList(),
+        transactionData = offerModel?.transactionData,
+        a11yLabel = catalogDevicePayButton.node.a11yLabel,
     )
 }
 
@@ -401,8 +469,9 @@ internal fun transformProgressControl(
 internal fun transformWhen(
     whenModel: LayoutSchemaModel.When,
     transformLayoutSchemaChildren: (LayoutSchemaModel) -> LayoutSchemaUiModel?,
+    bindPlaceholderValue: (String) -> BindData = { BindData.Undefined },
 ): LayoutSchemaUiModel.WhenUiModel = LayoutSchemaUiModel.WhenUiModel(
-    predicates = whenModel.node.predicates.map { it.transformWhenPredicate() }.toImmutableList(),
+    predicates = whenModel.node.predicates.map { it.transformWhenPredicate(bindPlaceholderValue) }.toImmutableList(),
     children = whenModel.node.children.mapNotNull { child ->
         transformLayoutSchemaChildren(child)
     }.toImmutableList(),
@@ -413,7 +482,9 @@ internal fun transformWhen(
     hide = whenModel.node.hide?.toHideUiModel(),
 )
 
-internal fun WhenPredicate.transformWhenPredicate(): WhenUiPredicate = when (this) {
+internal fun WhenPredicate.transformWhenPredicate(
+    bindPlaceholderValue: (String) -> BindData = { BindData.Undefined },
+): WhenUiPredicate = when (this) {
     is WhenPredicate.Breakpoint -> WhenUiPredicate.Breakpoint(
         condition = predicate.condition.toUiModel(),
         value = predicate.value,
@@ -456,8 +527,62 @@ internal fun WhenPredicate.transformWhenPredicate(): WhenUiPredicate = when (thi
         value = predicate.value,
     )
 
-    else -> throw IllegalArgumentException()
+    is WhenPredicate.DomainState -> WhenUiPredicate.DomainState(
+        condition = predicate.condition.toUiModel(),
+        key = predicate.key.string,
+        value = predicate.value,
+    )
+
+    is WhenPredicate.Placeholder -> predicate.toUiModel(bindPlaceholderValue)
 }
+
+private fun PlaceholderPredicate.toUiModel(bindPlaceholderValue: (String) -> BindData): WhenUiPredicate = when (this) {
+    is PlaceholderPredicate.TextValue -> WhenUiPredicate.PlaceholderTextValue(
+        condition = content.condition.toUiModel(),
+        input = content.input.toSupportedPredicatePlaceholder()?.let(bindPlaceholderValue) ?: BindData.Undefined,
+        value = content.value,
+    )
+
+    is PlaceholderPredicate.TextLength -> WhenUiPredicate.PlaceholderTextLength(
+        condition = content.condition.toUiModel(),
+        input = content.input.toSupportedPredicatePlaceholder()?.let(bindPlaceholderValue) ?: BindData.Undefined,
+        value = content.value,
+    )
+
+    is PlaceholderPredicate.Numeric -> WhenUiPredicate.PlaceholderNumeric(
+        condition = content.condition.toUiModel(),
+        input = content.input.toSupportedPredicatePlaceholder()?.let(bindPlaceholderValue) ?: BindData.Undefined,
+        value = content.value,
+    )
+}
+
+private fun String.toSupportedPredicatePlaceholder(): String? {
+    val trimmed = trim()
+    val content = trimmed.removeSurrounding("%^", "^%")
+    val paths = content.split('|').map { it.trim() }
+    if (paths.none { it.isSupportedPredicatePlaceholderPath() }) return null
+    return "%^${paths.filterNot { it.isUnsupportedPredicatePlaceholderPath() }.joinToString("|") }^%"
+}
+
+private fun String.isSupportedPredicatePlaceholderPath(): Boolean =
+    startsWithDataPlaceholderNamespace(CREATIVE_COPY_NAMESPACE) ||
+        startsWithDataPlaceholderNamespace(CREATIVE_RESPONSE_NAMESPACE) ||
+        startsWithDataPlaceholderNamespace(CREATIVE_LINKS_NAMESPACE) ||
+        startsWithDataPlaceholderNamespace(CATALOG_ITEM_NAMESPACE) ||
+        startsWithTemplateDataPrefix(TemplateDataPrefix.STATE)
+
+private fun String.isUnsupportedPredicatePlaceholderPath(): Boolean = !isSupportedPredicatePlaceholderPath() && (
+    startsWithTemplateDataPrefix(TemplateDataPrefix.DATA) ||
+        startsWithTemplateDataPrefix(TemplateDataPrefix.STATE) ||
+        unsupportedNamespacePattern.containsMatchIn(this)
+    )
+
+private fun String.startsWithDataPlaceholderNamespace(namespace: String): Boolean =
+    startsWith("${TemplateDataPrefix.DATA.value}.$namespace.")
+
+private fun String.startsWithTemplateDataPrefix(prefix: TemplateDataPrefix): Boolean = startsWith("${prefix.value}.")
+
+private val unsupportedNamespacePattern = Regex("^[A-Z][A-Z0-9_]*\\.")
 
 internal fun transformDataImageCarousel(
     dataImageCarousel: LayoutSchemaModel.DataImageCarousel,
@@ -537,8 +662,251 @@ internal fun transformDataImageCarousel(
     )
 }
 
+internal fun transformCatalogDropdown(
+    catalogDropdown: LayoutSchemaModel.CatalogDropdown,
+    offerModel: OfferModel?,
+    attributeIndex: Int,
+): LayoutSchemaUiModel.CatalogDropdownUiModel {
+    val elements = catalogDropdown.node.styles?.elements
+    val own = transformCatalogDropdownElement(elements?.own)
+    val ownDefault = own?.default
+
+    val conditionalStyleTransition = catalogDropdown.node.styles?.conditionalTransitions?.let {
+        ConditionalTransitionModifier(
+            modifier = transformModifier(
+                it.value.own?.spacing,
+                it.value.own?.dimension,
+                it.value.own?.background,
+                it.value.own?.border,
+                it.value.own?.container,
+            ),
+            predicates = it.predicates.map { predicate -> predicate.transformWhenPredicate() }.toImmutableList(),
+            duration = it.duration,
+        )
+    }
+
+    return LayoutSchemaUiModel.CatalogDropdownUiModel(
+        ownModifiers = ownDefault?.ownModifiers,
+        containerProperties = ownDefault?.containerProperties,
+        conditionalTransitionModifiers = conditionalStyleTransition,
+        head = transformCatalogDropdownElement(elements?.head),
+        icon = transformCatalogDropdownElement(elements?.icon),
+        optionList = transformCatalogDropdownElement(elements?.optionList),
+        option = transformCatalogDropdownElement(elements?.option),
+        error = transformCatalogDropdownElement(elements?.error),
+        placeholderValue = catalogDropdown.node.placeholderValue,
+        unavailableValue = catalogDropdown.node.unavailableValue,
+        validationFieldKey = catalogDropdown.node.validatorFieldConfig?.validationFieldKey,
+        validationErrorMessage = catalogDropdown.node.validatorFieldConfig?.validators
+            ?.firstNotNullOfOrNull { validation ->
+                (validation as? InputValidation.Required)?.value?.message
+            },
+        validateOnChange = catalogDropdown.node.validatorFieldConfig?.validateOnChange ?: false,
+        a11yLabel = catalogDropdown.node.a11yLabel,
+        attributeIndex = attributeIndex,
+        customStateKey = "$catalogDropdownCustomStateKeyPrefix$attributeIndex.selectedIndex",
+        catalogItemGroup = offerModel?.catalogItemGroup,
+        catalogItems = offerModel?.catalogItems ?: emptyList<CatalogItemModel>().toImmutableList(),
+    )
+}
+
+private fun transformCatalogDropdownElement(
+    styles: List<FormStateStylingBlock<CatalogDropdownStyles>>?,
+): LayoutSchemaUiModel.CatalogDropdownElementUiModel? {
+    if (styles.isNullOrEmpty()) return null
+
+    return LayoutSchemaUiModel.CatalogDropdownElementUiModel(
+        default = transformCatalogDropdownStyle(
+            styles.map { style ->
+                BasicStateStylingBlock(
+                    default = style.default,
+                    pressed = style.pressed,
+                )
+            }.toImmutableList(),
+        ),
+        selected = styles.toCatalogDropdownStateStyle { it.selected },
+        disabled = styles.toCatalogDropdownStateStyle { it.disabled },
+        errored = styles.toCatalogDropdownStateStyle { it.errored },
+    )
+}
+
+private fun List<FormStateStylingBlock<CatalogDropdownStyles>>.toCatalogDropdownStateStyle(
+    stateStyle: (FormStateStylingBlock<CatalogDropdownStyles>) -> CatalogDropdownStyles?,
+): LayoutSchemaUiModel.CatalogDropdownStyleUiModel? {
+    if (none { stateStyle(it) != null }) return null
+    return transformCatalogDropdownStyle(
+        map { style ->
+            BasicStateStylingBlock(
+                default = stateStyle(style) ?: style.default,
+            )
+        }.toImmutableList(),
+    )
+}
+
+private fun transformCatalogDropdownStyle(
+    styles: ImmutableList<BasicStateStylingBlock<CatalogDropdownStyles>>?,
+): LayoutSchemaUiModel.CatalogDropdownStyleUiModel {
+    val ownModifiers = styles.transformModifier(
+        transformSpacing = { ownStyle -> ownStyle.toBasicStateStylingBlock { style -> style.spacing } },
+        transformDimension = { ownStyle -> ownStyle.toBasicStateStylingBlock { style -> style.dimension } },
+        transformBackground = { ownStyle -> ownStyle.toBasicStateStylingBlock { style -> style.background } },
+        transformBorder = { ownStyle -> ownStyle.toBasicStateStylingBlock { style -> style.border } },
+        transformContainer = { ownStyle -> ownStyle.toBasicStateStylingBlock { style -> style.container } },
+    )
+
+    return LayoutSchemaUiModel.CatalogDropdownStyleUiModel(
+        ownModifiers = ownModifiers,
+        containerProperties = styles.transformContainer(
+            transformContainer = { ownStyle -> ownStyle.toBasicStateStylingBlock { style -> style.container } },
+            transformFlexChild = { ownStyle -> ownStyle.toBasicStateStylingBlock { style -> style.flexChild } },
+        ),
+        textStyles = styles.transformTextStyles { ownStyle ->
+            ownStyle.toBasicStateStylingBlock { style -> style.text }
+        },
+    )
+}
+
+internal fun transformCatalogImageGallery(
+    catalogImageGallery: LayoutSchemaModel.CatalogImageGallery,
+    offerModel: OfferModel?,
+    itemIndex: Int,
+    module: Module,
+): LayoutSchemaUiModel.CatalogImageGalleryUiModel {
+    val ownStyles = catalogImageGallery.node.styles?.elements?.own?.toImmutableList()
+    val ownModifiers = ownStyles.transformModifier(
+        transformSpacing = { ownStyle -> ownStyle.toBasicStateStylingBlock { style -> style.spacing } },
+        transformDimension = { ownStyle -> ownStyle.toBasicStateStylingBlock { style -> style.dimension } },
+        transformBackground = { ownStyle -> ownStyle.toBasicStateStylingBlock { style -> style.background } },
+        transformBorder = { ownStyle -> ownStyle.toBasicStateStylingBlock { style -> style.border } },
+        transformContainer = { ownStyle -> ownStyle.toBasicStateStylingBlock { style -> style.container } },
+    )
+
+    val mainImageStyles = catalogImageGallery.node.styles?.elements?.mainImage?.toImmutableList()
+    val width = mainImageStyles?.firstOrNull()?.default?.dimension?.width
+    val height = mainImageStyles?.firstOrNull()?.default?.dimension?.height
+    val contentScale: ContentScale = when {
+        width is DimensionWidthValue.Fit && height is DimensionHeightValue.Fit -> ContentScale.Crop
+        else -> ContentScale.FillWidth
+    }
+    val mainImageModifiers = mainImageStyles.transformModifier(
+        transformSpacing = { mainImageStyle -> mainImageStyle.toBasicStateStylingBlock { style -> style.spacing } },
+        transformDimension = { mainImageStyle -> mainImageStyle.toBasicStateStylingBlock { style -> style.dimension } },
+        transformBackground = { mainImageStyle ->
+            mainImageStyle.toBasicStateStylingBlock { style -> style.background }
+        },
+        transformBorder = { mainImageStyle -> mainImageStyle.toBasicStateStylingBlock { style -> style.border } },
+        transformContainer = { mainImageStyle -> mainImageStyle.toBasicStateStylingBlock { style -> style.container } },
+    )
+
+    val conditionalStyleTransition = catalogImageGallery.node.styles?.conditionalTransitions?.let {
+        ConditionalTransitionModifier(
+            modifier = transformModifier(
+                it.value.own?.spacing,
+                it.value.own?.dimension,
+                it.value.own?.background,
+                it.value.own?.border,
+                it.value.own?.container,
+            ),
+            predicates = it.predicates.map { predicate -> predicate.transformWhenPredicate() }.toImmutableList(),
+            duration = it.duration,
+        )
+    }
+
+    return LayoutSchemaUiModel.CatalogImageGalleryUiModel(
+        ownModifiers = ownModifiers,
+        containerProperties = ownStyles.transformContainer(
+            transformContainer = { ownStyle -> ownStyle.toBasicStateStylingBlock { style -> style.container } },
+            transformFlexChild = { ownStyle -> ownStyle.toBasicStateStylingBlock { style -> style.flexChild } },
+        ),
+        conditionalTransitionModifiers = conditionalStyleTransition,
+        images = getCatalogItemImages(
+            offerModel = offerModel,
+            itemIndex = itemIndex,
+            module = module,
+        ).mapValues { entry ->
+            LayoutSchemaUiModel.ImageUiModel(
+                ownModifiers = mainImageModifiers,
+                containerProperties = null,
+                conditionalTransitionModifiers = null,
+                alt = entry.value.properties.get<String>(TypedKey<String>(KEY_ALT)),
+                darkUrl = entry.value.properties.get<String>(TypedKey<String>(KEY_DARK))?.takeIf(String::isNotEmpty),
+                lightUrl = entry.value.properties.get<String>(TypedKey<String>(KEY_LIGHT)).orEmpty(),
+                title = entry.value.properties.get<String>(TypedKey<String>(KEY_TITLE)),
+                scaleType = contentScale,
+            )
+        }.toImmutableMap(),
+        showIndicators = catalogImageGallery.node.showIndicators ?: true,
+        indicatorStyle = catalogImageGallery.node.styles?.elements?.indicator?.let {
+            transformCatalogImageGalleryProgressIndicatorItem(it)
+        },
+        activeIndicator = catalogImageGallery.node.styles?.elements?.activeIndicator?.let {
+            transformCatalogImageGalleryProgressIndicatorItem(it)
+        },
+        seenIndicator = catalogImageGallery.node.styles?.elements?.seenIndicator?.let {
+            transformCatalogImageGalleryProgressIndicatorItem(it)
+        },
+        progressIndicatorContainer = catalogImageGallery.node.styles?.elements?.progressIndicatorContainer?.let {
+            transformCatalogImageGalleryProgressIndicatorItem(it)
+        },
+        controlButton = catalogImageGallery.node.styles?.elements?.controlButton?.let {
+            transformCatalogImageGalleryControlButton(it)
+        },
+        customStateKey = catalogImageGalleryCustomStateKey,
+        backwardIcon = catalogImageGallery.node.backwardIcon,
+        forwardIcon = catalogImageGallery.node.forwardIcon,
+        a11yLabel = catalogImageGallery.node.a11yLabel,
+    )
+}
+
+internal fun transformCatalogImageGalleryControlButton(
+    controlButton: List<BasicStateStylingBlock<CatalogImageGalleryStyles>>?,
+): LayoutSchemaUiModel.CatalogImageGalleryControlButtonUiModel {
+    val styles = controlButton?.toImmutableList()
+    val ownModifiers = styles.transformModifier(
+        transformSpacing = { ownStyle -> ownStyle.toBasicStateStylingBlock { style -> style.spacing } },
+        transformDimension = { ownStyle -> ownStyle.toBasicStateStylingBlock { style -> style.dimension } },
+        transformBackground = { ownStyle -> ownStyle.toBasicStateStylingBlock { style -> style.background } },
+        transformBorder = { ownStyle -> ownStyle.toBasicStateStylingBlock { style -> style.border } },
+        transformContainer = { ownStyle -> ownStyle.toBasicStateStylingBlock { style -> style.container } },
+    )
+
+    return LayoutSchemaUiModel.CatalogImageGalleryControlButtonUiModel(
+        ownModifiers = ownModifiers,
+        containerProperties = styles.transformContainer(
+            transformContainer = { ownStyle -> ownStyle.toBasicStateStylingBlock { style -> style.container } },
+            transformFlexChild = { ownStyle -> ownStyle.toBasicStateStylingBlock { style -> style.flexChild } },
+        ),
+        conditionalTransitionModifiers = null,
+        textStyles = styles.transformTextStyles { ownStyle ->
+            ownStyle.toBasicStateStylingBlock { style -> style.text }
+        },
+    )
+}
+
 internal fun transformCarouselProgressIndicatorItem(
     indicator: List<BasicStateStylingBlock<DataImageCarouselIndicatorStyles>>?,
+): LayoutSchemaUiModel.ProgressIndicatorItemUiModel {
+    val ownModifiers = indicator?.toImmutableList().transformModifier(
+        transformSpacing = { ownStyle -> ownStyle.toBasicStateStylingBlock { style -> style.spacing } },
+        transformDimension = { ownStyle -> ownStyle.toBasicStateStylingBlock { style -> style.dimension } },
+        transformBackground = { ownStyle -> ownStyle.toBasicStateStylingBlock { style -> style.background } },
+        transformBorder = { ownStyle -> ownStyle.toBasicStateStylingBlock { style -> style.border } },
+        transformContainer = { ownStyle -> ownStyle.toBasicStateStylingBlock { style -> style.container } },
+    )
+
+    return LayoutSchemaUiModel.ProgressIndicatorItemUiModel(
+        ownModifiers = ownModifiers,
+        containerProperties = indicator?.toImmutableList().transformContainer(
+            transformContainer = { ownStyle -> ownStyle.toBasicStateStylingBlock { style -> style.container } },
+            transformFlexChild = { ownStyle -> ownStyle.toBasicStateStylingBlock { style -> style.flexChild } },
+        ),
+        conditionalTransitionModifiers = null,
+        textStyles = null,
+    )
+}
+
+internal fun transformCatalogImageGalleryProgressIndicatorItem(
+    indicator: List<BasicStateStylingBlock<CatalogImageGalleryIndicatorStyles>>?,
 ): LayoutSchemaUiModel.ProgressIndicatorItemUiModel {
     val ownModifiers = indicator?.toImmutableList().transformModifier(
         transformSpacing = { ownStyle -> ownStyle.toBasicStateStylingBlock { style -> style.spacing } },
@@ -609,6 +977,13 @@ private fun BooleanWhenCondition.toUiModel() = when (this) {
 private fun ExistenceWhenCondition.toUiModel() = when (this) {
     ExistenceWhenCondition.Exists -> ExistenceWhenUiCondition.Exists
     ExistenceWhenCondition.NotExists -> ExistenceWhenUiCondition.NotExists
+}
+
+private fun StringWhenCondition.toUiModel() = when (this) {
+    StringWhenCondition.Is -> StringWhenUiCondition.Is
+    StringWhenCondition.IsNot -> StringWhenUiCondition.IsNot
+    StringWhenCondition.Exists -> StringWhenUiCondition.Exists
+    StringWhenCondition.NotExists -> StringWhenUiCondition.NotExists
 }
 
 private fun WhenTransition.toTransitionUiModel(): WhenUiTransition {

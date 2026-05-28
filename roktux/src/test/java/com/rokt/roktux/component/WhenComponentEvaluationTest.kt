@@ -2,11 +2,13 @@ package com.rokt.roktux.component
 
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
+import com.rokt.modelmapper.data.BindData
 import com.rokt.modelmapper.uimodel.BooleanWhenUiCondition
 import com.rokt.modelmapper.uimodel.EqualityWhenUiCondition
 import com.rokt.modelmapper.uimodel.ExistenceWhenUiCondition
 import com.rokt.modelmapper.uimodel.LayoutSchemaUiModel
 import com.rokt.modelmapper.uimodel.OrderableWhenUiCondition
+import com.rokt.modelmapper.uimodel.StringWhenUiCondition
 import com.rokt.modelmapper.uimodel.WhenUiHidden
 import com.rokt.modelmapper.uimodel.WhenUiPredicate
 import com.rokt.modelmapper.uimodel.WhenUiTransition
@@ -1234,6 +1236,154 @@ class WhenComponentEvaluationTest {
         // Assert
         assertTrue(evaluationResult)
     }
+
+    @Test
+    fun `given predicate target is placeholder text value, then evaluate should support equality and existence`() {
+        assertTrue(
+            evaluatePredicate(
+                WhenUiPredicate.PlaceholderTextValue(
+                    condition = StringWhenUiCondition.Is,
+                    input = BindData.Value("member"),
+                    value = "member",
+                ),
+            ),
+        )
+        assertTrue(
+            evaluatePredicate(
+                WhenUiPredicate.PlaceholderTextValue(
+                    condition = StringWhenUiCondition.Exists,
+                    input = BindData.Value("member"),
+                    value = "",
+                ),
+            ),
+        )
+        assertTrue(
+            evaluatePredicate(
+                WhenUiPredicate.PlaceholderTextValue(
+                    condition = StringWhenUiCondition.NotExists,
+                    input = BindData.Undefined,
+                    value = "",
+                ),
+            ),
+        )
+        assertFalse(
+            evaluatePredicate(
+                WhenUiPredicate.PlaceholderTextValue(
+                    condition = StringWhenUiCondition.Is,
+                    input = BindData.Undefined,
+                    value = "member",
+                ),
+            ),
+        )
+    }
+
+    @Test
+    fun `given predicate target is placeholder text length or numeric, then evaluate should use orderable comparisons`() {
+        assertTrue(
+            evaluatePredicate(
+                WhenUiPredicate.PlaceholderTextLength(
+                    condition = OrderableWhenUiCondition.IsAbove,
+                    input = BindData.Value("member"),
+                    value = "5",
+                ),
+            ),
+        )
+        assertTrue(
+            evaluatePredicate(
+                WhenUiPredicate.PlaceholderNumeric(
+                    condition = OrderableWhenUiCondition.IsBelow,
+                    input = BindData.Value("4"),
+                    value = "5",
+                ),
+            ),
+        )
+        assertFalse(
+            evaluatePredicate(
+                WhenUiPredicate.PlaceholderNumeric(
+                    condition = OrderableWhenUiCondition.IsAbove,
+                    input = BindData.Value("not-a-number"),
+                    value = "1",
+                ),
+            ),
+        )
+        assertFalse(
+            evaluatePredicate(
+                WhenUiPredicate.PlaceholderTextLength(
+                    condition = OrderableWhenUiCondition.Is,
+                    input = BindData.Undefined,
+                    value = "0",
+                ),
+            ),
+        )
+    }
+
+    @Test
+    fun `given predicate target is domainState, then evaluate should compare seeded values and default missing keys to zero`() {
+        val offerState = createOfferUiState(
+            domainStates = persistentMapOf(
+                "offerComplete" to 1,
+                "checkout" to 2,
+            ),
+        )
+
+        assertTrue(
+            evaluatePredicate(
+                WhenUiPredicate.DomainState(
+                    condition = OrderableWhenUiCondition.Is,
+                    key = "offerComplete",
+                    value = 1,
+                ),
+                WhenUiPredicate.DomainState(
+                    condition = OrderableWhenUiCondition.IsAbove,
+                    key = "checkout",
+                    value = 1,
+                ),
+                offerState = offerState,
+            ),
+        )
+        assertTrue(
+            evaluatePredicate(
+                WhenUiPredicate.DomainState(
+                    condition = OrderableWhenUiCondition.Is,
+                    key = "layoutMinimized",
+                    value = 0,
+                ),
+                offerState = offerState,
+            ),
+        )
+        assertFalse(
+            evaluatePredicate(
+                WhenUiPredicate.DomainState(
+                    condition = OrderableWhenUiCondition.IsBelow,
+                    key = "checkout",
+                    value = 2,
+                ),
+                offerState = offerState,
+            ),
+        )
+    }
+
+    private fun evaluatePredicate(
+        vararg predicate: WhenUiPredicate,
+        offerState: OfferUiState = createOfferUiState(),
+    ): Boolean = evaluatePredicates(
+        predicates = createWhenUiModel(*predicate).predicates,
+        breakpointIndex = 0,
+        isDarkModeEnabled = false,
+        offerState = offerState,
+    )
+
+    private fun createOfferUiState(
+        domainStates: kotlinx.collections.immutable.ImmutableMap<String, Int> = persistentMapOf(),
+    ): OfferUiState = OfferUiState(
+        currentOfferIndex = 0,
+        lastOfferIndex = 1,
+        viewableItems = 1,
+        creativeCopy = persistentMapOf(),
+        breakpoints = persistentMapOf(),
+        customState = persistentMapOf(),
+        domainStates = domainStates,
+    )
 
     private fun createWhenUiModel(vararg predicate: WhenUiPredicate): LayoutSchemaUiModel.WhenUiModel = LayoutSchemaUiModel.WhenUiModel(
         predicates = predicate.toList().toImmutableList(),
