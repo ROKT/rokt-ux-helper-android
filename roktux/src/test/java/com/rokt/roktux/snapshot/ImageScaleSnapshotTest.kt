@@ -19,7 +19,7 @@ import org.robolectric.annotation.GraphicsMode
 
 /**
  * Visual regression for DCUI [image.scale] on StaticImage and DataImage: `fit`, `fill`, and
- * `crop` drive Compose content scaling; non-`fit` scales also expand to max width. Uses the same
+ * `crop` drive Compose content scaling. Uses the same
  * in-memory PNG (56×56) inside a fixed 120×80 slot so modes produce visibly different crops.
  */
 @RunWith(AndroidJUnit4::class)

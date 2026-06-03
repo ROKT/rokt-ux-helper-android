@@ -1,6 +1,5 @@
 package com.rokt.roktux.component
 
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -49,7 +48,6 @@ internal class ImageComponent(private val modifierFactory: ModifierFactory) :
                 imageLoader = LocalLayoutComponent.current[ImageLoader::class.java],
                 contentScale = contentScale,
                 modifier = modifier
-                    .then(if (model.expandImageToMaxWidth) Modifier.fillMaxWidth() else Modifier)
                     .then(
                         modifierFactory
                             .createModifier(
