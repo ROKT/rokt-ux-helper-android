@@ -285,6 +285,8 @@ sealed class LayoutSchemaUiModel(
         val darkUrl: String?,
         val title: String?,
         val scaleType: ContentScale?,
+        /** When true, image should span available width (schema-driven non-[ContentScale.Fit] scales). */
+        val expandImageToMaxWidth: Boolean = false,
         val alt: String?,
     ) : LayoutSchemaUiModel(ownModifiers, containerProperties, conditionalTransitionModifiers)
 

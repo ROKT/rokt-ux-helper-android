@@ -1,5 +1,6 @@
 package com.rokt.roktux.component
 
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -41,27 +42,30 @@ internal class ImageComponent(private val modifierFactory: ModifierFactory) :
         }
         if (url.isBlank()) return
         if (!onImageError) {
+            val contentScale = model.scaleType ?: ContentScale.None
             AsyncImage(
                 model = ImageRequest.Builder(LocalContext.current).data(url).build(),
                 contentDescription = model.alt,
                 imageLoader = LocalLayoutComponent.current[ImageLoader::class.java],
-                contentScale = model.scaleType ?: ContentScale.None,
-                modifier = modifier.then(
-                    modifierFactory
-                        .createModifier(
-                            modifierPropertiesList = model.ownModifiers,
-                            conditionalTransitionModifier = model.conditionalTransitionModifiers,
-                            breakpointIndex = breakpointIndex,
-                            isPressed = isPressed,
-                            isDarkModeEnabled = isDarkModeEnabled,
-                            offerState = offerState,
-                        )
-                        .semantics {
-                            if (model.alt.isNullOrBlank()) {
-                                hideFromAccessibility()
-                            }
-                        },
-                ),
+                contentScale = contentScale,
+                modifier = modifier
+                    .then(if (model.expandImageToMaxWidth) Modifier.fillMaxWidth() else Modifier)
+                    .then(
+                        modifierFactory
+                            .createModifier(
+                                modifierPropertiesList = model.ownModifiers,
+                                conditionalTransitionModifier = model.conditionalTransitionModifiers,
+                                breakpointIndex = breakpointIndex,
+                                isPressed = isPressed,
+                                isDarkModeEnabled = isDarkModeEnabled,
+                                offerState = offerState,
+                            )
+                            .semantics {
+                                if (model.alt.isNullOrBlank()) {
+                                    hideFromAccessibility()
+                                }
+                            },
+                    ),
                 onError = { onImageError = true },
             )
         }

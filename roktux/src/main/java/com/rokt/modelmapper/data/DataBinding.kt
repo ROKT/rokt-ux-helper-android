@@ -172,10 +172,33 @@ private class PlaceholderReplacer(
 
     private fun getCreativeCopy(key: String): String? = offer?.creative?.copy?.get(getSanitisedDataKey(key))
 
-    private fun getCatalogItemCopy(key: String, itemIndex: Int): String? =
-        offer?.catalogItems?.getOrNull(itemIndex)?.run {
-            properties.get<String>(TypedKey<String>(getSanitisedDataKey(key)))
+    private fun getCatalogItemCopy(key: String, itemIndex: Int): String? {
+        val catalogItem = offer?.catalogItems?.getOrNull(itemIndex) ?: return null
+        val path = getSanitisedDataKey(key)
+        if (path.startsWith(CATALOG_ITEM_IMAGES_PREFIX)) {
+            return resolveCatalogItemImageField(catalogItem, path.removePrefix(CATALOG_ITEM_IMAGES_PREFIX))
         }
+        return catalogItem.properties.get<String>(TypedKey<String>(path))
+    }
+
+    /**
+     * Resolves `images.<slot>.<leaf>` against [CatalogItemModel.imageWrapper], mirroring nested
+     * struct navigation for placeholders such as `%^DATA.catalogItem.images.catalogItemImage2.light^%`.
+     * When the path stops at the image slot (no leaf), returns `""` so downstream logic treats
+     * the value as present-but-empty (parity with iOS catalog extractor).
+     */
+    private fun resolveCatalogItemImageField(catalogItem: CatalogItemModel, pathAfterImages: String): String? {
+        if (pathAfterImages.isBlank()) return null
+        val segments = pathAfterImages.split('.')
+        val slotKey = segments.firstOrNull() ?: return null
+        val imageModel = catalogItem.imageWrapper.properties.get<OfferImageModel>(TypedKey<OfferImageModel>(slotKey))
+            ?: return null
+        if (segments.size == 1) {
+            return ""
+        }
+        val leafKey = segments.drop(1).joinToString(".")
+        return imageModel.properties.get<String>(TypedKey<String>(leafKey))
+    }
 
     private fun getResponseOptionData(key: String): String? {
         offer?.creative?.responseOptions?.get(contextKey.orEmpty())?.let {
@@ -231,6 +254,8 @@ private val isStateTemplate = Regex("%\\^(${TemplateDataPrefix.STATE})\\.[a-zA-Z
 private val templatePattern = Regex(
     "%\\^(?:${TemplateDataPrefix.DATA}|${TemplateDataPrefix.STATE})\\.[a-zA-Z0-9]+[a-zA-Z0-9.]*(?:\\|.*?)?\\^%",
 )
+
+private const val CATALOG_ITEM_IMAGES_PREFIX = "images."
 
 private val INDICATOR_POSITION = listOf("IndicatorPosition", "indicatorPosition")
 private val TOTAL_OFFERS = listOf("TotalOffers", "totalOffers")

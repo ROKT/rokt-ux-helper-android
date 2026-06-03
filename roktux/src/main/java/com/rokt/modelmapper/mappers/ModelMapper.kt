@@ -1,6 +1,5 @@
 package com.rokt.modelmapper.mappers
 
-import androidx.compose.ui.layout.ContentScale
 import com.rokt.modelmapper.data.BindData
 import com.rokt.modelmapper.data.bindModel
 import com.rokt.modelmapper.hmap.TypedKey
@@ -21,6 +20,7 @@ import com.rokt.network.model.BasicTextStyle
 import com.rokt.network.model.DataIconStyles
 import com.rokt.network.model.DimensionHeightValue
 import com.rokt.network.model.DimensionWidthValue
+import com.rokt.network.model.ImageScale
 import com.rokt.network.model.LayoutSchemaModel
 import com.rokt.network.model.StaticIconStyles
 import kotlinx.collections.immutable.toImmutableList
@@ -136,10 +136,9 @@ internal fun transformDataImage(
     val ownStyles = dataImageModel.node.styles?.elements?.own?.toImmutableList()
     val width = ownStyles?.firstOrNull()?.default?.dimension?.width
     val height = ownStyles?.firstOrNull()?.default?.dimension?.height
-    val contentScale: ContentScale = when {
-        width is DimensionWidthValue.Fit && height is DimensionHeightValue.Fit -> ContentScale.Crop
-        else -> ContentScale.Fit
-    }
+    val schemaImageScale = ownStyles?.firstOrNull()?.default?.image?.scale
+    val contentScale = resolveLayoutImageContentScale(schemaImageScale, width, height)
+    val expandImageToMaxWidth = schemaImageScale != null && schemaImageScale != ImageScale.Fit
     val ownModifiers = ownStyles.transformModifier(
         transformBorder = { ownStyle -> ownStyle.toBasicStateStylingBlock { style -> style.border } },
         transformSpacing = { ownStyle -> ownStyle.toBasicStateStylingBlock { style -> style.spacing } },
@@ -172,6 +171,7 @@ internal fun transformDataImage(
         title = boundModel?.properties?.get<String>(TypedKey<String>(KEY_TITLE)),
         alt = boundModel?.properties?.get<String>(TypedKey<String>(KEY_ALT)),
         scaleType = contentScale,
+        expandImageToMaxWidth = expandImageToMaxWidth,
     )
 }
 
@@ -179,10 +179,9 @@ internal fun transformStaticImage(staticImageModel: LayoutSchemaModel.StaticImag
     val ownStyles = staticImageModel.node.styles?.elements?.own?.toImmutableList()
     val width = ownStyles?.firstOrNull()?.default?.dimension?.width
     val height = ownStyles?.firstOrNull()?.default?.dimension?.height
-    val contentScale: ContentScale = when {
-        width is DimensionWidthValue.Fit && height is DimensionHeightValue.Fit -> ContentScale.Crop
-        else -> ContentScale.Fit
-    }
+    val schemaImageScale = ownStyles?.firstOrNull()?.default?.image?.scale
+    val contentScale = resolveLayoutImageContentScale(schemaImageScale, width, height)
+    val expandImageToMaxWidth = schemaImageScale != null && schemaImageScale != ImageScale.Fit
     val ownModifiers = ownStyles.transformModifier(
         transformBorder = { ownStyle -> ownStyle.toBasicStateStylingBlock { style -> style.border } },
         transformSpacing = { ownStyle -> ownStyle.toBasicStateStylingBlock { style -> style.spacing } },
@@ -213,6 +212,7 @@ internal fun transformStaticImage(staticImageModel: LayoutSchemaModel.StaticImag
         darkUrl = staticImageModel.node.url.dark,
         title = staticImageModel.node.title,
         scaleType = contentScale,
+        expandImageToMaxWidth = expandImageToMaxWidth,
         alt = staticImageModel.node.alt,
     )
 }
