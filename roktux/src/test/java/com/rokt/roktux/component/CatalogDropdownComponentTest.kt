@@ -16,6 +16,7 @@ import androidx.compose.ui.test.performSemanticsAction
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntRect
 import androidx.compose.ui.unit.IntSize
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.rokt.core.testutils.annotations.DCUI_COMPONENT_TAG
@@ -135,6 +136,32 @@ class CatalogDropdownComponentTest : BaseDcuiEspressoTest() {
                 popupContentSize = popupSize,
             ),
         )
+    }
+
+    @Test
+    fun testCatalogDropdownPopupPositionProviderUsesWindowCoordinates() {
+        var popupPlacement: CatalogDropdownPopupPlacement? = null
+        val provider = CatalogDropdownPopupPositionProvider(
+            anchorHeight = 44,
+            measuredAnchorBoundsInParent = IntRect(
+                offset = IntOffset(5, 12),
+                size = IntSize(width = 220, height = 44),
+            ),
+            onPlacementCalculated = { popupPlacement = it },
+        )
+
+        val popupOffset = provider.calculatePosition(
+            anchorBounds = IntRect(
+                offset = IntOffset(20, 100),
+                size = IntSize(width = 300, height = 44),
+            ),
+            windowSize = IntSize(width = 400, height = 500),
+            layoutDirection = LayoutDirection.Ltr,
+            popupContentSize = IntSize(width = 220, height = 120),
+        )
+
+        assertEquals(IntOffset(25, 156), popupOffset)
+        assertEquals(CatalogDropdownPopupPlacement.Below, popupPlacement)
     }
 
     @Test

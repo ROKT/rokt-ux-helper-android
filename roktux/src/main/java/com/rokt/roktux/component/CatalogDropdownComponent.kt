@@ -26,7 +26,6 @@ import androidx.compose.ui.layout.boundsInWindow
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
-import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
@@ -83,7 +82,6 @@ internal class CatalogDropdownComponent(private val modifierFactory: ModifierFac
         var boxBounds by remember { mutableStateOf<IntRect?>(null) }
         var headBounds by remember { mutableStateOf<IntRect?>(null) }
         var popupPlacement by remember { mutableStateOf(CatalogDropdownPopupPlacement.Below) }
-        var popupWindowOffset by remember { mutableStateOf(IntOffset.Zero) }
         val headBoundsInBox = remember(headBounds, boxBounds) {
             headBounds?.let { bounds ->
                 boxBounds?.let(bounds::relativeTo)
@@ -91,7 +89,6 @@ internal class CatalogDropdownComponent(private val modifierFactory: ModifierFac
         }
         val density = LocalDensity.current
         val layoutDirection = LocalLayoutDirection.current
-        val view = LocalView.current
         val showValidationError = validationStatus == ValidationStatus.INVALID
         val rootContainer = modifierFactory.createContainerUiProperties(
             containerProperties = model.containerProperties,
@@ -146,7 +143,6 @@ internal class CatalogDropdownComponent(private val modifierFactory: ModifierFac
                     onPositioned = { coordinates, padding ->
                         val bounds = coordinates.boundsInWindowIntRect()
                             .inflate(padding = padding, density = density, layoutDirection = layoutDirection)
-                        popupWindowOffset = view.windowToScreenOffset()
                         headSize = IntSize(width = bounds.width, height = bounds.height)
                         headBounds = bounds
                     },
@@ -159,12 +155,10 @@ internal class CatalogDropdownComponent(private val modifierFactory: ModifierFac
                         popupPositionProvider = remember(
                             headSize.height,
                             headBoundsInBox,
-                            popupWindowOffset,
                         ) {
                             CatalogDropdownPopupPositionProvider(
                                 anchorHeight = headSize.height,
                                 measuredAnchorBoundsInParent = headBoundsInBox,
-                                windowOffset = popupWindowOffset,
                                 onPlacementCalculated = { placement ->
                                     popupPlacement = placement
                                 },
@@ -751,10 +745,9 @@ private val CatalogDropdownPopupPlacement.borderCornerRadiusMode: BorderCornerRa
         CatalogDropdownPopupPlacement.Below -> BorderCornerRadiusMode.Bottom
     }
 
-private class CatalogDropdownPopupPositionProvider(
+internal class CatalogDropdownPopupPositionProvider(
     private val anchorHeight: Int,
     private val measuredAnchorBoundsInParent: IntRect?,
-    private val windowOffset: IntOffset,
     private val onPlacementCalculated: (CatalogDropdownPopupPlacement) -> Unit,
 ) : PopupPositionProvider {
     override fun calculatePosition(
@@ -778,19 +771,8 @@ private class CatalogDropdownPopupPositionProvider(
             windowSize = windowSize,
             popupContentSize = popupContentSize,
             layoutDirection = layoutDirection,
-        ) + windowOffset
+        )
     }
-}
-
-private fun android.view.View.windowToScreenOffset(): IntOffset {
-    val locationOnScreen = IntArray(2)
-    val locationInWindow = IntArray(2)
-    getLocationOnScreen(locationOnScreen)
-    getLocationInWindow(locationInWindow)
-    return IntOffset(
-        x = locationOnScreen[0] - locationInWindow[0],
-        y = locationOnScreen[1] - locationInWindow[1],
-    )
 }
 
 private fun IntRect.toWindowBounds(parentBounds: IntRect): IntRect = IntRect(
