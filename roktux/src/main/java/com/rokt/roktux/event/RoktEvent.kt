@@ -188,6 +188,12 @@ enum class EventType {
     @SerialName("SignalCartItemInstantPurchaseInitiated")
     SignalCartItemInstantPurchaseInitiated,
 
+    @SerialName("SignalCartItemInstantPurchase")
+    SignalCartItemInstantPurchase,
+
+    @SerialName("SignalCartItemInstantPurchaseFailure")
+    SignalCartItemInstantPurchaseFailure,
+
     @SerialName("SignalInstantPurchaseDismissal")
     SignalInstantPurchaseDismissal,
 

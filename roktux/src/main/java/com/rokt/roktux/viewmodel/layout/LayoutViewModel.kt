@@ -86,6 +86,7 @@ internal class LayoutViewModel(
 
     private val _eventsQueue = MutableSharedFlow<RoktPlatformEvent>(replay = 5)
     private val _sentEvents = mutableSetOf<RoktPlatformEvent>()
+    private var pendingDevicePayCatalogItem: PendingDevicePayCatalogItem? = null
 
     init {
         // The buffer is a queue with max capacity of 20 and interval 25ms.
@@ -490,6 +491,16 @@ internal class LayoutViewModel(
 
         val catalogItemProperties = event.catalogItemModel ?: return
         val salePrice = catalogItemProperties.salePrice()
+        pendingDevicePayCatalogItem = catalogItemProperties.toPendingDevicePayCatalogItem()
+        handlePlatformEvent(
+            RoktPlatformEvent(
+                eventType = EventType.SignalCartItemInstantPurchaseInitiated,
+                sessionId = experienceModel.sessionId,
+                parentGuid = catalogItemProperties.instanceGuid(),
+                pageInstanceGuid = experienceModel.placementContext.pageInstanceGuid,
+                objectData = catalogItemProperties.cartItemObjectData(),
+            ),
+        )
         uxEvent(
             RoktUxEvent.CartItemDevicePay(
                 layoutId = pluginId,
@@ -510,30 +521,42 @@ internal class LayoutViewModel(
                 },
             ),
         )
-        handlePlatformEvent(
-            RoktPlatformEvent(
-                eventType = EventType.SignalCartItemInstantPurchaseInitiated,
-                sessionId = experienceModel.sessionId,
-                parentGuid = catalogItemProperties.instanceGuid(),
-                eventData = catalogItemProperties.cartItemEventData(salePrice),
-            ),
-        )
     }
 
     private fun handleCartItemDevicePayResult(offerId: Int, result: DevicePayResult) {
         when (result) {
-            DevicePayResult.Success -> updateOfferCustomState(offerId, PAYMENT_RESULT_CUSTOM_STATE_KEY, 1)
+            DevicePayResult.Success -> {
+                updateOfferCustomState(offerId, PAYMENT_RESULT_CUSTOM_STATE_KEY, 1)
+                sendDevicePayTerminalEvent(EventType.SignalCartItemInstantPurchase)
+            }
 
             DevicePayResult.Failure,
             DevicePayResult.Retry,
-            -> updateOfferCustomState(offerId, PAYMENT_RESULT_CUSTOM_STATE_KEY, -1)
+            -> {
+                updateOfferCustomState(offerId, PAYMENT_RESULT_CUSTOM_STATE_KEY, -1)
+                sendDevicePayTerminalEvent(EventType.SignalCartItemInstantPurchaseFailure)
+            }
 
             is DevicePayResult.PendingConfirmation -> {
                 runtimeState.setCatalogRuntimeData(result.catalogRuntimeData)
                 updateOfferCustomState(offerId, DEVICE_PAY_STATE_CUSTOM_STATE_KEY, 1)
+                pendingDevicePayCatalogItem = null
             }
         }
         sendViewState()
+    }
+
+    private fun sendDevicePayTerminalEvent(eventType: EventType) {
+        val catalogItem = pendingDevicePayCatalogItem ?: return
+        pendingDevicePayCatalogItem = null
+        handlePlatformEvent(
+            RoktPlatformEvent(
+                eventType = eventType,
+                sessionId = experienceModel.sessionId,
+                parentGuid = catalogItem.instanceGuid,
+                pageInstanceGuid = experienceModel.placementContext.pageInstanceGuid,
+            ),
+        )
     }
 
     private fun handleCartItemForwardPaymentResult(offerId: Int, result: DevicePayResult) {
@@ -914,6 +937,16 @@ internal class LayoutViewModel(
         KEY_QUANTITY to "1",
         KEY_UNIT_PRICE to price.toString(),
     )
+
+    private fun HMap.cartItemObjectData(): Map<String, String> = mapOf(
+        KEY_CATALOG_ITEM_ID to catalogItemId(),
+        KEY_QUANTITY to "1",
+    )
+
+    private fun HMap.toPendingDevicePayCatalogItem(): PendingDevicePayCatalogItem =
+        PendingDevicePayCatalogItem(instanceGuid = instanceGuid())
+
+    private data class PendingDevicePayCatalogItem(val instanceGuid: String)
 
     companion object {
         private const val KEY_INITIATOR = "initiator"
