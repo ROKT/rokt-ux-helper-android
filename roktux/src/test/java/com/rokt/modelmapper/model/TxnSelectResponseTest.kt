@@ -31,14 +31,15 @@ class TxnSelectResponseTest {
 
         val config = plugin.config!!
         assertEquals("plugin-instance-1", config.instanceGuid)
-        // Layout schemas are passed through as raw JSON strings.
-        assertEquals("{\"key\":\"value\"}", config.outerLayoutSchema)
+        // Typed layout schemas are parsed by the shared schema serializers (covered by
+        // the render-model tests); this fixture omits them, so they decode as null.
+        assertNull(config.outerLayoutSchema)
 
         val slot = config.slots.single()
         assertEquals("slot-1", slot.instanceGuid)
         assertEquals("variant-1", slot.layoutVariant?.layoutVariantId)
         assertEquals("module-1", slot.layoutVariant?.moduleName)
-        assertEquals("{\"variant\":true}", slot.layoutVariant?.layoutVariantSchema)
+        assertNull(slot.layoutVariant?.layoutVariantSchema)
 
         val offer = slot.offer!!
         assertEquals("campaign-1", offer.campaignId)
@@ -101,7 +102,6 @@ class TxnSelectResponseTest {
                                     layoutVariant = TxnSelectLayoutVariant(
                                         layoutVariantId = "variant-3",
                                         moduleName = "module-3",
-                                        layoutVariantSchema = "{\"variant\":true}",
                                     ),
                                     offer = TxnSelectOffer(
                                         campaignId = "campaign-3",
@@ -141,7 +141,6 @@ class TxnSelectResponseTest {
                                 ),
                             ),
                             instanceGuid = "plugin-instance-3",
-                            outerLayoutSchema = "{\"key\":\"value\"}",
                             token = "config-token",
                         ),
                     ),
@@ -172,13 +171,12 @@ class TxnSelectResponseTest {
                     "target_element_selector": "#target",
                     "config": {
                       "instance_guid": "plugin-instance-1",
-                      "outer_layout_schema": "{\"key\":\"value\"}",
                       "token": "config-token",
                       "slots": [
                         {
                           "instance_guid": "slot-1",
                           "token": "slot-token",
-                          "layout_variant": { "layout_variant_id": "variant-1", "module_name": "module-1", "layout_variant_schema": "{\"variant\":true}" },
+                          "layout_variant": { "layout_variant_id": "variant-1", "module_name": "module-1" },
                           "offer": {
                             "campaign_id": "campaign-1",
                             "catalog_items": [ { "id": "catalog-1" } ],

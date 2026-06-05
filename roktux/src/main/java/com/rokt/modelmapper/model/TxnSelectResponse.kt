@@ -1,5 +1,9 @@
 package com.rokt.modelmapper.model
 
+import com.rokt.network.model.LayoutDisplayPreset
+import com.rokt.network.model.LayoutSchemaModel
+import com.rokt.network.model.LayoutSettings
+import com.rokt.network.model.RootSchemaModel
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonElement
@@ -7,8 +11,9 @@ import kotlinx.serialization.json.JsonObject
 
 /**
  * Selection response for a v2 offers request — the model the renderer consumes,
- * alongside the v1 [NetworkExperienceResponse]. The layout schema fields arrive
- * as JSON strings and are passed through as-is.
+ * alongside the v1 [NetworkExperienceResponse]. The layout schema fields are
+ * parsed into the renderer's typed [RootSchemaModel] / [LayoutSchemaModel] (the
+ * SDK-side wire model keeps the same fields as raw strings instead).
  */
 @Serializable
 data class TxnSelectResponse(
@@ -46,7 +51,9 @@ data class TxnSelectPluginLayout(
 data class TxnSelectPluginConfig(
     @SerialName("slots") val slots: List<TxnSelectSlot> = emptyList(),
     @SerialName("instance_guid") val instanceGuid: String? = null,
-    @SerialName("outer_layout_schema") val outerLayoutSchema: String? = null,
+    @Serializable(with = RootSchemaModelSerializer::class)
+    @SerialName("outer_layout_schema")
+    val outerLayoutSchema: RootSchemaModel<LayoutSchemaModel, LayoutDisplayPreset, LayoutSettings>? = null,
     @SerialName("token") val token: String? = null,
 )
 
@@ -62,7 +69,9 @@ data class TxnSelectSlot(
 data class TxnSelectLayoutVariant(
     @SerialName("layout_variant_id") val layoutVariantId: String? = null,
     @SerialName("module_name") val moduleName: String? = null,
-    @SerialName("layout_variant_schema") val layoutVariantSchema: String? = null,
+    @Serializable(with = NetworkLayoutSchemaSerializer::class)
+    @SerialName("layout_variant_schema")
+    val layoutVariantSchema: LayoutSchemaModel? = null,
 )
 
 @Serializable
