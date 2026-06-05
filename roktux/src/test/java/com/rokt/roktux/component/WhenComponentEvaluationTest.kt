@@ -1363,6 +1363,85 @@ class WhenComponentEvaluationTest {
         )
     }
 
+    @Test
+    fun `given a custom state set only as an offer-scoped state for the current offer, when the When reads it, then evaluate resolves the offer value`() {
+        // Regression: the device-pay result is written to OFFER-scoped state (updateOfferCustomState),
+        // e.g. paymentResult=1 at offer 0. Without offer-scoped resolution the success branch never shows.
+        val offerState = createOfferUiState(
+            currentOfferIndex = 0,
+            offerCustomStates = persistentMapOf("0" to persistentMapOf("paymentResult" to 1)),
+        )
+
+        assertTrue(
+            evaluatePredicate(
+                WhenUiPredicate.CustomState(condition = OrderableWhenUiCondition.Is, key = "paymentResult", value = 1),
+                offerState = offerState,
+            ),
+        )
+    }
+
+    @Test
+    fun `given an offer-scoped custom state whose value does not match, then evaluate returns false`() {
+        val offerState = createOfferUiState(
+            currentOfferIndex = 0,
+            offerCustomStates = persistentMapOf("0" to persistentMapOf("paymentResult" to -1)),
+        )
+
+        assertFalse(
+            evaluatePredicate(
+                WhenUiPredicate.CustomState(condition = OrderableWhenUiCondition.Is, key = "paymentResult", value = 1),
+                offerState = offerState,
+            ),
+        )
+    }
+
+    @Test
+    fun `given an offer-scoped custom state set for a different offer, when the current offer has no value, then evaluate defaults to zero`() {
+        // Offer 1's paymentResult must not leak into offer 0's When evaluation.
+        val offerState = createOfferUiState(
+            currentOfferIndex = 0,
+            offerCustomStates = persistentMapOf("1" to persistentMapOf("paymentResult" to 1)),
+        )
+
+        assertFalse(
+            evaluatePredicate(
+                WhenUiPredicate.CustomState(condition = OrderableWhenUiCondition.Is, key = "paymentResult", value = 1),
+                offerState = offerState,
+            ),
+        )
+    }
+
+    @Test
+    fun `given the same key set both offer-scoped and global, when the When reads it, then the offer-scoped value takes precedence`() {
+        val offerState = createOfferUiState(
+            currentOfferIndex = 0,
+            customState = persistentMapOf("paymentResult" to -1),
+            offerCustomStates = persistentMapOf("0" to persistentMapOf("paymentResult" to 1)),
+        )
+
+        assertTrue(
+            evaluatePredicate(
+                WhenUiPredicate.CustomState(condition = OrderableWhenUiCondition.Is, key = "paymentResult", value = 1),
+                offerState = offerState,
+            ),
+        )
+    }
+
+    @Test
+    fun `given a custom state set only as a global state, when there is no offer-scoped value, then evaluate falls back to the global value`() {
+        val offerState = createOfferUiState(
+            currentOfferIndex = 0,
+            customState = persistentMapOf("globalFlag" to 1),
+        )
+
+        assertTrue(
+            evaluatePredicate(
+                WhenUiPredicate.CustomState(condition = OrderableWhenUiCondition.Is, key = "globalFlag", value = 1),
+                offerState = offerState,
+            ),
+        )
+    }
+
     private fun evaluatePredicate(
         vararg predicate: WhenUiPredicate,
         offerState: OfferUiState = createOfferUiState(),
@@ -1374,15 +1453,20 @@ class WhenComponentEvaluationTest {
     )
 
     private fun createOfferUiState(
+        currentOfferIndex: Int = 0,
         domainStates: kotlinx.collections.immutable.ImmutableMap<String, Int> = persistentMapOf(),
+        customState: kotlinx.collections.immutable.ImmutableMap<String, Int> = persistentMapOf(),
+        offerCustomStates: kotlinx.collections.immutable.ImmutableMap<String, kotlinx.collections.immutable.ImmutableMap<String, Int>> =
+            persistentMapOf(),
     ): OfferUiState = OfferUiState(
-        currentOfferIndex = 0,
+        currentOfferIndex = currentOfferIndex,
         lastOfferIndex = 1,
         viewableItems = 1,
         creativeCopy = persistentMapOf(),
         breakpoints = persistentMapOf(),
-        customState = persistentMapOf(),
+        customState = customState,
         domainStates = domainStates,
+        offerCustomStates = offerCustomStates,
     )
 
     private fun createWhenUiModel(vararg predicate: WhenUiPredicate): LayoutSchemaUiModel.WhenUiModel = LayoutSchemaUiModel.WhenUiModel(

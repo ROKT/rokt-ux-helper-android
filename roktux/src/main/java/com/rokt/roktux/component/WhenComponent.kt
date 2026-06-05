@@ -129,7 +129,14 @@ internal fun evaluatePredicates(
             }
 
             is WhenUiPredicate.CustomState -> {
-                offerState.customState[predicate.key] ?: 0
+                // Resolve against the effective custom state for the current offer:
+                // offer-scoped value first, then global fallback, then 0 (mirrors the iOS
+                // PredicateHandling.customStatePredicatesMatched local-then-global resolution).
+                // Without the offer-scoped lookup, results written per-offer (e.g. the device-pay
+                // `paymentResult`) are never observed by `When` nodes and the success branch never shows.
+                offerState.offerCustomStates[currentOffer.toString()]?.get(predicate.key)
+                    ?: offerState.customState[predicate.key]
+                    ?: 0
             }
 
             is WhenUiPredicate.DomainState -> {
