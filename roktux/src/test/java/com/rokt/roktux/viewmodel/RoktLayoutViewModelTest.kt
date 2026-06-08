@@ -529,7 +529,7 @@ class RoktLayoutViewModelTest : BaseViewModelTest() {
     @Test
     fun `CartItemForwardPayment callback updates payment result custom state`() = runTest {
         // Arrange
-        clearMocks(uxEvent, viewStateChange)
+        clearMocks(uxEvent, platformEvent, viewStateChange)
         layoutViewModel.setEvent(
             LayoutContract.LayoutEvent.CartItemForwardPaymentSelected(
                 offerId = 0,
@@ -540,7 +540,7 @@ class RoktLayoutViewModelTest : BaseViewModelTest() {
         val event = captureForwardPaymentEvent()
 
         // Act
-        clearMocks(viewStateChange)
+        clearMocks(platformEvent, viewStateChange)
         event.onResult(DevicePayResult.Success)
 
         // Assert
@@ -551,9 +551,12 @@ class RoktLayoutViewModelTest : BaseViewModelTest() {
                 },
             )
         }
+        verify(exactly = 0, timeout = 500) {
+            platformEvent.invoke(match { events -> events.containsTerminalInstantPurchaseEvent() })
+        }
 
         // Act
-        clearMocks(viewStateChange)
+        clearMocks(platformEvent, viewStateChange)
         event.onResult(DevicePayResult.Failure)
 
         // Assert
@@ -564,9 +567,12 @@ class RoktLayoutViewModelTest : BaseViewModelTest() {
                 },
             )
         }
+        verify(exactly = 0, timeout = 500) {
+            platformEvent.invoke(match { events -> events.containsTerminalInstantPurchaseEvent() })
+        }
 
         // Act
-        clearMocks(viewStateChange)
+        clearMocks(platformEvent, viewStateChange)
         event.onResult(DevicePayResult.Retry)
 
         // Assert
@@ -576,6 +582,9 @@ class RoktLayoutViewModelTest : BaseViewModelTest() {
                     assertThat(state.offerCustomStates["0"]).containsEntry("paymentResult", -1)
                 },
             )
+        }
+        verify(exactly = 0, timeout = 500) {
+            platformEvent.invoke(match { events -> events.containsTerminalInstantPurchaseEvent() })
         }
     }
 
@@ -600,7 +609,7 @@ class RoktLayoutViewModelTest : BaseViewModelTest() {
     }
 
     @Test
-    fun `CartItemDevicePaySelected sends event with sale price and platform signal`() = runTest {
+    fun `CartItemDevicePaySelected sends event with object data platform signal`() = runTest {
         // Arrange
         val transactionData = TransactionData(
             paymentType = "GooglePay",
@@ -636,12 +645,14 @@ class RoktLayoutViewModelTest : BaseViewModelTest() {
         verify(timeout = 2000) {
             platformEvent.invoke(
                 withArg { events ->
-                    assertThat(events).anyMatch {
-                        it.eventType == EventType.SignalCartItemInstantPurchaseInitiated &&
-                            it.parentGuid == "catalog-instance-guid-1" &&
-                            it.eventData?.get("totalPrice") == "79.99" &&
-                            it.eventData?.get("unitPrice") == "79.99"
+                    val platformEvent = events.single {
+                        it.eventType == EventType.SignalCartItemInstantPurchaseInitiated
                     }
+                    assertThat(platformEvent.parentGuid).isEqualTo("catalog-instance-guid-1")
+                    assertThat(platformEvent.pageInstanceGuid).isEqualTo("pageInstanceGuid")
+                    assertThat(platformEvent.objectData).containsEntry("catalogItemId", "catalog-item-1")
+                    assertThat(platformEvent.objectData).containsEntry("quantity", "1")
+                    assertThat(platformEvent.eventData).isNull()
                 },
             )
         }
@@ -663,7 +674,7 @@ class RoktLayoutViewModelTest : BaseViewModelTest() {
         val event = captureDevicePayEvent()
 
         // Act
-        clearMocks(viewStateChange)
+        clearMocks(platformEvent, viewStateChange)
         event.onResult(DevicePayResult.Success)
 
         // Assert
@@ -674,9 +685,16 @@ class RoktLayoutViewModelTest : BaseViewModelTest() {
                 },
             )
         }
+        verify(exactly = 1, timeout = 2000) {
+            platformEvent.invoke(
+                match { events ->
+                    events.containsSingleDevicePayTerminalEvent(EventType.SignalCartItemInstantPurchase)
+                },
+            )
+        }
 
         // Act
-        clearMocks(viewStateChange)
+        clearMocks(platformEvent, viewStateChange)
         event.onResult(DevicePayResult.Failure)
 
         // Assert
@@ -687,9 +705,12 @@ class RoktLayoutViewModelTest : BaseViewModelTest() {
                 },
             )
         }
+        verify(exactly = 0, timeout = 500) {
+            platformEvent.invoke(match { events -> events.containsTerminalInstantPurchaseEvent() })
+        }
 
         // Act
-        clearMocks(viewStateChange)
+        clearMocks(platformEvent, viewStateChange)
         event.onResult(DevicePayResult.Retry)
 
         // Assert
@@ -697,6 +718,67 @@ class RoktLayoutViewModelTest : BaseViewModelTest() {
             viewStateChange.invoke(
                 withArg { state ->
                     assertThat(state.offerCustomStates["0"]).containsEntry("paymentResult", -1)
+                },
+            )
+        }
+        verify(exactly = 0, timeout = 500) {
+            platformEvent.invoke(match { events -> events.containsTerminalInstantPurchaseEvent() })
+        }
+    }
+
+    @Test
+    fun `CartItemDevicePay failure callback sends failure platform signal once`() = runTest {
+        // Arrange
+        clearMocks(uxEvent, platformEvent, viewStateChange)
+        layoutViewModel.setEvent(
+            LayoutContract.LayoutEvent.CartItemDevicePaySelected(
+                offerId = 0,
+                catalogItemModel = createCatalogItemProperties(),
+                paymentProvider = PaymentProvider.GooglePay,
+                transactionData = null,
+                validatorFieldKeys = emptyList(),
+            ),
+        )
+        val event = captureDevicePayEvent()
+
+        // Act
+        clearMocks(platformEvent, viewStateChange)
+        event.onResult(DevicePayResult.Failure)
+
+        // Assert
+        verify(exactly = 1, timeout = 2000) {
+            platformEvent.invoke(
+                match { events ->
+                    events.containsSingleDevicePayTerminalEvent(EventType.SignalCartItemInstantPurchaseFailure)
+                },
+            )
+        }
+    }
+
+    @Test
+    fun `CartItemDevicePay retry callback sends failure platform signal once`() = runTest {
+        // Arrange
+        clearMocks(uxEvent, platformEvent, viewStateChange)
+        layoutViewModel.setEvent(
+            LayoutContract.LayoutEvent.CartItemDevicePaySelected(
+                offerId = 0,
+                catalogItemModel = createCatalogItemProperties(),
+                paymentProvider = PaymentProvider.GooglePay,
+                transactionData = null,
+                validatorFieldKeys = emptyList(),
+            ),
+        )
+        val event = captureDevicePayEvent()
+
+        // Act
+        clearMocks(platformEvent, viewStateChange)
+        event.onResult(DevicePayResult.Retry)
+
+        // Assert
+        verify(exactly = 1, timeout = 2000) {
+            platformEvent.invoke(
+                match { events ->
+                    events.containsSingleDevicePayTerminalEvent(EventType.SignalCartItemInstantPurchaseFailure)
                 },
             )
         }
@@ -718,8 +800,10 @@ class RoktLayoutViewModelTest : BaseViewModelTest() {
         val event = captureDevicePayEvent()
 
         // Act
-        clearMocks(viewStateChange)
+        clearMocks(platformEvent, viewStateChange)
         event.onResult(DevicePayResult.PendingConfirmation(mapOf("confirmationRef" to "confirmation-123")))
+        event.onResult(DevicePayResult.Success)
+        event.onResult(DevicePayResult.Failure)
 
         // Assert
         verify(timeout = 2000) {
@@ -728,6 +812,9 @@ class RoktLayoutViewModelTest : BaseViewModelTest() {
                     assertThat(state.offerCustomStates["0"]).containsEntry("devicePayState", 1)
                 },
             )
+        }
+        verify(exactly = 0, timeout = 500) {
+            platformEvent.invoke(match { events -> events.containsTerminalInstantPurchaseEvent() })
         }
     }
 
@@ -961,6 +1048,20 @@ class RoktLayoutViewModelTest : BaseViewModelTest() {
         runtimeStateField.isAccessible = true
         return runtimeStateField.get(layoutViewModel) as LayoutRuntimeState
     }
+
+    private fun List<RoktPlatformEvent>.containsTerminalInstantPurchaseEvent(): Boolean = any { it.isTerminalInstantPurchaseEvent() }
+
+    private fun List<RoktPlatformEvent>.containsSingleDevicePayTerminalEvent(eventType: EventType): Boolean {
+        val event = filter { it.isTerminalInstantPurchaseEvent() }.singleOrNull() ?: return false
+        return event.eventType == eventType &&
+            event.parentGuid == "catalog-instance-guid-1" &&
+            event.pageInstanceGuid == "pageInstanceGuid" &&
+            event.eventData == null &&
+            event.objectData == null
+    }
+
+    private fun RoktPlatformEvent.isTerminalInstantPurchaseEvent(): Boolean = eventType == EventType.SignalCartItemInstantPurchase ||
+        eventType == EventType.SignalCartItemInstantPurchaseFailure
 
     private fun createCatalogItemProperties(
         instanceGuid: String = "catalog-instance-guid-1",
