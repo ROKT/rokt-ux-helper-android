@@ -1,4 +1,4 @@
-package com.rokt.modelmapper.model
+package com.rokt.modelmapper.model.txn
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -6,36 +6,21 @@ import kotlinx.serialization.Serializable
 /**
  * Request body for `POST /v2/sessions/events` on the Transactions API.
  *
- * Colocated with the v2 offers models ([TxnSelectResponse]) so the whole
- * Transactions v2 contract lives in one place and the shared types ([TxnChannel],
- * [TxnSessionToken]) are defined once. The session is identified solely by the
- * JWT `sub` claim in the `Authorization` header — there is intentionally no
- * `session_id` in the body. Platform/channel context travels in [channel] (the
- * same descriptor used by the offers flow).
- */
-@Serializable
-data class TxnEventsRequest(
-    @SerialName("channel") val channel: TxnChannel,
-    @SerialName("events") val events: List<TxnEvent>,
-)
-
-/**
- * Channel descriptor sent on Transactions v2 offers and events requests. The
- * backend derives its `source` tag from [type] (`"msdk"` for the mobile SDK);
- * [sdkVersion] identifies the SDK build.
+ * The session is identified solely by the JWT `sub` claim in the `Authorization`
+ * header — there is intentionally no `session_id` in the body. Platform/channel
+ * context travels in [channel] (the same descriptor used by the offers flow).
  *
- * Shared by the offers and events flows (it is NOT part of `/v2/sessions/init`,
- * which carries platform identity via `operating_system` instead).
+ * Naming convention: types in the `...model.txn` package carry no `Txn`/`V2`
+ * prefix — the package namespaces them. This grouping is transitional; once the
+ * v1 models are retired these become the standard models and the `txn` package
+ * can be flattened. Class/package names do not affect the wire (driven by
+ * [SerialName]).
  */
 @Serializable
-data class TxnChannel(
-    @SerialName("type") val type: String = CHANNEL_TYPE_MSDK,
-    @SerialName("sdk_version") val sdkVersion: String,
-) {
-    companion object {
-        const val CHANNEL_TYPE_MSDK = "msdk"
-    }
-}
+data class EventsRequest(
+    @SerialName("channel") val channel: Channel,
+    @SerialName("events") val events: List<Event>,
+)
 
 /**
  * A single Transactions v2 event. Mirrors the provider's `TransactionEvent`:
@@ -51,7 +36,7 @@ data class TxnChannel(
  *    type-specific markers (`gated`, `sdk_event`, `interaction_type`).
  */
 @Serializable
-data class TxnEvent(
+data class Event(
     @SerialName("event_type") val eventType: String,
     @SerialName("instance_id") val instanceId: String? = null,
     @SerialName("timestamp") val timestamp: Long,
@@ -65,4 +50,4 @@ data class TxnEvent(
  * are ignored here.
  */
 @Serializable
-data class TxnEventsResponse(@SerialName("session_token") val sessionToken: TxnSessionToken)
+data class EventsResponse(@SerialName("session_token") val sessionToken: SessionToken)

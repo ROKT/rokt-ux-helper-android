@@ -1,4 +1,4 @@
-package com.rokt.modelmapper.model
+package com.rokt.modelmapper.model.txn
 
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -6,13 +6,13 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Test
 
-class TxnEventsRequestTest {
+class EventsRequestTest {
 
     private val json = Json { ignoreUnknownKeys = true }
 
     @Test
     fun `decodes a fully populated events request`() {
-        val request = json.decodeFromString<TxnEventsRequest>(FULL_REQUEST_PAYLOAD)
+        val request = json.decodeFromString<EventsRequest>(FULL_REQUEST_PAYLOAD)
 
         assertEquals("msdk", request.channel.type)
         assertEquals("1.2.3", request.channel.sdkVersion)
@@ -33,7 +33,7 @@ class TxnEventsRequestTest {
 
     @Test
     fun `decodes the events response and exposes the rotated session token`() {
-        val response = json.decodeFromString<TxnEventsResponse>(RESPONSE_PAYLOAD)
+        val response = json.decodeFromString<EventsResponse>(RESPONSE_PAYLOAD)
 
         assertEquals("rotated-token", response.sessionToken.token)
         assertEquals(1_711_038_900_000L, response.sessionToken.expiresAt)
@@ -41,9 +41,9 @@ class TxnEventsRequestTest {
 
     @Test
     fun `applies the channel type default when omitted`() {
-        val request = json.decodeFromString<TxnEventsRequest>(MINIMAL_REQUEST_PAYLOAD)
+        val request = json.decodeFromString<EventsRequest>(MINIMAL_REQUEST_PAYLOAD)
 
-        assertEquals(TxnChannel.CHANNEL_TYPE_MSDK, request.channel.type)
+        assertEquals(Channel.CHANNEL_TYPE_MSDK, request.channel.type)
         assertEquals("9.9.9", request.channel.sdkVersion)
         assertEquals(1, request.events.size)
         assertEquals("placement_ready", request.events.single().eventType)
@@ -51,10 +51,10 @@ class TxnEventsRequestTest {
 
     @Test
     fun `round-trips a request built from the constructors`() {
-        val original = TxnEventsRequest(
-            channel = TxnChannel(sdkVersion = "4.5.6"),
+        val original = EventsRequest(
+            channel = Channel(sdkVersion = "4.5.6"),
             events = listOf(
-                TxnEvent(
+                Event(
                     eventType = "signal_response",
                     instanceId = "instance-3",
                     timestamp = 42L,
@@ -64,20 +64,20 @@ class TxnEventsRequestTest {
                         "page_instance_guid" to "page-3",
                     ),
                 ),
-                TxnEvent(eventType = "placement_impression", timestamp = 43L),
+                Event(eventType = "placement_impression", timestamp = 43L),
             ),
         )
 
-        val decoded = json.decodeFromString<TxnEventsRequest>(json.encodeToString(original))
+        val decoded = json.decodeFromString<EventsRequest>(json.encodeToString(original))
 
         assertEquals(original, decoded)
     }
 
     @Test
     fun `round-trips an events response built from the constructor`() {
-        val original = TxnEventsResponse(sessionToken = TxnSessionToken(token = "token-5", expiresAt = 99L))
+        val original = EventsResponse(sessionToken = SessionToken(token = "token-5", expiresAt = 99L))
 
-        val decoded = json.decodeFromString<TxnEventsResponse>(json.encodeToString(original))
+        val decoded = json.decodeFromString<EventsResponse>(json.encodeToString(original))
 
         assertEquals(original, decoded)
     }
