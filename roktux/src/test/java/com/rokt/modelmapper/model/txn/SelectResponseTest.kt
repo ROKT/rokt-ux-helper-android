@@ -1,4 +1,4 @@
-package com.rokt.modelmapper.model
+package com.rokt.modelmapper.model.txn
 
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -9,13 +9,13 @@ import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
-class TxnSelectResponseTest {
+class SelectResponseTest {
 
     private val json = Json { ignoreUnknownKeys = true }
 
     @Test
     fun `decodes a fully populated selection response`() {
-        val response = json.decodeFromString<TxnSelectResponse>(FULL_PAYLOAD)
+        val response = json.decodeFromString<SelectResponse>(FULL_PAYLOAD)
 
         assertEquals("session-1", response.sessionId)
         assertEquals("token-1", response.sessionToken.token)
@@ -67,7 +67,7 @@ class TxnSelectResponseTest {
 
     @Test
     fun `applies defaults and nulls when optional fields are omitted`() {
-        val response = json.decodeFromString<TxnSelectResponse>(MINIMAL_PAYLOAD)
+        val response = json.decodeFromString<SelectResponse>(MINIMAL_PAYLOAD)
 
         assertEquals("session-2", response.sessionId)
         assertEquals("", response.pageInstanceGuid)
@@ -78,51 +78,51 @@ class TxnSelectResponseTest {
 
     @Test
     fun `round-trips a model built from the constructors`() {
-        val original = TxnSelectResponse(
+        val original = SelectResponse(
             sessionId = "session-3",
-            sessionToken = TxnSessionToken(token = "token-3", expiresAt = 42L),
+            sessionToken = SessionToken(token = "token-3", expiresAt = 42L),
             pageInstanceGuid = "page-instance-3",
-            pageContext = TxnSelectPageContext(
+            pageContext = SelectPageContext(
                 pageInstanceGuid = "page-instance-3",
                 pageId = "page-3",
                 language = "en",
                 token = "ctx-token",
             ),
             plugins = listOf(
-                TxnSelectPlugin(
-                    plugin = TxnSelectPluginLayout(
+                SelectPlugin(
+                    plugin = SelectPluginLayout(
                         id = "plugin-3",
                         name = "Layout",
                         targetElementSelector = "#target",
-                        config = TxnSelectPluginConfig(
+                        config = SelectPluginConfig(
                             slots = listOf(
-                                TxnSelectSlot(
+                                SelectSlot(
                                     instanceGuid = "slot-3",
                                     token = "slot-token",
-                                    layoutVariant = TxnSelectLayoutVariant(
+                                    layoutVariant = SelectLayoutVariant(
                                         layoutVariantId = "variant-3",
                                         moduleName = "module-3",
                                     ),
-                                    offer = TxnSelectOffer(
+                                    offer = SelectOffer(
                                         campaignId = "campaign-3",
                                         catalogItems = listOf(buildJsonObject { put("id", "catalog-3") }),
-                                        creative = TxnSelectCreative(
+                                        creative = SelectCreative(
                                             referralCreativeId = "creative-3",
                                             instanceGuid = "creative-instance-3",
                                             token = "creative-token",
                                             copy = mapOf("title" to "Hello"),
                                             images = mapOf(
-                                                "hero" to TxnSelectImage(
+                                                "hero" to SelectImage(
                                                     light = "https://example.com/light.png",
                                                     dark = "https://example.com/dark.png",
                                                     alt = "alt",
                                                     title = "title",
                                                 ),
                                             ),
-                                            links = mapOf("privacy" to TxnSelectLink(url = "https://example.com/privacy", title = "Privacy")),
-                                            icons = mapOf("close" to TxnSelectIcon(name = "close")),
+                                            links = mapOf("privacy" to SelectLink(url = "https://example.com/privacy", title = "Privacy")),
+                                            icons = mapOf("close" to SelectIcon(name = "close")),
                                             responseOptionsMap = mapOf(
-                                                "positive" to TxnSelectResponseOption(
+                                                "positive" to SelectResponseOption(
                                                     id = "ro-3",
                                                     action = "url",
                                                     instanceGuid = "ro-instance-3",
@@ -147,11 +147,11 @@ class TxnSelectResponseTest {
                 ),
             ),
             eventData = mapOf(
-                "entity-3" to TxnSelectEventDataEntry(token = "event-token", events = mapOf("impression" to buildJsonObject { })),
+                "entity-3" to SelectEventDataEntry(token = "event-token", events = mapOf("impression" to buildJsonObject { })),
             ),
         )
 
-        val decoded = json.decodeFromString<TxnSelectResponse>(json.encodeToString(original))
+        val decoded = json.decodeFromString<SelectResponse>(json.encodeToString(original))
 
         assertEquals(original, decoded)
     }

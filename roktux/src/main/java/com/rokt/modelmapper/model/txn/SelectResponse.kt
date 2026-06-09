@@ -1,5 +1,7 @@
-package com.rokt.modelmapper.model
+package com.rokt.modelmapper.model.txn
 
+import com.rokt.modelmapper.model.NetworkLayoutSchemaSerializer
+import com.rokt.modelmapper.model.RootSchemaModelSerializer
 import com.rokt.network.model.LayoutDisplayPreset
 import com.rokt.network.model.LayoutSchemaModel
 import com.rokt.network.model.LayoutSettings
@@ -11,25 +13,25 @@ import kotlinx.serialization.json.JsonObject
 
 /**
  * Selection response for a v2 offers request — the model the renderer consumes,
- * alongside the v1 [NetworkExperienceResponse]. The layout schema fields are
+ * alongside the v1 `NetworkExperienceResponse`. The layout schema fields are
  * parsed into the renderer's typed [RootSchemaModel] / [LayoutSchemaModel] (the
  * SDK-side wire model keeps the same fields as raw strings instead).
  */
 @Serializable
-data class TxnSelectResponse(
+data class SelectResponse(
     @SerialName("session_id") val sessionId: String,
-    @SerialName("session_token") val sessionToken: TxnSessionToken,
+    @SerialName("session_token") val sessionToken: SessionToken,
     @SerialName("page_instance_guid") val pageInstanceGuid: String = "",
-    @SerialName("page_context") val pageContext: TxnSelectPageContext? = null,
-    @SerialName("plugins") val plugins: List<TxnSelectPlugin>? = null,
-    @SerialName("event_data") val eventData: Map<String, TxnSelectEventDataEntry>? = null,
+    @SerialName("page_context") val pageContext: SelectPageContext? = null,
+    @SerialName("plugins") val plugins: List<SelectPlugin>? = null,
+    @SerialName("event_data") val eventData: Map<String, SelectEventDataEntry>? = null,
 )
 
 @Serializable
-data class TxnSessionToken(@SerialName("token") val token: String, @SerialName("expires_at") val expiresAt: Long)
+data class SessionToken(@SerialName("token") val token: String, @SerialName("expires_at") val expiresAt: Long)
 
 @Serializable
-data class TxnSelectPageContext(
+data class SelectPageContext(
     @SerialName("page_instance_guid") val pageInstanceGuid: String? = null,
     @SerialName("page_id") val pageId: String? = null,
     @SerialName("language") val language: String? = null,
@@ -37,19 +39,19 @@ data class TxnSelectPageContext(
 )
 
 @Serializable
-data class TxnSelectPlugin(@SerialName("plugin") val plugin: TxnSelectPluginLayout? = null)
+data class SelectPlugin(@SerialName("plugin") val plugin: SelectPluginLayout? = null)
 
 @Serializable
-data class TxnSelectPluginLayout(
+data class SelectPluginLayout(
     @SerialName("id") val id: String? = null,
     @SerialName("name") val name: String? = null,
     @SerialName("target_element_selector") val targetElementSelector: String? = null,
-    @SerialName("config") val config: TxnSelectPluginConfig? = null,
+    @SerialName("config") val config: SelectPluginConfig? = null,
 )
 
 @Serializable
-data class TxnSelectPluginConfig(
-    @SerialName("slots") val slots: List<TxnSelectSlot> = emptyList(),
+data class SelectPluginConfig(
+    @SerialName("slots") val slots: List<SelectSlot> = emptyList(),
     @SerialName("instance_guid") val instanceGuid: String? = null,
     @Serializable(with = RootSchemaModelSerializer::class)
     @SerialName("outer_layout_schema")
@@ -58,15 +60,15 @@ data class TxnSelectPluginConfig(
 )
 
 @Serializable
-data class TxnSelectSlot(
+data class SelectSlot(
     @SerialName("instance_guid") val instanceGuid: String? = null,
-    @SerialName("layout_variant") val layoutVariant: TxnSelectLayoutVariant? = null,
-    @SerialName("offer") val offer: TxnSelectOffer? = null,
+    @SerialName("layout_variant") val layoutVariant: SelectLayoutVariant? = null,
+    @SerialName("offer") val offer: SelectOffer? = null,
     @SerialName("token") val token: String? = null,
 )
 
 @Serializable
-data class TxnSelectLayoutVariant(
+data class SelectLayoutVariant(
     @SerialName("layout_variant_id") val layoutVariantId: String? = null,
     @SerialName("module_name") val moduleName: String? = null,
     @Serializable(with = NetworkLayoutSchemaSerializer::class)
@@ -75,26 +77,26 @@ data class TxnSelectLayoutVariant(
 )
 
 @Serializable
-data class TxnSelectOffer(
+data class SelectOffer(
     @SerialName("campaign_id") val campaignId: String? = null,
-    @SerialName("creative") val creative: TxnSelectCreative? = null,
+    @SerialName("creative") val creative: SelectCreative? = null,
     @SerialName("catalog_items") val catalogItems: List<JsonObject>? = null,
 )
 
 @Serializable
-data class TxnSelectCreative(
+data class SelectCreative(
     @SerialName("referral_creative_id") val referralCreativeId: String? = null,
     @SerialName("instance_guid") val instanceGuid: String? = null,
     @SerialName("token") val token: String? = null,
-    @SerialName("response_options_map") val responseOptionsMap: Map<String, TxnSelectResponseOption>? = null,
+    @SerialName("response_options_map") val responseOptionsMap: Map<String, SelectResponseOption>? = null,
     @SerialName("copy") val copy: Map<String, String>? = null,
-    @SerialName("images") val images: Map<String, TxnSelectImage>? = null,
-    @SerialName("links") val links: Map<String, TxnSelectLink>? = null,
-    @SerialName("icons") val icons: Map<String, TxnSelectIcon>? = null,
+    @SerialName("images") val images: Map<String, SelectImage>? = null,
+    @SerialName("links") val links: Map<String, SelectLink>? = null,
+    @SerialName("icons") val icons: Map<String, SelectIcon>? = null,
 )
 
 @Serializable
-data class TxnSelectResponseOption(
+data class SelectResponseOption(
     @SerialName("id") val id: String? = null,
     @SerialName("action") val action: String? = null,
     @SerialName("instance_guid") val instanceGuid: String? = null,
@@ -109,7 +111,7 @@ data class TxnSelectResponseOption(
 )
 
 @Serializable
-data class TxnSelectImage(
+data class SelectImage(
     @SerialName("light") val light: String? = null,
     @SerialName("dark") val dark: String? = null,
     @SerialName("alt") val alt: String? = null,
@@ -117,13 +119,13 @@ data class TxnSelectImage(
 )
 
 @Serializable
-data class TxnSelectLink(@SerialName("url") val url: String? = null, @SerialName("title") val title: String? = null)
+data class SelectLink(@SerialName("url") val url: String? = null, @SerialName("title") val title: String? = null)
 
 @Serializable
-data class TxnSelectIcon(@SerialName("name") val name: String? = null)
+data class SelectIcon(@SerialName("name") val name: String? = null)
 
 @Serializable
-data class TxnSelectEventDataEntry(
+data class SelectEventDataEntry(
     @SerialName("token") val token: String,
     @SerialName("events") val events: Map<String, JsonElement>? = null,
 )
