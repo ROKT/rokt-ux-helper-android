@@ -17,10 +17,7 @@ import kotlinx.serialization.Serializable
  * [SerialName]).
  */
 @Serializable
-data class EventsRequest(
-    @SerialName("channel") val channel: Channel,
-    @SerialName("events") val events: List<Event>,
-)
+data class EventsRequest(@SerialName("channel") val channel: Channel, @SerialName("events") val events: List<Event>)
 
 /**
  * A single Transactions v2 event. Mirrors the provider's `TransactionEvent`:

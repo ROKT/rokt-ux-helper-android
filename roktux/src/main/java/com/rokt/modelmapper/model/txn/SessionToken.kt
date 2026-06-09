@@ -9,7 +9,4 @@ import kotlinx.serialization.Serializable
  * [expiresAt] is Unix epoch milliseconds.
  */
 @Serializable
-data class SessionToken(
-    @SerialName("token") val token: String,
-    @SerialName("expires_at") val expiresAt: Long,
-)
+data class SessionToken(@SerialName("token") val token: String, @SerialName("expires_at") val expiresAt: Long)
