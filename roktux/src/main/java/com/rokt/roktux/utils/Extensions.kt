@@ -89,11 +89,43 @@ internal fun BindData.getValue(offerState: OfferUiState, viewableItems: Int): St
         offerState.currentOfferIndex,
         offerState.lastOfferIndex,
         viewableItems,
+    ).replaceCatalogRuntimePlaceholders(
+        catalogRuntimeData = offerState.catalogRuntimeData,
     )
 
     is BindData.State -> (offerState.currentOfferIndex + 1).toString()
 
     else -> null
+}
+
+private fun String.replaceCatalogRuntimePlaceholders(
+    catalogRuntimeData: Map<String, String>,
+): String {
+    if (!contains(DATA_CATALOG_RUNTIME_PREFIX)) return this
+    return catalogRuntimePlaceholderRegex.replace(this) { match ->
+        resolveCatalogRuntimePlaceholder(match.value, catalogRuntimeData)
+    }
+}
+
+private fun resolveCatalogRuntimePlaceholder(
+    token: String,
+    catalogRuntimeData: Map<String, String>,
+): String {
+    val chain = token.removePrefix("%^").removeSuffix("^%")
+    if (!chain.contains(DATA_CATALOG_RUNTIME_PREFIX)) return token
+    val parts = chain.split('|').map { it.trim() }
+    var fallback: String? = null
+    for (part in parts) {
+        when {
+            part.startsWith(DATA_CATALOG_RUNTIME_PREFIX) -> {
+                catalogRuntimeData[part.removePrefix(DATA_CATALOG_RUNTIME_PREFIX)]
+                    ?.takeIf { it.isNotEmpty() }
+                    ?.let { return it }
+            }
+            part.isNotEmpty() || fallback == null -> fallback = part
+        }
+    }
+    return fallback ?: token
 }
 
 internal fun Context.getDeviceLocale(): String = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
@@ -426,3 +458,5 @@ private tailrec fun <T> ReceiveChannel<T>.drainAll(
 }
 
 private const val COMPONENT_VISIBILITY_THRESHOLD_RATIO = 0.5f
+private const val DATA_CATALOG_RUNTIME_PREFIX = "DATA.catalogRuntime."
+private val catalogRuntimePlaceholderRegex = Regex("%\\^([a-zA-Z0-9 .|_$\\-]*)\\^%")

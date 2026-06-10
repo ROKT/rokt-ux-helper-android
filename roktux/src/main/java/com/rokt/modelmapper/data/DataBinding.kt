@@ -93,14 +93,22 @@ private class PlaceholderReplacer(
         return bindData
     }
 
-    private fun replacer(matchResult: MatchResult): String = reducer(removeIdentifiersAndSplit(matchResult.value))
+    private fun replacer(matchResult: MatchResult): String = reducer(
+        keys = removeIdentifiersAndSplit(matchResult.value),
+        rawToken = matchResult.value,
+    )
 
-    private fun reducer(keys: List<String>): String {
+    private fun reducer(keys: List<String>, rawToken: String): String {
         var result: String? = null
         for (key in keys) {
             if (startsWithNamespace.containsMatchIn(key)) {
                 if (isDataTemplate.containsMatchIn(key)) {
                     when (getNamespace(removePrefix(TemplateDataPrefix.DATA, key))) {
+                        CATALOG_RUNTIME_NAMESPACE -> {
+                            // Keep placeholder token for runtime resolution at rendering stage.
+                            result = rawToken
+                        }
+
                         CREATIVE_COPY_NAMESPACE -> {
                             val copyVal = getCreativeCopy(key)
                             if (copyVal != null) {
@@ -256,6 +264,7 @@ private val templatePattern = Regex(
 )
 
 private const val CATALOG_ITEM_IMAGES_PREFIX = "images."
+private const val CATALOG_RUNTIME_NAMESPACE = "catalogRuntime"
 
 private val INDICATOR_POSITION = listOf("IndicatorPosition", "indicatorPosition")
 private val TOTAL_OFFERS = listOf("TotalOffers", "totalOffers")
