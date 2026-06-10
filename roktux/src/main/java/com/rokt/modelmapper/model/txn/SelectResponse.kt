@@ -28,9 +28,6 @@ data class SelectResponse(
 )
 
 @Serializable
-data class SessionToken(@SerialName("token") val token: String, @SerialName("expires_at") val expiresAt: Long)
-
-@Serializable
 data class SelectPageContext(
     @SerialName("page_instance_guid") val pageInstanceGuid: String? = null,
     @SerialName("page_id") val pageId: String? = null,
