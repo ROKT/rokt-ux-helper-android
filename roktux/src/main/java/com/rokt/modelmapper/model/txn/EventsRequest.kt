@@ -4,11 +4,10 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 /**
- * Request body for `POST /v2/sessions/events` on the Transactions API.
- *
- * The session is identified solely by the JWT `sub` claim in the `Authorization`
- * header — there is intentionally no `session_id` in the body. Platform/channel
- * context travels in [channel] (the same descriptor used by the offers flow).
+ * Request body for the v2 events endpoint. The session is identified by the JWT
+ * in the `Authorization` header, so there is no `session_id` in the body.
+ * Channel context travels in [channel] (the same descriptor used by the offers
+ * request).
  *
  * Naming convention: types in the `...model.txn` package carry no `Txn`/`V2`
  * prefix — the package namespaces them. This grouping is transitional; once the
@@ -20,17 +19,12 @@ import kotlinx.serialization.Serializable
 data class EventsRequest(@SerialName("channel") val channel: Channel, @SerialName("events") val events: List<Event>)
 
 /**
- * A single Transactions v2 event. Mirrors the provider's `TransactionEvent`:
- *  - [eventType] must resolve to a registered registry type; unknown strings emit
- *    `unknown_event_type` warnings server-side and break attribution.
- *  - [instanceId] is the event's **own** occurrence id (legacy `instanceGuid`).
- *    The trackable entity id and its echo token live in [data] as `parent_id`
- *    and `token` respectively.
- *  - [timestamp] is Unix epoch milliseconds. The provider accepts a JSON number
- *    here (its decoder also accepts an RFC3339 string).
- *  - [data] is an opaque string map carrying `parent_id`, `token`,
- *    `page_instance_guid`, `capture_method`, plus folded attributes/metadata and
- *    type-specific markers (`gated`, `sdk_event`, `interaction_type`).
+ * A single event entry sent on a request.
+ *  - [eventType] is the event name as it appears on the wire (snake_case).
+ *  - [instanceId] is this event's own occurrence id.
+ *  - [timestamp] is Unix epoch milliseconds.
+ *  - [data] is an optional string map of supporting fields (e.g. `parent_id`,
+ *    `token`, `page_instance_guid`).
  */
 @Serializable
 data class Event(
@@ -41,10 +35,9 @@ data class Event(
 )
 
 /**
- * Response body for `POST /v2/sessions/events`. Only [sessionToken] is consumed —
- * it is rotated forward so the next offers/events call authenticates against the
- * same session. The provider also returns `event_ids`/`errors`/`warnings`, which
- * are ignored here.
+ * Response body for the v2 events endpoint. Only [sessionToken] is read — it is
+ * carried forward so the next request authenticates against the same session.
+ * Any other fields in the response are ignored.
  */
 @Serializable
 data class EventsResponse(@SerialName("session_token") val sessionToken: SessionToken)

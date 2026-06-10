@@ -52,9 +52,8 @@ class EventsRequestTest {
 
     @Test
     fun `serializes the default channel type even when encodeDefaults is off`() {
-        // The SDK's production Json disables encodeDefaults; @EncodeDefault(ALWAYS)
-        // on Channel.type must still force "msdk" onto the wire so the backend
-        // keeps the channel source.
+        // Even when encodeDefaults is off, @EncodeDefault(ALWAYS) on Channel.type
+        // must still force "msdk" onto the wire.
         val encoded = Json.encodeToString(Channel(sdkVersion = "1.2.3"))
 
         assertTrue(encoded, encoded.contains("\"type\":\"msdk\""))
