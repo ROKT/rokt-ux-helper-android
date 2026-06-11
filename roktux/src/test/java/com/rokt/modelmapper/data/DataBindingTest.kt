@@ -606,6 +606,13 @@ class DataBindingImplTest : MockkUnitTest() {
             0,
         ),
         arrayOf(
+            "%^DATA.catalogRuntime.total|default-total^%",
+            "%^DATA.catalogRuntime.total|default-total^%",
+            null,
+            BindData.Value::class.java,
+            0,
+        ),
+        arrayOf(
             "%^DATA.creativeImage.creativeCarouselImageHorizontal.1.title^%",
             "creativeImage 1 !!!",
             null,

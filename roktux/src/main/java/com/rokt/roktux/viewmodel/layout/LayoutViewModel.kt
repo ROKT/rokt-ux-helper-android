@@ -181,6 +181,7 @@ internal class LayoutViewModel(
                         creativeCopy = persistentMapOf(),
                         breakpoints = pluginModel.breakpoint,
                         customState = runtimeState.globalCustomStates().toImmutableMap(),
+                        catalogRuntimeData = runtimeState.catalogRuntimeData().toImmutableMap(),
                         domainStates = runtimeState.domainStates().toImmutableMap(),
                         offerCustomStates = runtimeState.immutableOfferCustomStates(),
                     ),
@@ -539,7 +540,15 @@ internal class LayoutViewModel(
 
             is DevicePayResult.PendingConfirmation -> {
                 runtimeState.setCatalogRuntimeData(result.catalogRuntimeData)
-                updateOfferCustomState(offerId, DEVICE_PAY_STATE_CUSTOM_STATE_KEY, 1)
+                runtimeState.setOfferCustomState(offerId, DEVICE_PAY_STATE_CUSTOM_STATE_KEY, 1)
+                updateState { currentUiState ->
+                    currentUiState.copy(
+                        offerUiState = currentUiState.offerUiState.copy(
+                            offerCustomStates = runtimeState.immutableOfferCustomStates(),
+                            catalogRuntimeData = runtimeState.catalogRuntimeData().toImmutableMap(),
+                        ),
+                    )
+                }
                 pendingDevicePayCatalogItem = null
             }
         }
