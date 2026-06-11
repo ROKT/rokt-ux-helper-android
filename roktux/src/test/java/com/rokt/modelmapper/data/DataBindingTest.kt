@@ -662,6 +662,13 @@ class DataBindingImplTest : MockkUnitTest() {
             0,
         ),
         arrayOf(
+            "Supplied by %^DATA.catalogItem.copy.provider.supplierName | Rokt^% to %^DATA.transactionData.shippingAddress.name | ^%",
+            "Supplied by Acme Co to John Doe",
+            null,
+            BindData.Value::class.java,
+            0,
+        ),
+        arrayOf(
             "%^DATA.creativeImage.creativeCarouselImageHorizontal.1.title^%",
             "creativeImage 1 !!!",
             null,
