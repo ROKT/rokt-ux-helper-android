@@ -65,7 +65,11 @@ data class CreativeIcon(val name: String)
 
 data class ResponseOptionModel(val properties: HMap)
 
-data class CatalogItemModel(val properties: HMap, val imageWrapper: CatalogImageWrapperModel)
+data class CatalogItemModel(
+    val properties: HMap,
+    val imageWrapper: CatalogImageWrapperModel,
+    val copy: Map<String, String> = emptyMap(),
+)
 
 data class CatalogImageWrapperModel(val properties: HMap)
 

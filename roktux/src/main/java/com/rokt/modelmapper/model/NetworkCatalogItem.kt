@@ -6,6 +6,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class NetworkCatalogItem(
     @SerialName("images") val images: Map<String, NetworkCreativeImage>,
+    @SerialName("copy") val copy: Map<String, String> = emptyMap(),
     @SerialName("instanceGuid") val instanceGuid: String,
     @SerialName("cartItemId") val cartItemId: String,
     @SerialName("catalogItemId") val catalogItemId: String,

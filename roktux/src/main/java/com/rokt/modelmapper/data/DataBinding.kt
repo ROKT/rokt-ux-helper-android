@@ -2,12 +2,14 @@ package com.rokt.modelmapper.data
 
 import com.rokt.modelmapper.hmap.TypedKey
 import com.rokt.modelmapper.hmap.get
+import com.rokt.modelmapper.uimodel.Address
 import com.rokt.modelmapper.uimodel.CatalogItemModel
 import com.rokt.modelmapper.uimodel.CreativeIcon
 import com.rokt.modelmapper.uimodel.Module
 import com.rokt.modelmapper.uimodel.OfferImageModel
 import com.rokt.modelmapper.uimodel.OfferModel
 import com.rokt.modelmapper.uimodel.ResponseOptionModel
+import com.rokt.modelmapper.uimodel.TransactionData
 import com.rokt.modelmapper.utils.CURRENT_POSITION_PLACEHOLDER
 import com.rokt.modelmapper.utils.TOTAL_OFFERS_PLACEHOLDER
 import com.rokt.modelmapper.utils.transformToAnchorTag
@@ -145,6 +147,13 @@ private class PlaceholderReplacer(
                             }
                         }
 
+                        TRANSACTION_DATA_NAMESPACE -> {
+                            val txnVal = getTransactionData(key)
+                            if (txnVal != null) {
+                                result = txnVal
+                            }
+                        }
+
                         else -> {}
                     }
                 } else {
@@ -169,7 +178,7 @@ private class PlaceholderReplacer(
     }
 
     private fun removeIdentifiersAndSplit(matchResult: String): List<String> =
-        matchResult.substring(2, matchResult.length - 2).split('|')
+        matchResult.substring(2, matchResult.length - 2).split('|').map { it.trim() }
 
     private fun removePrefix(prefix: TemplateDataPrefix, key: String): String = key.removePrefix("${prefix.value}.")
 
@@ -186,7 +195,39 @@ private class PlaceholderReplacer(
         if (path.startsWith(CATALOG_ITEM_IMAGES_PREFIX)) {
             return resolveCatalogItemImageField(catalogItem, path.removePrefix(CATALOG_ITEM_IMAGES_PREFIX))
         }
+        if (path.startsWith(CATALOG_ITEM_COPY_PREFIX)) {
+            return catalogItem.copy[path.removePrefix(CATALOG_ITEM_COPY_PREFIX)]
+        }
         return catalogItem.properties.get<String>(TypedKey<String>(path))
+    }
+
+    private fun getTransactionData(key: String): String? {
+        val transactionData = offer?.transactionData ?: return null
+        val segments = getSanitisedDataKey(key).split('.')
+        return when (segments.firstOrNull()) {
+            "shippingAddress" -> resolveAddressField(transactionData.shippingAddress, segments.drop(1))
+            "billingAddress" -> resolveAddressField(transactionData.billingAddress, segments.drop(1))
+            "confirmationRef" -> transactionData.confirmationRef
+            "paymentType" -> transactionData.paymentType
+            "partnerPaymentReference" -> transactionData.partnerPaymentReference
+            else -> null
+        }
+    }
+
+    private fun resolveAddressField(address: Address?, rest: List<String>): String? {
+        if (address == null || rest.isEmpty()) return null
+        return when (rest.first()) {
+            "name" -> address.name
+            "address1" -> address.address1
+            "address2" -> address.address2
+            "city" -> address.city
+            "state" -> address.state
+            "stateCode" -> address.stateCode
+            "country" -> address.country
+            "countryCode" -> address.countryCode
+            "zip" -> address.zip
+            else -> null
+        }
     }
 
     /**
@@ -260,10 +301,11 @@ private val startsWithNamespace = Regex("^(${TemplateDataPrefix.DATA}|${Template
 private val isDataTemplate = Regex("^${TemplateDataPrefix.DATA}")
 private val isStateTemplate = Regex("%\\^(${TemplateDataPrefix.STATE})\\.[a-zA-Z0-9]+[a-zA-Z0-9.]*(?:\\|.*?)?\\^%")
 private val templatePattern = Regex(
-    "%\\^(?:${TemplateDataPrefix.DATA}|${TemplateDataPrefix.STATE})\\.[a-zA-Z0-9]+[a-zA-Z0-9.]*(?:\\|.*?)?\\^%",
+    "%\\^(?:${TemplateDataPrefix.DATA}|${TemplateDataPrefix.STATE})\\.[a-zA-Z0-9]+[a-zA-Z0-9.]*(?:\\s*\\|.*?)?\\^%",
 )
 
 private const val CATALOG_ITEM_IMAGES_PREFIX = "images."
+private const val CATALOG_ITEM_COPY_PREFIX = "copy."
 private const val CATALOG_RUNTIME_NAMESPACE = "catalogRuntime"
 
 private val INDICATOR_POSITION = listOf("IndicatorPosition", "indicatorPosition")
