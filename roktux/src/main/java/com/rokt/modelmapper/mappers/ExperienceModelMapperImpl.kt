@@ -239,6 +239,7 @@ class ExperienceModelMapperImpl(private val experienceResponse: String, private 
             set(TypedKey<String>(KEY_INVENTORY_STATUS), inventoryStatus)
         },
         imageWrapper = transformImage(images),
+        copy = copy,
     )
 
     private fun NetworkCatalogItemGroup.toCatalogItemGroupModel(): CatalogItemGroupModel = CatalogItemGroupModel(
