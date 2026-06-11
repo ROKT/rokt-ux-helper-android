@@ -98,19 +98,14 @@ internal fun BindData.getValue(offerState: OfferUiState, viewableItems: Int): St
     else -> null
 }
 
-private fun String.replaceCatalogRuntimePlaceholders(
-    catalogRuntimeData: Map<String, String>,
-): String {
+private fun String.replaceCatalogRuntimePlaceholders(catalogRuntimeData: Map<String, String>): String {
     if (!contains(DATA_CATALOG_RUNTIME_PREFIX)) return this
     return catalogRuntimePlaceholderRegex.replace(this) { match ->
         resolveCatalogRuntimePlaceholder(match.value, catalogRuntimeData)
     }
 }
 
-private fun resolveCatalogRuntimePlaceholder(
-    token: String,
-    catalogRuntimeData: Map<String, String>,
-): String {
+private fun resolveCatalogRuntimePlaceholder(token: String, catalogRuntimeData: Map<String, String>): String {
     val chain = token.removePrefix("%^").removeSuffix("^%")
     if (!chain.contains(DATA_CATALOG_RUNTIME_PREFIX)) return token
     val parts = chain.split('|').map { it.trim() }
@@ -122,6 +117,7 @@ private fun resolveCatalogRuntimePlaceholder(
                     ?.takeIf { it.isNotEmpty() }
                     ?.let { return it }
             }
+
             part.isNotEmpty() || fallback == null -> fallback = part
         }
     }
