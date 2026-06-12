@@ -1,6 +1,7 @@
 package com.rokt.roktux.testutil
 
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -23,17 +24,38 @@ import com.rokt.roktux.viewmodel.layout.LayoutContract
 import com.rokt.roktux.viewmodel.layout.OfferUiState
 import kotlinx.collections.immutable.PersistentMap
 import kotlinx.collections.immutable.persistentMapOf
+import kotlinx.collections.immutable.toPersistentMap
 import kotlinx.coroutines.Dispatchers
+
+internal class MutableOfferStateController {
+    private var updateCustomState: ((String, Int) -> Unit)? = null
+
+    fun setCustomState(key: String, value: Int) {
+        updateCustomState?.invoke(key, value) ?: error("Mutable offer state renderer is not ready")
+    }
+
+    internal fun bind(updateCustomState: (String, Int) -> Unit) {
+        this.updateCustomState = updateCustomState
+    }
+}
 
 internal fun BaseDcuiEspressoTest.renderParsedModelWithMutableOfferState(
     initialCustomState: PersistentMap<String, Int> = persistentMapOf(),
+    initialOfferCustomStates: PersistentMap<String, PersistentMap<String, Int>> = persistentMapOf(),
     initialActiveCatalogItemIndex: Int = 0,
     testTag: String = DCUI_COMPONENT_TAG,
-) {
+): MutableOfferStateController {
+    val controller = MutableOfferStateController()
     val factory = LayoutUiModelFactory()
     composeTestRule.setContent {
         var customState by remember { mutableStateOf(initialCustomState) }
+        var offerCustomStates by remember { mutableStateOf(initialOfferCustomStates) }
         var activeCatalogItemIndex by remember { mutableIntStateOf(initialActiveCatalogItemIndex) }
+        SideEffect {
+            controller.bind { key, value ->
+                customState = customState.put(key, value)
+            }
+        }
 
         CompositionLocalProvider(
             LocalLayoutComponent provides LayoutComponent(
@@ -69,6 +91,7 @@ internal fun BaseDcuiEspressoTest.renderParsedModelWithMutableOfferState(
                     creativeCopy = persistentMapOf(),
                     breakpoints = persistentMapOf("default" to 0),
                     customState = customState,
+                    offerCustomStates = offerCustomStates,
                     activeCatalogItemIndex = activeCatalogItemIndex,
                 ),
                 isDarkModeEnabled = false,
@@ -80,6 +103,13 @@ internal fun BaseDcuiEspressoTest.renderParsedModelWithMutableOfferState(
                         customState = customState.put(event.key, event.value)
                     }
 
+                    is LayoutContract.LayoutEvent.SetOfferCustomState -> {
+                        offerCustomStates = offerCustomStates.put(
+                            event.offerId.toString(),
+                            event.customState.toPersistentMap(),
+                        )
+                    }
+
                     is LayoutContract.LayoutEvent.SetActiveCatalogItem -> {
                         activeCatalogItemIndex = event.index
                     }
@@ -89,4 +119,5 @@ internal fun BaseDcuiEspressoTest.renderParsedModelWithMutableOfferState(
             }
         }
     }
+    return controller
 }
