@@ -64,6 +64,7 @@ class DcuiComponentRule(
         val breakpoints = buildBreakpoints(dcuiNodeComponentState?.breakpoints)
         layoutComponent = LayoutComponent(
             experienceResponse = "",
+            parsedExperienceResponse = null,
             location = "",
             startTimeStamp = System.currentTimeMillis(),
             onUxEvent = {},

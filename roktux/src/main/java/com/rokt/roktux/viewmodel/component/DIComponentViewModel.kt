@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.CreationExtras
 import coil.ImageLoader
+import com.rokt.modelmapper.model.NetworkExperienceResponse
 import com.rokt.roktux.RoktViewState
 import com.rokt.roktux.di.layout.LayoutComponent
 import com.rokt.roktux.event.RoktPlatformEvent
@@ -11,7 +12,8 @@ import com.rokt.roktux.event.RoktUxEvent
 import kotlinx.coroutines.CoroutineDispatcher
 
 internal class DIComponentViewModel(
-    private val experienceResponse: String,
+    private val experienceResponse: String?,
+    private val parsedExperienceResponse: NetworkExperienceResponse?,
     private val location: String,
     private val startTimeStamp: Long,
     private val onUxEvent: (uxEvent: RoktUxEvent) -> Unit,
@@ -30,6 +32,7 @@ internal class DIComponentViewModel(
 
     val component = LayoutComponent(
         experienceResponse,
+        parsedExperienceResponse,
         location,
         startTimeStamp,
         onUxEvent,
@@ -47,7 +50,8 @@ internal class DIComponentViewModel(
     )
 
     class DIComponentViewModelFactory(
-        private val experienceResponse: String,
+        private val experienceResponse: String?,
+        private val parsedExperienceResponse: NetworkExperienceResponse?,
         private val location: String,
         private val startTimeStamp: Long,
         private val uxEvent: (uxEvent: RoktUxEvent) -> Unit,
@@ -68,6 +72,7 @@ internal class DIComponentViewModel(
             if (modelClass.isAssignableFrom(DIComponentViewModel::class.java)) {
                 return DIComponentViewModel(
                     experienceResponse = experienceResponse,
+                    parsedExperienceResponse = parsedExperienceResponse,
                     location = location,
                     startTimeStamp = startTimeStamp,
                     onUxEvent = uxEvent,

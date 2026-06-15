@@ -60,6 +60,7 @@ internal fun BaseDcuiEspressoTest.renderParsedModelWithMutableOfferState(
         CompositionLocalProvider(
             LocalLayoutComponent provides LayoutComponent(
                 experienceResponse = "",
+                parsedExperienceResponse = null,
                 location = "",
                 startTimeStamp = System.currentTimeMillis(),
                 onUxEvent = {},

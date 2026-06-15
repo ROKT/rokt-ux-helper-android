@@ -6,6 +6,7 @@ import com.rokt.modelmapper.data.DataBinding
 import com.rokt.modelmapper.data.DataBindingImpl
 import com.rokt.modelmapper.mappers.ExperienceModelMapperImpl
 import com.rokt.modelmapper.mappers.ModelMapper
+import com.rokt.modelmapper.model.NetworkExperienceResponse
 import com.rokt.roktux.RoktViewState
 import com.rokt.roktux.component.LayoutUiModelFactory
 import com.rokt.roktux.event.RoktPlatformEvent
@@ -15,7 +16,8 @@ import com.rokt.roktux.viewmodel.layout.LayoutViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 
 internal class LayoutModule(
-    private val experience: String,
+    private val experience: String?,
+    private val parsedExperience: NetworkExperienceResponse?,
     private val location: String,
     private val startTimeStamp: Long,
     private val uxEvent: (uxEvent: RoktUxEvent) -> Unit,
@@ -38,8 +40,7 @@ internal class LayoutModule(
         this.provideModuleScoped { DataBindingImpl() }
         this.provideModuleScoped { LayoutUiModelFactory() }
         this.provideModuleScoped { ValidationCoordinator() }
-        this.provideModuleScoped { ExperienceModelMapperImpl(get(EXPERIENCE), get()) }
-        this.provideModuleScoped(EXPERIENCE) { experience }
+        this.provideModuleScoped { ExperienceModelMapperImpl(experience, parsedExperience, get()) }
         this.provideModuleScoped(LOCATION) { location }
         this.provideModuleScoped<CoroutineDispatcher>(IO) { ioDispatcher }
         this.provideModuleScoped<CoroutineDispatcher>(MAIN) { mainDispatcher }
@@ -68,7 +69,6 @@ internal class LayoutModule(
     }
 
     companion object {
-        const val EXPERIENCE = "EXPERIENCE"
         const val LOCATION = "Location"
         const val IO = "IO"
         const val MAIN = "MAIN"
