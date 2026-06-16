@@ -6,10 +6,18 @@ import com.rokt.network.model.LayoutDisplayPreset
 import com.rokt.network.model.LayoutSchemaModel
 import com.rokt.network.model.LayoutSettings
 import com.rokt.network.model.RootSchemaModel
+import kotlinx.serialization.KSerializer
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.descriptors.SerialDescriptor
+import kotlinx.serialization.encoding.Decoder
+import kotlinx.serialization.encoding.Encoder
+import kotlinx.serialization.json.JsonDecoder
 import kotlinx.serialization.json.JsonElement
+import kotlinx.serialization.json.JsonEncoder
 import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.contentOrNull
+import kotlinx.serialization.json.jsonPrimitive
 
 /**
  * Selection response for a v2 offers request — the model the renderer consumes,
@@ -77,8 +85,59 @@ data class SelectLayoutVariant(
 data class SelectOffer(
     @SerialName("campaign_id") val campaignId: String? = null,
     @SerialName("creative") val creative: SelectCreative? = null,
-    @SerialName("catalog_items") val catalogItems: List<JsonObject>? = null,
+    @SerialName("catalog_items") val catalogItems: List<SelectCatalogItem>? = null,
 )
+
+/**
+ * A catalog item from a v2 offers selection response.
+ *
+ * The transactions catalog-item shape is open and campaign-specific — only
+ * [instanceGuid] and [title] are guaranteed; every other field varies by
+ * campaign type. To stay type-safe without risking decode failures as that
+ * shape changes, the guaranteed fields are surfaced as (optional) typed
+ * accessors while the full payload is retained in [raw] so any
+ * campaign-specific field still round-trips. Decoding never fails on an
+ * unrecognised shape.
+ *
+ * When the renderer starts consuming catalog items, promote the fields it needs
+ * from [raw] into typed (optional) properties here.
+ */
+@Serializable(with = SelectCatalogItemSerializer::class)
+data class SelectCatalogItem(
+    /** The complete decoded payload, keyed by the raw (snake_case) JSON key. */
+    val raw: JsonObject,
+) {
+    /** Guaranteed by the server contract for every catalog item. */
+    val instanceGuid: String?
+        get() = raw["instance_guid"]?.jsonPrimitive?.contentOrNull
+
+    /** Guaranteed by the server contract for every catalog item. */
+    val title: String?
+        get() = raw["title"]?.jsonPrimitive?.contentOrNull
+}
+
+/**
+ * Captures the whole catalog-item object into [SelectCatalogItem.raw] so unknown
+ * / campaign-specific fields are preserved, rather than mapping a fixed field
+ * set. Keeps [raw] as the single source of truth for the wire shape.
+ */
+internal object SelectCatalogItemSerializer : KSerializer<SelectCatalogItem> {
+    private val delegate = JsonObject.serializer()
+
+    override val descriptor: SerialDescriptor = delegate.descriptor
+
+    override fun deserialize(decoder: Decoder): SelectCatalogItem {
+        val input = decoder as? JsonDecoder
+            ?: error("SelectCatalogItem can only be deserialized from JSON")
+        return SelectCatalogItem(raw = delegate.deserialize(input))
+    }
+
+    override fun serialize(encoder: Encoder, value: SelectCatalogItem) {
+        val output = encoder as? JsonEncoder
+            ?: error("SelectCatalogItem can only be serialized to JSON")
+        delegate.serialize(output, value.raw)
+    }
+}
 
 @Serializable
 data class SelectCreative(

@@ -3,6 +3,10 @@ package com.rokt.modelmapper.model.txn
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.double
+import kotlinx.serialization.json.int
+import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.serialization.json.put
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
@@ -45,6 +49,14 @@ class SelectResponseTest {
         assertEquals("campaign-1", offer.campaignId)
         assertEquals(1, offer.catalogItems?.size)
 
+        // Only `instance_guid` and `title` are guaranteed; campaign-specific
+        // fields vary by campaign type and round-trip via `raw`.
+        val catalogItem = offer.catalogItems!!.single()
+        assertEquals("catalog-instance-1", catalogItem.instanceGuid)
+        assertEquals("Catalog title", catalogItem.title)
+        assertEquals(9.99, catalogItem.raw["price"]?.jsonPrimitive?.double)
+        assertEquals("varies-by-campaign", catalogItem.raw["custom_field"]?.jsonPrimitive?.content)
+
         val creative = offer.creative!!
         assertEquals("creative-1", creative.referralCreativeId)
         assertEquals("Hello", creative.copy?.get("title"))
@@ -77,6 +89,21 @@ class SelectResponseTest {
     }
 
     @Test
+    fun `decodes a catalog item when the guaranteed fields are absent`() {
+        // The catalog-item shape is open and campaign-specific; only `instance_guid`
+        // and `title` are guaranteed. Decoding must not fail when they are absent —
+        // the typed accessors are null and the payload is retained in `raw`.
+        val catalogItem = json.decodeFromString<SelectCatalogItem>(
+            """{ "campaign_only_field": 7, "nested": { "k": "v" } }""",
+        )
+
+        assertNull(catalogItem.instanceGuid)
+        assertNull(catalogItem.title)
+        assertEquals(7, catalogItem.raw["campaign_only_field"]?.jsonPrimitive?.int)
+        assertEquals("v", catalogItem.raw["nested"]?.jsonObject?.get("k")?.jsonPrimitive?.content)
+    }
+
+    @Test
     fun `round-trips a model built from the constructors`() {
         val original = SelectResponse(
             sessionId = "session-3",
@@ -105,7 +132,15 @@ class SelectResponseTest {
                                     ),
                                     offer = SelectOffer(
                                         campaignId = "campaign-3",
-                                        catalogItems = listOf(buildJsonObject { put("id", "catalog-3") }),
+                                        catalogItems = listOf(
+                                            SelectCatalogItem(
+                                                raw = buildJsonObject {
+                                                    put("instance_guid", "catalog-instance-3")
+                                                    put("title", "Catalog title")
+                                                    put("price", 9.99)
+                                                },
+                                            ),
+                                        ),
                                         creative = SelectCreative(
                                             referralCreativeId = "creative-3",
                                             instanceGuid = "creative-instance-3",
@@ -179,7 +214,7 @@ class SelectResponseTest {
                           "layout_variant": { "layout_variant_id": "variant-1", "module_name": "module-1" },
                           "offer": {
                             "campaign_id": "campaign-1",
-                            "catalog_items": [ { "id": "catalog-1" } ],
+                            "catalog_items": [ { "instance_guid": "catalog-instance-1", "title": "Catalog title", "price": 9.99, "custom_field": "varies-by-campaign" } ],
                             "creative": {
                               "referral_creative_id": "creative-1",
                               "instance_guid": "creative-instance-1",
