@@ -169,6 +169,7 @@ internal fun RoktLayout(
                     domainStates = domainStates,
                     handleUrlByApp = roktUxConfig.handleUrlByApp,
                     edgeToEdgeDisplay = roktUxConfig.edgeToEdgeDisplay,
+                    completedDevicePayCartItemIds = roktUxConfig.completedDevicePayCartItemIds,
                     mainDispatcher = mainDispatcher,
                     ioDispatcher = ioDispatcher,
                 ),

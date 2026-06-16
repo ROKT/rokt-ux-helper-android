@@ -67,6 +67,7 @@ internal class LayoutViewModel(
     domainStates: Map<String, Int>,
     validationCoordinator: ValidationCoordinator = ValidationCoordinator(),
     private var edgeToEdgeDisplay: Boolean,
+    private val completedDevicePayCartItemIds: Set<String> = emptySet(),
 ) : BaseViewModel<LayoutContract.LayoutEvent, LayoutUiState, LayoutContract.LayoutEffect>() {
 
     private lateinit var pluginId: String
@@ -167,6 +168,8 @@ internal class LayoutViewModel(
         }
         val lastOfferIndex = pluginModel.slots.size - 1
         pluginId = pluginModel.id
+
+        seedCompletedDevicePayOffers()
 
         if (layoutSchema != null && lastOfferIndex >= FIRST_OFFER_INDEX) {
             sendViewState(currentOffer)
@@ -932,6 +935,24 @@ internal class LayoutViewModel(
         ?.properties
         ?.instanceGuid()
 
+    /**
+     * Seeds offers whose device-pay purchase already completed into their post-purchase state
+     * (`paymentResult = 1`) before the first layout state is emitted, so the confirmation renders
+     * immediately when the host is recreated mid-checkout. Reuses the same offer custom state the
+     * live [handleCartItemDevicePayResult] success path sets; unmatched cart item ids are ignored.
+     */
+    private fun seedCompletedDevicePayOffers() {
+        if (completedDevicePayCartItemIds.isEmpty()) return
+        completedDevicePayCartItemIds.forEach { cartItemId ->
+            val offerIndex = pluginModel.slots.indexOfFirst { slot ->
+                slot.offer?.catalogItems?.any { it.properties.cartItemId() == cartItemId } == true
+            }
+            if (offerIndex >= FIRST_OFFER_INDEX) {
+                runtimeState.setOfferCustomState(offerIndex, PAYMENT_RESULT_CUSTOM_STATE_KEY, 1)
+            }
+        }
+    }
+
     private fun HMap.originalPrice(): Double = get<Double>(KEY_ORIGINAL_PRICE) ?: 0.0
 
     private fun HMap.salePrice(): Double = get<Double>(KEY_PRICE) ?: originalPrice()
@@ -1008,6 +1029,7 @@ internal class LayoutViewModel(
         private val domainStates: Map<String, Int>,
         private val validationCoordinator: ValidationCoordinator = ValidationCoordinator(),
         private val edgeToEdgeDisplay: Boolean,
+        private val completedDevicePayCartItemIds: Set<String> = emptySet(),
     ) : ViewModelProvider.Factory {
         @Suppress("UNCHECKED_CAST")
         override fun <T : ViewModel> create(modelClass: Class<T>, extras: CreationExtras): T {
@@ -1028,6 +1050,7 @@ internal class LayoutViewModel(
                     domainStates = domainStates,
                     validationCoordinator = validationCoordinator,
                     edgeToEdgeDisplay = edgeToEdgeDisplay,
+                    completedDevicePayCartItemIds = completedDevicePayCartItemIds,
                 ) as T
             }
             throw IllegalArgumentException("Unknown ViewModel type")

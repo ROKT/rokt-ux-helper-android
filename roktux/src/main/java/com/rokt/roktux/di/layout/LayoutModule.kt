@@ -28,6 +28,7 @@ internal class LayoutModule(
     private val offerCustomStates: Map<String, Map<String, Int>>,
     private val domainStates: Map<String, Int>,
     private val edgeToEdgeDisplay: Boolean,
+    private val completedDevicePayCartItemIds: Set<String>,
     private val mainDispatcher: CoroutineDispatcher,
     private val ioDispatcher: CoroutineDispatcher,
 ) : Module() {
@@ -60,6 +61,7 @@ internal class LayoutModule(
                 domainStates = domainStates,
                 validationCoordinator = get(),
                 edgeToEdgeDisplay = edgeToEdgeDisplay,
+                completedDevicePayCartItemIds = completedDevicePayCartItemIds,
             )
         }
         this.provideModuleScoped {
