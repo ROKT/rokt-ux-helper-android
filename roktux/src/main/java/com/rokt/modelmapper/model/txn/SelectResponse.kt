@@ -9,6 +9,7 @@ import com.rokt.network.model.RootSchemaModel
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.SerializationException
 import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
@@ -16,8 +17,7 @@ import kotlinx.serialization.json.JsonDecoder
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonEncoder
 import kotlinx.serialization.json.JsonObject
-import kotlinx.serialization.json.contentOrNull
-import kotlinx.serialization.json.jsonPrimitive
+import kotlinx.serialization.json.JsonPrimitive
 
 /**
  * Selection response for a v2 offers request — the model the renderer consumes,
@@ -81,12 +81,54 @@ data class SelectLayoutVariant(
     val layoutVariantSchema: LayoutSchemaModel? = null,
 )
 
-@Serializable
+@Serializable(with = SelectOfferSerializer::class)
 data class SelectOffer(
-    @SerialName("campaign_id") val campaignId: String? = null,
-    @SerialName("creative") val creative: SelectCreative? = null,
-    @SerialName("catalog_items") val catalogItems: List<SelectCatalogItem>? = null,
+    val campaignId: String? = null,
+    val creative: SelectCreative? = null,
+    val catalogItems: List<SelectCatalogItem>? = null,
 )
+
+/**
+ * Decodes `catalog_items` as opaque [JsonElement]s first so a non-object element
+ * (a bare string, number, null, nested array, etc.) does not fail the whole
+ * response decode — consistent with the "never fail on shape drift" promise. Only
+ * the object-shaped elements become typed [SelectCatalogItem]s; anything else is
+ * skipped. An absent key stays `null`; an empty array stays an empty (non-null)
+ * list. Mirrors the iOS `SelectOffer.init(from:)` resilient skip.
+ */
+internal object SelectOfferSerializer : KSerializer<SelectOffer> {
+    @Serializable
+    private data class Surrogate(
+        @SerialName("campaign_id") val campaignId: String? = null,
+        @SerialName("creative") val creative: SelectCreative? = null,
+        @SerialName("catalog_items") val catalogItems: List<JsonElement>? = null,
+    )
+
+    override val descriptor: SerialDescriptor = Surrogate.serializer().descriptor
+
+    override fun deserialize(decoder: Decoder): SelectOffer {
+        val surrogate = Surrogate.serializer().deserialize(decoder)
+        return SelectOffer(
+            campaignId = surrogate.campaignId,
+            creative = surrogate.creative,
+            // absent -> null; empty -> empty list; non-object elements skipped (Behavior B).
+            catalogItems = surrogate.catalogItems
+                ?.mapNotNull { it as? JsonObject }
+                ?.map { SelectCatalogItem(raw = it) },
+        )
+    }
+
+    override fun serialize(encoder: Encoder, value: SelectOffer) {
+        Surrogate.serializer().serialize(
+            encoder,
+            Surrogate(
+                campaignId = value.campaignId,
+                creative = value.creative,
+                catalogItems = value.catalogItems?.map { it.raw },
+            ),
+        )
+    }
+}
 
 /**
  * A catalog item from a v2 offers selection response.
@@ -107,13 +149,36 @@ data class SelectCatalogItem(
     /** The complete decoded payload, keyed by the raw (snake_case) JSON key. */
     val raw: JsonObject,
 ) {
-    /** Guaranteed by the server contract for every catalog item. */
+    /**
+     * Guaranteed by the server contract for every catalog item.
+     *
+     * Surfaced only when the wire value is a JSON string. If the server sends a
+     * non-string (number, bool, `null`, object, or array) for this guaranteed
+     * field — a server contract violation — this narrows to `null`,
+     * indistinguishable from the field being absent. This lossiness is
+     * deliberate: decoding never fails on shape drift. The original, untyped
+     * value is always preserved in [raw], so callers needing to observe a
+     * wrong-typed value can read [raw] directly.
+     */
     val instanceGuid: String?
-        get() = raw["instance_guid"]?.jsonPrimitive?.contentOrNull
+        get() = raw.stringValue("instance_guid")
 
-    /** Guaranteed by the server contract for every catalog item. */
+    /** Guaranteed by the server contract for every catalog item. See [instanceGuid]. */
     val title: String?
-        get() = raw["title"]?.jsonPrimitive?.contentOrNull
+        get() = raw.stringValue("title")
+
+    private companion object {
+        /**
+         * Reads [key] only when its wire value is an actual JSON string.
+         *
+         * `as? JsonPrimitive` is `null` for objects/arrays (so it never throws,
+         * unlike `jsonPrimitive`), and `isString` filters out unquoted
+         * number/bool/null literals so they narrow to `null` — matching the iOS
+         * `stringValue` narrowing exactly.
+         */
+        private fun JsonObject.stringValue(key: String): String? =
+            (this[key] as? JsonPrimitive)?.takeIf { it.isString }?.content
+    }
 }
 
 /**
@@ -128,13 +193,13 @@ internal object SelectCatalogItemSerializer : KSerializer<SelectCatalogItem> {
 
     override fun deserialize(decoder: Decoder): SelectCatalogItem {
         val input = decoder as? JsonDecoder
-            ?: error("SelectCatalogItem can only be deserialized from JSON")
+            ?: throw SerializationException("SelectCatalogItem can only be deserialized from JSON")
         return SelectCatalogItem(raw = delegate.deserialize(input))
     }
 
     override fun serialize(encoder: Encoder, value: SelectCatalogItem) {
         val output = encoder as? JsonEncoder
-            ?: error("SelectCatalogItem can only be serialized to JSON")
+            ?: throw SerializationException("SelectCatalogItem can only be serialized to JSON")
         delegate.serialize(output, value.raw)
     }
 }
