@@ -117,6 +117,7 @@ class RoktLayoutViewModelTest : BaseViewModelTest() {
         handleUrlByApp: Boolean = true,
         domainStates: Map<String, Int> = emptyMap(),
         validationCoordinator: ValidationCoordinator = ValidationCoordinator(),
+        completedDevicePayCartItemIds: Set<String> = emptySet(),
     ) {
         layoutViewModel = LayoutViewModel(
             location = "location1",
@@ -134,7 +135,44 @@ class RoktLayoutViewModelTest : BaseViewModelTest() {
             domainStates = domainStates,
             validationCoordinator = validationCoordinator,
             edgeToEdgeDisplay = false,
+            completedDevicePayCartItemIds = completedDevicePayCartItemIds,
         )
+    }
+
+    @Test
+    fun `completedDevicePayCartItemIds seeds the matching offer into its post-purchase state on init`() = runTest {
+        // Arrange: a fresh VM seeded with a completed purchase for the cart item in offer index 0,
+        // simulating restore after the host was destroyed mid-checkout (no live device-pay event).
+        clearMocks(viewStateChange)
+        initialize(completedDevicePayCartItemIds = setOf("cart-item-1"))
+
+        // Act
+        layoutViewModel.setEvent(LayoutContract.LayoutEvent.LayoutInitialised)
+
+        // Assert: offer 0 is already in its paymentResult=1 (confirmation) state on first render.
+        verify(timeout = 2000) {
+            viewStateChange.invoke(
+                withArg { state ->
+                    assertThat(state.offerCustomStates["0"]).containsEntry("paymentResult", 1)
+                },
+            )
+        }
+    }
+
+    @Test
+    fun `completedDevicePayCartItemIds does not seed any offer when the cart item is unknown`() = runTest {
+        clearMocks(viewStateChange)
+        initialize(completedDevicePayCartItemIds = setOf("not-a-real-cart-item"))
+
+        layoutViewModel.setEvent(LayoutContract.LayoutEvent.LayoutInitialised)
+
+        verify(timeout = 2000) {
+            viewStateChange.invoke(
+                withArg { state ->
+                    assertThat(state.offerCustomStates["0"]?.get("paymentResult")).isNull()
+                },
+            )
+        }
     }
 
     @Test

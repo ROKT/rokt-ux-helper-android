@@ -24,6 +24,7 @@ internal class DIComponentViewModel(
     private val domainStates: Map<String, Int>,
     private val handleUrlByApp: Boolean,
     private val edgeToEdgeDisplay: Boolean,
+    private val completedDevicePayCartItemIds: Set<String>,
     private val mainDispatcher: CoroutineDispatcher,
     private val ioDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
@@ -42,6 +43,7 @@ internal class DIComponentViewModel(
         offerCustomStates,
         domainStates,
         edgeToEdgeDisplay,
+        completedDevicePayCartItemIds,
         mainDispatcher,
         ioDispatcher,
     )
@@ -60,6 +62,7 @@ internal class DIComponentViewModel(
         private val domainStates: Map<String, Int>,
         private val handleUrlByApp: Boolean,
         private val edgeToEdgeDisplay: Boolean,
+        private val completedDevicePayCartItemIds: Set<String>,
         private val mainDispatcher: CoroutineDispatcher,
         private val ioDispatcher: CoroutineDispatcher,
     ) : ViewModelProvider.Factory {
@@ -80,6 +83,7 @@ internal class DIComponentViewModel(
                     domainStates = domainStates,
                     handleUrlByApp = handleUrlByApp,
                     edgeToEdgeDisplay = edgeToEdgeDisplay,
+                    completedDevicePayCartItemIds = completedDevicePayCartItemIds,
                     mainDispatcher = mainDispatcher,
                     ioDispatcher = ioDispatcher,
                 ) as T

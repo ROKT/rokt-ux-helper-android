@@ -24,6 +24,7 @@ internal class LayoutComponent(
     offerCustomStates: Map<String, Map<String, Int>>,
     domainStates: Map<String, Int>,
     edgeToEdgeDisplay: Boolean,
+    completedDevicePayCartItemIds: Set<String> = emptySet(),
     mainDispatcher: CoroutineDispatcher,
     ioDispatcher: CoroutineDispatcher,
 ) : Component(
@@ -42,6 +43,7 @@ internal class LayoutComponent(
             offerCustomStates,
             domainStates,
             edgeToEdgeDisplay,
+            completedDevicePayCartItemIds,
             mainDispatcher,
             ioDispatcher,
         ),
