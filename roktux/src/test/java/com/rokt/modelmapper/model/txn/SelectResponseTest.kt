@@ -2,6 +2,7 @@ package com.rokt.modelmapper.model.txn
 
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.boolean
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.double
 import kotlinx.serialization.json.int
@@ -101,6 +102,61 @@ class SelectResponseTest {
         assertNull(catalogItem.title)
         assertEquals(7, catalogItem.raw["campaign_only_field"]?.jsonPrimitive?.int)
         assertEquals("v", catalogItem.raw["nested"]?.jsonObject?.get("k")?.jsonPrimitive?.content)
+    }
+
+    @Test
+    fun `catalog item narrows a non-string guaranteed field to null but retains it in raw`() {
+        // A guaranteed field arriving as a non-string is a server contract violation.
+        // Decoding deliberately tolerates it: the typed accessor narrows to null (the
+        // narrowing is lossy and pinned here on purpose), while the original value is
+        // always preserved untyped in `raw`.
+        val catalogItem = json.decodeFromString<SelectCatalogItem>(
+            """{ "instance_guid": 12345, "title": true }""",
+        )
+
+        assertNull(catalogItem.instanceGuid)
+        assertNull(catalogItem.title)
+        assertEquals(12345, catalogItem.raw["instance_guid"]?.jsonPrimitive?.int)
+        assertEquals(true, catalogItem.raw["title"]?.jsonPrimitive?.boolean)
+    }
+
+    @Test
+    fun `offer skips non-object catalog items without failing the decode`() {
+        // `catalog_items` is open; a non-object element (string, number, null, array)
+        // must not fail the whole response decode. Only object-shaped elements become
+        // typed items; everything else is skipped.
+        val offer = json.decodeFromString<SelectOffer>(
+            """
+            {
+              "campaign_id": "campaign-x",
+              "catalog_items": [
+                { "instance_guid": "keep-1", "title": "Kept" },
+                "bare-string",
+                42,
+                null,
+                ["nested", "array"],
+                { "instance_guid": "keep-2" }
+              ]
+            }
+            """.trimIndent(),
+        )
+
+        assertEquals(2, offer.catalogItems?.size)
+        assertEquals(listOf("keep-1", "keep-2"), offer.catalogItems!!.map { it.instanceGuid })
+    }
+
+    @Test
+    fun `offer distinguishes an empty catalog items array from an absent field`() {
+        // Absent key -> null; present-but-empty array -> empty (non-null) list.
+        val absentOffer = json.decodeFromString<SelectOffer>(
+            """{ "campaign_id": "campaign-absent" }""",
+        )
+        val emptyOffer = json.decodeFromString<SelectOffer>(
+            """{ "campaign_id": "campaign-empty", "catalog_items": [] }""",
+        )
+
+        assertNull(absentOffer.catalogItems)
+        assertTrue(emptyOffer.catalogItems!!.isEmpty())
     }
 
     @Test
