@@ -20,8 +20,8 @@ import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
 
 /**
- * Selection response for a v2 offers request — the model the renderer consumes,
- * alongside the v1 `NetworkExperienceResponse`. The layout schema fields are
+ * Selection response for an offers request — the model the renderer consumes,
+ * alongside `NetworkExperienceResponse`. The layout schema fields are
  * parsed into the renderer's typed [RootSchemaModel] / [LayoutSchemaModel] (the
  * SDK-side wire model keeps the same fields as raw strings instead).
  */
@@ -131,7 +131,7 @@ internal object SelectOfferSerializer : KSerializer<SelectOffer> {
 }
 
 /**
- * A catalog item from a v2 offers selection response.
+ * A catalog item from an offers selection response.
  *
  * The transactions catalog-item shape is open and campaign-specific — only
  * [instanceGuid] and [title] are guaranteed; every other field varies by
