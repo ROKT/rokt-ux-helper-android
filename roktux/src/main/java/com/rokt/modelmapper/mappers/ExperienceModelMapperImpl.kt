@@ -62,8 +62,13 @@ interface ModelMapper {
     fun getSavedExperience(): ExperienceModel?
 }
 
-class ExperienceModelMapperImpl(private val experienceResponse: String, private val dataBinding: DataBinding) :
-    ModelMapper {
+class ExperienceModelMapperImpl(
+    private val experienceResponse: String?,
+    private val parsedExperienceResponse: NetworkExperienceResponse?,
+    private val dataBinding: DataBinding,
+) : ModelMapper {
+
+    constructor(experienceResponse: String, dataBinding: DataBinding) : this(experienceResponse, null, dataBinding)
 
     var savedExperienceModel: Result<ExperienceModel>? = null
 
@@ -76,8 +81,10 @@ class ExperienceModelMapperImpl(private val experienceResponse: String, private 
     override fun transformResponse(): Result<ExperienceModel> {
         RoktUXLogger.verbose { "Transforming experience response" }
         savedExperienceModel = try {
-            json.decodeFromString<NetworkExperienceResponse>(experienceResponse)
-                .let { Result.success(it.toExperienceModel()) }
+            val networkResponse = parsedExperienceResponse ?: json.decodeFromString(
+                requireNotNull(experienceResponse) { "Experience response is required" },
+            )
+            Result.success(networkResponse.toExperienceModel())
         } catch (e: Throwable) {
             RoktUXLogger.error(error = e) { "Failed to transform experience response" }
             Result.failure(e)
