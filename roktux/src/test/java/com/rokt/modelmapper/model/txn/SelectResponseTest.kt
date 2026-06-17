@@ -2,13 +2,7 @@ package com.rokt.modelmapper.model.txn
 
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.boolean
 import kotlinx.serialization.json.buildJsonObject
-import kotlinx.serialization.json.double
-import kotlinx.serialization.json.int
-import kotlinx.serialization.json.jsonObject
-import kotlinx.serialization.json.jsonPrimitive
-import kotlinx.serialization.json.put
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
@@ -50,13 +44,11 @@ class SelectResponseTest {
         assertEquals("campaign-1", offer.campaignId)
         assertEquals(1, offer.catalogItems?.size)
 
-        // Only `instance_guid` and `title` are guaranteed; campaign-specific
-        // fields vary by campaign type and round-trip via `raw`.
+        // Only `instance_guid` and `title` are part of the agreed contract; any
+        // campaign-specific fields in the payload are ignored.
         val catalogItem = offer.catalogItems!!.single()
         assertEquals("catalog-instance-1", catalogItem.instanceGuid)
         assertEquals("Catalog title", catalogItem.title)
-        assertEquals(9.99, catalogItem.raw["price"]?.jsonPrimitive?.double)
-        assertEquals("varies-by-campaign", catalogItem.raw["custom_field"]?.jsonPrimitive?.content)
 
         val creative = offer.creative!!
         assertEquals("creative-1", creative.referralCreativeId)
@@ -91,58 +83,15 @@ class SelectResponseTest {
 
     @Test
     fun `decodes a catalog item when the guaranteed fields are absent`() {
-        // The catalog-item shape is open and campaign-specific; only `instance_guid`
-        // and `title` are guaranteed. Decoding must not fail when they are absent —
-        // the typed accessors are null and the payload is retained in `raw`.
+        // Only `instance_guid` and `title` are modelled; both are optional, so
+        // decoding succeeds (with null values) when they are absent and any other
+        // fields in the payload are ignored (ignoreUnknownKeys).
         val catalogItem = json.decodeFromString<SelectCatalogItem>(
             """{ "campaign_only_field": 7, "nested": { "k": "v" } }""",
         )
 
         assertNull(catalogItem.instanceGuid)
         assertNull(catalogItem.title)
-        assertEquals(7, catalogItem.raw["campaign_only_field"]?.jsonPrimitive?.int)
-        assertEquals("v", catalogItem.raw["nested"]?.jsonObject?.get("k")?.jsonPrimitive?.content)
-    }
-
-    @Test
-    fun `catalog item narrows a non-string guaranteed field to null but retains it in raw`() {
-        // A guaranteed field arriving as a non-string is a server contract violation.
-        // Decoding deliberately tolerates it: the typed accessor narrows to null (the
-        // narrowing is lossy and pinned here on purpose), while the original value is
-        // always preserved untyped in `raw`.
-        val catalogItem = json.decodeFromString<SelectCatalogItem>(
-            """{ "instance_guid": 12345, "title": true }""",
-        )
-
-        assertNull(catalogItem.instanceGuid)
-        assertNull(catalogItem.title)
-        assertEquals(12345, catalogItem.raw["instance_guid"]?.jsonPrimitive?.int)
-        assertEquals(true, catalogItem.raw["title"]?.jsonPrimitive?.boolean)
-    }
-
-    @Test
-    fun `offer skips non-object catalog items without failing the decode`() {
-        // `catalog_items` is open; a non-object element (string, number, null, array)
-        // must not fail the whole response decode. Only object-shaped elements become
-        // typed items; everything else is skipped.
-        val offer = json.decodeFromString<SelectOffer>(
-            """
-            {
-              "campaign_id": "campaign-x",
-              "catalog_items": [
-                { "instance_guid": "keep-1", "title": "Kept" },
-                "bare-string",
-                42,
-                null,
-                ["nested", "array"],
-                { "instance_guid": "keep-2" }
-              ]
-            }
-            """.trimIndent(),
-        )
-
-        assertEquals(2, offer.catalogItems?.size)
-        assertEquals(listOf("keep-1", "keep-2"), offer.catalogItems!!.map { it.instanceGuid })
     }
 
     @Test
@@ -190,11 +139,8 @@ class SelectResponseTest {
                                         campaignId = "campaign-3",
                                         catalogItems = listOf(
                                             SelectCatalogItem(
-                                                raw = buildJsonObject {
-                                                    put("instance_guid", "catalog-instance-3")
-                                                    put("title", "Catalog title")
-                                                    put("price", 9.99)
-                                                },
+                                                instanceGuid = "catalog-instance-3",
+                                                title = "Catalog title",
                                             ),
                                         ),
                                         creative = SelectCreative(
