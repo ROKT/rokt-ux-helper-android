@@ -3,7 +3,6 @@ package com.rokt.modelmapper.model.txn
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.buildJsonObject
-import kotlinx.serialization.json.put
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
@@ -21,8 +20,13 @@ class SelectResponseTest {
         assertEquals("token-1", response.sessionToken.token)
         assertEquals(1_711_038_600_000L, response.sessionToken.expiresAt)
         assertEquals("page-instance-1", response.pageInstanceGuid)
+        assertEquals("tag-1", response.pageContext?.roktTagId)
         assertEquals("page-1", response.pageContext?.pageId)
+        assertEquals("checkout", response.pageContext?.pageType)
         assertEquals("en", response.pageContext?.language)
+        assertEquals(true, response.pageContext?.isPageDetected)
+        assertEquals("variant-a", response.pageContext?.pageVariantName)
+        assertEquals("template-1", response.pageContext?.partnerContentTemplate)
 
         val plugin = response.plugins!!.single().plugin!!
         assertEquals("plugin-1", plugin.id)
@@ -44,6 +48,12 @@ class SelectResponseTest {
         val offer = slot.offer!!
         assertEquals("campaign-1", offer.campaignId)
         assertEquals(1, offer.catalogItems?.size)
+
+        // Only `instance_guid` and `title` are part of the agreed contract; any
+        // campaign-specific fields in the payload are ignored.
+        val catalogItem = offer.catalogItems!!.single()
+        assertEquals("catalog-instance-1", catalogItem.instanceGuid)
+        assertEquals("Catalog title", catalogItem.title)
 
         val creative = offer.creative!!
         assertEquals("creative-1", creative.referralCreativeId)
@@ -77,15 +87,47 @@ class SelectResponseTest {
     }
 
     @Test
+    fun `decodes a catalog item when the guaranteed fields are absent`() {
+        // Only `instance_guid` and `title` are modelled; both are optional, so
+        // decoding succeeds (with null values) when they are absent and any other
+        // fields in the payload are ignored (ignoreUnknownKeys).
+        val catalogItem = json.decodeFromString<SelectCatalogItem>(
+            """{ "campaign_only_field": 7, "nested": { "k": "v" } }""",
+        )
+
+        assertNull(catalogItem.instanceGuid)
+        assertNull(catalogItem.title)
+    }
+
+    @Test
+    fun `offer distinguishes an empty catalog items array from an absent field`() {
+        // Absent key -> null; present-but-empty array -> empty (non-null) list.
+        val absentOffer = json.decodeFromString<SelectOffer>(
+            """{ "campaign_id": "campaign-absent" }""",
+        )
+        val emptyOffer = json.decodeFromString<SelectOffer>(
+            """{ "campaign_id": "campaign-empty", "catalog_items": [] }""",
+        )
+
+        assertNull(absentOffer.catalogItems)
+        assertTrue(emptyOffer.catalogItems!!.isEmpty())
+    }
+
+    @Test
     fun `round-trips a model built from the constructors`() {
         val original = SelectResponse(
             sessionId = "session-3",
             sessionToken = SessionToken(token = "token-3", expiresAt = 42L),
             pageInstanceGuid = "page-instance-3",
             pageContext = SelectPageContext(
+                roktTagId = "tag-3",
                 pageInstanceGuid = "page-instance-3",
                 pageId = "page-3",
+                pageType = "checkout",
                 language = "en",
+                isPageDetected = true,
+                pageVariantName = "variant-a",
+                partnerContentTemplate = "template-3",
                 token = "ctx-token",
             ),
             plugins = listOf(
@@ -105,7 +147,12 @@ class SelectResponseTest {
                                     ),
                                     offer = SelectOffer(
                                         campaignId = "campaign-3",
-                                        catalogItems = listOf(buildJsonObject { put("id", "catalog-3") }),
+                                        catalogItems = listOf(
+                                            SelectCatalogItem(
+                                                instanceGuid = "catalog-instance-3",
+                                                title = "Catalog title",
+                                            ),
+                                        ),
                                         creative = SelectCreative(
                                             referralCreativeId = "creative-3",
                                             instanceGuid = "creative-instance-3",
@@ -162,7 +209,7 @@ class SelectResponseTest {
               "session_id": "session-1",
               "session_token": { "token": "token-1", "expires_at": 1711038600000 },
               "page_instance_guid": "page-instance-1",
-              "page_context": { "page_instance_guid": "page-instance-1", "page_id": "page-1", "language": "en", "token": "ctx-token" },
+              "page_context": { "rokt_tag_id": "tag-1", "page_instance_guid": "page-instance-1", "page_id": "page-1", "page_type": "checkout", "language": "en", "is_page_detected": true, "page_variant_name": "variant-a", "partner_content_template": "template-1", "token": "ctx-token" },
               "plugins": [
                 {
                   "plugin": {
@@ -179,7 +226,7 @@ class SelectResponseTest {
                           "layout_variant": { "layout_variant_id": "variant-1", "module_name": "module-1" },
                           "offer": {
                             "campaign_id": "campaign-1",
-                            "catalog_items": [ { "id": "catalog-1" } ],
+                            "catalog_items": [ { "instance_guid": "catalog-instance-1", "title": "Catalog title", "price": 9.99, "custom_field": "varies-by-campaign" } ],
                             "creative": {
                               "referral_creative_id": "creative-1",
                               "instance_guid": "creative-instance-1",

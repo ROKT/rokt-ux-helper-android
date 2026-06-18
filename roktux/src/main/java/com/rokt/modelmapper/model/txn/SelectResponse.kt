@@ -9,11 +9,10 @@ import com.rokt.network.model.RootSchemaModel
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonElement
-import kotlinx.serialization.json.JsonObject
 
 /**
- * Selection response for a v2 offers request — the model the renderer consumes,
- * alongside the v1 `NetworkExperienceResponse`. The layout schema fields are
+ * Selection response for an offers request — the model the renderer consumes,
+ * alongside `NetworkExperienceResponse`. The layout schema fields are
  * parsed into the renderer's typed [RootSchemaModel] / [LayoutSchemaModel] (the
  * SDK-side wire model keeps the same fields as raw strings instead).
  */
@@ -29,9 +28,14 @@ data class SelectResponse(
 
 @Serializable
 data class SelectPageContext(
+    @SerialName("rokt_tag_id") val roktTagId: String? = null,
     @SerialName("page_instance_guid") val pageInstanceGuid: String? = null,
     @SerialName("page_id") val pageId: String? = null,
+    @SerialName("page_type") val pageType: String? = null,
     @SerialName("language") val language: String? = null,
+    @SerialName("is_page_detected") val isPageDetected: Boolean? = null,
+    @SerialName("page_variant_name") val pageVariantName: String? = null,
+    @SerialName("partner_content_template") val partnerContentTemplate: String? = null,
     @SerialName("token") val token: String? = null,
 )
 
@@ -77,7 +81,21 @@ data class SelectLayoutVariant(
 data class SelectOffer(
     @SerialName("campaign_id") val campaignId: String? = null,
     @SerialName("creative") val creative: SelectCreative? = null,
-    @SerialName("catalog_items") val catalogItems: List<JsonObject>? = null,
+    @SerialName("catalog_items") val catalogItems: List<SelectCatalogItem>? = null,
+)
+
+/**
+ * A catalog item from an offers selection response.
+ *
+ * Only `instance_guid` and `title` are part of the agreed contract, so they are
+ * the only fields modelled here. Both are optional; campaign-specific fields are
+ * intentionally not surfaced. As the renderer starts consuming catalog items,
+ * add the fields it needs as typed (optional) properties here.
+ */
+@Serializable
+data class SelectCatalogItem(
+    @SerialName("instance_guid") val instanceGuid: String? = null,
+    @SerialName("title") val title: String? = null,
 )
 
 @Serializable
