@@ -19,6 +19,7 @@ The Rokt UX Helper for Android enables partner applications to render tailored u
 - Android Gradle Plugin 8.1.2
 - Gradle 8.9+
 - JDK 17
+- Kotlin 2.1 (Gradle plugin version; required to compile against Coil 3 and the Kotlin Compose compiler plugin)
 
 ## Installation
 

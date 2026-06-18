@@ -8,13 +8,10 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import java.io.File
 
 fun Project.configureAndroidCompose(commonExtension: CommonExtension<*, *, *, *, *, *>) {
+    pluginManager.apply("org.jetbrains.kotlin.plugin.compose")
     commonExtension.apply {
         buildFeatures {
             compose = true
-        }
-
-        composeOptions {
-            kotlinCompilerExtensionVersion = libs.findVersion("androidxComposeCompiler").get().toString()
         }
 
         dependencies {

@@ -3,7 +3,6 @@ androidGradlePlugin = "8.6.1"
 androidxActivity = "1.10.1"
 androidxAppCompat = "1.7.1"
 androidxComposeBom = "2024.09.02"
-androidxComposeCompiler = "1.4.7"
 androidxCore = "1.16.0"
 androidxCoreSplashscreen = "1.0.1"
 androidxEspresso = "3.6.1"
@@ -11,11 +10,11 @@ androidxLifecycle = "2.8.7"                # Newer versions require kotlin 2+
 androidxNavigation = "2.8.9"               # Newer versions require kotlin 2+
 androidxWindowManager = "1.4.0"
 androidXbrowser = "1.8.0"
-coil = "2.3.0"
+coil = "3.2.0"
 junit4 = "4.13.2"
 junitParams = "1.1.1"
-kotlin = "1.8.21"
-kotlinxCoroutines = "1.7.3"
+kotlin = "2.1.10"
+kotlinxCoroutines = "1.9.0"
 kotlinxSerializationJson = "1.6.3"         # Newer versions require kotlin 2+
 kotlinxCollectionsImmutable = "0.3.7"
 okhttpBom = "4.10.0"
@@ -66,10 +65,11 @@ androidx-navigation-compose = { group = "androidx.navigation", name = "navigatio
 androidx-window-manager = { module = "androidx.window:window", version.ref = "androidxWindowManager" }
 androidx-test-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "androidxEspresso" }
 androidx-browser = { group = "androidx.browser", name = "browser", version.ref = "androidXbrowser" }
-coil-kt = { group = "io.coil-kt", name = "coil", version.ref = "coil" }
-coil-kt-compose = { group = "io.coil-kt", name = "coil-compose", version.ref = "coil" }
-coil-kt-svg = { group = "io.coil-kt", name = "coil-svg", version.ref = "coil" }
-coil-test = { group = "io.coil-kt", name = "coil-test", version.ref = "coil" }
+coil-kt = { group = "io.coil-kt.coil3", name = "coil", version.ref = "coil" }
+coil-kt-compose = { group = "io.coil-kt.coil3", name = "coil-compose", version.ref = "coil" }
+coil-kt-svg = { group = "io.coil-kt.coil3", name = "coil-svg", version.ref = "coil" }
+coil-network-okhttp = { group = "io.coil-kt.coil3", name = "coil-network-okhttp", version.ref = "coil" }
+coil-test = { group = "io.coil-kt.coil3", name = "coil-test", version.ref = "coil" }
 junit4 = { group = "junit", name = "junit", version.ref = "junit4" }
 junit-params = { group = "pl.pragmatists", name = "JUnitParams", version.ref = "junitParams" }
 kotlinx-coroutines-android = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-android", version.ref = "kotlinxCoroutines" }
@@ -119,6 +119,7 @@ kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 kotlinKapt = { id = "org.jetbrains.kotlin.kapt", version.ref = "kotlin" }
+kotlin-plugin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 dokka = { id = "org.jetbrains.dokka", version.ref = "dokka" }
 hilt = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
 maven-publish = { id = "com.vanniktech.maven.publish", version.ref = "mavenPublish" }

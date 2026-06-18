@@ -3,7 +3,7 @@ package com.rokt.roktux.viewmodel.component
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.CreationExtras
-import coil.ImageLoader
+import coil3.ImageLoader
 import com.rokt.roktux.RoktViewState
 import com.rokt.roktux.di.layout.LayoutComponent
 import com.rokt.roktux.event.RoktPlatformEvent

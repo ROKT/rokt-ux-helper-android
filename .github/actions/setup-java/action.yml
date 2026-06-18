@@ -14,7 +14,7 @@ runs:
       run: |
         mkdir -p ~/.gradle
         echo "org.gradle.jvmargs=-Xmx2g -XX:+TieredCompilation -XX:TieredStopAtLevel=1 -Dfile.encoding=UTF-8" >> ~/.gradle/gradle.properties
-        echo "kotlin.daemon.jvmargs=-Xmx512m -XX:+TieredCompilation -XX:TieredStopAtLevel=1" >> ~/.gradle/gradle.properties
+        echo "kotlin.daemon.jvmargs=-Xmx2048m -XX:+TieredCompilation -XX:TieredStopAtLevel=1 -Dfile.encoding=UTF-8" >> ~/.gradle/gradle.properties
         echo "org.gradle.parallel=true" >> ~/.gradle/gradle.properties
         echo "org.gradle.configureondemand=true" >> ~/.gradle/gradle.properties
         echo "kotlin.incremental=true" >> ~/.gradle/gradle.properties

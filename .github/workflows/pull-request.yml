@@ -98,7 +98,7 @@ jobs:
         with:
           cache-provider: basic
       - name: Run tests
-        run: ./gradlew test --no-daemon --max-workers=2 -Dkotlin.daemon.jvm.options="-Xmx1g"
+        run: ./gradlew test --no-daemon --max-workers=2
       - name: Generate coverage
         run: ./gradlew koverXmlReport --no-daemon --max-workers=2
       - name: Upload Test Report
@@ -123,7 +123,7 @@ jobs:
         with:
           cache-provider: basic
       - name: Assemble debug
-        run: ./gradlew --no-daemon --max-workers=2 assembleDebug -Dkotlin.daemon.jvm.options="-Xmx1g"
+        run: ./gradlew --no-daemon --max-workers=2 assembleDebug
       - name: Upload APK artifacts
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
@@ -156,7 +156,7 @@ jobs:
       - name: Verify snapshots
         id: verify-snapshots
         run: |
-          ./gradlew verifyRoborazziRelease -PenableSnapshotTests --tests "com.rokt.roktux.snapshot.*" --no-daemon --max-workers=2 -Dkotlin.daemon.jvm.options="-Xmx1g"
+          ./gradlew verifyRoborazziRelease -PenableSnapshotTests --tests "com.rokt.roktux.snapshot.*" --no-daemon --max-workers=2
 
       - name: Upload snapshot artifacts
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1

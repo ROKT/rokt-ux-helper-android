@@ -4,7 +4,7 @@ Instructions for AI coding agents (Claude Code, Codex, etc.) working in this rep
 
 ## Project overview
 
-`roktux` is an Android library that renders Rokt experiences inside partner apps using Jetpack Compose. It is published to [Maven Central](https://central.sonatype.com/artifact/com.rokt/roktux). The library targets **Android 5.0 (API 21)+**, AGP 8.1.2, Gradle 8.9+, JDK 17. See [README.md](./README.md) for installation and the Jetpack Compose compatibility matrix.
+`roktux` is an Android library that renders Rokt experiences inside partner apps using Jetpack Compose. It is published to [Maven Central](https://central.sonatype.com/artifact/com.rokt/roktux). The library targets **Android 5.0 (API 21)+**, AGP 8.6.x, Gradle 8.9+, Kotlin 2.1, JDK 17. See [README.md](./README.md) for installation and the Jetpack Compose compatibility matrix.
 
 ## Confidentiality — this is a public repository
 

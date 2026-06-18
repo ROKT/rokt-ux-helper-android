@@ -2,7 +2,7 @@ package com.rokt.roktux.di.layout
 
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.ui.text.font.FontFamily
-import coil.ImageLoader
+import coil3.ImageLoader
 import com.rokt.core.di.Component
 import com.rokt.roktux.RoktViewState
 import com.rokt.roktux.event.RoktPlatformEvent
