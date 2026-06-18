@@ -1,6 +1,6 @@
 package com.rokt.roktux.di.layout
 
-import coil.ImageLoader
+import coil3.ImageLoader
 import com.rokt.core.di.Module
 import com.rokt.modelmapper.data.DataBinding
 import com.rokt.modelmapper.data.DataBindingImpl

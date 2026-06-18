@@ -1,0 +1,69 @@
+{
+  "type": "Column",
+  "node": {
+    "styles": {
+      "elements": {
+        "own": [
+          {
+            "default": {
+              "dimension": {
+                "width": {
+                  "type": "fixed",
+                  "value": 160
+                },
+                "height": {
+                  "type": "fixed",
+                  "value": 160
+                }
+              },
+              "background": {
+                "backgroundColor": {
+                  "light": "#FFFFFF",
+                  "dark": "#FFFFFF"
+                }
+              },
+              "container": {
+                "alignItems": "center",
+                "justifyContent": "center"
+              }
+            }
+          }
+        ]
+      }
+    },
+    "children": [
+      {
+        "type": "StaticImage",
+        "node": {
+          "url": {
+            "light": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz48IS0tIFVwbG9hZGVkIHRvOiBTVkcgUmVwbywgd3d3LnN2Z3JlcG8uY29tLCBHZW5lcmF0b3I6IFNWRyBSZXBvIE1peGVyIFRvb2xzIC0tPg0KPHN2ZyB3aWR0aD0iODAwcHgiIGhlaWdodD0iODAwcHgiIHZpZXdCb3g9IjAgMCAxNiAxNiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4NCjxwYXRoIGZpbGwtcnVsZT0iZXZlbm9kZCIgY2xpcC1ydWxlPSJldmVub2RkIiBkPSJNNi40MjQzNiAwSDkuNTc1NjVMMTQuOTk1IDE2SDExLjgyNzZMMTAuODExNSAxM0g1LjE4ODU1TDQuMTcyNDIgMTZIMS4wMDVMNi40MjQzNiAwWk02LjIwNDY4IDEwSDkuNzk1MzNMOCA0LjY5OTUyTDYuMjA0NjggMTBaIiBmaWxsPSIjMDAwMDAwIi8+DQo8L3N2Zz4=",
+            "dark": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz48IS0tIFVwbG9hZGVkIHRvOiBTVkcgUmVwbywgd3d3LnN2Z3JlcG8uY29tLCBHZW5lcmF0b3I6IFNWRyBSZXBvIE1peGVyIFRvb2xzIC0tPg0KPHN2ZyB3aWR0aD0iODAwcHgiIGhlaWdodD0iODAwcHgiIHZpZXdCb3g9IjAgMCAxNiAxNiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4NCjxwYXRoIGZpbGwtcnVsZT0iZXZlbm9kZCIgY2xpcC1ydWxlPSJldmVub2RkIiBkPSJNNi40MjQzNiAwSDkuNTc1NjVMMTQuOTk1IDE2SDExLjgyNzZMMTAuODExNSAxM0g1LjE4ODU1TDQuMTcyNDIgMTZIMS4wMDVMNi40MjQzNiAwWk02LjIwNDY4IDEwSDkuNzk1MzNMOCA0LjY5OTUyTDYuMjA0NjggMTBaIiBmaWxsPSIjMDAwMDAwIi8+DQo8L3N2Zz4="
+          },
+          "styles": {
+            "elements": {
+              "own": [
+                {
+                  "default": {
+                    "dimension": {
+                      "width": {
+                        "type": "fixed",
+                        "value": 96
+                      },
+                      "height": {
+                        "type": "fixed",
+                        "value": 96
+                      }
+                    },
+                    "image": {
+                      "scale": "fit"
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        }
+      }
+    ]
+  }
+}

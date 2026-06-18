@@ -1,6 +1,5 @@
 package com.rokt.networkhelper.data
 
-import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import com.rokt.networkhelper.BuildConfig
 import com.rokt.networkhelper.model.ExperienceRequest
 import com.rokt.networkhelper.model.IntegrationInfo
@@ -16,6 +15,7 @@ import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.OkHttpClient
 import okhttp3.Response
 import retrofit2.Retrofit
+import retrofit2.converter.kotlinx.serialization.asConverterFactory
 import java.util.concurrent.TimeUnit
 
 /**

@@ -37,8 +37,8 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.hideFromAccessibility
 import androidx.compose.ui.semantics.semantics
-import coil.ImageLoader
-import coil.request.ImageRequest
+import coil3.ImageLoader
+import coil3.request.ImageRequest
 import com.rokt.modelmapper.uimodel.DataImageTransition
 import com.rokt.modelmapper.uimodel.LayoutSchemaUiModel
 import com.rokt.roktux.di.layout.LocalLayoutComponent
