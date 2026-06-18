@@ -28,9 +28,14 @@ data class SelectResponse(
 
 @Serializable
 data class SelectPageContext(
+    @SerialName("rokt_tag_id") val roktTagId: String? = null,
     @SerialName("page_instance_guid") val pageInstanceGuid: String? = null,
     @SerialName("page_id") val pageId: String? = null,
+    @SerialName("page_type") val pageType: String? = null,
     @SerialName("language") val language: String? = null,
+    @SerialName("is_page_detected") val isPageDetected: Boolean? = null,
+    @SerialName("page_variant_name") val pageVariantName: String? = null,
+    @SerialName("partner_content_template") val partnerContentTemplate: String? = null,
     @SerialName("token") val token: String? = null,
 )
 

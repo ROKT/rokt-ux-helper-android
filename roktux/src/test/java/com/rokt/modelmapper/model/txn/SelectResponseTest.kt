@@ -20,8 +20,13 @@ class SelectResponseTest {
         assertEquals("token-1", response.sessionToken.token)
         assertEquals(1_711_038_600_000L, response.sessionToken.expiresAt)
         assertEquals("page-instance-1", response.pageInstanceGuid)
+        assertEquals("tag-1", response.pageContext?.roktTagId)
         assertEquals("page-1", response.pageContext?.pageId)
+        assertEquals("checkout", response.pageContext?.pageType)
         assertEquals("en", response.pageContext?.language)
+        assertEquals(true, response.pageContext?.isPageDetected)
+        assertEquals("variant-a", response.pageContext?.pageVariantName)
+        assertEquals("template-1", response.pageContext?.partnerContentTemplate)
 
         val plugin = response.plugins!!.single().plugin!!
         assertEquals("plugin-1", plugin.id)
@@ -115,9 +120,14 @@ class SelectResponseTest {
             sessionToken = SessionToken(token = "token-3", expiresAt = 42L),
             pageInstanceGuid = "page-instance-3",
             pageContext = SelectPageContext(
+                roktTagId = "tag-3",
                 pageInstanceGuid = "page-instance-3",
                 pageId = "page-3",
+                pageType = "checkout",
                 language = "en",
+                isPageDetected = true,
+                pageVariantName = "variant-a",
+                partnerContentTemplate = "template-3",
                 token = "ctx-token",
             ),
             plugins = listOf(
@@ -199,7 +209,7 @@ class SelectResponseTest {
               "session_id": "session-1",
               "session_token": { "token": "token-1", "expires_at": 1711038600000 },
               "page_instance_guid": "page-instance-1",
-              "page_context": { "page_instance_guid": "page-instance-1", "page_id": "page-1", "language": "en", "token": "ctx-token" },
+              "page_context": { "rokt_tag_id": "tag-1", "page_instance_guid": "page-instance-1", "page_id": "page-1", "page_type": "checkout", "language": "en", "is_page_detected": true, "page_variant_name": "variant-a", "partner_content_template": "template-1", "token": "ctx-token" },
               "plugins": [
                 {
                   "plugin": {
