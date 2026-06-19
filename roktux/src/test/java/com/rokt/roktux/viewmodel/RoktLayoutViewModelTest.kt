@@ -65,12 +65,15 @@ class RoktLayoutViewModelTest : BaseViewModelTest() {
                     every { outerLayoutSchema } returns mockk(relaxed = true)
                     every { breakpoint } returns mockk(relaxed = true)
                     every { instanceGuid } returns "pluginInstanceGuid"
+                    every { token } returns "pluginToken"
                     every { slots } returns persistentListOf(
                         mockk(relaxed = true) {
                             every { instanceGuid } returns "slotInstanceGuid"
+                            every { token } returns "slotToken"
                             every { offer } returns mockk(relaxed = true) {
                                 every { creative } returns mockk(relaxed = true) {
                                     every { instanceGuid } returns "creativeInstanceGuid"
+                                    every { token } returns "creativeToken"
                                 }
                                 every { catalogItems } returns persistentListOf(
                                     CatalogItemModel(
@@ -81,6 +84,7 @@ class RoktLayoutViewModelTest : BaseViewModelTest() {
                                         properties = createCatalogItemProperties(
                                             instanceGuid = "catalog-instance-guid-2",
                                             catalogItemId = "catalog-item-2",
+                                            token = "catalog-token-2",
                                         ),
                                         imageWrapper = CatalogImageWrapperModel(HMap()),
                                     ),
@@ -89,9 +93,11 @@ class RoktLayoutViewModelTest : BaseViewModelTest() {
                         },
                         mockk(relaxed = true) {
                             every { instanceGuid } returns "slotInstanceGuid1"
+                            every { token } returns "slotToken1"
                             every { offer } returns mockk(relaxed = true) {
                                 every { creative } returns mockk(relaxed = true) {
                                     every { instanceGuid } returns "creativeInstanceGuid1"
+                                    every { token } returns "creativeToken1"
                                 }
                             }
                         },
@@ -187,6 +193,82 @@ class RoktLayoutViewModelTest : BaseViewModelTest() {
             platformEvent.invoke(
                 withArg { events ->
                     assertThat(events).anyMatch { it.eventType == EventType.SignalLoadComplete }
+                },
+            )
+        }
+    }
+
+    @Test
+    fun `LayoutReady Event sends SignalLoadComplete platform event carrying the plugin token`() = runTest {
+        // Act
+        layoutViewModel.setEvent(LayoutContract.LayoutEvent.LayoutReady)
+        // Assert
+        verify(timeout = 2000) {
+            platformEvent.invoke(
+                withArg { events ->
+                    assertThat(events).anySatisfy { event ->
+                        assertThat(event.eventType).isEqualTo(EventType.SignalLoadComplete)
+                        assertThat(event.parentGuid).isEqualTo("pluginInstanceGuid")
+                        assertThat(event.token).isEqualTo("pluginToken")
+                    }
+                },
+            )
+        }
+    }
+
+    @Test
+    fun `ResponseOptionSelected sends SignalResponse platform event carrying the response option token`() = runTest {
+        // Arrange
+        val responseOptionProperties = HMap().apply {
+            this[TypedKey<Action>("action")] = Action.CaptureOnly
+            this[TypedKey<SignalType>("signalType")] = SignalType.SignalResponse
+            this[TypedKey<String>("instanceGuid")] = "responseInstanceGuid"
+            this[TypedKey<String>("token")] = "responseToken"
+        }
+        // Act
+        layoutViewModel.setEvent(
+            LayoutContract.LayoutEvent.ResponseOptionSelected(
+                1,
+                OpenLinks.Internally,
+                responseOptionProperties,
+                true,
+            ),
+        )
+        // Assert
+        verify(timeout = 2000) {
+            platformEvent.invoke(
+                withArg { events ->
+                    assertThat(events).anySatisfy { event ->
+                        assertThat(event.eventType).isEqualTo(EventType.SignalResponse)
+                        assertThat(event.parentGuid).isEqualTo("responseInstanceGuid")
+                        assertThat(event.token).isEqualTo("responseToken")
+                    }
+                },
+            )
+        }
+    }
+
+    @Test
+    fun `CartItemForwardPaymentSelected sends platform event carrying the catalog item token`() = runTest {
+        // Arrange
+        clearMocks(uxEvent, platformEvent, viewStateChange)
+        // Act
+        layoutViewModel.setEvent(
+            LayoutContract.LayoutEvent.CartItemForwardPaymentSelected(
+                offerId = 0,
+                catalogItemModel = createCatalogItemProperties(),
+                transactionData = null,
+            ),
+        )
+        // Assert
+        verify(timeout = 2000) {
+            platformEvent.invoke(
+                withArg { events ->
+                    assertThat(events).anySatisfy { event ->
+                        assertThat(event.eventType).isEqualTo(EventType.SignalCartItemInstantPurchaseInitiated)
+                        assertThat(event.parentGuid).isEqualTo("catalog-instance-guid-1")
+                        assertThat(event.token).isEqualTo("catalog-token-1")
+                    }
                 },
             )
         }
@@ -1106,8 +1188,10 @@ class RoktLayoutViewModelTest : BaseViewModelTest() {
         catalogItemId: String = "catalog-item-1",
         price: Double = 79.99,
         originalPrice: Double = 99.99,
+        token: String = "catalog-token-1",
     ): HMap = HMap().apply {
         set(TypedKey<String>("instanceGuid"), instanceGuid)
+        set(TypedKey<String>("token"), token)
         set(TypedKey<String>("title"), "Everyday sneakers")
         set(TypedKey<String>("cartItemId"), "cart-item-1")
         set(TypedKey<String>("catalogItemId"), catalogItemId)

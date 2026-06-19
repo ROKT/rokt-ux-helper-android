@@ -137,6 +137,7 @@ data class RoktPlatformEvent(
     @SerialName("eventType") val eventType: EventType,
     @SerialName("sessionId") val sessionId: String,
     @SerialName("parentGuid") val parentGuid: String = "",
+    @SerialName("token") val token: String = "",
     @SerialName("pageInstanceGuid") val pageInstanceGuid: String = "",
     @SerialName("eventTime") val eventTime: String = roktDateFormat.format(Date()),
     @SerialName("eventData") val eventData: Map<String, String>? = null,

@@ -10,6 +10,7 @@ import com.rokt.modelmapper.mappers.ExperienceModelMapperImpl.Companion.KEY_ACTI
 import com.rokt.modelmapper.mappers.ExperienceModelMapperImpl.Companion.KEY_INSTANCE_GUID
 import com.rokt.modelmapper.mappers.ExperienceModelMapperImpl.Companion.KEY_IS_POSITIVE
 import com.rokt.modelmapper.mappers.ExperienceModelMapperImpl.Companion.KEY_SIGNAL_TYPE
+import com.rokt.modelmapper.mappers.ExperienceModelMapperImpl.Companion.KEY_TOKEN
 import com.rokt.modelmapper.mappers.ExperienceModelMapperImpl.Companion.KEY_URL
 import com.rokt.modelmapper.mappers.ModelMapper
 import com.rokt.modelmapper.uimodel.Action
@@ -211,6 +212,7 @@ internal class LayoutViewModel(
                         eventType = EventType.SignalLoadComplete,
                         sessionId = experienceModel.sessionId,
                         parentGuid = pluginModel.instanceGuid,
+                        token = pluginModel.token,
                     ),
                 )
             }
@@ -226,6 +228,7 @@ internal class LayoutViewModel(
                         eventType = EventType.SignalActivation,
                         sessionId = experienceModel.sessionId,
                         parentGuid = pluginModel.instanceGuid,
+                        token = pluginModel.token,
                     ),
                 )
             }
@@ -373,6 +376,7 @@ internal class LayoutViewModel(
                 eventType = EventType.SignalViewed,
                 sessionId = experienceModel.sessionId,
                 parentGuid = pluginModel.slots[offerId].offer?.creative?.instanceGuid.orEmpty(),
+                token = pluginModel.slots[offerId].offer?.creative?.token.orEmpty(),
                 pageInstanceGuid = experienceModel.placementContext.pageInstanceGuid,
             ),
         )
@@ -385,6 +389,7 @@ internal class LayoutViewModel(
                 eventType = EventType.SignalImpression,
                 sessionId = experienceModel.sessionId,
                 parentGuid = pluginModel.instanceGuid,
+                token = pluginModel.token,
                 metadata = listOf(
                     EventNameValue(KEY_PAGE_SIGNAL_LOAD_START, roktDateFormat.format(Date(startTimeStamp))),
                     EventNameValue(KEY_PAGE_RENDER_ENGINE, LAYOUTS_RENDER_ENGINE),
@@ -406,6 +411,7 @@ internal class LayoutViewModel(
                     eventType = EventType.SignalImpression,
                     sessionId = experienceModel.sessionId,
                     parentGuid = pluginModel.slots[id].instanceGuid,
+                    token = pluginModel.slots[id].token,
                 ),
             )
 
@@ -415,6 +421,7 @@ internal class LayoutViewModel(
                     eventType = EventType.SignalImpression,
                     sessionId = experienceModel.sessionId,
                     parentGuid = pluginModel.slots[id].offer?.creative?.instanceGuid.orEmpty(),
+                    token = pluginModel.slots[id].offer?.creative?.token.orEmpty(),
                 ),
             )
         }
@@ -440,6 +447,7 @@ internal class LayoutViewModel(
                 eventType = EventType.SignalCartItemInstantPurchaseInitiated,
                 sessionId = experienceModel.sessionId,
                 parentGuid = catalogItemProperties.instanceGuid(),
+                token = catalogItemProperties.token(),
                 eventData = catalogItemProperties.cartItemEventData(originalPrice),
             ),
         )
@@ -478,6 +486,7 @@ internal class LayoutViewModel(
                 eventType = EventType.SignalCartItemInstantPurchaseInitiated,
                 sessionId = experienceModel.sessionId,
                 parentGuid = catalogItemProperties.instanceGuid(),
+                token = catalogItemProperties.token(),
                 eventData = catalogItemProperties.cartItemEventData(salePrice),
             ),
         )
@@ -487,6 +496,7 @@ internal class LayoutViewModel(
         if (!runtimeState.validationCoordinator.validate(event.validatorFieldKeys)) {
             sendUserInteractionEvent(
                 parentGuid = event.catalogItemModel?.instanceGuid().orEmpty(),
+                token = event.catalogItemModel?.token().orEmpty(),
                 action = RoktUserInteractionAction.ValidationTriggerFailed,
                 context = RoktUserInteractionContext.CustomStateValidationTriggerButton,
             )
@@ -501,6 +511,7 @@ internal class LayoutViewModel(
                 eventType = EventType.SignalCartItemInstantPurchaseInitiated,
                 sessionId = experienceModel.sessionId,
                 parentGuid = catalogItemProperties.instanceGuid(),
+                token = catalogItemProperties.token(),
                 pageInstanceGuid = experienceModel.placementContext.pageInstanceGuid,
                 objectData = catalogItemProperties.cartItemObjectData(),
             ),
@@ -566,6 +577,7 @@ internal class LayoutViewModel(
                 eventType = eventType,
                 sessionId = experienceModel.sessionId,
                 parentGuid = catalogItem.instanceGuid,
+                token = catalogItem.token,
                 pageInstanceGuid = experienceModel.placementContext.pageInstanceGuid,
             ),
         )
@@ -590,8 +602,10 @@ internal class LayoutViewModel(
         val parentGuid = event.parentGuid
             ?: event.catalogItemIndex?.let { index -> catalogItemInstanceGuid(event.offerId, index) }
             ?: return
+        val token = event.catalogItemIndex?.let { index -> catalogItemToken(event.offerId, index) }.orEmpty()
         sendUserInteractionEvent(
             parentGuid = parentGuid,
+            token = token,
             action = event.action,
             context = event.context,
         )
@@ -599,6 +613,7 @@ internal class LayoutViewModel(
 
     private fun sendUserInteractionEvent(
         parentGuid: String,
+        token: String,
         action: RoktUserInteractionAction,
         context: RoktUserInteractionContext,
     ) {
@@ -608,6 +623,7 @@ internal class LayoutViewModel(
                 eventType = EventType.SignalUserInteraction,
                 sessionId = experienceModel.sessionId,
                 parentGuid = parentGuid,
+                token = token,
                 objectData = mapOf(
                     KEY_USER_INTERACTION_ACTION to action.name,
                     KEY_USER_INTERACTION_CONTEXT to context.name,
@@ -635,6 +651,7 @@ internal class LayoutViewModel(
                         eventType = eventType,
                         sessionId = experienceModel.sessionId,
                         parentGuid = parentGuid,
+                        token = token(),
                     ),
                 )
             }
@@ -759,6 +776,7 @@ internal class LayoutViewModel(
                 eventType = EventType.SignalDismissal,
                 sessionId = experienceModel.sessionId,
                 parentGuid = pluginModel.instanceGuid,
+                token = pluginModel.token,
                 metadata = listOf(EventNameValue(KEY_INITIATOR, dismissReason)),
             ),
         )
@@ -770,6 +788,7 @@ internal class LayoutViewModel(
                 eventType = EventType.SignalInstantPurchaseDismissal,
                 sessionId = experienceModel.sessionId,
                 parentGuid = pluginModel.instanceGuid,
+                token = pluginModel.token,
                 metadata = listOf(EventNameValue(KEY_INITIATOR, dismissReason)),
             ),
         )
@@ -927,13 +946,24 @@ internal class LayoutViewModel(
 
     private fun HMap.instanceGuid(): String = get<String>(KEY_INSTANCE_GUID).orEmpty()
 
-    private fun catalogItemInstanceGuid(offerId: Int, catalogItemIndex: Int): String? = pluginModel.slots
+    private fun HMap.token(): String = get<String>(KEY_TOKEN).orEmpty()
+
+    private fun catalogItemInstanceGuid(offerId: Int, catalogItemIndex: Int): String? = catalogItemProperties(
+        offerId,
+        catalogItemIndex,
+    )?.instanceGuid()
+
+    private fun catalogItemToken(offerId: Int, catalogItemIndex: Int): String? = catalogItemProperties(
+        offerId,
+        catalogItemIndex,
+    )?.token()
+
+    private fun catalogItemProperties(offerId: Int, catalogItemIndex: Int): HMap? = pluginModel.slots
         .getOrNull(offerId)
         ?.offer
         ?.catalogItems
         ?.getOrNull(catalogItemIndex)
         ?.properties
-        ?.instanceGuid()
 
     /**
      * Seeds offers whose device-pay purchase already completed into their post-purchase state
@@ -974,9 +1004,9 @@ internal class LayoutViewModel(
     )
 
     private fun HMap.toPendingDevicePayCatalogItem(): PendingDevicePayCatalogItem =
-        PendingDevicePayCatalogItem(instanceGuid = instanceGuid())
+        PendingDevicePayCatalogItem(instanceGuid = instanceGuid(), token = token())
 
-    private data class PendingDevicePayCatalogItem(val instanceGuid: String)
+    private data class PendingDevicePayCatalogItem(val instanceGuid: String, val token: String)
 
     companion object {
         private const val KEY_INITIATOR = "initiator"
