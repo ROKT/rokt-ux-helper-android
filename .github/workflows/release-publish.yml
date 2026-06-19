@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+      - maintenance/*
       - workstation/*
 
 permissions:
@@ -11,6 +12,7 @@ permissions:
 
 jobs:
   setup-and-version:
+    if: ${{ !github.event.created && !github.event.deleted }}
     runs-on: ubuntu-latest
     outputs:
       full_release_needed: ${{ steps.version-changed.outputs.any_changed }}
@@ -44,7 +46,7 @@ jobs:
         env:
           BRANCH: ${{ github.ref_name }}
         run: |
-          if [[ "$BRANCH" == workstation/* ]]; then
+          if [[ "$BRANCH" == maintenance/* || "$BRANCH" == workstation/* ]]; then
             echo "level=patch" >> $GITHUB_OUTPUT
           else
             echo "level=minor" >> $GITHUB_OUTPUT
@@ -192,7 +194,7 @@ jobs:
         uses: ncipollo/release-action@339a81892b84b4eeb0f6e744e4574d79d0d9b8dd # v1.21.0
         with:
           artifacts: ${{ steps.concat-files.outputs.concatenated_files }}
-          makeLatest: ${{ needs.setup-and-version.outputs.is_prerelease == 'true' && 'false' || 'true' }}
+          makeLatest: ${{ needs.setup-and-version.outputs.is_prerelease != 'true' && github.ref_name == 'main' }}
           prerelease: ${{ needs.setup-and-version.outputs.is_prerelease == 'true' }}
           tag: ${{ needs.setup-and-version.outputs.full_release_version }}
           body: |
