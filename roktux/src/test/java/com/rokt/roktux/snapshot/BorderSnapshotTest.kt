@@ -58,7 +58,7 @@ class BorderSnapshotTest : BaseDcuiEspressoTest() {
     fun testDarkModeBorderColor() = capture()
 
     private fun capture() {
-        composeTestRule.onRoot().captureRoboImage()
+        composeTestRule.onRoot().captureRoboImage(roborazziOptions = snapshotRoborazziOptions)
     }
 
     private companion object {

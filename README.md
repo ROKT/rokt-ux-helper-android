@@ -37,6 +37,9 @@ dependencies {
 - If there are any migrations between versions you will find instructions in the [migration guide](MIGRATING.md)
 - To learn about how to release the UX Helper modules, check out the [releasing guide](RELEASING.md)
 
+> [!NOTE]
+> `CHANGELOG.md` is generated automatically by the "Release – Draft" workflow from conventional commit PR titles. **Do not edit it in feature branches** — manual entries will be overwritten at release time. See [RELEASING.md](RELEASING.md) for details.
+
 ## Jetpack Compose Compatibility
 
 As `roktux` uses Jetpack Compose, consuming projects should use Compose libraries with compatible versions:
