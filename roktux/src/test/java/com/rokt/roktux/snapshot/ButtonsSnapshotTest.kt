@@ -66,7 +66,7 @@ class ButtonsSnapshotTest : BaseDcuiEspressoTest() {
     fun testProgressControlBackward() = capture()
 
     private fun capture() {
-        composeTestRule.onRoot().captureRoboImage()
+        composeTestRule.onRoot().captureRoboImage(roborazziOptions = snapshotRoborazziOptions)
     }
 
     private companion object {
