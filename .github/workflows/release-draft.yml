@@ -42,6 +42,27 @@ jobs:
       ORG_GRADLE_PROJECT_mavenCentralUsername: ${{ secrets.SONATYPE_USERNAME }}
       ORG_GRADLE_PROJECT_mavenCentralPassword: ${{ secrets.SONATYPE_PASSWORD }}
     steps:
+      - name: Validate release branch
+        env:
+          BUMP_TYPE: ${{ github.event.inputs.bump-type }}
+        run: |
+          release_branch="${GITHUB_REF_NAME}"
+          bump_type="${BUMP_TYPE}"
+
+          case "$release_branch" in
+            main|maintenance/*|workstation/*)
+              ;;
+            *)
+              echo "::error::Release drafts can only run from main, maintenance/*, or workstation/* branches."
+              exit 1
+              ;;
+          esac
+
+          if [[ "$release_branch" == maintenance/* && "$bump_type" != "patch" && "$bump_type" != "none" ]]; then
+            echo "::error::Maintenance branch releases must use a patch bump, or none when finalising an existing pre-release."
+            exit 1
+          fi
+
       - name: Checkout repository
         uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
         with:
