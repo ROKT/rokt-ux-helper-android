@@ -90,9 +90,10 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.toIntSize
-import androidx.core.graphics.drawable.toBitmap
-import coil.ImageLoader
-import coil.request.ImageRequest
+import coil3.ImageLoader
+import coil3.request.ImageRequest
+import coil3.request.allowHardware
+import coil3.toBitmap
 import com.rokt.modelmapper.uimodel.ArrangementUiModel
 import com.rokt.modelmapper.uimodel.BaseModifierProperties
 import com.rokt.modelmapper.uimodel.BaseTextStylingUiProperties
@@ -694,7 +695,7 @@ internal class ModifierFactory {
                 .allowHardware(false)
                 .data(url)
                 .build()
-            return imageLoader.execute(request).drawable?.toBitmap()
+            return imageLoader.execute(request).image?.toBitmap()
         }
     }
 

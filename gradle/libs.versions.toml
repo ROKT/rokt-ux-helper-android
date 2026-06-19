@@ -6,27 +6,26 @@ androidxComposeBom = "2026.05.01"
 androidxCore = "1.16.0"
 androidxCoreSplashscreen = "1.0.1"
 androidxEspresso = "3.6.1"
-androidxLifecycle = "2.8.7"                # Newer versions require kotlin 2+
-androidxNavigation = "2.8.9"               # Newer versions require kotlin 2+
+androidxLifecycle = "2.8.7"             # Newer versions require kotlin 2+
+androidxNavigation = "2.8.9"            # Newer versions require kotlin 2+
 androidxWindowManager = "1.4.0"
 androidXbrowser = "1.8.0"
-coil = "2.3.0"
+coil = "3.2.0"
 junit4 = "4.13.2"
 junitParams = "1.1.1"
 kotlin = "2.1.20"
-kotlinxCoroutines = "1.7.3"
-kotlinxSerializationJson = "1.6.3"         # Newer versions require kotlin 2+
+kotlinxCoroutines = "1.10.2"
+kotlinxSerializationJson = "1.6.3"      # Newer versions require kotlin 2+
 kotlinxCollectionsImmutable = "0.3.7"
-okhttpBom = "4.10.0"
+okhttpBom = "4.12.0"
 rebugger = "1.0.0-rc03"
 retrofit = "2.11.0"
-retrofitKotlinxSerializationJson = "0.8.0"
 mockk = "1.13.16"
 assertj-core = "3.15.0"
-dcui = "2.4.0-beta-1"
+dcui = "2.4.0"
 robolectric = "4.14.1"
 composeLint = "1.4.1"
-lifecycleRuntimeKtx = "2.8.7"              # Newer versions require kotlin 2+
+lifecycleRuntimeKtx = "2.8.7"           # Newer versions require kotlin 2+
 junit = "1.2.1"
 material = "1.12.0"
 dokka = "2.0.0"
@@ -66,10 +65,11 @@ androidx-navigation-compose = { group = "androidx.navigation", name = "navigatio
 androidx-window-manager = { module = "androidx.window:window", version.ref = "androidxWindowManager" }
 androidx-test-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "androidxEspresso" }
 androidx-browser = { group = "androidx.browser", name = "browser", version.ref = "androidXbrowser" }
-coil-kt = { group = "io.coil-kt", name = "coil", version.ref = "coil" }
-coil-kt-compose = { group = "io.coil-kt", name = "coil-compose", version.ref = "coil" }
-coil-kt-svg = { group = "io.coil-kt", name = "coil-svg", version.ref = "coil" }
-coil-test = { group = "io.coil-kt", name = "coil-test", version.ref = "coil" }
+coil-kt = { group = "io.coil-kt.coil3", name = "coil", version.ref = "coil" }
+coil-kt-compose = { group = "io.coil-kt.coil3", name = "coil-compose", version.ref = "coil" }
+coil-kt-network-okhttp = { group = "io.coil-kt.coil3", name = "coil-network-okhttp", version.ref = "coil" }
+coil-kt-svg = { group = "io.coil-kt.coil3", name = "coil-svg", version.ref = "coil" }
+coil-test = { group = "io.coil-kt.coil3", name = "coil-test", version.ref = "coil" }
 junit4 = { group = "junit", name = "junit", version.ref = "junit4" }
 junit-params = { group = "pl.pragmatists", name = "JUnitParams", version.ref = "junitParams" }
 kotlinx-coroutines-android = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-android", version.ref = "kotlinxCoroutines" }
@@ -82,7 +82,7 @@ okhttp-mockwebserver = { group = "com.squareup.okhttp3", name = "mockwebserver" 
 rebugger = { module = "io.github.theapache64:rebugger", version.ref = "rebugger" }
 retrofit-core = { group = "com.squareup.retrofit2", name = "retrofit", version.ref = "retrofit" }
 retrofit-converter-gson = { group = "com.squareup.retrofit2", name = "converter-gson", version.ref = "retrofit" }
-retrofit-kotlin-serialization = { group = "com.jakewharton.retrofit", name = "retrofit2-kotlinx-serialization-converter", version.ref = "retrofitKotlinxSerializationJson" }
+retrofit-kotlin-serialization = { group = "com.squareup.retrofit2", name = "converter-kotlinx-serialization", version.ref = "retrofit" }
 material = { group = "com.google.android.material", name = "material", version.ref = "material" }
 mockk-android = { group = "io.mockk", name = "mockk-android", version.ref = "mockk" }
 mockk-agent = { group = "io.mockk", name = "mockk-agent", version.ref = "mockk" }
