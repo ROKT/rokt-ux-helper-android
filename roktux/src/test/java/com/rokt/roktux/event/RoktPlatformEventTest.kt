@@ -26,4 +26,18 @@ class RoktPlatformEventTest {
         assertEquals("ThumbnailClick", objectData.getValue("action").jsonPrimitive.content)
         assertEquals("CatalogImageGallery", objectData.getValue("context").jsonPrimitive.content)
     }
+
+    @Test
+    fun `RoktPlatformEvent serializes token`() {
+        val event = RoktPlatformEvent(
+            eventType = EventType.SignalImpression,
+            sessionId = "session-id",
+            parentGuid = "slot-instance-guid",
+            token = "slot-token",
+        )
+
+        val json = Json.parseToJsonElement(event.toJsonString()).jsonObject
+
+        assertEquals("slot-token", json.getValue("token").jsonPrimitive.content)
+    }
 }

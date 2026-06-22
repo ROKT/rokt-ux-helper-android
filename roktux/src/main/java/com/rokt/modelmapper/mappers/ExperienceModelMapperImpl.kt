@@ -502,7 +502,7 @@ class ExperienceModelMapperImpl(
 
     companion object {
         private const val KEY_ID = "id"
-        private const val KEY_TOKEN = "token"
+        const val KEY_TOKEN = "token"
         private const val KEY_SHORT_LABEL = "shortLabel"
         private const val KEY_LONG_LABEL = "longLabel"
         private const val KEY_SHORT_SUCCESS_LABEL = "shortSuccessLabel"
