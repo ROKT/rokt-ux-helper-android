@@ -34,11 +34,15 @@ fun LayoutSchemaUiModel.transformModifiers(
         is LayoutSchemaUiModel.RowUiModel -> copy(ownModifiers = modifiedModifiers)
         is LayoutSchemaUiModel.BoxUiModel -> copy(ownModifiers = modifiedModifiers)
         is LayoutSchemaUiModel.CatalogStackedCollectionUiModel -> copy(ownModifiers = modifiedModifiers)
+        is LayoutSchemaUiModel.CatalogCombinedCollectionUiModel -> copy(ownModifiers = modifiedModifiers)
+        is LayoutSchemaUiModel.CatalogImageGalleryUiModel -> copy(ownModifiers = modifiedModifiers)
+        is LayoutSchemaUiModel.CatalogDropdownUiModel -> copy(ownModifiers = modifiedModifiers)
         is LayoutSchemaUiModel.ProgressIndicatorUiModel -> copy(ownModifiers = modifiedModifiers)
         is LayoutSchemaUiModel.ProgressIndicatorItemUiModel -> copy(ownModifiers = modifiedModifiers)
         is LayoutSchemaUiModel.CreativeResponseUiModel -> copy(ownModifiers = modifiedModifiers)
         is LayoutSchemaUiModel.CloseButtonUiModel -> copy(ownModifiers = modifiedModifiers)
         is LayoutSchemaUiModel.CatalogResponseButtonUiModel -> copy(ownModifiers = modifiedModifiers)
+        is LayoutSchemaUiModel.CatalogDevicePayButtonUiModel -> copy(ownModifiers = modifiedModifiers)
         is LayoutSchemaUiModel.StaticLinkUiModel -> copy(ownModifiers = modifiedModifiers)
         is LayoutSchemaUiModel.ToggleButtonStateTriggerUiModel -> copy(ownModifiers = modifiedModifiers)
         is LayoutSchemaUiModel.ProgressControlUiModel -> copy(ownModifiers = modifiedModifiers)
@@ -51,7 +55,6 @@ fun LayoutSchemaUiModel.transformModifiers(
         is LayoutSchemaUiModel.IconUiModel -> copy(ownModifiers = modifiedModifiers)
         is LayoutSchemaUiModel.WhenUiModel -> copy(ownModifiers = modifiedModifiers)
         is LayoutSchemaUiModel.DataImageCarouselUiModel -> copy(ownModifiers = modifiedModifiers)
-        else -> this
     }
 }
 

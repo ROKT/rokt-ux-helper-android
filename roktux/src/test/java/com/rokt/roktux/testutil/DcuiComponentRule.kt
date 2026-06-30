@@ -2,11 +2,11 @@ package com.rokt.roktux.testutil
 
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.junit4.ComposeContentTestRule
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
+import androidx.test.platform.app.InstrumentationRegistry
 import com.rokt.core.testutils.BaseComponentRule
 import com.rokt.core.testutils.annotations.DcuiBreakpoint
 import com.rokt.core.testutils.annotations.DcuiNodeComponentState
@@ -36,6 +36,7 @@ class DcuiComponentRule(
 ) : BaseComponentRule(composeTestRule, true) {
 
     lateinit var uiModel: LayoutSchemaUiModel
+    internal lateinit var layoutComponent: LayoutComponent
 
     internal val capturedEvents = mutableListOf<BaseContract.BaseEvent>()
 
@@ -61,24 +62,27 @@ class DcuiComponentRule(
     ) {
         val factory = LayoutUiModelFactory()
         val breakpoints = buildBreakpoints(dcuiNodeComponentState?.breakpoints)
+        layoutComponent = LayoutComponent(
+            experienceResponse = "",
+            parsedExperienceResponse = null,
+            location = "",
+            startTimeStamp = System.currentTimeMillis(),
+            onUxEvent = {},
+            onPlatformEvent = {},
+            onViewStateChange = {},
+            imageLoader = NetworkStrategy().getImageLoader(InstrumentationRegistry.getInstrumentation().targetContext),
+            handleUrlByApp = true,
+            currentOffer = 0,
+            customStates = mapOf(),
+            offerCustomStates = mapOf(),
+            domainStates = mapOf(),
+            edgeToEdgeDisplay = false,
+            mainDispatcher = Dispatchers.Main,
+            ioDispatcher = Dispatchers.IO,
+        )
         composeTestRule.setContent {
             CompositionLocalProvider(
-                LocalLayoutComponent provides LayoutComponent(
-                    experienceResponse = "",
-                    location = "",
-                    startTimeStamp = System.currentTimeMillis(),
-                    onUxEvent = {},
-                    onPlatformEvent = {},
-                    onViewStateChange = {},
-                    imageLoader = NetworkStrategy().getImageLoader(LocalContext.current),
-                    handleUrlByApp = true,
-                    currentOffer = 0,
-                    customStates = mapOf(),
-                    offerCustomStates = mapOf(),
-                    edgeToEdgeDisplay = false,
-                    mainDispatcher = Dispatchers.Main,
-                    ioDispatcher = Dispatchers.IO,
-                ),
+                LocalLayoutComponent provides layoutComponent,
                 LocalFontFamilyProvider provides (
                     persistentMapOf(
                         "roboto" to FontFamily.Default,

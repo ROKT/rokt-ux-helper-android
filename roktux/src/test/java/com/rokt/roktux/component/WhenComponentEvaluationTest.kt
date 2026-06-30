@@ -2,11 +2,13 @@ package com.rokt.roktux.component
 
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
+import com.rokt.modelmapper.data.BindData
 import com.rokt.modelmapper.uimodel.BooleanWhenUiCondition
 import com.rokt.modelmapper.uimodel.EqualityWhenUiCondition
 import com.rokt.modelmapper.uimodel.ExistenceWhenUiCondition
 import com.rokt.modelmapper.uimodel.LayoutSchemaUiModel
 import com.rokt.modelmapper.uimodel.OrderableWhenUiCondition
+import com.rokt.modelmapper.uimodel.StringWhenUiCondition
 import com.rokt.modelmapper.uimodel.WhenUiHidden
 import com.rokt.modelmapper.uimodel.WhenUiPredicate
 import com.rokt.modelmapper.uimodel.WhenUiTransition
@@ -1234,6 +1236,238 @@ class WhenComponentEvaluationTest {
         // Assert
         assertTrue(evaluationResult)
     }
+
+    @Test
+    fun `given predicate target is placeholder text value, then evaluate should support equality and existence`() {
+        assertTrue(
+            evaluatePredicate(
+                WhenUiPredicate.PlaceholderTextValue(
+                    condition = StringWhenUiCondition.Is,
+                    input = BindData.Value("member"),
+                    value = "member",
+                ),
+            ),
+        )
+        assertTrue(
+            evaluatePredicate(
+                WhenUiPredicate.PlaceholderTextValue(
+                    condition = StringWhenUiCondition.Exists,
+                    input = BindData.Value("member"),
+                    value = "",
+                ),
+            ),
+        )
+        assertTrue(
+            evaluatePredicate(
+                WhenUiPredicate.PlaceholderTextValue(
+                    condition = StringWhenUiCondition.NotExists,
+                    input = BindData.Undefined,
+                    value = "",
+                ),
+            ),
+        )
+        assertFalse(
+            evaluatePredicate(
+                WhenUiPredicate.PlaceholderTextValue(
+                    condition = StringWhenUiCondition.Is,
+                    input = BindData.Undefined,
+                    value = "member",
+                ),
+            ),
+        )
+    }
+
+    @Test
+    fun `given predicate target is placeholder text length or numeric, then evaluate should use orderable comparisons`() {
+        assertTrue(
+            evaluatePredicate(
+                WhenUiPredicate.PlaceholderTextLength(
+                    condition = OrderableWhenUiCondition.IsAbove,
+                    input = BindData.Value("member"),
+                    value = "5",
+                ),
+            ),
+        )
+        assertTrue(
+            evaluatePredicate(
+                WhenUiPredicate.PlaceholderNumeric(
+                    condition = OrderableWhenUiCondition.IsBelow,
+                    input = BindData.Value("4"),
+                    value = "5",
+                ),
+            ),
+        )
+        assertFalse(
+            evaluatePredicate(
+                WhenUiPredicate.PlaceholderNumeric(
+                    condition = OrderableWhenUiCondition.IsAbove,
+                    input = BindData.Value("not-a-number"),
+                    value = "1",
+                ),
+            ),
+        )
+        assertFalse(
+            evaluatePredicate(
+                WhenUiPredicate.PlaceholderTextLength(
+                    condition = OrderableWhenUiCondition.Is,
+                    input = BindData.Undefined,
+                    value = "0",
+                ),
+            ),
+        )
+    }
+
+    @Test
+    fun `given predicate target is domainState, then evaluate should compare seeded values and default missing keys to zero`() {
+        val offerState = createOfferUiState(
+            domainStates = persistentMapOf(
+                "offerComplete" to 1,
+                "checkout" to 2,
+            ),
+        )
+
+        assertTrue(
+            evaluatePredicate(
+                WhenUiPredicate.DomainState(
+                    condition = OrderableWhenUiCondition.Is,
+                    key = "offerComplete",
+                    value = 1,
+                ),
+                WhenUiPredicate.DomainState(
+                    condition = OrderableWhenUiCondition.IsAbove,
+                    key = "checkout",
+                    value = 1,
+                ),
+                offerState = offerState,
+            ),
+        )
+        assertTrue(
+            evaluatePredicate(
+                WhenUiPredicate.DomainState(
+                    condition = OrderableWhenUiCondition.Is,
+                    key = "layoutMinimized",
+                    value = 0,
+                ),
+                offerState = offerState,
+            ),
+        )
+        assertFalse(
+            evaluatePredicate(
+                WhenUiPredicate.DomainState(
+                    condition = OrderableWhenUiCondition.IsBelow,
+                    key = "checkout",
+                    value = 2,
+                ),
+                offerState = offerState,
+            ),
+        )
+    }
+
+    @Test
+    fun `given a custom state set only as an offer-scoped state for the current offer, when the When reads it, then evaluate resolves the offer value`() {
+        // Regression: the device-pay result is written to OFFER-scoped state (updateOfferCustomState),
+        // e.g. paymentResult=1 at offer 0. Without offer-scoped resolution the success branch never shows.
+        val offerState = createOfferUiState(
+            currentOfferIndex = 0,
+            offerCustomStates = persistentMapOf("0" to persistentMapOf("paymentResult" to 1)),
+        )
+
+        assertTrue(
+            evaluatePredicate(
+                WhenUiPredicate.CustomState(condition = OrderableWhenUiCondition.Is, key = "paymentResult", value = 1),
+                offerState = offerState,
+            ),
+        )
+    }
+
+    @Test
+    fun `given an offer-scoped custom state whose value does not match, then evaluate returns false`() {
+        val offerState = createOfferUiState(
+            currentOfferIndex = 0,
+            offerCustomStates = persistentMapOf("0" to persistentMapOf("paymentResult" to -1)),
+        )
+
+        assertFalse(
+            evaluatePredicate(
+                WhenUiPredicate.CustomState(condition = OrderableWhenUiCondition.Is, key = "paymentResult", value = 1),
+                offerState = offerState,
+            ),
+        )
+    }
+
+    @Test
+    fun `given an offer-scoped custom state set for a different offer, when the current offer has no value, then evaluate defaults to zero`() {
+        // Offer 1's paymentResult must not leak into offer 0's When evaluation.
+        val offerState = createOfferUiState(
+            currentOfferIndex = 0,
+            offerCustomStates = persistentMapOf("1" to persistentMapOf("paymentResult" to 1)),
+        )
+
+        assertFalse(
+            evaluatePredicate(
+                WhenUiPredicate.CustomState(condition = OrderableWhenUiCondition.Is, key = "paymentResult", value = 1),
+                offerState = offerState,
+            ),
+        )
+    }
+
+    @Test
+    fun `given the same key set both offer-scoped and global, when the When reads it, then the offer-scoped value takes precedence`() {
+        val offerState = createOfferUiState(
+            currentOfferIndex = 0,
+            customState = persistentMapOf("paymentResult" to -1),
+            offerCustomStates = persistentMapOf("0" to persistentMapOf("paymentResult" to 1)),
+        )
+
+        assertTrue(
+            evaluatePredicate(
+                WhenUiPredicate.CustomState(condition = OrderableWhenUiCondition.Is, key = "paymentResult", value = 1),
+                offerState = offerState,
+            ),
+        )
+    }
+
+    @Test
+    fun `given a custom state set only as a global state, when there is no offer-scoped value, then evaluate falls back to the global value`() {
+        val offerState = createOfferUiState(
+            currentOfferIndex = 0,
+            customState = persistentMapOf("globalFlag" to 1),
+        )
+
+        assertTrue(
+            evaluatePredicate(
+                WhenUiPredicate.CustomState(condition = OrderableWhenUiCondition.Is, key = "globalFlag", value = 1),
+                offerState = offerState,
+            ),
+        )
+    }
+
+    private fun evaluatePredicate(
+        vararg predicate: WhenUiPredicate,
+        offerState: OfferUiState = createOfferUiState(),
+    ): Boolean = evaluatePredicates(
+        predicates = createWhenUiModel(*predicate).predicates,
+        breakpointIndex = 0,
+        isDarkModeEnabled = false,
+        offerState = offerState,
+    )
+
+    private fun createOfferUiState(
+        currentOfferIndex: Int = 0,
+        domainStates: kotlinx.collections.immutable.ImmutableMap<String, Int> = persistentMapOf(),
+        customState: kotlinx.collections.immutable.ImmutableMap<String, Int> = persistentMapOf(),
+        offerCustomStates: kotlinx.collections.immutable.ImmutableMap<String, kotlinx.collections.immutable.ImmutableMap<String, Int>> =
+            persistentMapOf(),
+    ): OfferUiState = OfferUiState(
+        currentOfferIndex = currentOfferIndex,
+        lastOfferIndex = 1,
+        viewableItems = 1,
+        creativeCopy = persistentMapOf(),
+        breakpoints = persistentMapOf(),
+        customState = customState,
+        domainStates = domainStates,
+        offerCustomStates = offerCustomStates,
+    )
 
     private fun createWhenUiModel(vararg predicate: WhenUiPredicate): LayoutSchemaUiModel.WhenUiModel = LayoutSchemaUiModel.WhenUiModel(
         predicates = predicate.toList().toImmutableList(),

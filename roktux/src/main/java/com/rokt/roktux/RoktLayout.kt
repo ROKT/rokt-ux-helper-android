@@ -25,6 +25,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.rokt.core.composablescoped.WithComposableScopedViewModelStoreOwner
+import com.rokt.modelmapper.model.NetworkExperienceResponse
 import com.rokt.modelmapper.utils.FIRST_OFFER_INDEX
 import com.rokt.modelmapper.utils.ROKT_ICONS_FONT_FAMILY
 import com.rokt.roktux.component.LayoutUiModelFactory
@@ -80,6 +81,45 @@ fun RoktLayout(
     }
     RoktLayout(
         experienceResponse = experienceResponse,
+        parsedExperienceResponse = null,
+        location = location,
+        roktUxConfig = roktUxConfig,
+        mainDispatcher = Dispatchers.Main,
+        ioDispatcher = Dispatchers.IO,
+        modifier = modifier,
+        startTimeStamp = startTimeStamp,
+        onUxEvent = onUxEvent,
+        onPlatformEvent = onPlatformEvent,
+    )
+}
+
+/**
+ * Composable function to render the Rokt layout from a pre-parsed experience response.
+ *
+ * @param experienceResponse The parsed experience response.
+ * @param location The location identifier for the layout.
+ * @param modifier The modifier to be applied to the layout.
+ * @param roktUxConfig The configuration for the Rokt UX.
+ * @param startTimeStamp Optional - The start timestamp of the layout request.
+ * @param onUxEvent Callback for UX events.
+ * @param onPlatformEvent Callback for platform events.
+ */
+@Composable
+fun RoktLayout(
+    experienceResponse: NetworkExperienceResponse,
+    location: String,
+    modifier: Modifier = Modifier,
+    roktUxConfig: RoktUxConfig,
+    startTimeStamp: Long = System.currentTimeMillis(),
+    onUxEvent: (event: RoktUxEvent) -> Unit = { },
+    onPlatformEvent: (platformEvents: RoktPlatformEventsWrapper) -> Unit = { },
+) {
+    LaunchedEffect(location) {
+        RoktUXLogger.verbose { "RoktLayout loading for location: $location" }
+    }
+    RoktLayout(
+        experienceResponse = null,
+        parsedExperienceResponse = experienceResponse,
         location = location,
         roktUxConfig = roktUxConfig,
         mainDispatcher = Dispatchers.Main,
@@ -93,7 +133,8 @@ fun RoktLayout(
 
 @Composable
 internal fun RoktLayout(
-    experienceResponse: String,
+    experienceResponse: String?,
+    parsedExperienceResponse: NetworkExperienceResponse? = null,
     location: String,
     roktUxConfig: RoktUxConfig,
     mainDispatcher: CoroutineDispatcher,
@@ -103,7 +144,8 @@ internal fun RoktLayout(
     onUxEvent: (event: RoktUxEvent) -> Unit = { },
     onPlatformEvent: (platformEvents: RoktPlatformEventsWrapper) -> Unit = { },
 ) {
-    val experienceHash = experienceResponse.hashCode().toString()
+    val experienceHash = parsedExperienceResponse?.stableExperienceKey()
+        ?: experienceResponse.orEmpty().hashCode().toString()
     val context = LocalContext.current
     val imageLoader = roktUxConfig.imageHandlingStrategy.getImageLoader(context)
     var currentOffer by rememberSaveable(key = experienceHash) {
@@ -124,6 +166,19 @@ internal fun RoktLayout(
     ) {
         roktUxConfig.viewStateConfig?.viewState?.customStates?.let { mutableStateOf(it) } ?: mutableStateOf(mapOf())
     }
+    var domainStates by rememberSaveable(
+        key = experienceHash,
+        saver = mapSaver(
+            save = { it.value },
+            restore = {
+                mutableStateOf(
+                    it.filterValues { value -> value is Int }.mapValues { (_, value) -> value as Int },
+                )
+            },
+        ),
+    ) {
+        roktUxConfig.viewStateConfig?.viewState?.domainStates?.let { mutableStateOf(it) } ?: mutableStateOf(mapOf())
+    }
     val offerCustomStates by remember {
         roktUxConfig.viewStateConfig?.viewState?.offerCustomStates?.let { mutableStateOf(it) }
             ?: mutableStateOf(mapOf())
@@ -133,6 +188,7 @@ internal fun RoktLayout(
             val viewModel = viewModel<DIComponentViewModel>(
                 factory = DIComponentViewModel.DIComponentViewModelFactory(
                     experienceResponse = experienceResponse,
+                    parsedExperienceResponse = parsedExperienceResponse,
                     location = location,
                     uxEvent = onUxEvent,
                     startTimeStamp = startTimeStamp,
@@ -153,8 +209,10 @@ internal fun RoktLayout(
                     currentOffer = currentOffer,
                     customStates = customState,
                     offerCustomStates = offerCustomStates,
+                    domainStates = domainStates,
                     handleUrlByApp = roktUxConfig.handleUrlByApp,
                     edgeToEdgeDisplay = roktUxConfig.edgeToEdgeDisplay,
+                    completedDevicePayCartItemIds = roktUxConfig.completedDevicePayCartItemIds,
                     mainDispatcher = mainDispatcher,
                     ioDispatcher = ioDispatcher,
                 ),
@@ -165,9 +223,10 @@ internal fun RoktLayout(
                 modifier = modifier,
                 fontMap = roktUxConfig.composeFontMap?.toImmutableMap() ?: persistentMapOf(),
                 colorMode = roktUxConfig.colorMode,
-                updateSavedState = { offer, state ->
+                updateSavedState = { offer, state, updatedDomainStates ->
                     currentOffer = offer
                     customState = state
+                    domainStates = updatedDomainStates
                 },
             )
         }
@@ -176,6 +235,9 @@ internal fun RoktLayout(
     }
 }
 
+private fun NetworkExperienceResponse.stableExperienceKey(): String =
+    plugins.firstOrNull()?.plugin?.config?.instanceGuid ?: "$sessionId:${pageContext.pageInstanceGuid}"
+
 @SuppressLint("ComposeViewModelInjection")
 @Composable
 private fun DIComponentInjector(
@@ -183,7 +245,7 @@ private fun DIComponentInjector(
     fontMap: ImmutableMap<String, FontFamily>,
     modifier: Modifier = Modifier,
     colorMode: ColorMode? = null,
-    updateSavedState: (currentOffer: Int, customState: Map<String, Int>) -> Unit,
+    updateSavedState: (currentOffer: Int, customState: Map<String, Int>, domainStates: Map<String, Int>) -> Unit,
 ) {
     CompositionLocalProvider(
         LocalLayoutComponent provides viewModel.component,
@@ -209,7 +271,7 @@ private fun RoktLayout(
     fontMap: ImmutableMap<String, FontFamily>,
     modifier: Modifier = Modifier,
     colorMode: ColorMode? = null,
-    updateSavedState: (currentOffer: Int, customState: Map<String, Int>) -> Unit,
+    updateSavedState: (currentOffer: Int, customState: Map<String, Int>, domainStates: Map<String, Int>) -> Unit,
 ) {
     val component = LocalLayoutComponent.current
     val context = LocalContext.current
@@ -285,7 +347,11 @@ private fun RoktLayout(
                 LaunchedEffect(Unit) {
                     viewModel.setEvent(LayoutContract.LayoutEvent.LayoutReady)
                 }
-                updateSavedState(state.value.offerUiState.currentOfferIndex, state.value.offerUiState.customState)
+                updateSavedState(
+                    state.value.offerUiState.currentOfferIndex,
+                    state.value.offerUiState.customState,
+                    state.value.offerUiState.domainStates,
+                )
                 var isLayoutInteractive by remember { mutableStateOf(false) }
                 var hasUserInteracted by remember { mutableStateOf(false) }
                 CompositionLocalProvider(

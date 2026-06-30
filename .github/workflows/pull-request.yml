@@ -19,9 +19,6 @@ permissions:
   checks: write
   id-token: write
 
-env:
-  GRADLE_OPTS: -Dorg.gradle.daemon=false
-
 jobs:
   trunk-check:
     runs-on: ubuntu-latest
@@ -76,11 +73,11 @@ jobs:
       - name: Setup JDK
         uses: ./.github/actions/setup-java
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@50e97c2cd7a37755bbfafc9c5b7cafaece252f6e # v6.1.0
+        uses: gradle/actions/setup-gradle@3f131e8634966bd73d06cc69884922b02e6faf92 # v6.2.0
         with:
           cache-provider: basic
       - name: Run lint
-        run: ./gradlew lint --no-daemon --max-workers=2
+        run: ./gradlew lint
 
   unit-test:
     runs-on: ubuntu-latest
@@ -94,15 +91,25 @@ jobs:
       - name: Setup JDK
         uses: ./.github/actions/setup-java
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@50e97c2cd7a37755bbfafc9c5b7cafaece252f6e # v6.1.0
+        uses: gradle/actions/setup-gradle@3f131e8634966bd73d06cc69884922b02e6faf92 # v6.2.0
         with:
           cache-provider: basic
       - name: Run tests
-        run: ./gradlew test --no-daemon --max-workers=2 -Dkotlin.daemon.jvm.options="-Xmx1g"
+        run: ./gradlew test
+      - name: Upload unit test reports
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: unit-test-reports
+          path: |
+            **/build/reports/tests
+            **/build/test-results
+            **/build/outputs/roborazzi
+          retention-days: 7
       - name: Generate coverage
-        run: ./gradlew koverXmlReport --no-daemon --max-workers=2
+        run: ./gradlew koverXmlReport
       - name: Upload Test Report
-        uses: codecov/codecov-action@e79a6962e0d4c0c17b229090214935d2e33f8354 # v6.0.1
+        uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v7.0.0
         with:
           files: ./roktux/build/reports/kover/report.xml
           token: ${{ secrets.CODECOV_TOKEN }}
@@ -119,11 +126,11 @@ jobs:
       - name: Setup JDK
         uses: ./.github/actions/setup-java
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@50e97c2cd7a37755bbfafc9c5b7cafaece252f6e # v6.1.0
+        uses: gradle/actions/setup-gradle@3f131e8634966bd73d06cc69884922b02e6faf92 # v6.2.0
         with:
           cache-provider: basic
       - name: Assemble debug
-        run: ./gradlew --no-daemon --max-workers=2 assembleDebug -Dkotlin.daemon.jvm.options="-Xmx1g"
+        run: ./gradlew assembleDebug
       - name: Upload APK artifacts
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
@@ -156,7 +163,7 @@ jobs:
       - name: Verify snapshots
         id: verify-snapshots
         run: |
-          ./gradlew verifyRoborazziRelease -PenableSnapshotTests --tests "com.rokt.roktux.snapshot.*" --no-daemon --max-workers=2 -Dkotlin.daemon.jvm.options="-Xmx1g"
+          ./gradlew verifyRoborazziRelease -PenableSnapshotTests --tests "com.rokt.roktux.snapshot.*"
 
       - name: Upload snapshot artifacts
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1

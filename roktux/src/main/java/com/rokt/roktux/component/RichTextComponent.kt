@@ -17,6 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.LinkAnnotation
 import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.TextLinkStyles
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -146,6 +147,7 @@ private fun String.asHTML(
                 addLink(
                     LinkAnnotation.Url(
                         url = span.url,
+                        styles = TextLinkStyles(style = urlSpanStyle),
                         linkInteractionListener = {
                             onClick.invoke(span.url)
                         },
@@ -153,7 +155,7 @@ private fun String.asHTML(
                     start,
                     end,
                 )
-                urlSpanStyle
+                null
             }
 
             else -> {

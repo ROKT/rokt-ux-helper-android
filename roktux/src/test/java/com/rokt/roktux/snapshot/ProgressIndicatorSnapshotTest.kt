@@ -62,7 +62,7 @@ class ProgressIndicatorSnapshotTest : BaseDcuiEspressoTest() {
     fun testJustifyContentCenter() = capture()
 
     private fun capture() {
-        composeTestRule.onRoot().captureRoboImage()
+        composeTestRule.onRoot().captureRoboImage(roborazziOptions = snapshotRoborazziOptions)
     }
 
     private companion object {

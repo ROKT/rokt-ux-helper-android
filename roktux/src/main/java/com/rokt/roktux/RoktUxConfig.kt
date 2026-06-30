@@ -22,6 +22,7 @@ class RoktUxConfig private constructor(
     val viewStateConfig: ViewStateConfig? = null,
     val handleUrlByApp: Boolean = true,
     val edgeToEdgeDisplay: Boolean = true,
+    val completedDevicePayCartItemIds: Set<String> = emptySet(),
 ) {
     /**
      * Builder class for RoktUxConfig.
@@ -41,6 +42,7 @@ class RoktUxConfig private constructor(
         private var handleUrlByApp: Boolean = true,
         private var viewStateConfig: ViewStateConfig? = null,
         private var edgeToEdgeDisplay: Boolean = true,
+        private var completedDevicePayCartItemIds: Set<String> = emptySet(),
     ) {
         /**
          * Sets the XML font family map.
@@ -93,6 +95,18 @@ class RoktUxConfig private constructor(
         fun edgeToEdgeDisplay(edgeToEdgeDisplay: Boolean) = apply { this.edgeToEdgeDisplay = edgeToEdgeDisplay }
 
         /**
+         * Seeds offers whose device-pay purchase already completed (by cart item id) into their
+         * post-purchase state on first composition. Used to restore the confirmation screen when
+         * the host was destroyed mid-checkout (e.g. Don't-Keep-Activities / low-memory reclaim).
+         *
+         * @param completedDevicePayCartItemIds Cart item ids whose purchase already succeeded.
+         * @return The Builder instance.
+         */
+        fun completedDevicePayCartItemIds(completedDevicePayCartItemIds: Set<String>) = apply {
+            this.completedDevicePayCartItemIds = completedDevicePayCartItemIds
+        }
+
+        /**
          * Builds the RoktUxConfig instance.
          *
          * @return The RoktUxConfig instance.
@@ -105,6 +119,7 @@ class RoktUxConfig private constructor(
             handleUrlByApp = handleUrlByApp,
             viewStateConfig = viewStateConfig,
             edgeToEdgeDisplay = edgeToEdgeDisplay,
+            completedDevicePayCartItemIds = completedDevicePayCartItemIds,
         )
     }
 

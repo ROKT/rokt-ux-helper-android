@@ -12,6 +12,7 @@ import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
+import com.rokt.modelmapper.model.NetworkExperienceResponse
 import com.rokt.roktux.event.RoktPlatformEventsWrapper
 import com.rokt.roktux.event.RoktUxEvent
 import kotlinx.collections.immutable.ImmutableList
@@ -36,7 +37,8 @@ class RoktLayoutView @JvmOverloads constructor(
 ) : AbstractComposeView(context, attrs, defStyle) {
 
     // Mutable state to hold the experience response.
-    private var experienceResponse by mutableStateOf("")
+    private var experienceResponse by mutableStateOf<String?>(null)
+    private var parsedExperienceResponse by mutableStateOf<NetworkExperienceResponse?>(null)
 
     // Event handlers for UX and platform events.
     private var uxEvent: ((event: RoktUxEvent) -> Unit) = {}
@@ -61,7 +63,7 @@ class RoktLayoutView @JvmOverloads constructor(
      */
     @Composable
     override fun Content() {
-        if (experienceResponse.isNotEmpty()) {
+        if (experienceResponse?.isNotEmpty() == true || parsedExperienceResponse != null) {
             val roktConfig: RoktUxConfig = remember(roktUxConfig) {
                 val composeFontMap =
                     roktUxConfig?.xmlFontFamilyMap?.mapValues { getFontFamily(it.value.toPersistentList()) }
@@ -74,8 +76,16 @@ class RoktLayoutView @JvmOverloads constructor(
                     roktUxConfig?.edgeToEdgeDisplay?.let { edgeToEdgeDisplay(it) }
                 }.build()
             }
-            RoktLayout(
-                experienceResponse = experienceResponse,
+            parsedExperienceResponse?.let {
+                RoktLayout(
+                    experienceResponse = it,
+                    location = location.orEmpty(),
+                    roktUxConfig = roktConfig,
+                    onUxEvent = uxEvent,
+                    onPlatformEvent = platformEvents,
+                )
+            } ?: RoktLayout(
+                experienceResponse = experienceResponse.orEmpty(),
                 location = location.orEmpty(),
                 roktUxConfig = roktConfig,
                 onUxEvent = uxEvent,
@@ -101,6 +111,28 @@ class RoktLayoutView @JvmOverloads constructor(
         this.uxEvent = onUxEvent
         this.platformEvents = onPlatformEvent
         this.experienceResponse = experienceResponse
+        this.parsedExperienceResponse = null
+        this.roktUxConfig = roktUxConfig
+    }
+
+    /**
+     * Loads the layout with the given parameters.
+     *
+     * @param experienceResponse The parsed experience response.
+     * @param roktUxConfig The Rokt UX configuration.
+     * @param onUxEvent The UX event handler.
+     * @param onPlatformEvent The platform event handler.
+     */
+    fun loadLayout(
+        experienceResponse: NetworkExperienceResponse,
+        roktUxConfig: RoktUxConfig,
+        onUxEvent: ((event: RoktUxEvent) -> Unit),
+        onPlatformEvent: ((platformEvents: RoktPlatformEventsWrapper) -> Unit),
+    ) {
+        this.uxEvent = onUxEvent
+        this.platformEvents = onPlatformEvent
+        this.experienceResponse = null
+        this.parsedExperienceResponse = experienceResponse
         this.roktUxConfig = roktUxConfig
     }
 

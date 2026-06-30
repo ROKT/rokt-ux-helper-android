@@ -2,8 +2,9 @@ package com.rokt.roktux.di.layout
 
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.ui.text.font.FontFamily
-import coil.ImageLoader
+import coil3.ImageLoader
 import com.rokt.core.di.Component
+import com.rokt.modelmapper.model.NetworkExperienceResponse
 import com.rokt.roktux.RoktViewState
 import com.rokt.roktux.event.RoktPlatformEvent
 import com.rokt.roktux.event.RoktUxEvent
@@ -11,7 +12,8 @@ import kotlinx.collections.immutable.ImmutableMap
 import kotlinx.coroutines.CoroutineDispatcher
 
 internal class LayoutComponent(
-    experienceResponse: String,
+    experienceResponse: String?,
+    parsedExperienceResponse: NetworkExperienceResponse?,
     location: String,
     startTimeStamp: Long,
     onUxEvent: (event: RoktUxEvent) -> Unit,
@@ -22,13 +24,16 @@ internal class LayoutComponent(
     currentOffer: Int,
     customStates: Map<String, Int>,
     offerCustomStates: Map<String, Map<String, Int>>,
+    domainStates: Map<String, Int>,
     edgeToEdgeDisplay: Boolean,
+    completedDevicePayCartItemIds: Set<String> = emptySet(),
     mainDispatcher: CoroutineDispatcher,
     ioDispatcher: CoroutineDispatcher,
 ) : Component(
     listOf(
         LayoutModule(
             experienceResponse,
+            parsedExperienceResponse,
             location,
             startTimeStamp,
             onUxEvent,
@@ -39,7 +44,9 @@ internal class LayoutComponent(
             currentOffer,
             customStates,
             offerCustomStates,
+            domainStates,
             edgeToEdgeDisplay,
+            completedDevicePayCartItemIds,
             mainDispatcher,
             ioDispatcher,
         ),

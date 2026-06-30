@@ -3,7 +3,8 @@ package com.rokt.roktux.viewmodel.component
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.CreationExtras
-import coil.ImageLoader
+import coil3.ImageLoader
+import com.rokt.modelmapper.model.NetworkExperienceResponse
 import com.rokt.roktux.RoktViewState
 import com.rokt.roktux.di.layout.LayoutComponent
 import com.rokt.roktux.event.RoktPlatformEvent
@@ -11,7 +12,8 @@ import com.rokt.roktux.event.RoktUxEvent
 import kotlinx.coroutines.CoroutineDispatcher
 
 internal class DIComponentViewModel(
-    private val experienceResponse: String,
+    private val experienceResponse: String?,
+    private val parsedExperienceResponse: NetworkExperienceResponse?,
     private val location: String,
     private val startTimeStamp: Long,
     private val onUxEvent: (uxEvent: RoktUxEvent) -> Unit,
@@ -21,14 +23,17 @@ internal class DIComponentViewModel(
     private val currentOffer: Int,
     private val customStates: Map<String, Int>,
     private val offerCustomStates: Map<String, Map<String, Int>>,
+    private val domainStates: Map<String, Int>,
     private val handleUrlByApp: Boolean,
     private val edgeToEdgeDisplay: Boolean,
+    private val completedDevicePayCartItemIds: Set<String>,
     private val mainDispatcher: CoroutineDispatcher,
     private val ioDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
 
     val component = LayoutComponent(
         experienceResponse,
+        parsedExperienceResponse,
         location,
         startTimeStamp,
         onUxEvent,
@@ -39,13 +44,16 @@ internal class DIComponentViewModel(
         currentOffer,
         customStates,
         offerCustomStates,
+        domainStates,
         edgeToEdgeDisplay,
+        completedDevicePayCartItemIds,
         mainDispatcher,
         ioDispatcher,
     )
 
     class DIComponentViewModelFactory(
-        private val experienceResponse: String,
+        private val experienceResponse: String?,
+        private val parsedExperienceResponse: NetworkExperienceResponse?,
         private val location: String,
         private val startTimeStamp: Long,
         private val uxEvent: (uxEvent: RoktUxEvent) -> Unit,
@@ -55,8 +63,10 @@ internal class DIComponentViewModel(
         private val currentOffer: Int,
         private val customStates: Map<String, Int>,
         private val offerCustomStates: Map<String, Map<String, Int>>,
+        private val domainStates: Map<String, Int>,
         private val handleUrlByApp: Boolean,
         private val edgeToEdgeDisplay: Boolean,
+        private val completedDevicePayCartItemIds: Set<String>,
         private val mainDispatcher: CoroutineDispatcher,
         private val ioDispatcher: CoroutineDispatcher,
     ) : ViewModelProvider.Factory {
@@ -65,6 +75,7 @@ internal class DIComponentViewModel(
             if (modelClass.isAssignableFrom(DIComponentViewModel::class.java)) {
                 return DIComponentViewModel(
                     experienceResponse = experienceResponse,
+                    parsedExperienceResponse = parsedExperienceResponse,
                     location = location,
                     startTimeStamp = startTimeStamp,
                     onUxEvent = uxEvent,
@@ -74,8 +85,10 @@ internal class DIComponentViewModel(
                     currentOffer = currentOffer,
                     customStates = customStates,
                     offerCustomStates = offerCustomStates,
+                    domainStates = domainStates,
                     handleUrlByApp = handleUrlByApp,
                     edgeToEdgeDisplay = edgeToEdgeDisplay,
+                    completedDevicePayCartItemIds = completedDevicePayCartItemIds,
                     mainDispatcher = mainDispatcher,
                     ioDispatcher = ioDispatcher,
                 ) as T

@@ -21,6 +21,9 @@ internal data class OfferUiState(
     val creativeCopy: ImmutableMap<String, String>,
     val breakpoints: ImmutableMap<String, Int>,
     val customState: ImmutableMap<String, Int>,
+    val catalogRuntimeData: ImmutableMap<String, String> = emptyMap<String, String>().toImmutableMap(),
+    val domainStates: ImmutableMap<String, Int> = emptyMap<String, Int>().toImmutableMap(),
     val offerCustomStates: ImmutableMap<String, ImmutableMap<String, Int>> =
         emptyMap<String, ImmutableMap<String, Int>>().toImmutableMap(),
+    val activeCatalogItemIndex: Int = 0,
 )

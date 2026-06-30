@@ -1,0 +1,56 @@
+{
+  "campaignId": "campaign-123",
+  "creative": {
+    "referralCreativeId": "creative-123",
+    "instanceGuid": "creative-instance-guid",
+    "token": "test",
+    "responseOptionsMap": {},
+    "copy": {},
+    "images": {},
+    "links": {},
+    "icons": {}
+  },
+  "catalogItems": [
+    {
+      "images": {},
+      "instanceGuid": "catalog-instance-guid-1",
+      "cartItemId": "cart-item-1",
+      "catalogItemId": "catalog-item-1",
+      "title": "Everyday sneakers",
+      "description": "Lightweight daily shoes",
+      "price": 79.99,
+      "originalPrice": 99.99,
+      "originalPriceFormatted": "$99.99",
+      "currency": "USD",
+      "signalType": "SignalResponse",
+      "url": "https://example.com/products/sneakers",
+      "minItemCount": 1,
+      "maxItemCount": 3,
+      "preSelectedQuantity": 1,
+      "providerData": "{\"merchant\":\"rokt\"}",
+      "urlBehavior": "External",
+      "linkedProductId": "linked-product-1",
+      "quantityMustBeSynchronized": false,
+      "positiveResponseText": "Add sneakers",
+      "negativeResponseText": "Skip sneakers",
+      "priceFormatted": "$79.99",
+      "addOnPluginUrl": "",
+      "addOnPluginName": "",
+      "token": "test"
+    }
+  ],
+  "transactionData": {
+    "paymentType": "Card",
+    "supportedPaymentMethods": [
+      {
+        "type": "CARD"
+      }
+    ],
+    "isPartnerManagedPurchase": false,
+    "partnerPaymentReference": "partner-reference",
+    "confirmationRef": "confirmation-ref",
+    "metadata": {
+      "merchant": "rokt"
+    }
+  }
+}
