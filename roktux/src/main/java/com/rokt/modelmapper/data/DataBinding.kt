@@ -2,12 +2,14 @@ package com.rokt.modelmapper.data
 
 import com.rokt.modelmapper.hmap.TypedKey
 import com.rokt.modelmapper.hmap.get
+import com.rokt.modelmapper.uimodel.Address
 import com.rokt.modelmapper.uimodel.CatalogItemModel
 import com.rokt.modelmapper.uimodel.CreativeIcon
 import com.rokt.modelmapper.uimodel.Module
 import com.rokt.modelmapper.uimodel.OfferImageModel
 import com.rokt.modelmapper.uimodel.OfferModel
 import com.rokt.modelmapper.uimodel.ResponseOptionModel
+import com.rokt.modelmapper.uimodel.TransactionData
 import com.rokt.modelmapper.utils.CURRENT_POSITION_PLACEHOLDER
 import com.rokt.modelmapper.utils.TOTAL_OFFERS_PLACEHOLDER
 import com.rokt.modelmapper.utils.transformToAnchorTag
@@ -93,14 +95,22 @@ private class PlaceholderReplacer(
         return bindData
     }
 
-    private fun replacer(matchResult: MatchResult): String = reducer(removeIdentifiersAndSplit(matchResult.value))
+    private fun replacer(matchResult: MatchResult): String = reducer(
+        keys = removeIdentifiersAndSplit(matchResult.value),
+        rawToken = matchResult.value,
+    )
 
-    private fun reducer(keys: List<String>): String {
+    private fun reducer(keys: List<String>, rawToken: String): String {
         var result: String? = null
         for (key in keys) {
             if (startsWithNamespace.containsMatchIn(key)) {
                 if (isDataTemplate.containsMatchIn(key)) {
                     when (getNamespace(removePrefix(TemplateDataPrefix.DATA, key))) {
+                        CATALOG_RUNTIME_NAMESPACE -> {
+                            // Keep placeholder token for runtime resolution at rendering stage.
+                            result = rawToken
+                        }
+
                         CREATIVE_COPY_NAMESPACE -> {
                             val copyVal = getCreativeCopy(key)
                             if (copyVal != null) {
@@ -137,6 +147,13 @@ private class PlaceholderReplacer(
                             }
                         }
 
+                        TRANSACTION_DATA_NAMESPACE -> {
+                            val txnVal = getTransactionData(key)
+                            if (txnVal != null) {
+                                result = txnVal
+                            }
+                        }
+
                         else -> {}
                     }
                 } else {
@@ -161,7 +178,7 @@ private class PlaceholderReplacer(
     }
 
     private fun removeIdentifiersAndSplit(matchResult: String): List<String> =
-        matchResult.substring(2, matchResult.length - 2).split('|')
+        matchResult.substring(2, matchResult.length - 2).split('|').map { it.trim() }
 
     private fun removePrefix(prefix: TemplateDataPrefix, key: String): String = key.removePrefix("${prefix.value}.")
 
@@ -172,10 +189,65 @@ private class PlaceholderReplacer(
 
     private fun getCreativeCopy(key: String): String? = offer?.creative?.copy?.get(getSanitisedDataKey(key))
 
-    private fun getCatalogItemCopy(key: String, itemIndex: Int): String? =
-        offer?.catalogItems?.getOrNull(itemIndex)?.run {
-            properties.get<String>(TypedKey<String>(getSanitisedDataKey(key)))
+    private fun getCatalogItemCopy(key: String, itemIndex: Int): String? {
+        val catalogItem = offer?.catalogItems?.getOrNull(itemIndex) ?: return null
+        val path = getSanitisedDataKey(key)
+        if (path.startsWith(CATALOG_ITEM_IMAGES_PREFIX)) {
+            return resolveCatalogItemImageField(catalogItem, path.removePrefix(CATALOG_ITEM_IMAGES_PREFIX))
         }
+        if (path.startsWith(CATALOG_ITEM_COPY_PREFIX)) {
+            return catalogItem.copy[path.removePrefix(CATALOG_ITEM_COPY_PREFIX)]
+        }
+        return catalogItem.properties.get<String>(TypedKey<String>(path))
+    }
+
+    private fun getTransactionData(key: String): String? {
+        val transactionData = offer?.transactionData ?: return null
+        val segments = getSanitisedDataKey(key).split('.')
+        return when (segments.firstOrNull()) {
+            "shippingAddress" -> resolveAddressField(transactionData.shippingAddress, segments.drop(1))
+            "billingAddress" -> resolveAddressField(transactionData.billingAddress, segments.drop(1))
+            "confirmationRef" -> transactionData.confirmationRef
+            "paymentType" -> transactionData.paymentType
+            "partnerPaymentReference" -> transactionData.partnerPaymentReference
+            else -> null
+        }
+    }
+
+    private fun resolveAddressField(address: Address?, rest: List<String>): String? {
+        if (address == null || rest.isEmpty()) return null
+        return when (rest.first()) {
+            "name" -> address.name
+            "address1" -> address.address1
+            "address2" -> address.address2
+            "city" -> address.city
+            "state" -> address.state
+            "stateCode" -> address.stateCode
+            "country" -> address.country
+            "countryCode" -> address.countryCode
+            "zip" -> address.zip
+            else -> null
+        }
+    }
+
+    /**
+     * Resolves `images.<slot>.<leaf>` against [CatalogItemModel.imageWrapper], mirroring nested
+     * struct navigation for placeholders such as `%^DATA.catalogItem.images.catalogItemImage2.light^%`.
+     * When the path stops at the image slot (no leaf), returns `""` so downstream logic treats
+     * the value as present-but-empty (parity with iOS catalog extractor).
+     */
+    private fun resolveCatalogItemImageField(catalogItem: CatalogItemModel, pathAfterImages: String): String? {
+        if (pathAfterImages.isBlank()) return null
+        val segments = pathAfterImages.split('.')
+        val slotKey = segments.firstOrNull() ?: return null
+        val imageModel = catalogItem.imageWrapper.properties.get<OfferImageModel>(TypedKey<OfferImageModel>(slotKey))
+            ?: return null
+        if (segments.size == 1) {
+            return ""
+        }
+        val leafKey = segments.drop(1).joinToString(".")
+        return imageModel.properties.get<String>(TypedKey<String>(leafKey))
+    }
 
     private fun getResponseOptionData(key: String): String? {
         offer?.creative?.responseOptions?.get(contextKey.orEmpty())?.let {
@@ -206,22 +278,35 @@ internal fun getOfferImages(inputKey: String = "", offerModel: OfferModel?): Map
     }.toMap(TreeMap())
 }
 
-private enum class TemplateDataPrefix(val value: String) {
-    DATA("DATA"),
-    STATE("STATE"),
+internal fun getCatalogItemImages(offerModel: OfferModel?, itemIndex: Int, module: Module): Map<Int, OfferImageModel> {
+    val catalogItemIndex = if (module == Module.AddToCart) itemIndex else 0
+    val images = offerModel?.catalogItems?.getOrNull(catalogItemIndex)?.imageWrapper?.properties?.map
+        ?: return emptyMap()
+
+    return images.entries
+        .mapNotNull { (key, value) ->
+            (value as? OfferImageModel)?.let { image -> key.key to image }
+        }
+        .sortedWith(
+            compareBy<Pair<String, OfferImageModel>> { (key, _) -> key.trailingNumber() ?: Int.MAX_VALUE }
+                .thenBy { (key, _) -> key },
+        )
+        .mapIndexed { index, (_, image) -> index to image }
+        .toMap()
 }
+
+private fun String.trailingNumber(): Int? = Regex("(\\d+)$").find(this)?.value?.toIntOrNull()
 
 private val startsWithNamespace = Regex("^(${TemplateDataPrefix.DATA}|${TemplateDataPrefix.STATE})")
 private val isDataTemplate = Regex("^${TemplateDataPrefix.DATA}")
 private val isStateTemplate = Regex("%\\^(${TemplateDataPrefix.STATE})\\.[a-zA-Z0-9]+[a-zA-Z0-9.]*(?:\\|.*?)?\\^%")
 private val templatePattern = Regex(
-    "%\\^(?:${TemplateDataPrefix.DATA}|${TemplateDataPrefix.STATE})\\.[a-zA-Z0-9]+[a-zA-Z0-9.]*(?:\\|.*?)?\\^%",
+    "%\\^(?:${TemplateDataPrefix.DATA}|${TemplateDataPrefix.STATE})\\.[a-zA-Z0-9]+[a-zA-Z0-9.]*(?:\\s*\\|.*?)?\\^%",
 )
 
-private const val CREATIVE_RESPONSE_NAMESPACE = "creativeResponse"
-private const val CREATIVE_COPY_NAMESPACE = "creativeCopy"
-private const val CREATIVE_LINKS_NAMESPACE = "creativeLink"
-private const val CATALOG_ITEM_NAMESPACE = "catalogItem"
-private const val CREATIVE_IMAGE_NAMESPACE = "creativeImage"
+private const val CATALOG_ITEM_IMAGES_PREFIX = "images."
+private const val CATALOG_ITEM_COPY_PREFIX = "copy."
+private const val CATALOG_RUNTIME_NAMESPACE = "catalogRuntime"
+
 private val INDICATOR_POSITION = listOf("IndicatorPosition", "indicatorPosition")
 private val TOTAL_OFFERS = listOf("TotalOffers", "totalOffers")

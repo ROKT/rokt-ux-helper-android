@@ -79,6 +79,38 @@ class MarketingViewModelTest : BaseViewModelTest() {
     }
 
     @Test
+    fun `SetCustomState event should preserve existing custom state when propagating the event`() = runTest {
+        // Given
+        viewModel = MarketingViewModel(
+            0,
+            modelMapper,
+            ioDispatcher,
+            mapOf("existingKey" to 2),
+        )
+        val key = "key"
+        val value = 1
+
+        // When
+        viewModel.setEvent(LayoutContract.LayoutEvent.SetCustomState(key, value))
+        val viewState = viewModel.viewState.value
+        val effect = viewModel.effect.first()
+
+        // Then
+        val successState = viewState as BaseContract.BaseViewState.Success
+        assertThat(successState.value.customState)
+            .containsEntry("existingKey", 2)
+            .containsEntry(key, value)
+        assertThat(effect).isInstanceOf(MarketingVariantContract.LayoutVariantEffect.PropagateEvent::class.java)
+        val propagateEvent = effect as MarketingVariantContract.LayoutVariantEffect.PropagateEvent
+        assertThat(propagateEvent.event).isEqualTo(
+            LayoutContract.LayoutEvent.SetOfferCustomState(
+                0,
+                mapOf("existingKey" to 2, key to value),
+            ),
+        )
+    }
+
+    @Test
     fun `UserInteracted should set the SetSignalViewed effect only once`() = runTest {
         // Given
         val event = LayoutContract.LayoutEvent.UserInteracted

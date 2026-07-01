@@ -1,0 +1,89 @@
+{
+  "type": "BottomSheet",
+  "node": {
+    "allowBackdropToClose": true,
+    "styles": {
+      "elements": {
+        "own": [
+          {
+            "default": {
+              "background": {
+                "backgroundColor": {
+                  "light": "#ffffff",
+                  "dark": "#ffffff"
+                }
+              },
+              "dimension": {
+                "height": {
+                  "type": "percentage",
+                  "value": 50
+                }
+              },
+              "spacing": {
+                "padding": "16 16 16 16",
+                "margin": "0 0 0 0"
+              }
+            }
+          }
+        ],
+        "wrapper": [
+          {
+            "default": {
+              "background": {
+                "backgroundColor": {
+                  "light": "#520E0A13",
+                  "dark": "#520E0A13"
+                }
+              }
+            }
+          }
+        ]
+      }
+    },
+    "children": [
+      {
+        "type": "BasicText",
+        "node": {
+          "value": "Collapsed content"
+        }
+      },
+      {
+        "type": "ToggleButtonStateTrigger",
+        "node": {
+          "customStateKey": "BottomSheetExpandedState",
+          "children": [
+            {
+              "type": "BasicText",
+              "node": {
+                "value": "Toggle details"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "type": "When",
+        "node": {
+          "predicates": [
+            {
+              "type": "CustomState",
+              "predicate": {
+                "key": "BottomSheetExpandedState",
+                "value": 1,
+                "condition": "is"
+              }
+            }
+          ],
+          "children": [
+            {
+              "type": "BasicText",
+              "node": {
+                "value": "Expanded content"
+              }
+            }
+          ]
+        }
+      }
+    ]
+  }
+}

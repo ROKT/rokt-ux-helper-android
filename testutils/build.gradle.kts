@@ -31,5 +31,7 @@ dependencies {
     api(libs.androidx.compose.foundation)
     api(libs.androidx.compose.foundation.layout)
     api(libs.robolectric)
+    api(libs.roborazzi)
+    api(libs.roborazzi.compose)
     lintChecks(libs.compose.lint.checks)
 }

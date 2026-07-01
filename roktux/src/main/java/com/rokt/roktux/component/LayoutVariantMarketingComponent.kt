@@ -1,7 +1,6 @@
 package com.rokt.roktux.component
 
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.height
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -23,6 +22,7 @@ import com.rokt.roktux.viewmodel.layout.LayoutContract
 import com.rokt.roktux.viewmodel.layout.OfferUiState
 import com.rokt.roktux.viewmodel.variants.MarketingVariantContract
 import com.rokt.roktux.viewmodel.variants.MarketingViewModel
+import kotlinx.collections.immutable.toImmutableMap
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.onEach
 
@@ -102,7 +102,7 @@ internal class LayoutVariantMarketingComponent(private val factory: LayoutUiMode
                         isPressed = isPressed,
                         offerState = offerState.copy(
                             creativeCopy = state.value.creativeCopy,
-                            customState = state.value.customState,
+                            customState = (offerState.customState + state.value.customState).toImmutableMap(),
                         ),
                         isDarkModeEnabled = isDarkModeEnabled,
                         breakpointIndex = breakpointIndex,

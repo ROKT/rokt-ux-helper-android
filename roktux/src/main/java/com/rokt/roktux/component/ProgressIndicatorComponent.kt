@@ -10,7 +10,7 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
-import androidx.compose.ui.semantics.invisibleToUser
+import androidx.compose.ui.semantics.hideFromAccessibility
 import androidx.compose.ui.semantics.semantics
 import com.rokt.modelmapper.data.BindData
 import com.rokt.modelmapper.data.BindState
@@ -77,7 +77,7 @@ internal class ProgressIndicatorComponent(
                         .semantics(mergeDescendants = true) {}
                         .clearAndSetSemantics {
                             if (model.accessibilityHidden) {
-                                invisibleToUser()
+                                hideFromAccessibility()
                             } else {
                                 contentDescription = accessibilityReadOutText.format(
                                     offerState.currentOfferIndex,

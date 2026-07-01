@@ -8,6 +8,7 @@ import androidx.compose.ui.semantics.getOrNull
 import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.test.SemanticsNodeInteraction
 import androidx.compose.ui.test.assert
+import androidx.compose.ui.text.LinkAnnotation
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextStyle
@@ -155,7 +156,21 @@ private fun getTextStyle(node: SemanticsNode): TextStyle? {
 private fun getAnnotatedSpanUrlTextStyle(node: SemanticsNode): SpanStyle? {
     val textLayoutResults = mutableListOf<TextLayoutResult>()
     node.config.getOrNull(SemanticsActions.GetTextLayoutResult)?.action?.invoke(textLayoutResults)
-    return textLayoutResults.getOrNull(0)?.layoutInput?.text?.spanStyles?.getOrNull(0)?.item
+    val annotatedString = textLayoutResults.getOrNull(0)?.layoutInput?.text ?: return null
+
+    // Compose 1.7+ attaches link styling to the LinkAnnotation via TextLinkStyles.
+    // When a styled link is rendered (addLink + addStyle on the same range), the SpanStyle is
+    // promoted onto the LinkAnnotation and no longer appears in annotatedString.spanStyles.
+    val linkRange = annotatedString.getLinkAnnotations(0, annotatedString.length).firstOrNull()
+    val linkStyle = when (val link = linkRange?.item) {
+        is LinkAnnotation.Url -> link.styles?.style
+        is LinkAnnotation.Clickable -> link.styles?.style
+        else -> null
+    }
+    if (linkStyle != null) return linkStyle
+
+    // Fall back to the first span style intersecting the link range (legacy Compose behavior).
+    return annotatedString.spanStyles.getOrNull(0)?.item
 }
 
 private fun <T> validateAndPrintError(property: String, expected: T, target: T?): Boolean {

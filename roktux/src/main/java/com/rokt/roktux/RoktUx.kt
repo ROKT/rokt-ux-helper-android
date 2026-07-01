@@ -24,6 +24,14 @@ public object RoktUx {
     }
 
     /**
+     * Get the DCUI layout schema version supported by RoktUXHelper.
+     *
+     * @return The full layout schema version.
+     */
+    @JvmStatic
+    public fun getLayoutSchemaVersion(): String = BuildConfig.SCHEMA_VERSION
+
+    /**
      * Get the Rokt Integration configuration. Data to be included in the Rokt API request.
      *
      * @param context The Android Context.
@@ -34,7 +42,7 @@ public object RoktUx {
         version = BuildConfig.SDK_VERSION,
         packageName = context.packageName,
         packageVersion = context.getPackageVersion(),
-        layoutSchemaVersion = BuildConfig.SCHEMA_VERSION,
+        layoutSchemaVersion = getLayoutSchemaVersion(),
         framework = SDK_FRAMEWORK,
         platform = SDK_PLATFORM,
         operatingSystem = SDK_OPERATING_SYSTEM,

@@ -11,7 +11,7 @@ import androidx.compose.ui.BiasAlignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.semantics.Role
-import androidx.compose.ui.semantics.invisibleToUser
+import androidx.compose.ui.semantics.hideFromAccessibility
 import androidx.compose.ui.semantics.semantics
 import com.rokt.modelmapper.uimodel.ButtonUiModel
 import com.rokt.roktux.component.LayoutUiModelFactory
@@ -83,7 +83,7 @@ internal fun ButtonComponent(
                         childModifier = childModifier.then(Modifier.align(BiasAlignment.Vertical(it)))
                     }
                     if (ignoreChildrenForAccessibility) {
-                        childModifier = childModifier.semantics { invisibleToUser() }
+                        childModifier = childModifier.semantics { hideFromAccessibility() }
                     }
                 }
                 factory.CreateComposable(

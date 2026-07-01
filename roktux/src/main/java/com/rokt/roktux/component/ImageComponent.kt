@@ -9,11 +9,11 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.semantics.invisibleToUser
+import androidx.compose.ui.semantics.hideFromAccessibility
 import androidx.compose.ui.semantics.semantics
-import coil.ImageLoader
-import coil.compose.AsyncImage
-import coil.request.ImageRequest
+import coil3.ImageLoader
+import coil3.compose.AsyncImage
+import coil3.request.ImageRequest
 import com.rokt.modelmapper.uimodel.LayoutSchemaUiModel
 import com.rokt.roktux.di.layout.LocalLayoutComponent
 import com.rokt.roktux.viewmodel.layout.LayoutContract
@@ -34,30 +34,36 @@ internal class ImageComponent(private val modifierFactory: ModifierFactory) :
         onEventSent: (LayoutContract.LayoutEvent) -> Unit,
     ) {
         var onImageError by remember(isDarkModeEnabled) { mutableStateOf(false) }
-        val url = if (isDarkModeEnabled) model.darkUrl ?: model.lightUrl else model.lightUrl
+        val url = if (isDarkModeEnabled) {
+            model.darkUrl?.takeIf { it.isNotBlank() } ?: model.lightUrl
+        } else {
+            model.lightUrl
+        }
         if (url.isBlank()) return
         if (!onImageError) {
+            val contentScale = model.scaleType ?: ContentScale.None
             AsyncImage(
                 model = ImageRequest.Builder(LocalContext.current).data(url).build(),
                 contentDescription = model.alt,
                 imageLoader = LocalLayoutComponent.current[ImageLoader::class.java],
-                contentScale = model.scaleType ?: ContentScale.None,
-                modifier = modifier.then(
-                    modifierFactory
-                        .createModifier(
-                            modifierPropertiesList = model.ownModifiers,
-                            conditionalTransitionModifier = model.conditionalTransitionModifiers,
-                            breakpointIndex = breakpointIndex,
-                            isPressed = isPressed,
-                            isDarkModeEnabled = isDarkModeEnabled,
-                            offerState = offerState,
-                        )
-                        .semantics {
-                            if (model.alt.isNullOrBlank()) {
-                                invisibleToUser()
-                            }
-                        },
-                ),
+                contentScale = contentScale,
+                modifier = modifier
+                    .then(
+                        modifierFactory
+                            .createModifier(
+                                modifierPropertiesList = model.ownModifiers,
+                                conditionalTransitionModifier = model.conditionalTransitionModifiers,
+                                breakpointIndex = breakpointIndex,
+                                isPressed = isPressed,
+                                isDarkModeEnabled = isDarkModeEnabled,
+                                offerState = offerState,
+                            )
+                            .semantics {
+                                if (model.alt.isNullOrBlank()) {
+                                    hideFromAccessibility()
+                                }
+                            },
+                    ),
                 onError = { onImageError = true },
             )
         }

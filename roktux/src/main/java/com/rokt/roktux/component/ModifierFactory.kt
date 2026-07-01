@@ -90,9 +90,10 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.toIntSize
-import androidx.core.graphics.drawable.toBitmap
-import coil.ImageLoader
-import coil.request.ImageRequest
+import coil3.ImageLoader
+import coil3.request.ImageRequest
+import coil3.request.allowHardware
+import coil3.toBitmap
 import com.rokt.modelmapper.uimodel.ArrangementUiModel
 import com.rokt.modelmapper.uimodel.BaseModifierProperties
 import com.rokt.modelmapper.uimodel.BaseTextStylingUiProperties
@@ -125,6 +126,13 @@ import kotlin.math.min
 import kotlin.math.pow
 
 @Immutable
+internal enum class BorderCornerRadiusMode {
+    All,
+    Top,
+    Bottom,
+}
+
+@Immutable
 internal class ModifierFactory {
 
     @SuppressLint("ComposeUnstableReceiver")
@@ -137,6 +145,7 @@ internal class ModifierFactory {
         isDarkModeEnabled: Boolean,
         offerState: OfferUiState,
         basePropertiesList: ImmutableList<StateBlock<ModifierProperties>>? = null,
+        borderCornerRadiusMode: BorderCornerRadiusMode? = null,
     ): Modifier {
         val coroutineScope = rememberCoroutineScope()
         val context = LocalContext.current
@@ -157,12 +166,33 @@ internal class ModifierFactory {
                 transitionDuration = conditionalTransitionModifier.duration,
                 transitionStyleState = transitionStyleState,
             )
-            Modifier.applyProperties(transitionData, isDarkModeEnabled, coroutineScope, context, imageLoader)
+            Modifier.applyProperties(
+                transitionData,
+                isDarkModeEnabled,
+                coroutineScope,
+                context,
+                imageLoader,
+                borderCornerRadiusMode,
+            )
         } else {
-            remember(modifierPropertiesList, breakpointIndex, isPressed, isDarkModeEnabled, basePropertiesList) {
+            remember(
+                modifierPropertiesList,
+                breakpointIndex,
+                isPressed,
+                isDarkModeEnabled,
+                basePropertiesList,
+                borderCornerRadiusMode,
+            ) {
                 val modifierProperty =
                     createModifierProperties(isPressed, breakpointIndex, modifierPropertiesList, basePropertiesList)
-                Modifier.applyProperties(modifierProperty, isDarkModeEnabled, coroutineScope, context, imageLoader)
+                Modifier.applyProperties(
+                    modifierProperty,
+                    isDarkModeEnabled,
+                    coroutineScope,
+                    context,
+                    imageLoader,
+                    borderCornerRadiusMode,
+                )
             }
         }
     }
@@ -412,8 +442,9 @@ internal class ModifierFactory {
         coroutineScope: CoroutineScope,
         context: Context,
         imageLoader: ImageLoader,
+        borderCornerRadiusMode: BorderCornerRadiusMode?,
     ): Modifier {
-        val shape = createBackgroundShape(properties = properties)
+        val shape = createBackgroundShape(properties = properties, borderCornerRadiusMode = borderCornerRadiusMode)
         return this
             .then(properties.margin?.let { Modifier.padding(it) } ?: Modifier)
             .then(properties.offset?.let { Modifier.offset(it.x, it.y) } ?: Modifier)
@@ -664,7 +695,7 @@ internal class ModifierFactory {
                 .allowHardware(false)
                 .data(url)
                 .build()
-            return imageLoader.execute(request).drawable?.toBitmap()
+            return imageLoader.execute(request).image?.toBitmap()
         }
     }
 
@@ -1097,17 +1128,27 @@ internal class ModifierFactory {
         }
     }
 
-    fun createBackgroundShape(properties: BaseModifierProperties): Shape = properties.borderRadius?.let {
+    fun createBackgroundShape(
+        properties: BaseModifierProperties,
+        borderCornerRadiusMode: BorderCornerRadiusMode? = null,
+    ): Shape = properties.borderRadius?.let {
         if (it > 0.dp) {
-            if (properties.borderUseTopCornerRadius == true) {
-                RoundedCornerShape(topStart = it, topEnd = it)
-            } else {
-                RoundedCornerShape(it)
+            when (borderCornerRadiusMode ?: properties.defaultBorderCornerRadiusMode()) {
+                BorderCornerRadiusMode.All -> RoundedCornerShape(it)
+                BorderCornerRadiusMode.Top -> RoundedCornerShape(topStart = it, topEnd = it)
+                BorderCornerRadiusMode.Bottom -> RoundedCornerShape(bottomStart = it, bottomEnd = it)
             }
         } else {
             RectangleShape
         }
     } ?: RectangleShape
+
+    private fun BaseModifierProperties.defaultBorderCornerRadiusMode(): BorderCornerRadiusMode =
+        if (borderUseTopCornerRadius == true) {
+            BorderCornerRadiusMode.Top
+        } else {
+            BorderCornerRadiusMode.All
+        }
 
     private fun createTextProperties(
         isPressed: Boolean,

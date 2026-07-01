@@ -11,6 +11,8 @@ data class RoktViewState(
     val customStates: Map<String, Int>,
     @SerialName("offerCustomStates")
     val offerCustomStates: Map<String, Map<String, Int>>,
+    @SerialName("domainStates")
+    val domainStates: Map<String, Int> = emptyMap(),
     @SerialName("offerIndex")
     val offerIndex: Int,
     @SerialName("pluginDismissed")
