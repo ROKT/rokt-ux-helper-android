@@ -601,7 +601,7 @@ internal class LayoutViewModel(
     private fun handleUserInteractionSelected(event: LayoutContract.LayoutEvent.UserInteractionSelected) {
         val parentGuid = event.parentGuid
             ?: event.catalogItemIndex?.let { index -> catalogItemInstanceGuid(event.offerId, index) }
-            ?: return
+            ?: pluginModel.instanceGuid
         val token = event.catalogItemIndex?.let { index -> catalogItemToken(event.offerId, index) }.orEmpty()
         sendUserInteractionEvent(
             parentGuid = parentGuid,

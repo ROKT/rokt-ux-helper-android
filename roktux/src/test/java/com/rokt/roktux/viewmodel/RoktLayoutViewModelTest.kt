@@ -986,6 +986,39 @@ class RoktLayoutViewModelTest : BaseViewModelTest() {
     }
 
     @Test
+    fun `UserInteractionSelected sends layout scoped SignalUserInteraction with plugin parent guid`() = runTest {
+        // Arrange
+        clearMocks(platformEvent)
+
+        // Act
+        layoutViewModel.setEvent(
+            LayoutContract.LayoutEvent.UserInteractionSelected(
+                offerId = 0,
+                action = RoktUserInteractionAction.ToggleButtonStateTriggerClick,
+                context = RoktUserInteractionContext.ToggleButtonStateTrigger,
+            ),
+        )
+
+        // Assert
+        verify(timeout = 2000) {
+            platformEvent.invoke(
+                withArg { events ->
+                    assertThat(events).anySatisfy { platformEvent ->
+                        assertThat(platformEvent.eventType).isEqualTo(EventType.SignalUserInteraction)
+                        assertThat(platformEvent.parentGuid).isEqualTo("pluginInstanceGuid")
+                        assertThat(platformEvent.objectData).isEqualTo(
+                            mapOf(
+                                "action" to "ToggleButtonStateTriggerClick",
+                                "context" to "ToggleButtonStateTrigger",
+                            ),
+                        )
+                    }
+                },
+            )
+        }
+    }
+
+    @Test
     fun `UserInteractionSelected sends SignalUserInteraction with object data`() = runTest {
         // Arrange
         clearMocks(platformEvent)
