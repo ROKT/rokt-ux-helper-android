@@ -213,12 +213,14 @@ internal enum class RoktUserInteractionAction {
     MainImageScrollIconRightClick,
     MainImageSwipeLeft,
     MainImageSwipeRight,
+    ToggleButtonStateTriggerClick,
 }
 
 internal enum class RoktUserInteractionContext {
     CustomStateValidationTriggerButton,
     CatalogDropDown,
     CatalogImageGallery,
+    ToggleButtonStateTrigger,
 }
 
 internal fun SignalType.toEventType(): EventType = when (this) {
