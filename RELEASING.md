@@ -8,17 +8,17 @@ title: UX Helper releases overview
 gitGraph
     commit
     commit tag: "4.7.0"
-    branch workstation/4.7.x
-    checkout workstation/4.7.x
+    branch maintenance/4.7.x
+    checkout maintenance/4.7.x
     commit tag: "4.7.1"
     checkout main
-    merge workstation/4.7.x
+    merge maintenance/4.7.x
     commit
     commit
-    checkout workstation/4.7.x
+    checkout maintenance/4.7.x
     commit tag: "4.7.2"
     checkout main
-    merge workstation/4.7.x
+    merge maintenance/4.7.x
     commit
     commit tag: "4.8.0"
     commit
@@ -83,11 +83,11 @@ Hotfix / patch version e.g. releases that increase Z in the format X.Y.Z consist
 ```mermaid
 gitGraph
     commit tag: "4.7.0"
-    branch workstation/4.7.x
+    branch maintenance/4.7.x
     checkout main
     commit
     commit id: "Bug fix"
-    checkout workstation/4.7.x
+    checkout maintenance/4.7.x
     cherry-pick id:"Bug fix"
     commit tag: "4.7.1"
     checkout main
@@ -95,33 +95,41 @@ gitGraph
     commit
 ```
 
-1. Find and create a working branch in the format `workstation/X.Y.x` (e.g.
-   `workstation/4.7.x`) from the tagged commit you need to patch.
-2. On the workstation branch, make or cherry-pick the required changes.
-3. Run "Release – Draft" **with the branch selector set to `workstation/4.7.x`**
+1. Find and create a maintenance branch in the format `maintenance/X.Y.x` (e.g.
+   `maintenance/4.7.x`) from the tagged commit you need to patch. After a major
+   release such as `1.0.0`, create `maintenance/1.0.x` from the stable release
+   tag or release commit.
+2. On the maintenance branch, make or cherry-pick the required changes.
+3. Run "Release – Draft" **with the branch selector set to `maintenance/4.7.x`**
    (the "Use workflow from" dropdown). The draft workflow respects the dispatch
    branch and will:
-    - Check out, bump, and changelog against `workstation/4.7.x`.
-    - Open a PR targeting `workstation/4.7.x` (not `main`).
-4. Approve and merge the resulting `release-prep/...` PR into the workstation
+    - Check out, bump, and changelog against `maintenance/4.7.x`.
+    - Open a PR targeting `maintenance/4.7.x` (not `main`).
+    - Reject `minor` and `major` bumps on maintenance branches.
+4. Approve and merge the resulting `release-prep/...` PR into the maintenance
    branch.
-5. Once merged, `Release – Publish` will run from `workstation/4.7.x` and:
+5. Once merged, `Release – Publish` will run from `maintenance/4.7.x` and:
     - Upload the build to Maven Central.
-    - Create a GitHub release with the relevant build files.
+    - Create a GitHub release with the relevant build files. Maintenance
+      releases are not marked as GitHub "Latest"; only stable releases from
+      `main` update the latest release badge.
     - Tag the commit with the version number (e.g. `4.7.2`).
 
 > [!NOTE]
-> `Release – Publish` is triggered by pushes to `main` and `workstation/*`
-> branches only. Any other branch (e.g. `feat/...`, `chore/...`) will not
-> publish.
+> `Release – Publish` is triggered by pushes to `main`, `maintenance/*`, and
+> `workstation/*` branches only. Any other branch (e.g. `feat/...`,
+> `chore/...`) will not publish.
 >
 > Snapshot version logic:
 >
-> - On `workstation/*`, snapshots use a `patch` bump from the current `VERSION`
->   (so `workstation/4.7.x` at VERSION `4.7.1` produces `4.7.2-SNAPSHOT`).
+> - On `maintenance/*` and `workstation/*`, snapshots use a `patch` bump from
+>   the current `VERSION` (so `maintenance/4.7.x` at VERSION `4.7.1` produces
+>   `4.7.2-SNAPSHOT`).
 > - On `main`, snapshots use a `minor` bump (VERSION `4.7.1` → `4.8.0-SNAPSHOT`).
 > - If `VERSION` is already a pre-release (e.g. `1.0.0-rc1`), snapshots track
 >   the in-progress stable and emit `1.0.0-SNAPSHOT` instead of bumping further.
 >
 > The PR branch created by `Release – Draft` is named `release-prep/<version>`
 > so it does not collide with workstation or release branches.
+> `Release – Draft` can only run from `main`, `maintenance/*`, or
+> `workstation/*` branches.
