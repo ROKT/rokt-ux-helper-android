@@ -939,6 +939,41 @@ class RoktLayoutViewModelTest : BaseViewModelTest() {
     }
 
     @Test
+    fun `CartItemDevicePaySelected sends OfferProgression when validation passes`() = runTest {
+        // Arrange
+        clearMocks(platformEvent, uxEvent)
+
+        // Act
+        layoutViewModel.setEvent(
+            LayoutContract.LayoutEvent.CartItemDevicePaySelected(
+                offerId = 0,
+                catalogItemModel = createCatalogItemProperties(),
+                paymentProvider = PaymentProvider.GooglePay,
+                transactionData = null,
+                validatorFieldKeys = emptyList(),
+            ),
+        )
+
+        // Assert
+        verify(timeout = 2000) {
+            platformEvent.invoke(
+                withArg { events ->
+                    assertThat(events).anySatisfy { platformEvent ->
+                        assertThat(platformEvent.eventType).isEqualTo(EventType.SignalUserInteraction)
+                        assertThat(platformEvent.parentGuid).isEqualTo("catalog-instance-guid-1")
+                        assertThat(platformEvent.objectData).isEqualTo(
+                            mapOf(
+                                "action" to "OfferProgression",
+                                "context" to "CustomStateValidationTriggerButton",
+                            ),
+                        )
+                    }
+                },
+            )
+        }
+    }
+
+    @Test
     fun `CartItemDevicePaySelected does not emit event when validation fails`() = runTest {
         // Arrange
         val validationCoordinator = ValidationCoordinator()
