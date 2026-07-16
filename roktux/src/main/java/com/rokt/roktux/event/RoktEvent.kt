@@ -206,6 +206,7 @@ enum class EventType {
 data class EventNameValue(@SerialName("name") val name: String, @SerialName("value") val value: String)
 
 internal enum class RoktUserInteractionAction {
+    OfferProgression,
     ValidationTriggerFailed,
     DropDownItemSelected,
     ThumbnailClick,

@@ -504,6 +504,12 @@ internal class LayoutViewModel(
         }
 
         val catalogItemProperties = event.catalogItemModel ?: return
+        sendUserInteractionEvent(
+            parentGuid = catalogItemProperties.instanceGuid(),
+            token = catalogItemProperties.token(),
+            action = RoktUserInteractionAction.OfferProgression,
+            context = RoktUserInteractionContext.CustomStateValidationTriggerButton,
+        )
         val salePrice = catalogItemProperties.salePrice()
         pendingDevicePayCatalogItem = catalogItemProperties.toPendingDevicePayCatalogItem()
         handlePlatformEvent(
