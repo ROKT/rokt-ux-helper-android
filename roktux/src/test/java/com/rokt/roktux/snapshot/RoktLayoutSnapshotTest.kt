@@ -1,9 +1,9 @@
 package com.rokt.roktux.snapshot
 
-import android.graphics.drawable.ColorDrawable
-import coil.ImageLoader
-import coil.annotation.ExperimentalCoilApi
-import coil.test.FakeImageLoaderEngine
+import coil3.ColorImage
+import coil3.ImageLoader
+import coil3.annotation.ExperimentalCoilApi
+import coil3.test.FakeImageLoaderEngine
 import com.rokt.core.testutils.TestJsonLoader
 import com.rokt.roktux.RoktLayout
 import com.rokt.roktux.RoktUxConfig
@@ -35,7 +35,7 @@ abstract class RoktLayoutSnapshotTest : BaseDcuiEspressoTest() {
     @OptIn(ExperimentalCoilApi::class)
     private fun testImageLoader(): ImageLoader {
         val engine = FakeImageLoaderEngine.Builder()
-            .default(ColorDrawable(android.graphics.Color.RED))
+            .default(ColorImage(android.graphics.Color.RED))
             .build()
 
         return ImageLoader.Builder(RuntimeEnvironment.getApplication())

@@ -21,10 +21,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.input.pointer.pointerInput
+import com.rokt.modelmapper.uimodel.HeightUiModel
 import com.rokt.modelmapper.uimodel.LayoutSchemaUiModel
+import com.rokt.modelmapper.uimodel.ModifierProperties
+import com.rokt.modelmapper.uimodel.StateBlock
 import com.rokt.roktux.utils.interceptTap
 import com.rokt.roktux.viewmodel.layout.LayoutContract
 import com.rokt.roktux.viewmodel.layout.OfferUiState
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.toImmutableList
 
 @OptIn(ExperimentalMaterial3Api::class)
 internal class BottomSheetComponent(
@@ -63,6 +68,9 @@ internal class BottomSheetComponent(
             model.child.ownModifiers?.getOrNull(breakpointIndex)?.default?.let {
                 modifierFactory.createBackgroundShape(it)
             } ?: RectangleShape
+        val bottomSheetChild = remember(model.child, offerState, breakpointIndex) {
+            model.child.expandPercentageHeightIfNeeded(offerState, breakpointIndex)
+        }
         var hasUserInteracted by remember { mutableStateOf(false) }
         val sheetProperties = remember { BottomSheetPropertiesCompat.create() }
         ModalBottomSheet(
@@ -98,7 +106,7 @@ internal class BottomSheetComponent(
                 }
             }
             factory.CreateComposable(
-                model = model.child,
+                model = bottomSheetChild,
                 modifier = Modifier
                     .animateContentSize()
                     .pointerInput(Unit) {
@@ -117,5 +125,45 @@ internal class BottomSheetComponent(
                 }
             }
         }
+    }
+
+    private fun LayoutSchemaUiModel.ColumnUiModel.expandPercentageHeightIfNeeded(
+        offerState: OfferUiState,
+        breakpointIndex: Int,
+    ): LayoutSchemaUiModel.ColumnUiModel {
+        if (!offerState.isBottomSheetExpanded()) {
+            return this
+        }
+        val breakpointModifier = ownModifiers?.getOrNull(breakpointIndex) ?: return this
+        if (breakpointModifier.default.height !is HeightUiModel.Percentage) {
+            return this
+        }
+        return copy(
+            ownModifiers = ownModifiers.replaceAt(
+                index = breakpointIndex,
+                value = breakpointModifier.copy(
+                    default = breakpointModifier.default.copy(height = HeightUiModel.MatchParent),
+                ),
+            ),
+        )
+    }
+
+    private fun OfferUiState.isBottomSheetExpanded(): Boolean = (
+        offerCustomStates[currentOfferIndex.toString()]?.get(BottomSheetExpandedStateKey)
+            ?: customState[BottomSheetExpandedStateKey]
+            ?: DefaultCustomStateValue
+        ) == ExpandedCustomStateValue
+
+    private fun ImmutableList<StateBlock<ModifierProperties>>.replaceAt(
+        index: Int,
+        value: StateBlock<ModifierProperties>,
+    ): ImmutableList<StateBlock<ModifierProperties>> = mapIndexed { currentIndex, currentValue ->
+        if (currentIndex == index) value else currentValue
+    }.toImmutableList()
+
+    private companion object {
+        const val BottomSheetExpandedStateKey = "BottomSheetExpandedState"
+        const val DefaultCustomStateValue = 0
+        const val ExpandedCustomStateValue = 1
     }
 }

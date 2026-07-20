@@ -9,6 +9,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- Update Jetpack Compose BOM to 2026.05.01.
+
+## [1.0.0-rc.1] - 2026-05-21
+
+### Changed
+
+- Upgrade Kotlin to 2.1.20 and Compose BOM to 2026.05.01 ([#253](https://github.com/ROKT/rokt-ux-helper-android/pull/253))
+- Support pre-release qualifiers for workstation releases ([#257](https://github.com/ROKT/rokt-ux-helper-android/pull/257))
+- Bump trunk-io/trunk-action from 1.2.4 to 1.3.1 ([#246](https://github.com/ROKT/rokt-ux-helper-android/pull/246))
+- Bump codecov/codecov-action from 6.0.0 to 6.0.1 ([#247](https://github.com/ROKT/rokt-ux-helper-android/pull/247))
+
 ## [0.9.3] - 2026-05-13
 
 ### Fixed
@@ -194,7 +207,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Initial implementation of UX Helper
 
-[unreleased]: https://github.com/ROKT/rokt-ux-helper-android/compare/0.9.3...HEAD
+[unreleased]: https://github.com/ROKT/rokt-ux-helper-android/compare/1.0.0-rc.1...HEAD
+[1.0.0-rc.1]: https://github.com/ROKT/rokt-ux-helper-android/compare/0.9.3...1.0.0-rc.1
 [0.9.3]: https://github.com/ROKT/rokt-ux-helper-android/compare/0.9.2...0.9.3
 [0.9.2]: https://github.com/ROKT/rokt-ux-helper-android/compare/0.9.1...0.9.2
 [0.9.1]: https://github.com/ROKT/rokt-ux-helper-android/compare/0.9.0...0.9.1

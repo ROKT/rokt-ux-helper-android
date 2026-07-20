@@ -42,6 +42,8 @@ data class OfferModel(
     val campaignId: String,
     val creative: CreativeModel,
     val catalogItems: ImmutableList<CatalogItemModel>,
+    val transactionData: TransactionData? = null,
+    val catalogItemGroup: CatalogItemGroupModel? = null,
 )
 
 data class CreativeModel(
@@ -63,9 +65,33 @@ data class CreativeIcon(val name: String)
 
 data class ResponseOptionModel(val properties: HMap)
 
-data class CatalogItemModel(val properties: HMap, val imageWrapper: CatalogImageWrapperModel)
+data class CatalogItemModel(
+    val properties: HMap,
+    val imageWrapper: CatalogImageWrapperModel,
+    val copy: Map<String, String> = emptyMap(),
+)
 
 data class CatalogImageWrapperModel(val properties: HMap)
+
+data class CatalogItemGroupModel(
+    val groupId: String,
+    val catalogItemIds: ImmutableList<String>,
+    val attributes: ImmutableList<CatalogItemGroupAttributeModel>,
+    val metadata: ImmutableMap<String, String>,
+)
+
+data class CatalogItemGroupAttributeModel(
+    val attributeId: String,
+    val label: String?,
+    val options: ImmutableList<CatalogItemGroupOptionModel>,
+    val metadata: ImmutableMap<String, String>,
+)
+
+data class CatalogItemGroupOptionModel(
+    val label: String?,
+    val catalogItemIds: ImmutableList<String>,
+    val metadata: ImmutableMap<String, String>,
+)
 
 data class LayoutVariantModel(
     val layoutVariantId: String,

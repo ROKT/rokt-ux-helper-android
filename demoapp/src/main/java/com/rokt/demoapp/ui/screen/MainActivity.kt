@@ -7,6 +7,8 @@ import androidx.activity.viewModels
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.view.WindowCompat
 import com.rokt.demoapp.R
+import com.rokt.roktux.RoktUx
+import com.rokt.roktux.logging.RoktUXLogLevel
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -24,6 +26,7 @@ class MainActivity : ComponentActivity() {
             installSplashScreen()
         }
         setTheme(R.style.Theme_RoktDemo)
+        RoktUx.setLogLevel(RoktUXLogLevel.VERBOSE)
         setContent { RoktDemoApp(viewModel) }
     }
 

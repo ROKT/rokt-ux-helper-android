@@ -1,0 +1,13 @@
+{
+  "type": "CatalogResponseButton",
+  "node": {
+    "children": [
+      {
+        "type": "BasicText",
+        "node": {
+          "value": "Confirm order"
+        }
+      }
+    ]
+  }
+}
