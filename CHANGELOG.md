@@ -13,6 +13,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Update Jetpack Compose BOM to 2026.05.01.
 
+## [1.0.0] - 2026-07-20
+
+### Changed
+
+- Support maintenance branch patch releases ([#292](https://github.com/ROKT/rokt-ux-helper-android/pull/292))
+- Bump gradle/actions from 6.1.0 to 6.2.0 ([#286](https://github.com/ROKT/rokt-ux-helper-android/pull/286))
+- Bump codecov/codecov-action from 6.0.1 to 7.0.0 ([#278](https://github.com/ROKT/rokt-ux-helper-android/pull/278))
+- Bump actions/checkout from 6.0.2 to 6.0.3 ([#270](https://github.com/ROKT/rokt-ux-helper-android/pull/270))
+- Add public-repo confidentiality guidance ([#268](https://github.com/ROKT/rokt-ux-helper-android/pull/268))
+- Bump actions/create-github-app-token from 3.1.1 to 3.2.0 ([#266](https://github.com/ROKT/rokt-ux-helper-android/pull/266))
+- Add AGENTS.md and clarify CHANGELOG is auto-generated ([#255](https://github.com/ROKT/rokt-ux-helper-android/pull/255))
+- Stabilize Roborazzi host rendering ([#263](https://github.com/ROKT/rokt-ux-helper-android/pull/263))
+- Add embedded and bottom sheet coverage ([#261](https://github.com/ROKT/rokt-ux-helper-android/pull/261))
+- Snapshot coverage for custom font registration ([#260](https://github.com/ROKT/rokt-ux-helper-android/pull/260))
+- Increase snapshot testing of basic components ([#258](https://github.com/ROKT/rokt-ux-helper-android/pull/258))
+- Skip source-dependent jobs when only non-source files change ([#259](https://github.com/ROKT/rokt-ux-helper-android/pull/259))
+- Support pre-release qualifiers and non-main branch dispatch ([#256](https://github.com/ROKT/rokt-ux-helper-android/pull/256))
+- Bump trunk-io/trunk-action from 1.2.4 to 1.3.1 ([#246](https://github.com/ROKT/rokt-ux-helper-android/pull/246))
+- Bump codecov/codecov-action from 6.0.0 to 6.0.1 ([#247](https://github.com/ROKT/rokt-ux-helper-android/pull/247))
+
 ## [1.0.0-rc.1] - 2026-05-21
 
 ### Changed
@@ -207,7 +227,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Initial implementation of UX Helper
 
-[unreleased]: https://github.com/ROKT/rokt-ux-helper-android/compare/1.0.0-rc.1...HEAD
+[unreleased]: https://github.com/ROKT/rokt-ux-helper-android/compare/1.0.0...HEAD
+[1.0.0]: https://github.com/ROKT/rokt-ux-helper-android/compare/0.9.3...1.0.0
 [1.0.0-rc.1]: https://github.com/ROKT/rokt-ux-helper-android/compare/0.9.3...1.0.0-rc.1
 [0.9.3]: https://github.com/ROKT/rokt-ux-helper-android/compare/0.9.2...0.9.3
 [0.9.2]: https://github.com/ROKT/rokt-ux-helper-android/compare/0.9.1...0.9.2
