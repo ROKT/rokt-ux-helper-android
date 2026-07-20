@@ -2,6 +2,11 @@ package com.rokt.roktux.viewmodel.layout
 
 import com.rokt.modelmapper.hmap.HMap
 import com.rokt.modelmapper.uimodel.OpenLinks
+import com.rokt.modelmapper.uimodel.TransactionData
+import com.rokt.network.model.PaymentProvider
+import com.rokt.roktux.event.DevicePayResult
+import com.rokt.roktux.event.RoktUserInteractionAction
+import com.rokt.roktux.event.RoktUserInteractionContext
 import com.rokt.roktux.viewmodel.base.BaseContract
 
 internal class LayoutContract {
@@ -12,7 +17,7 @@ internal class LayoutContract {
         object LayoutInteractive : LayoutEvent
         object FirstOfferLoaded : LayoutEvent
         object UserInteracted : LayoutEvent
-        data class CloseSelected(val isDismissed: Boolean) : LayoutEvent
+        data class CloseSelected(val isDismissed: Boolean, val dismissalMethod: String? = null) : LayoutEvent
         data class ResponseOptionSelected(
             val currentOffer: Int,
             val openLinks: OpenLinks,
@@ -24,13 +29,39 @@ internal class LayoutContract {
         data class LayoutVariantSwiped(val currentOffer: Int) : LayoutEvent
         data class ViewableItemsChanged(val viewableItems: Int) : LayoutEvent
         data class SetCustomState(val key: String, val value: Int) : LayoutEvent
+        data class SetDomainState(val key: String, val value: Int) : LayoutEvent
         data class SetOfferCustomState(val offerId: Int, val customState: Map<String, Int>) : LayoutEvent
+        data class SetActiveCatalogItem(val index: Int) : LayoutEvent
         data class LayoutVariantNavigated(val targetOffer: Int) : LayoutEvent
         data class SetCurrentOffer(val currentOffer: Int) : LayoutEvent
         data class SignalViewed(val offerId: Int) : LayoutEvent
         data class OfferVisibilityChanged(val offerId: Int, val visible: Boolean) : LayoutEvent
         data class UiException(val throwable: Throwable, val closeLayout: Boolean) : LayoutEvent
         data class CartItemInstantPurchaseSelected(val catalogItemModel: HMap) : LayoutEvent
+        data class UserInteractionSelected(
+            val offerId: Int,
+            val action: RoktUserInteractionAction,
+            val context: RoktUserInteractionContext,
+            val catalogItemIndex: Int? = null,
+            val parentGuid: String? = null,
+        ) : LayoutEvent
+
+        data class CartItemForwardPaymentSelected(
+            val offerId: Int,
+            val catalogItemModel: HMap,
+            val transactionData: TransactionData?,
+        ) : LayoutEvent
+
+        data class CartItemDevicePaySelected(
+            val offerId: Int,
+            val catalogItemModel: HMap?,
+            val paymentProvider: PaymentProvider,
+            val transactionData: TransactionData?,
+            val validatorFieldKeys: List<String>,
+        ) : LayoutEvent
+
+        data class CartItemDevicePayResultReceived(val offerId: Int, val result: DevicePayResult) : LayoutEvent
+        data class CartItemForwardPaymentResultReceived(val offerId: Int, val result: DevicePayResult) : LayoutEvent
     }
 
     sealed interface LayoutEffect : BaseContract.BaseEffect {

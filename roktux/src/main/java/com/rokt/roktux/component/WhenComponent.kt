@@ -14,7 +14,9 @@ import com.rokt.modelmapper.uimodel.EqualityWhenUiCondition
 import com.rokt.modelmapper.uimodel.ExistenceWhenUiCondition
 import com.rokt.modelmapper.uimodel.LayoutSchemaUiModel
 import com.rokt.modelmapper.uimodel.OrderableWhenUiCondition
+import com.rokt.modelmapper.uimodel.StringWhenUiCondition
 import com.rokt.modelmapper.uimodel.WhenUiPredicate
+import com.rokt.roktux.utils.getValue
 import com.rokt.roktux.viewmodel.layout.LayoutContract
 import com.rokt.roktux.viewmodel.layout.OfferUiState
 import kotlinx.collections.immutable.ImmutableList
@@ -127,7 +129,18 @@ internal fun evaluatePredicates(
             }
 
             is WhenUiPredicate.CustomState -> {
-                offerState.customState[predicate.key] ?: 0
+                // Resolve against the effective custom state for the current offer:
+                // offer-scoped value first, then global fallback, then 0 (mirrors the iOS
+                // PredicateHandling.customStatePredicatesMatched local-then-global resolution).
+                // Without the offer-scoped lookup, results written per-offer (e.g. the device-pay
+                // `paymentResult`) are never observed by `When` nodes and the success branch never shows.
+                offerState.offerCustomStates[currentOffer.toString()]?.get(predicate.key)
+                    ?: offerState.customState[predicate.key]
+                    ?: 0
+            }
+
+            is WhenUiPredicate.DomainState -> {
+                offerState.domainStates[predicate.key] ?: 0
             }
 
             is WhenUiPredicate.DarkMode -> {
@@ -160,18 +173,46 @@ internal fun evaluatePredicates(
                 predicate.value
             }
 
+            is WhenUiPredicate.DomainState -> {
+                predicate.value
+            }
+
             else -> null
         }
 
         val evaluationResult = when (predicate) {
             is WhenUiPredicate.Breakpoint -> predicate.condition.evaluate(leftValue, rightValue)
+
             is WhenUiPredicate.DarkMode -> predicate.condition.evaluate(leftValue == 1, isDarkModeEnabled)
+
             is WhenUiPredicate.Position -> predicate.condition.evaluate(leftValue, rightValue)
+
             is WhenUiPredicate.Progression -> predicate.condition.evaluate(leftValue as Int, rightValue)
+
             is WhenUiPredicate.CreativeCopy -> predicate.condition.evaluate(offerState.creativeCopy[predicate.value])
+
             is WhenUiPredicate.StaticBoolean -> predicate.condition.evaluate(predicate.value)
+
             is WhenUiPredicate.CustomState -> predicate.condition.evaluate(leftValue, rightValue)
+
+            is WhenUiPredicate.DomainState -> predicate.condition.evaluate(leftValue, rightValue)
+
             is WhenUiPredicate.StaticString -> predicate.condition.evaluate(predicate.input, predicate.value)
+
+            is WhenUiPredicate.PlaceholderTextValue -> predicate.condition.evaluate(
+                predicate.input.getValue(offerState, offerState.viewableItems),
+                predicate.value,
+            )
+
+            is WhenUiPredicate.PlaceholderTextLength -> predicate.condition.evaluate(
+                predicate.input.getValue(offerState, offerState.viewableItems)?.length,
+                predicate.value.toIntOrNull(),
+            )
+
+            is WhenUiPredicate.PlaceholderNumeric -> predicate.condition.evaluate(
+                predicate.input.getValue(offerState, offerState.viewableItems)?.toIntOrNull(),
+                predicate.value.toIntOrNull(),
+            )
         }
 
         if (!evaluationResult) {
@@ -211,6 +252,13 @@ private fun EqualityWhenUiCondition.evaluate(leftValue: String, rightValue: Stri
 private fun ExistenceWhenUiCondition.evaluate(value: String?): Boolean = when (this) {
     ExistenceWhenUiCondition.Exists -> !value.isNullOrEmpty()
     ExistenceWhenUiCondition.NotExists -> value.isNullOrEmpty()
+}
+
+private fun StringWhenUiCondition.evaluate(leftValue: String?, rightValue: String): Boolean = when (this) {
+    StringWhenUiCondition.Is -> leftValue == rightValue
+    StringWhenUiCondition.IsNot -> leftValue != rightValue
+    StringWhenUiCondition.Exists -> !leftValue.isNullOrEmpty()
+    StringWhenUiCondition.NotExists -> leftValue.isNullOrEmpty()
 }
 
 private fun BooleanWhenUiCondition.evaluate(value: Boolean): Boolean = when (this) {

@@ -24,7 +24,7 @@ android {
     compileSdk = 35
 
     defaultConfig {
-        minSdk = 21
+        minSdk = 23
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles("consumer-rules.pro")
@@ -62,8 +62,9 @@ tasks.withType(Test::class.java) {
 dependencies {
     api(libs.dcui.schema)
     api(libs.kotlinx.serialization.json)
-    implementation(libs.coil.kt)
+    api(libs.coil.kt)
     implementation(libs.coil.kt.compose)
+    implementation(libs.coil.kt.network.okhttp)
     implementation(libs.coil.kt.svg)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)

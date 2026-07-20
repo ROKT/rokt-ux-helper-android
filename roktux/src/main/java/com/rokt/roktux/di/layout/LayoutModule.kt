@@ -1,20 +1,23 @@
 package com.rokt.roktux.di.layout
 
-import coil.ImageLoader
+import coil3.ImageLoader
 import com.rokt.core.di.Module
 import com.rokt.modelmapper.data.DataBinding
 import com.rokt.modelmapper.data.DataBindingImpl
 import com.rokt.modelmapper.mappers.ExperienceModelMapperImpl
 import com.rokt.modelmapper.mappers.ModelMapper
+import com.rokt.modelmapper.model.NetworkExperienceResponse
 import com.rokt.roktux.RoktViewState
 import com.rokt.roktux.component.LayoutUiModelFactory
 import com.rokt.roktux.event.RoktPlatformEvent
 import com.rokt.roktux.event.RoktUxEvent
+import com.rokt.roktux.validation.ValidationCoordinator
 import com.rokt.roktux.viewmodel.layout.LayoutViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 
 internal class LayoutModule(
-    private val experience: String,
+    private val experience: String?,
+    private val parsedExperience: NetworkExperienceResponse?,
     private val location: String,
     private val startTimeStamp: Long,
     private val uxEvent: (uxEvent: RoktUxEvent) -> Unit,
@@ -25,7 +28,9 @@ internal class LayoutModule(
     private val currentOffer: Int,
     private val customStates: Map<String, Int>,
     private val offerCustomStates: Map<String, Map<String, Int>>,
+    private val domainStates: Map<String, Int>,
     private val edgeToEdgeDisplay: Boolean,
+    private val completedDevicePayCartItemIds: Set<String>,
     private val mainDispatcher: CoroutineDispatcher,
     private val ioDispatcher: CoroutineDispatcher,
 ) : Module() {
@@ -35,8 +40,8 @@ internal class LayoutModule(
 
         this.provideModuleScoped { DataBindingImpl() }
         this.provideModuleScoped { LayoutUiModelFactory() }
-        this.provideModuleScoped { ExperienceModelMapperImpl(get(EXPERIENCE), get()) }
-        this.provideModuleScoped(EXPERIENCE) { experience }
+        this.provideModuleScoped { ValidationCoordinator() }
+        this.provideModuleScoped { ExperienceModelMapperImpl(experience, parsedExperience, get()) }
         this.provideModuleScoped(LOCATION) { location }
         this.provideModuleScoped<CoroutineDispatcher>(IO) { ioDispatcher }
         this.provideModuleScoped<CoroutineDispatcher>(MAIN) { mainDispatcher }
@@ -54,7 +59,10 @@ internal class LayoutModule(
                 currentOffer = currentOffer,
                 customStates = customStates,
                 offerCustomStates = offerCustomStates,
+                domainStates = domainStates,
+                validationCoordinator = get(),
                 edgeToEdgeDisplay = edgeToEdgeDisplay,
+                completedDevicePayCartItemIds = completedDevicePayCartItemIds,
             )
         }
         this.provideModuleScoped {
@@ -63,7 +71,6 @@ internal class LayoutModule(
     }
 
     companion object {
-        const val EXPERIENCE = "EXPERIENCE"
         const val LOCATION = "Location"
         const val IO = "IO"
         const val MAIN = "MAIN"

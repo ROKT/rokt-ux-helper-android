@@ -58,7 +58,7 @@ class ShadowSnapshotTest : BaseDcuiEspressoTest() {
     fun testShadowDarkModeColor() = capture()
 
     private fun capture() {
-        composeTestRule.onRoot().captureRoboImage()
+        composeTestRule.onRoot().captureRoboImage(roborazziOptions = snapshotRoborazziOptions)
     }
 
     private companion object {

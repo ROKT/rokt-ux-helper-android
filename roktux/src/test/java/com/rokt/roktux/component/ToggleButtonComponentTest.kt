@@ -9,8 +9,11 @@ import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.rokt.core.testutils.annotations.DCUI_COMPONENT_TAG
 import com.rokt.core.testutils.annotations.DcuiNodeJson
+import com.rokt.roktux.event.RoktUserInteractionAction
+import com.rokt.roktux.event.RoktUserInteractionContext
 import com.rokt.roktux.testutil.BaseDcuiEspressoTest
 import com.rokt.roktux.viewmodel.layout.LayoutContract
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.Assert
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -37,5 +40,10 @@ class ToggleButtonComponentTest : BaseDcuiEspressoTest() {
         Assert.assertTrue(
             getCapturedEvents().any { e -> e.equals(LayoutContract.LayoutEvent.SetCustomState("ToggleButtonState", 1)) },
         )
+        assertThat(getCapturedEvents().filterIsInstance<LayoutContract.LayoutEvent.UserInteractionSelected>())
+            .anySatisfy { event ->
+                assertThat(event.action).isEqualTo(RoktUserInteractionAction.ToggleButtonStateTriggerClick)
+                assertThat(event.context).isEqualTo(RoktUserInteractionContext.ToggleButtonStateTrigger)
+            }
     }
 }

@@ -6,6 +6,8 @@ import com.rokt.modelmapper.uimodel.LayoutSchemaUiModel
 import com.rokt.roktux.component.ComposableComponent
 import com.rokt.roktux.component.LayoutUiModelFactory
 import com.rokt.roktux.component.ModifierFactory
+import com.rokt.roktux.event.RoktUserInteractionAction
+import com.rokt.roktux.event.RoktUserInteractionContext
 import com.rokt.roktux.viewmodel.layout.LayoutContract
 import com.rokt.roktux.viewmodel.layout.OfferUiState
 
@@ -41,6 +43,13 @@ internal class ToggleButtonStateTriggerComponent(
                 0
             }
             onEventSent(LayoutContract.LayoutEvent.SetCustomState(model.customStateKey, newState))
+            onEventSent(
+                LayoutContract.LayoutEvent.UserInteractionSelected(
+                    offerId = offerState.currentOfferIndex,
+                    action = RoktUserInteractionAction.ToggleButtonStateTriggerClick,
+                    context = RoktUserInteractionContext.ToggleButtonStateTrigger,
+                ),
+            )
         }
     }
 }

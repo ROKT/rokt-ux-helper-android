@@ -8,6 +8,7 @@ import com.rokt.demoapp.ui.state.UiContent
 import com.rokt.demoapp.ui.state.UiState
 import com.rokt.networkhelper.data.RoktNetwork
 import com.rokt.networkhelper.model.ExperienceRequest
+import com.rokt.roktux.event.DevicePayResult
 import com.rokt.roktux.event.RoktUxEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -63,22 +64,45 @@ class TutorialNineViewModel @Inject constructor() : ViewModel() {
 
     fun handleUXEvent(event: RoktUxEvent) {
         viewModelScope.launch {
-            if (event is RoktUxEvent.CartItemInstantPurchase) {
-                _state.value = UiState(loading = true)
-                try {
-                    withContext(Dispatchers.IO) {
-                        delay(5000)
-                        // Simulate a failure scenario 1 out of 5 times
-                        val random = Random.nextInt(5)
-                        if (random == 0) {
-                            throw Exception("Purchase failed")
+            when (event) {
+                is RoktUxEvent.CartItemInstantPurchase -> {
+                    _state.value = UiState(loading = true)
+                    try {
+                        withContext(Dispatchers.IO) {
+                            delay(5000)
+                            // Simulate a failure scenario 1 out of 5 times
+                            val random = Random.nextInt(5)
+                            if (random == 0) {
+                                throw Exception("Purchase failed")
+                            }
                         }
+                        _state.value = UiState(data = UiContent.PaymentSuccessContent("Purchase completed"))
+                    } catch (e: Exception) {
+                        _state.value = UiState(data = UiContent.PaymentFailureContent(e.message.orEmpty()))
                     }
-                    _state.value = UiState(data = UiContent.PaymentSuccessContent("Purchase completed"))
-                } catch (e: Exception) {
-                    _state.value = UiState(data = UiContent.PaymentFailureContent(e.message.orEmpty()))
                 }
+
+                is RoktUxEvent.CartItemDevicePay -> event.onResult(dummyPaymentResult())
+
+                is RoktUxEvent.CartItemForwardPayment -> event.onResult(dummyPaymentResult())
+
+                else -> Unit
             }
         }
+    }
+
+    private fun dummyPaymentResult(): DevicePayResult = when (Random.nextInt(3)) {
+        0 -> DevicePayResult.Success
+
+        1 -> DevicePayResult.Failure
+
+        else -> DevicePayResult.PendingConfirmation(
+            mapOf(
+                "subtotal" to "79.99",
+                "tax" to "6.60",
+                "shipping" to "0.00",
+                "total" to "86.59",
+            ),
+        )
     }
 }

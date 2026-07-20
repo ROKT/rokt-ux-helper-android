@@ -13,9 +13,11 @@ runs:
       shell: bash
       run: |
         mkdir -p ~/.gradle
-        echo "org.gradle.jvmargs=-Xmx2g -XX:+TieredCompilation -XX:TieredStopAtLevel=1 -Dfile.encoding=UTF-8" >> ~/.gradle/gradle.properties
-        echo "kotlin.daemon.jvmargs=-Xmx512m -XX:+TieredCompilation -XX:TieredStopAtLevel=1" >> ~/.gradle/gradle.properties
-        echo "org.gradle.parallel=true" >> ~/.gradle/gradle.properties
-        echo "org.gradle.configureondemand=true" >> ~/.gradle/gradle.properties
-        echo "kotlin.incremental=true" >> ~/.gradle/gradle.properties
-        echo "org.gradle.daemon=false" >> ~/.gradle/gradle.properties
+        {
+          echo "org.gradle.jvmargs=-Xmx2g -XX:MaxMetaspaceSize=1g -Dfile.encoding=UTF-8"
+          echo "kotlin.daemon.jvmargs=-Xmx3g"
+          echo "org.gradle.workers.max=1"
+          echo "org.gradle.parallel=false"
+          echo "kotlin.incremental=true"
+          echo "org.gradle.daemon=false"
+        } >> ~/.gradle/gradle.properties

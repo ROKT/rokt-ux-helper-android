@@ -3,12 +3,14 @@ package com.rokt.modelmapper.data
 import com.rokt.modelmapper.hmap.TypedKey
 import com.rokt.modelmapper.hmap.get
 import com.rokt.modelmapper.testutils.MockkUnitTest
+import com.rokt.modelmapper.uimodel.Address
 import com.rokt.modelmapper.uimodel.CatalogItemModel
 import com.rokt.modelmapper.uimodel.CreativeLink
 import com.rokt.modelmapper.uimodel.Module
 import com.rokt.modelmapper.uimodel.OfferImageModel
 import com.rokt.modelmapper.uimodel.OfferModel
 import com.rokt.modelmapper.uimodel.ResponseOptionModel
+import com.rokt.modelmapper.uimodel.TransactionData
 import io.mockk.every
 import io.mockk.mockk
 import junit.framework.TestCase.assertTrue
@@ -83,8 +85,13 @@ class DataBindingImplTest : MockkUnitTest() {
                 ),
             )
         }
+        every { transactionData } returns TransactionData(
+            shippingAddress = Address(name = "John Doe", city = "New York"),
+            confirmationRef = "CONF-123",
+        )
         every { catalogItems } returns listOf<CatalogItemModel>(
             mockk(relaxed = true) {
+                every { copy } returns mapOf("provider.supplierName" to "Acme Co")
                 every { properties } returns mockk(relaxed = false) {
                     every { get(key = any<TypedKey<Any>>()) } returns null
                     every { get(TypedKey<String>("positiveResponseText1")) } returns "Add to order 1"
@@ -576,6 +583,90 @@ class DataBindingImplTest : MockkUnitTest() {
             null,
             BindData.Value::class.java,
             1,
+        ),
+        arrayOf(
+            "%^DATA.catalogItem.images.catalogItemImage1.light^%",
+            "light1",
+            null,
+            BindData.Value::class.java,
+            0,
+        ),
+        arrayOf(
+            "%^DATA.catalogItem.images.catalogItemImage2.light^%",
+            "light2",
+            null,
+            BindData.Value::class.java,
+            1,
+        ),
+        arrayOf(
+            "%^DATA.catalogItem.images.catalogItemImage2.light|^%",
+            "",
+            null,
+            BindData.Value::class.java,
+            0,
+        ),
+        arrayOf(
+            "%^DATA.catalogItem.images.catalogItemImage1^%",
+            "",
+            null,
+            BindData.Value::class.java,
+            0,
+        ),
+        arrayOf(
+            "%^DATA.catalogRuntime.total|default-total^%",
+            "%^DATA.catalogRuntime.total|default-total^%",
+            null,
+            BindData.Value::class.java,
+            0,
+        ),
+        arrayOf(
+            "%^DATA.catalogItem.copy.provider.supplierName | Rokt^%",
+            "Acme Co",
+            null,
+            BindData.Value::class.java,
+            0,
+        ),
+        arrayOf(
+            "%^DATA.catalogItem.copy.provider.missing | Rokt^%",
+            "Rokt",
+            null,
+            BindData.Value::class.java,
+            0,
+        ),
+        arrayOf(
+            "%^DATA.transactionData.shippingAddress.name | ^%",
+            "John Doe",
+            null,
+            BindData.Value::class.java,
+            0,
+        ),
+        arrayOf(
+            "%^DATA.transactionData.shippingAddress.city^%",
+            "New York",
+            null,
+            BindData.Value::class.java,
+            0,
+        ),
+        arrayOf(
+            "%^DATA.transactionData.confirmationRef^%",
+            "CONF-123",
+            null,
+            BindData.Value::class.java,
+            0,
+        ),
+        arrayOf(
+            "%^DATA.transactionData.billingAddress.name | N/A^%",
+            "N/A",
+            null,
+            BindData.Value::class.java,
+            0,
+        ),
+        arrayOf(
+            "Supplied by %^DATA.catalogItem.copy.provider.supplierName | Rokt^% to %^DATA.transactionData.shippingAddress.name | ^%",
+            "Supplied by Acme Co to John Doe",
+            null,
+            BindData.Value::class.java,
+            0,
         ),
         arrayOf(
             "%^DATA.creativeImage.creativeCarouselImageHorizontal.1.title^%",
