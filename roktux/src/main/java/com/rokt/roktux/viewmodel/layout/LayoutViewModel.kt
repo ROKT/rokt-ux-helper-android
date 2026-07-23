@@ -633,6 +633,9 @@ internal class LayoutViewModel(
                 objectData = mapOf(
                     KEY_USER_INTERACTION_ACTION to action.name,
                     KEY_USER_INTERACTION_CONTEXT to context.name,
+                    // Canonical classification the ledger reads; mirrors action so downstream
+                    // consumers get a populated interactionType without SDK-side derivation.
+                    KEY_USER_INTERACTION_INTERACTION_TYPE to action.name,
                 ),
             ),
         )
@@ -1018,6 +1021,7 @@ internal class LayoutViewModel(
         private const val KEY_INITIATOR = "initiator"
         private const val KEY_USER_INTERACTION_ACTION = "action"
         private const val KEY_USER_INTERACTION_CONTEXT = "context"
+        private const val KEY_USER_INTERACTION_INTERACTION_TYPE = "interactionType"
         private const val KEY_PAGE_RENDER_ENGINE = "pageRenderEngine"
         private const val KEY_PAGE_SIGNAL_LOAD_START = "pageSignalLoadStart"
         private const val KEY_PAGE_SIGNAL_LOAD_COMPLETE = "pageSignalLoadComplete"

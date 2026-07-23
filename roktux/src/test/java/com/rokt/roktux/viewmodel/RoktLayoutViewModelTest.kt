@@ -965,6 +965,7 @@ class RoktLayoutViewModelTest : BaseViewModelTest() {
                             mapOf(
                                 "action" to "OfferProgression",
                                 "context" to "CustomStateValidationTriggerButton",
+                                "interactionType" to "OfferProgression",
                             ),
                         )
                     }
@@ -1012,6 +1013,7 @@ class RoktLayoutViewModelTest : BaseViewModelTest() {
                             mapOf(
                                 "action" to "ValidationTriggerFailed",
                                 "context" to "CustomStateValidationTriggerButton",
+                                "interactionType" to "ValidationTriggerFailed",
                             ),
                         )
                     }
@@ -1045,6 +1047,7 @@ class RoktLayoutViewModelTest : BaseViewModelTest() {
                             mapOf(
                                 "action" to "ToggleButtonStateTriggerClick",
                                 "context" to "ToggleButtonStateTrigger",
+                                "interactionType" to "ToggleButtonStateTriggerClick",
                             ),
                         )
                     }
@@ -1079,6 +1082,7 @@ class RoktLayoutViewModelTest : BaseViewModelTest() {
                             mapOf(
                                 "action" to "ThumbnailClick",
                                 "context" to "CatalogImageGallery",
+                                "interactionType" to "ThumbnailClick",
                             ),
                         )
                     }
@@ -1113,6 +1117,7 @@ class RoktLayoutViewModelTest : BaseViewModelTest() {
                             mapOf(
                                 "action" to "DropDownItemSelected",
                                 "context" to "CatalogDropDown",
+                                "interactionType" to "DropDownItemSelected",
                             ),
                         )
                     }
