@@ -39,7 +39,7 @@ kover = "0.9.1"
 
 roktUxHelper = "0.2.0"
 sdkVersionCode = "79"
-roborazzi = "1.43.0"
+roborazzi = "1.60.0"
 
 [libraries]
 androidx-activity-compose = { group = "androidx.activity", name = "activity-compose", version.ref = "androidxActivity" }

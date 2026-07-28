@@ -45,8 +45,8 @@ android {
             isIncludeAndroidResources = true
             all {
                 it.useJUnit {
-                    // Run screenshot tests by using -PrunSnapshotTests
-                    if (project.hasProperty("runSnapshotTests")) {
+                    // Run screenshot tests by using -PenableSnapshotTests
+                    if (project.hasProperty("enableSnapshotTests")) {
                         includeCategories("com.rokt.roktux.snapshot.SnapshotTest")
                     }
                 }
