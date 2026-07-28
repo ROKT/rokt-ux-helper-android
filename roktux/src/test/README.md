@@ -8,6 +8,14 @@ We use [Roborazzi](https://github.com/takahirom/roborazzi) for snapshot testing.
 
 To separate snapshot tests from regular unit tests, you can use the `@Category(SnapshotTest::class)` annotation for each test class. When running a test command, include `-PenableSnapshotTests` to also make the snapshot tests run. If you are not using a Roborazzi task (e.g. running `./gradlew test` instead of `./gradlew verifyRoborazziRelease`) you will also need to include the Roborazzi properties `-Proborazzi.test.record=true`, `-Proborazzi.test.compare=true`, and `-Proborazzi.test.verify=true` depending on which task you want to execute.
 
+### IDE Plugin
+
+The JetBrains Marketplace plugin for Roborazzi renders screenshot diffs directly in Android Studio and IntelliJ IDEA. Search for "Roborazzi" in the IDE plugin marketplace, or install plugin ID `24561`.
+
+### Debugging
+
+When a snapshot verification fails locally, add `-Proborazzi.debug=true` to the Gradle command to emit verbose path and comparison diagnostics.
+
 ### Updating Baselines
 
 To ensure consistency of the environment used for snapshot testing, baseline images should be created via CI.
