@@ -287,6 +287,40 @@ class RoktLayoutViewModelTest : BaseViewModelTest() {
     }
 
     @Test
+    fun `ResponseOptionSelected Url action with empty URL omits click destination metadata`() = runTest {
+        // Arrange
+        val responseOptionProperties = HMap().apply {
+            this[TypedKey<Action>("action")] = Action.Url
+            this[TypedKey<SignalType>("signalType")] = SignalType.SignalResponse
+            this[TypedKey<String>("instanceGuid")] = "responseInstanceGuid"
+            this[TypedKey<String>("token")] = "responseToken"
+            this[TypedKey<String>("url")] = ""
+        }
+        // Act
+        layoutViewModel.setEvent(
+            LayoutContract.LayoutEvent.ResponseOptionSelected(
+                1,
+                OpenLinks.Internally,
+                responseOptionProperties,
+                true,
+            ),
+        )
+        // Assert
+        verify(timeout = 2000) {
+            platformEvent.invoke(
+                withArg { events ->
+                    assertThat(events).anySatisfy { event ->
+                        assertThat(event.eventType).isEqualTo(EventType.SignalResponse)
+                        assertThat(event.parentGuid).isEqualTo("responseInstanceGuid")
+                        assertThat(event.token).isEqualTo("responseToken")
+                        assertThat(event.metadata.map { it.name }).doesNotContain("transformedTrafficURL")
+                    }
+                },
+            )
+        }
+    }
+
+    @Test
     fun `CartItemForwardPaymentSelected sends platform event carrying the catalog item token`() = runTest {
         // Arrange
         clearMocks(uxEvent, platformEvent, viewStateChange)
