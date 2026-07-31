@@ -654,6 +654,7 @@ internal class LayoutViewModel(
             }
             val eventType = get<SignalType>(KEY_SIGNAL_TYPE)?.toEventType()
             val parentGuid = get<String>(KEY_INSTANCE_GUID)
+            val responseUrl = get<String>(KEY_URL)?.takeIf { it.isNotEmpty() }
             if (eventType != null && parentGuid != null) {
                 handlePlatformEvent(
                     RoktPlatformEvent(
@@ -661,11 +662,16 @@ internal class LayoutViewModel(
                         sessionId = experienceModel.sessionId,
                         parentGuid = parentGuid,
                         token = token(),
+                        metadata = buildList {
+                            if (get<Action>(KEY_ACTION) == Action.Url && responseUrl != null) {
+                                add(EventNameValue(KEY_TRANSFORMED_TRAFFIC_URL, responseUrl))
+                            }
+                        },
                     ),
                 )
             }
             if (get<Action>(KEY_ACTION) == Action.Url) {
-                sendOpenUrlEvent(get<String>(KEY_URL).orEmpty(), openLinks, true, shouldProgress)
+                sendOpenUrlEvent(responseUrl.orEmpty(), openLinks, true, shouldProgress)
             } else {
                 if (shouldProgress) {
                     updateTargetOffer(currentOffer + 1)
@@ -1019,6 +1025,7 @@ internal class LayoutViewModel(
 
     companion object {
         private const val KEY_INITIATOR = "initiator"
+        private const val KEY_TRANSFORMED_TRAFFIC_URL = "transformedTrafficURL"
         private const val KEY_USER_INTERACTION_ACTION = "action"
         private const val KEY_USER_INTERACTION_CONTEXT = "context"
         private const val KEY_USER_INTERACTION_INTERACTION_TYPE = "interactionType"
