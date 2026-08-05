@@ -487,6 +487,7 @@ internal class LayoutViewModel(
                 sessionId = experienceModel.sessionId,
                 parentGuid = catalogItemProperties.instanceGuid(),
                 token = catalogItemProperties.token(),
+                pageInstanceGuid = experienceModel.placementContext.pageInstanceGuid,
                 eventData = catalogItemProperties.cartItemEventData(salePrice),
             ),
         )
