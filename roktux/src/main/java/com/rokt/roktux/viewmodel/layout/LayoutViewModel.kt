@@ -630,6 +630,7 @@ internal class LayoutViewModel(
                 sessionId = experienceModel.sessionId,
                 parentGuid = parentGuid,
                 token = token,
+                pageInstanceGuid = experienceModel.placementContext.pageInstanceGuid,
                 objectData = mapOf(
                     KEY_USER_INTERACTION_ACTION to action.name,
                     KEY_USER_INTERACTION_CONTEXT to context.name,
@@ -804,6 +805,7 @@ internal class LayoutViewModel(
                 sessionId = experienceModel.sessionId,
                 parentGuid = pluginModel.instanceGuid,
                 token = pluginModel.token,
+                pageInstanceGuid = experienceModel.placementContext.pageInstanceGuid,
                 metadata = listOf(EventNameValue(KEY_INITIATOR, dismissReason)),
             ),
         )

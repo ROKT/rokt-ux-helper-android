@@ -1033,6 +1033,7 @@ class RoktLayoutViewModelTest : BaseViewModelTest() {
                     assertThat(events).anySatisfy { platformEvent ->
                         assertThat(platformEvent.eventType).isEqualTo(EventType.SignalUserInteraction)
                         assertThat(platformEvent.parentGuid).isEqualTo("catalog-instance-guid-1")
+                        assertThat(platformEvent.pageInstanceGuid).isEqualTo("pageInstanceGuid")
                         assertThat(platformEvent.objectData).isEqualTo(
                             mapOf(
                                 "action" to "OfferProgression",
@@ -1081,6 +1082,7 @@ class RoktLayoutViewModelTest : BaseViewModelTest() {
                     assertThat(events).anySatisfy { platformEvent ->
                         assertThat(platformEvent.eventType).isEqualTo(EventType.SignalUserInteraction)
                         assertThat(platformEvent.parentGuid).isEqualTo("catalog-instance-guid-1")
+                        assertThat(platformEvent.pageInstanceGuid).isEqualTo("pageInstanceGuid")
                         assertThat(platformEvent.objectData).isEqualTo(
                             mapOf(
                                 "action" to "ValidationTriggerFailed",
@@ -1115,6 +1117,7 @@ class RoktLayoutViewModelTest : BaseViewModelTest() {
                     assertThat(events).anySatisfy { platformEvent ->
                         assertThat(platformEvent.eventType).isEqualTo(EventType.SignalUserInteraction)
                         assertThat(platformEvent.parentGuid).isEqualTo("pluginInstanceGuid")
+                        assertThat(platformEvent.pageInstanceGuid).isEqualTo("pageInstanceGuid")
                         assertThat(platformEvent.objectData).isEqualTo(
                             mapOf(
                                 "action" to "ToggleButtonStateTriggerClick",
@@ -1150,6 +1153,7 @@ class RoktLayoutViewModelTest : BaseViewModelTest() {
                     assertThat(events).anySatisfy { platformEvent ->
                         assertThat(platformEvent.eventType).isEqualTo(EventType.SignalUserInteraction)
                         assertThat(platformEvent.parentGuid).isEqualTo("catalog-instance-guid-1")
+                        assertThat(platformEvent.pageInstanceGuid).isEqualTo("pageInstanceGuid")
                         assertThat(platformEvent.objectData).isEqualTo(
                             mapOf(
                                 "action" to "ThumbnailClick",
@@ -1185,6 +1189,7 @@ class RoktLayoutViewModelTest : BaseViewModelTest() {
                     assertThat(events).anySatisfy { platformEvent ->
                         assertThat(platformEvent.eventType).isEqualTo(EventType.SignalUserInteraction)
                         assertThat(platformEvent.parentGuid).isEqualTo("catalog-instance-guid-2")
+                        assertThat(platformEvent.pageInstanceGuid).isEqualTo("pageInstanceGuid")
                         assertThat(platformEvent.objectData).isEqualTo(
                             mapOf(
                                 "action" to "DropDownItemSelected",
@@ -1218,6 +1223,7 @@ class RoktLayoutViewModelTest : BaseViewModelTest() {
                     assertThat(events).anySatisfy { platformEvent ->
                         assertThat(platformEvent.eventType).isEqualTo(EventType.SignalInstantPurchaseDismissal)
                         assertThat(platformEvent.parentGuid).isEqualTo("pluginInstanceGuid")
+                        assertThat(platformEvent.pageInstanceGuid).isEqualTo("pageInstanceGuid")
                         assertThat(platformEvent.metadata)
                             .anySatisfy { metadata ->
                                 assertThat(metadata.name).isEqualTo("initiator")
