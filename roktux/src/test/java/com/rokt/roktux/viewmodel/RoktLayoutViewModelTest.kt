@@ -340,6 +340,7 @@ class RoktLayoutViewModelTest : BaseViewModelTest() {
                         assertThat(event.eventType).isEqualTo(EventType.SignalCartItemInstantPurchaseInitiated)
                         assertThat(event.parentGuid).isEqualTo("catalog-instance-guid-1")
                         assertThat(event.token).isEqualTo("catalog-token-1")
+                        assertThat(event.pageInstanceGuid).isEqualTo("pageInstanceGuid")
                     }
                 },
             )
@@ -707,6 +708,7 @@ class RoktLayoutViewModelTest : BaseViewModelTest() {
                     assertThat(events).anyMatch {
                         it.eventType == EventType.SignalCartItemInstantPurchaseInitiated &&
                             it.parentGuid == "catalog-instance-guid-1" &&
+                            it.pageInstanceGuid == "pageInstanceGuid" &&
                             it.eventData?.get("totalPrice") == "79.99" &&
                             it.eventData?.get("unitPrice") == "79.99"
                     }
