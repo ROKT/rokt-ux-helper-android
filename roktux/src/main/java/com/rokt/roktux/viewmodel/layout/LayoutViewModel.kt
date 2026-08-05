@@ -448,7 +448,7 @@ internal class LayoutViewModel(
                 sessionId = experienceModel.sessionId,
                 parentGuid = catalogItemProperties.instanceGuid(),
                 token = catalogItemProperties.token(),
-                eventData = catalogItemProperties.cartItemEventData(originalPrice),
+                pageInstanceGuid = experienceModel.placementContext.pageInstanceGuid,
             ),
         )
         setEvent(LayoutContract.LayoutEvent.CloseSelected(isDismissed = false))

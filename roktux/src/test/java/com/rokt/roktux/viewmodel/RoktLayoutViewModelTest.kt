@@ -321,6 +321,52 @@ class RoktLayoutViewModelTest : BaseViewModelTest() {
     }
 
     @Test
+    fun `CartItemInstantPurchaseSelected sends lean initiated signal with ids and no event body`() = runTest {
+        // Arrange
+        clearMocks(uxEvent, platformEvent, viewStateChange)
+
+        // Act
+        layoutViewModel.setEvent(
+            LayoutContract.LayoutEvent.CartItemInstantPurchaseSelected(
+                catalogItemModel = createCatalogItemProperties(),
+            ),
+        )
+
+        // Assert — rich host UX callback unchanged
+        verify(timeout = 2000) {
+            uxEvent.invoke(
+                match { event ->
+                    event is RoktUxEvent.CartItemInstantPurchase &&
+                        event.layoutId == "pluginId" &&
+                        event.cartItemId == "cart-item-1" &&
+                        event.catalogItemId == "catalog-item-1" &&
+                        event.currency == "USD" &&
+                        event.description == "Lightweight daily shoes" &&
+                        event.linkedProductId == "linked-product-1" &&
+                        event.totalPrice == 99.99 &&
+                        event.unitPrice == 99.99 &&
+                        event.quantity == 1
+                },
+            )
+        }
+        // Assert — platform Initiated matches iOS: ids only, no fat eventData / objectData
+        verify(timeout = 2000) {
+            platformEvent.invoke(
+                match { events ->
+                    events.any {
+                        it.eventType == EventType.SignalCartItemInstantPurchaseInitiated &&
+                            it.parentGuid == "catalog-instance-guid-1" &&
+                            it.token == "catalog-token-1" &&
+                            it.pageInstanceGuid == "pageInstanceGuid" &&
+                            it.eventData == null &&
+                            it.objectData == null
+                    }
+                },
+            )
+        }
+    }
+
+    @Test
     fun `CartItemForwardPaymentSelected sends platform event carrying the catalog item token`() = runTest {
         // Arrange
         clearMocks(uxEvent, platformEvent, viewStateChange)
