@@ -8,13 +8,13 @@ import com.rokt.network.model.LayoutSettings
 import com.rokt.network.model.RootSchemaModel
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.json.JsonElement
 
 /**
- * Selection response for an offers request — the model the renderer consumes,
- * alongside `NetworkExperienceResponse`. The layout schema fields are
- * parsed into the renderer's typed [RootSchemaModel] / [LayoutSchemaModel] (the
- * SDK-side wire model keeps the same fields as raw strings instead).
+ * Selection response for a `v2/sessions/offers` request — the single canonical,
+ * helper-owned response model the renderer consumes. The layout schema fields are
+ * parsed into the renderer's typed [RootSchemaModel] / [LayoutSchemaModel] during
+ * decode; [ExperienceModelMapperImpl] maps this tree into the renderer's
+ * `ExperienceModel`. Only the consumed fields are typed; any other keys are ignored.
  */
 @Serializable
 data class SelectResponse(
@@ -82,20 +82,44 @@ data class SelectOffer(
     @SerialName("campaign_id") val campaignId: String? = null,
     @SerialName("creative") val creative: SelectCreative? = null,
     @SerialName("catalog_items") val catalogItems: List<SelectCatalogItem>? = null,
+    @SerialName("catalog_item_group") val catalogItemGroup: SelectCatalogItemGroup? = null,
+    @SerialName("transaction_data") val transactionData: SelectTransactionData? = null,
 )
 
 /**
- * A catalog item from an offers selection response.
- *
- * Only `instance_guid` and `title` are part of the agreed contract, so they are
- * the only fields modelled here. Both are optional; campaign-specific fields are
- * intentionally not surfaced. As the renderer starts consuming catalog items,
- * add the fields it needs as typed (optional) properties here.
+ * A shoppable catalog item from an offers selection response. Only the fields the
+ * renderer / purchase events consume are modelled; every field is optional and any
+ * other keys on the wire are ignored. The mapping into the renderer's
+ * `CatalogItemModel` supplies defaults for the keys it requires but the response
+ * can omit.
  */
 @Serializable
 data class SelectCatalogItem(
+    @SerialName("catalog_item_id") val catalogItemId: String? = null,
     @SerialName("instance_guid") val instanceGuid: String? = null,
+    @SerialName("cart_item_id") val cartItemId: String? = null,
     @SerialName("title") val title: String? = null,
+    @SerialName("description") val description: String? = null,
+    @SerialName("price") val price: Double? = null,
+    @SerialName("original_price") val originalPrice: Double? = null,
+    @SerialName("price_formatted") val priceFormatted: String? = null,
+    @SerialName("original_price_formatted") val originalPriceFormatted: String? = null,
+    @SerialName("currency") val currency: String? = null,
+    @SerialName("url") val url: String? = null,
+    @SerialName("url_behavior") val urlBehavior: String? = null,
+    @SerialName("signal_type") val signalType: String? = null,
+    @SerialName("min_item_count") val minItemCount: Int? = null,
+    @SerialName("max_item_count") val maxItemCount: Int? = null,
+    @SerialName("pre_selected_quantity") val preSelectedQuantity: Int? = null,
+    @SerialName("provider_data") val providerData: String? = null,
+    @SerialName("linked_product_id") val linkedProductId: String? = null,
+    @SerialName("quantity_must_be_synchronized") val quantityMustBeSynchronized: Boolean? = null,
+    @SerialName("positive_response_text") val positiveResponseText: String? = null,
+    @SerialName("negative_response_text") val negativeResponseText: String? = null,
+    @SerialName("inventory_status") val inventoryStatus: String? = null,
+    @SerialName("copy") val copy: Map<String, String>? = null,
+    @SerialName("images") val images: Map<String, SelectImage>? = null,
+    @SerialName("token") val token: String? = null,
 )
 
 @Serializable
@@ -140,7 +164,64 @@ data class SelectLink(@SerialName("url") val url: String? = null, @SerialName("t
 data class SelectIcon(@SerialName("name") val name: String? = null)
 
 @Serializable
+data class SelectCatalogItemGroup(
+    @SerialName("group_id") val groupId: String? = null,
+    @SerialName("catalog_item_ids") val catalogItemIds: List<String>? = null,
+    @SerialName("attributes") val attributes: List<SelectCatalogItemGroupAttribute>? = null,
+    @SerialName("metadata") val metadata: Map<String, String>? = null,
+)
+
+@Serializable
+data class SelectCatalogItemGroupAttribute(
+    @SerialName("attribute_id") val attributeId: String? = null,
+    @SerialName("label") val label: String? = null,
+    @SerialName("options") val options: List<SelectCatalogItemGroupOption>? = null,
+    @SerialName("metadata") val metadata: Map<String, String>? = null,
+)
+
+@Serializable
+data class SelectCatalogItemGroupOption(
+    @SerialName("label") val label: String? = null,
+    @SerialName("catalog_item_ids") val catalogItemIds: List<String>? = null,
+    @SerialName("metadata") val metadata: Map<String, String>? = null,
+)
+
+@Serializable
+data class SelectTransactionData(
+    @SerialName("shipping_address") val shippingAddress: SelectAddress? = null,
+    @SerialName("billing_address") val billingAddress: SelectAddress? = null,
+    @SerialName("payment_type") val paymentType: String? = null,
+    @SerialName("supported_payment_methods") val supportedPaymentMethods: List<SelectPaymentMethod>? = null,
+    @SerialName("is_partner_managed_purchase") val isPartnerManagedPurchase: Boolean? = null,
+    @SerialName("partner_payment_reference") val partnerPaymentReference: String? = null,
+    @SerialName("confirmation_ref") val confirmationRef: String? = null,
+    @SerialName("metadata") val metadata: Map<String, String>? = null,
+)
+
+@Serializable
+data class SelectAddress(
+    @SerialName("name") val name: String? = null,
+    @SerialName("address1") val address1: String? = null,
+    @SerialName("address2") val address2: String? = null,
+    @SerialName("city") val city: String? = null,
+    @SerialName("state") val state: String? = null,
+    @SerialName("state_code") val stateCode: String? = null,
+    @SerialName("country") val country: String? = null,
+    @SerialName("country_code") val countryCode: String? = null,
+    @SerialName("zip") val zip: String? = null,
+)
+
+@Serializable
+data class SelectPaymentMethod(@SerialName("type") val type: String? = null)
+
+@Serializable
 data class SelectEventDataEntry(
     @SerialName("token") val token: String,
-    @SerialName("events") val events: Map<String, JsonElement>? = null,
+    @SerialName("events") val events: Map<String, SelectRealTimeEvent>? = null,
+)
+
+@Serializable
+data class SelectRealTimeEvent(
+    @SerialName("event_type") val eventType: String? = null,
+    @SerialName("payload") val payload: String? = null,
 )

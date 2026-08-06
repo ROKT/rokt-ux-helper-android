@@ -5,25 +5,21 @@ import com.rokt.modelmapper.data.DataBinding
 import com.rokt.modelmapper.hmap.HMap
 import com.rokt.modelmapper.hmap.TypedKey
 import com.rokt.modelmapper.hmap.set
-import com.rokt.modelmapper.model.NetworkAction
-import com.rokt.modelmapper.model.NetworkAddress
-import com.rokt.modelmapper.model.NetworkCatalogItem
-import com.rokt.modelmapper.model.NetworkCatalogItemGroup
-import com.rokt.modelmapper.model.NetworkCatalogItemGroupAttribute
-import com.rokt.modelmapper.model.NetworkCatalogItemGroupOption
-import com.rokt.modelmapper.model.NetworkCreativeImage
-import com.rokt.modelmapper.model.NetworkCreativeLayout
-import com.rokt.modelmapper.model.NetworkExperienceResponse
-import com.rokt.modelmapper.model.NetworkLayoutVariant
-import com.rokt.modelmapper.model.NetworkOfferLayout
-import com.rokt.modelmapper.model.NetworkOptions
-import com.rokt.modelmapper.model.NetworkPageContext
-import com.rokt.modelmapper.model.NetworkPaymentMethod
-import com.rokt.modelmapper.model.NetworkPlugin
-import com.rokt.modelmapper.model.NetworkResponseOption
-import com.rokt.modelmapper.model.NetworkSignalType
-import com.rokt.modelmapper.model.NetworkSlotLayout
-import com.rokt.modelmapper.model.NetworkTransactionData
+import com.rokt.modelmapper.model.txn.SelectAddress
+import com.rokt.modelmapper.model.txn.SelectCatalogItem
+import com.rokt.modelmapper.model.txn.SelectCatalogItemGroup
+import com.rokt.modelmapper.model.txn.SelectCatalogItemGroupAttribute
+import com.rokt.modelmapper.model.txn.SelectCatalogItemGroupOption
+import com.rokt.modelmapper.model.txn.SelectCreative
+import com.rokt.modelmapper.model.txn.SelectImage
+import com.rokt.modelmapper.model.txn.SelectLayoutVariant
+import com.rokt.modelmapper.model.txn.SelectOffer
+import com.rokt.modelmapper.model.txn.SelectPaymentMethod
+import com.rokt.modelmapper.model.txn.SelectPluginLayout
+import com.rokt.modelmapper.model.txn.SelectResponse
+import com.rokt.modelmapper.model.txn.SelectResponseOption
+import com.rokt.modelmapper.model.txn.SelectSlot
+import com.rokt.modelmapper.model.txn.SelectTransactionData
 import com.rokt.modelmapper.uimodel.Action
 import com.rokt.modelmapper.uimodel.Address
 import com.rokt.modelmapper.uimodel.CatalogImageWrapperModel
@@ -64,7 +60,7 @@ interface ModelMapper {
 
 class ExperienceModelMapperImpl(
     private val experienceResponse: String?,
-    private val parsedExperienceResponse: NetworkExperienceResponse?,
+    private val parsedExperienceResponse: SelectResponse?,
     private val dataBinding: DataBinding,
 ) : ModelMapper {
 
@@ -81,10 +77,10 @@ class ExperienceModelMapperImpl(
     override fun transformResponse(): Result<ExperienceModel> {
         RoktUXLogger.verbose { "Transforming experience response" }
         savedExperienceModel = try {
-            val networkResponse = parsedExperienceResponse ?: json.decodeFromString(
+            val response = parsedExperienceResponse ?: json.decodeFromString<SelectResponse>(
                 requireNotNull(experienceResponse) { "Experience response is required" },
             )
-            Result.success(networkResponse.toExperienceModel())
+            Result.success(response.toExperienceModel())
         } catch (e: Throwable) {
             RoktUXLogger.error(error = e) { "Failed to transform experience response" }
             Result.failure(e)
@@ -94,105 +90,114 @@ class ExperienceModelMapperImpl(
 
     override fun getSavedExperience(): ExperienceModel? = savedExperienceModel?.getOrNull()
 
-    private fun NetworkExperienceResponse.toExperienceModel(): ExperienceModel = ExperienceModel(
-        sessionId = sessionId,
-        token = pageContext.token,
-        pageId = pageContext.pageId,
-        placementContext = pageContext.toPlacementContextModel(),
-        plugins = plugins.map { it.plugin.toPluginModel() }.toImmutableList(),
-        options = options.toOptionsModel(),
-    )
+    private fun SelectResponse.toExperienceModel(): ExperienceModel {
+        val token = pageContext?.token ?: sessionToken.token
+        return ExperienceModel(
+            sessionId = sessionId,
+            token = token,
+            pageId = pageContext?.pageId,
+            placementContext = PlacementContextModel(
+                pageInstanceGuid = pageContext?.pageInstanceGuid ?: pageInstanceGuid,
+                token = token,
+            ),
+            plugins = (plugins ?: emptyList()).mapNotNull { it.plugin?.toPluginModel() }.toImmutableList(),
+            // The v2 response carries no `options`; diagnostic events default on (matches
+            // the previous SDK experience-response behaviour).
+            options = OptionsModel(useDiagnosticEvents = true),
+        )
+    }
 
-    private fun NetworkPageContext.toPlacementContextModel(): PlacementContextModel =
-        PlacementContextModel(pageInstanceGuid, token)
-
-    private fun NetworkOptions.toOptionsModel(): OptionsModel = OptionsModel(useDiagnosticEvents)
-
-    private fun NetworkPlugin.toPluginModel(): PluginModel = PluginModel(
-        id = id,
-        name = name,
-        targetElementSelector = targetElementSelector,
-        instanceGuid = config.instanceGuid,
-        token = config.token,
-        outerLayoutSchema = transformOuterLayoutSchemaModel(config.outerLayoutSchema.layout),
-        slots = config.slots.map { it.toSlotModel() }.toImmutableList(),
-        breakpoint = config.outerLayoutSchema.breakpoints.buildBreakpoints(),
-        settings = buildSettings(config.outerLayoutSchema.settings),
-    )
+    private fun SelectPluginLayout.toPluginModel(): PluginModel {
+        val outer = config?.outerLayoutSchema
+        return PluginModel(
+            id = id.orEmpty(),
+            name = name.orEmpty(),
+            targetElementSelector = targetElementSelector.orEmpty(),
+            instanceGuid = config?.instanceGuid.orEmpty(),
+            token = config?.token.orEmpty(),
+            outerLayoutSchema = outer?.layout?.let { transformOuterLayoutSchemaModel(it) },
+            slots = (config?.slots ?: emptyList()).map { it.toSlotModel() }.toImmutableList(),
+            breakpoint = outer?.breakpoints.buildBreakpoints(),
+            settings = buildSettings(outer?.settings),
+        )
+    }
 
     private fun buildSettings(settings: com.rokt.network.model.LayoutSettings?): LayoutSettings = LayoutSettings(
         closeOnComplete = settings?.closeOnComplete ?: true,
     )
 
-    private fun HashMap<String, Float>.buildBreakpoints(): ImmutableMap<String, Int> {
+    private fun HashMap<String, Float>?.buildBreakpoints(): ImmutableMap<String, Int> {
         val breakpoints = mutableMapOf<String, Int>()
         // Add the default breakpoint
         breakpoints["default"] = 0
         // Add the other breakpoints
-        breakpoints.putAll(
-            this.mapValues { pair -> pair.value.toInt() },
-        )
+        this?.let {
+            breakpoints.putAll(it.mapValues { pair -> pair.value.toInt() })
+        }
         return breakpoints.toImmutableMap()
     }
 
-    private fun NetworkSlotLayout.toSlotModel(): SlotModel {
+    private fun SelectSlot.toSlotModel(): SlotModel {
         val offerModel = offer?.toOfferModel()
         return SlotModel(
-            instanceGuid = instanceGuid,
-            token = token,
+            instanceGuid = instanceGuid.orEmpty(),
+            token = token.orEmpty(),
             offer = offerModel,
             layoutVariant = layoutVariant?.toLayoutVariantModel(offerModel),
         )
     }
 
-    private fun NetworkOfferLayout.toOfferModel(): OfferModel {
-        val offerModel = OfferModel(
-            campaignId = campaignId,
-            creative = creative.toCreativeModel(),
-            catalogItems = catalogItems.map { it.toCatalogItemModel() }.toImmutableList(),
+    // An offer is only renderable with a creative; without one there is nothing to map.
+    private fun SelectOffer.toOfferModel(): OfferModel? {
+        val creativeModel = creative?.toCreativeModel() ?: return null
+        return OfferModel(
+            campaignId = campaignId.orEmpty(),
+            creative = creativeModel,
+            catalogItems = (catalogItems ?: emptyList()).map { it.toCatalogItemModel() }.toImmutableList(),
             transactionData = transactionData?.toTransactionDataModel(),
             catalogItemGroup = catalogItemGroup?.toCatalogItemGroupModel(),
         )
-        return offerModel
     }
 
-    private fun NetworkTransactionData.toTransactionDataModel(): TransactionData = TransactionData(
+    private fun SelectTransactionData.toTransactionDataModel(): TransactionData = TransactionData(
         shippingAddress = shippingAddress?.toAddressModel(),
         billingAddress = billingAddress?.toAddressModel(),
         paymentType = paymentType,
         supportedPaymentMethods = supportedPaymentMethods?.map { it.toPaymentMethodModel() },
-        isPartnerManagedPurchase = isPartnerManagedPurchase,
+        isPartnerManagedPurchase = isPartnerManagedPurchase ?: true,
         partnerPaymentReference = partnerPaymentReference,
         confirmationRef = confirmationRef,
-        metadata = metadata,
+        metadata = metadata ?: emptyMap(),
     )
 
-    private fun NetworkPaymentMethod.toPaymentMethodModel(): PaymentMethod = PaymentMethod(type = type)
+    private fun SelectPaymentMethod.toPaymentMethodModel(): PaymentMethod = PaymentMethod(type = type.orEmpty())
 
-    private fun NetworkAddress.toAddressModel(): Address = Address(
-        name = name,
-        address1 = address1,
+    private fun SelectAddress.toAddressModel(): Address = Address(
+        name = name.orEmpty(),
+        address1 = address1.orEmpty(),
         address2 = address2,
-        city = city,
-        state = state,
-        stateCode = stateCode,
-        country = country,
-        countryCode = countryCode,
+        city = city.orEmpty(),
+        state = state.orEmpty(),
+        stateCode = stateCode.orEmpty(),
+        country = country.orEmpty(),
+        countryCode = countryCode.orEmpty(),
         zip = zip,
     )
 
-    private fun NetworkCreativeLayout.toCreativeModel(): CreativeModel = CreativeModel(
-        referralCreativeId = referralCreativeId,
-        instanceGuid = instanceGuid,
-        token = token,
-        responseOptions = responseOptions.mapValues { it.value.toResponseOptionModel() }.toImmutableMap(),
-        copy = copy.toImmutableMap(),
-        icons = icons.mapValues { CreativeIcon(it.value.name) }.toImmutableMap(),
-        images = images.mapValues { it.value.toCreateImageModel() }.toImmutableMap(),
-        links = links.mapValues { CreativeLink(it.value.url, it.value.title) }.toImmutableMap(),
+    private fun SelectCreative.toCreativeModel(): CreativeModel = CreativeModel(
+        referralCreativeId = referralCreativeId.orEmpty(),
+        instanceGuid = instanceGuid.orEmpty(),
+        token = token.orEmpty(),
+        responseOptions = (responseOptionsMap ?: emptyMap())
+            .mapValues { it.value.toResponseOptionModel() }.toImmutableMap(),
+        copy = (copy ?: emptyMap()).toImmutableMap(),
+        icons = (icons ?: emptyMap()).mapValues { CreativeIcon(it.value.name.orEmpty()) }.toImmutableMap(),
+        images = (images ?: emptyMap()).mapValues { it.value.toCreateImageModel() }.toImmutableMap(),
+        links = (links ?: emptyMap()).mapValues { CreativeLink(it.value.url.orEmpty(), it.value.title.orEmpty()) }
+            .toImmutableMap(),
     )
 
-    private fun NetworkCreativeImage.toCreateImageModel(): OfferImageModel = OfferImageModel(
+    private fun SelectImage.toCreateImageModel(): OfferImageModel = OfferImageModel(
         HMap().apply {
             set(TypedKey<String>(KEY_LIGHT), light)
             set(TypedKey<String>(KEY_DARK), dark)
@@ -201,7 +206,7 @@ class ExperienceModelMapperImpl(
         },
     )
 
-    private fun NetworkResponseOption.toResponseOptionModel(): ResponseOptionModel = ResponseOptionModel(
+    private fun SelectResponseOption.toResponseOptionModel(): ResponseOptionModel = ResponseOptionModel(
         HMap().apply {
             set(TypedKey<String>(KEY_ID), id)
             set(TypedKey<Action>(KEY_ACTION), action?.toActionModel())
@@ -217,7 +222,7 @@ class ExperienceModelMapperImpl(
         },
     )
 
-    private fun NetworkCatalogItem.toCatalogItemModel(): CatalogItemModel = CatalogItemModel(
+    private fun SelectCatalogItem.toCatalogItemModel(): CatalogItemModel = CatalogItemModel(
         HMap().apply {
             set(TypedKey<String>(KEY_CATALOG_ITEM_ID), catalogItemId)
             set(TypedKey<String>(KEY_CART_ITEM_ID), cartItemId)
@@ -240,49 +245,49 @@ class ExperienceModelMapperImpl(
             set(TypedKey<String>(KEY_POSITIVE_RESPONSE_TEXT), positiveResponseText)
             set(TypedKey<String>(KEY_NEGATIVE_RESPONSE_TEXT), negativeResponseText)
             set(TypedKey<String>(KEY_PRICE_FORMATTED), priceFormatted)
-            set(TypedKey<String>(KEY_ADD_ON_PLUGIN_URL), addOnPluginUrl)
-            set(TypedKey<String>(KEY_ADD_ON_PLUGIN_NAME), addOnPluginName)
             set(TypedKey<String>(KEY_TOKEN), token)
             set(TypedKey<String>(KEY_INVENTORY_STATUS), inventoryStatus)
         },
-        imageWrapper = transformImage(images),
-        copy = copy,
+        imageWrapper = transformImage(images ?: emptyMap()),
+        copy = copy ?: emptyMap(),
     )
 
-    private fun NetworkCatalogItemGroup.toCatalogItemGroupModel(): CatalogItemGroupModel = CatalogItemGroupModel(
-        groupId = groupId,
-        catalogItemIds = catalogItemIds.toImmutableList(),
-        attributes = attributes.map { it.toCatalogItemGroupAttributeModel() }.toImmutableList(),
-        metadata = metadata.toImmutableMap(),
+    private fun SelectCatalogItemGroup.toCatalogItemGroupModel(): CatalogItemGroupModel = CatalogItemGroupModel(
+        groupId = groupId.orEmpty(),
+        catalogItemIds = (catalogItemIds ?: emptyList()).toImmutableList(),
+        attributes = (attributes ?: emptyList()).map { it.toCatalogItemGroupAttributeModel() }.toImmutableList(),
+        metadata = (metadata ?: emptyMap()).toImmutableMap(),
     )
 
-    private fun NetworkCatalogItemGroupAttribute.toCatalogItemGroupAttributeModel(): CatalogItemGroupAttributeModel =
+    private fun SelectCatalogItemGroupAttribute.toCatalogItemGroupAttributeModel(): CatalogItemGroupAttributeModel =
         CatalogItemGroupAttributeModel(
-            attributeId = attributeId,
+            attributeId = attributeId.orEmpty(),
             label = label,
-            options = options.map { it.toCatalogItemGroupOptionModel() }.toImmutableList(),
-            metadata = metadata.toImmutableMap(),
+            options = (options ?: emptyList()).map { it.toCatalogItemGroupOptionModel() }.toImmutableList(),
+            metadata = (metadata ?: emptyMap()).toImmutableMap(),
         )
 
-    private fun NetworkCatalogItemGroupOption.toCatalogItemGroupOptionModel(): CatalogItemGroupOptionModel =
+    private fun SelectCatalogItemGroupOption.toCatalogItemGroupOptionModel(): CatalogItemGroupOptionModel =
         CatalogItemGroupOptionModel(
             label = label,
-            catalogItemIds = catalogItemIds.toImmutableList(),
-            metadata = metadata.toImmutableMap(),
+            catalogItemIds = (catalogItemIds ?: emptyList()).toImmutableList(),
+            metadata = (metadata ?: emptyMap()).toImmutableMap(),
         )
 
-    private fun NetworkAction.toActionModel(): Action = when (this) {
-        NetworkAction.Url -> Action.Url
-        NetworkAction.CaptureOnly -> Action.CaptureOnly
-        NetworkAction.ExternalPaymentTrigger -> Action.ExternalPaymentTrigger
+    // v2 sends `action` / `signal_type` as strings; map to the renderer enums with a
+    // safe default for anything unrecognised.
+    private fun String.toActionModel(): Action = when (this) {
+        "CaptureOnly" -> Action.CaptureOnly
+        "ExternalPaymentTrigger" -> Action.ExternalPaymentTrigger
+        else -> Action.Url
     }
 
-    private fun NetworkSignalType.toSignalTypeModel(): SignalType = when (this) {
-        NetworkSignalType.SignalResponse -> SignalType.SignalResponse
-        NetworkSignalType.SignalGatedResponse -> SignalType.SignalGatedResponse
+    private fun String?.toSignalTypeModel(): SignalType = when (this) {
+        "SignalGatedResponse" -> SignalType.SignalGatedResponse
+        else -> SignalType.SignalResponse
     }
 
-    private fun NetworkCreativeImage.toCatalogItemImage(): OfferImageModel = OfferImageModel(
+    private fun SelectImage.toCatalogItemImage(): OfferImageModel = OfferImageModel(
         HMap().apply {
             set(TypedKey<String>(KEY_LIGHT), light)
             set(TypedKey<String>(KEY_DARK), dark)
@@ -291,25 +296,26 @@ class ExperienceModelMapperImpl(
         },
     )
 
-    private fun transformImage(imageMap: Map<String, NetworkCreativeImage>): CatalogImageWrapperModel =
-        CatalogImageWrapperModel(
-            HMap().apply {
-                imageMap.forEach { (key, value) ->
-                    set(TypedKey<OfferImageModel>(key), value.toCatalogItemImage())
-                }
-            },
-        )
+    private fun transformImage(imageMap: Map<String, SelectImage>): CatalogImageWrapperModel = CatalogImageWrapperModel(
+        HMap().apply {
+            imageMap.forEach { (key, value) ->
+                set(TypedKey<OfferImageModel>(key), value.toCatalogItemImage())
+            }
+        },
+    )
 
-    private fun NetworkLayoutVariant.toLayoutVariantModel(offerModel: OfferModel?): LayoutVariantModel {
+    private fun SelectLayoutVariant.toLayoutVariantModel(offerModel: OfferModel?): LayoutVariantModel {
         nextCatalogDropdownAttributeIndex = 0
         return LayoutVariantModel(
-            layoutVariantId = layoutVariantId,
-            moduleName = moduleName,
-            layoutVariantSchema = transformLayoutSchemaModel(
-                layoutSchemaModel = layoutVariantSchema,
-                offerModel = offerModel,
-                module = Module.fromString(moduleName),
-            ),
+            layoutVariantId = layoutVariantId.orEmpty(),
+            moduleName = moduleName.orEmpty(),
+            layoutVariantSchema = layoutVariantSchema?.let {
+                transformLayoutSchemaModel(
+                    layoutSchemaModel = it,
+                    offerModel = offerModel,
+                    module = Module.fromString(moduleName.orEmpty()),
+                )
+            },
         )
     }
 
@@ -535,8 +541,6 @@ class ExperienceModelMapperImpl(
         private const val KEY_POSITIVE_RESPONSE_TEXT = "positiveResponseText"
         private const val KEY_NEGATIVE_RESPONSE_TEXT = "negativeResponseText"
         private const val KEY_PRICE_FORMATTED = "priceFormatted"
-        private const val KEY_ADD_ON_PLUGIN_URL = "addOnPluginUrl"
-        private const val KEY_ADD_ON_PLUGIN_NAME = "addOnPluginName"
         const val KEY_INVENTORY_STATUS = "inventoryStatus"
     }
 }

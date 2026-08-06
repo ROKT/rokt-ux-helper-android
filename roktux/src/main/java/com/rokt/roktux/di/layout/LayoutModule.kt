@@ -6,7 +6,7 @@ import com.rokt.modelmapper.data.DataBinding
 import com.rokt.modelmapper.data.DataBindingImpl
 import com.rokt.modelmapper.mappers.ExperienceModelMapperImpl
 import com.rokt.modelmapper.mappers.ModelMapper
-import com.rokt.modelmapper.model.NetworkExperienceResponse
+import com.rokt.modelmapper.model.txn.SelectResponse
 import com.rokt.roktux.RoktViewState
 import com.rokt.roktux.component.LayoutUiModelFactory
 import com.rokt.roktux.event.RoktPlatformEvent
@@ -17,7 +17,7 @@ import kotlinx.coroutines.CoroutineDispatcher
 
 internal class LayoutModule(
     private val experience: String?,
-    private val parsedExperience: NetworkExperienceResponse?,
+    private val parsedExperience: SelectResponse?,
     private val location: String,
     private val startTimeStamp: Long,
     private val uxEvent: (uxEvent: RoktUxEvent) -> Unit,

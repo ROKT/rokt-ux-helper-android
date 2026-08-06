@@ -1,54 +1,52 @@
 {
-  "campaignId": "campaign-123",
+  "campaign_id": "campaign-123",
   "creative": {
-    "referralCreativeId": "creative-123",
-    "instanceGuid": "creative-instance-guid",
+    "referral_creative_id": "creative-123",
+    "instance_guid": "creative-instance-guid",
     "token": "test",
-    "responseOptionsMap": {},
     "copy": {},
     "images": {},
     "links": {},
-    "icons": {}
+    "icons": {},
+    "response_options_map": {}
   },
-  "catalogItems": [
+  "catalog_items": [
     {
       "images": {},
-      "instanceGuid": "catalog-instance-guid-1",
-      "cartItemId": "cart-item-1",
-      "catalogItemId": "catalog-item-1",
+      "instance_guid": "catalog-instance-guid-1",
+      "cart_item_id": "cart-item-1",
+      "catalog_item_id": "catalog-item-1",
       "title": "Everyday sneakers",
       "description": "Lightweight daily shoes",
       "price": 79.99,
-      "originalPrice": 99.99,
-      "originalPriceFormatted": "$99.99",
+      "original_price": 99.99,
+      "original_price_formatted": "$99.99",
       "currency": "USD",
-      "signalType": "SignalResponse",
+      "signal_type": "SignalResponse",
       "url": "https://example.com/products/sneakers",
-      "minItemCount": 1,
-      "maxItemCount": 3,
-      "preSelectedQuantity": 1,
-      "providerData": "{\"merchant\":\"rokt\"}",
-      "urlBehavior": "External",
-      "linkedProductId": "linked-product-1",
-      "quantityMustBeSynchronized": false,
-      "positiveResponseText": "Add sneakers",
-      "negativeResponseText": "Skip sneakers",
-      "priceFormatted": "$79.99",
-      "addOnPluginUrl": "",
-      "addOnPluginName": "",
+      "min_item_count": 1,
+      "max_item_count": 3,
+      "pre_selected_quantity": 1,
+      "provider_data": "{\"merchant\":\"rokt\"}",
+      "url_behavior": "External",
+      "linked_product_id": "linked-product-1",
+      "quantity_must_be_synchronized": false,
+      "positive_response_text": "Add sneakers",
+      "negative_response_text": "Skip sneakers",
+      "price_formatted": "$79.99",
       "token": "test"
     }
   ],
-  "transactionData": {
-    "paymentType": "Card",
-    "supportedPaymentMethods": [
+  "transaction_data": {
+    "payment_type": "Card",
+    "supported_payment_methods": [
       {
         "type": "CARD"
       }
     ],
-    "isPartnerManagedPurchase": false,
-    "partnerPaymentReference": "partner-reference",
-    "confirmationRef": "confirmation-ref",
+    "is_partner_managed_purchase": false,
+    "partner_payment_reference": "partner-reference",
+    "confirmation_ref": "confirmation-ref",
     "metadata": {
       "merchant": "rokt"
     }

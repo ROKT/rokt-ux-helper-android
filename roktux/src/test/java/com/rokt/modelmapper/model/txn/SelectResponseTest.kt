@@ -2,7 +2,6 @@ package com.rokt.modelmapper.model.txn
 
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.buildJsonObject
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
@@ -194,7 +193,10 @@ class SelectResponseTest {
                 ),
             ),
             eventData = mapOf(
-                "entity-3" to SelectEventDataEntry(token = "event-token", events = mapOf("impression" to buildJsonObject { })),
+                "entity-3" to SelectEventDataEntry(
+                    token = "event-token",
+                    events = mapOf("impression" to SelectRealTimeEvent(eventType = "SignalImpression", payload = "payload-3")),
+                ),
             ),
         )
 

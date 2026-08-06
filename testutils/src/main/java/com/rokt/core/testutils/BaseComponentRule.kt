@@ -31,12 +31,12 @@ private const val OUTER_LAYOUT_WRAPPER = """
 
 private const val SLOT_WRAPPER = """
 {
-   "instanceGuid": "",
+   "instance_guid": "",
    "token": "",
-   "layoutVariant": {
-     "layoutVariantId": "",
-     "moduleName": "",
-     "layoutVariantSchema": $DCUI_INNER_LAYOUT_PLACEHOLDER
+   "layout_variant": {
+     "layout_variant_id": "",
+     "module_name": "",
+     "layout_variant_schema": $DCUI_INNER_LAYOUT_PLACEHOLDER
    },
    "offer": $DCUI_SLOT_OFFER_PLACEHOLDER
 }
@@ -44,11 +44,12 @@ private const val SLOT_WRAPPER = """
 
 private const val EXPERIENCE_JSON = """
 {
-  "sessionId": "",
-  "token": "token",
-  "placementContext": {
-    "roktTagId": "",
-    "pageInstanceGuid": "",
+  "session_id": "",
+  "session_token": { "token": "token", "expires_at": 0 },
+  "page_instance_guid": "",
+  "page_context": {
+    "rokt_tag_id": "",
+    "page_instance_guid": "",
     "token": "page_token"
   },
   "plugins": [
@@ -56,12 +57,11 @@ private const val EXPERIENCE_JSON = """
       "plugin": {
         "id": "",
         "name": "",
-        "targetElementSelector": "",
+        "target_element_selector": "",
         "config": {
-          "instanceGuid": "",
+          "instance_guid": "",
           "token": "",
-          "outerLayoutSchema": $DCUI_PLACEHOLDER,
-          "layoutVersion": "",
+          "outer_layout_schema": $DCUI_PLACEHOLDER,
           "slots": [
             $SLOT_WRAPPER
           ]
@@ -74,30 +74,26 @@ private const val EXPERIENCE_JSON = """
 
 private const val PARTNER_EXPERIENCE_JSON = """
 {
-  "sessionId": "",
-  "pageContext": {
-    "pageInstanceGuid": "",
+  "session_id": "",
+  "session_token": { "token": "token", "expires_at": 0 },
+  "page_context": {
+    "page_instance_guid": "",
     "token": "page_token",
-    "pageId": "",
+    "page_id": "",
     "language" : "en",
-    "isPageDetected": true,
-    "pageVariantName": ""
+    "is_page_detected": true,
+    "page_variant_name": ""
   },
-    "options": {
-    "useDiagnosticEvents": true
-  },
-  "success": true,
   "plugins": [
     {
       "plugin": {
         "id": "",
         "name": "",
-        "targetElementSelector": "",
+        "target_element_selector": "",
         "config": {
-          "instanceGuid": "",
+          "instance_guid": "",
           "token": "",
-          "outerLayoutSchema": $DCUI_PLACEHOLDER,
-          "layoutVersion": "",
+          "outer_layout_schema": $DCUI_PLACEHOLDER,
           "slots": [
             $SLOT_WRAPPER
           ]
