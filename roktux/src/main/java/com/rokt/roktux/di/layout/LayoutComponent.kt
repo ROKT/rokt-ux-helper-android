@@ -4,7 +4,7 @@ import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.ui.text.font.FontFamily
 import coil3.ImageLoader
 import com.rokt.core.di.Component
-import com.rokt.modelmapper.model.NetworkExperienceResponse
+import com.rokt.modelmapper.model.txn.SelectResponse
 import com.rokt.roktux.RoktViewState
 import com.rokt.roktux.event.RoktPlatformEvent
 import com.rokt.roktux.event.RoktUxEvent
@@ -13,7 +13,7 @@ import kotlinx.coroutines.CoroutineDispatcher
 
 internal class LayoutComponent(
     experienceResponse: String?,
-    parsedExperienceResponse: NetworkExperienceResponse?,
+    parsedExperienceResponse: SelectResponse?,
     location: String,
     startTimeStamp: Long,
     onUxEvent: (event: RoktUxEvent) -> Unit,

@@ -12,7 +12,7 @@ import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
-import com.rokt.modelmapper.model.NetworkExperienceResponse
+import com.rokt.modelmapper.model.txn.SelectResponse
 import com.rokt.roktux.event.RoktPlatformEventsWrapper
 import com.rokt.roktux.event.RoktUxEvent
 import kotlinx.collections.immutable.ImmutableList
@@ -38,7 +38,7 @@ class RoktLayoutView @JvmOverloads constructor(
 
     // Mutable state to hold the experience response.
     private var experienceResponse by mutableStateOf<String?>(null)
-    private var parsedExperienceResponse by mutableStateOf<NetworkExperienceResponse?>(null)
+    private var parsedExperienceResponse by mutableStateOf<SelectResponse?>(null)
 
     // Event handlers for UX and platform events.
     private var uxEvent: ((event: RoktUxEvent) -> Unit) = {}
@@ -124,7 +124,7 @@ class RoktLayoutView @JvmOverloads constructor(
      * @param onPlatformEvent The platform event handler.
      */
     fun loadLayout(
-        experienceResponse: NetworkExperienceResponse,
+        experienceResponse: SelectResponse,
         roktUxConfig: RoktUxConfig,
         onUxEvent: ((event: RoktUxEvent) -> Unit),
         onPlatformEvent: ((platformEvents: RoktPlatformEventsWrapper) -> Unit),

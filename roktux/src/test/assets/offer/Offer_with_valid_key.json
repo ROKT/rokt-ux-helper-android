@@ -1,36 +1,9 @@
 {
-  "campaignId": "2732344566234284034",
-  "creativeId": "2732356166940819466",
+  "campaign_id": "2732344566234284034",
   "creative": {
-    "referralCreativeId": "2732356166940819466",
-    "instanceGuid": "f5987bb9-f7ba-4a89-91e7-80a446c5d29c",
+    "referral_creative_id": "2732356166940819466",
+    "instance_guid": "f5987bb9-f7ba-4a89-91e7-80a446c5d29c",
     "token": "creative_token",
-    "responseOptionsMap": {
-      "positive": {
-        "id": "2732356166940819464",
-        "action": "CaptureOnly",
-        "instanceGuid": "549a346b-cd76-4f04-bccd-a1168c870e97",
-        "token": "response_token",
-        "signalType": "SignalResponse",
-        "shortLabel": "Claim offer",
-        "longLabel": "Claim offer",
-        "shortSuccessLabel": "Claim offer",
-        "isPositive": true,
-        "url": ""
-      },
-      "negative": {
-        "id": "2732356166940819465",
-        "action": "CaptureOnly",
-        "instanceGuid": "c94a4aab-8e73-47f1-ad5b-a07bf00703ec",
-        "token": "response_token",
-        "signalType": "SignalResponse",
-        "shortLabel": "No thanks",
-        "longLabel": "No thanks",
-        "shortSuccessLabel": "",
-        "isPositive": false,
-        "url": ""
-      }
-    },
     "copy": {
       "creative.copy": "Some copy",
       "creative.title": "You've unlocked a partner offer!",
@@ -45,7 +18,6 @@
       "creative.success.title": "Success",
       "creative.success.copy": "We have sent a confirmation to test1593754986316@rokt.com."
     },
-    "data-elements": {},
     "images": {
       "creativeImage": {
         "alt": "alt text",
@@ -67,6 +39,32 @@
     "icons": {
       "icon.1": {
         "name": "Dollar"
+      }
+    },
+    "response_options_map": {
+      "positive": {
+        "id": "2732356166940819464",
+        "action": "CaptureOnly",
+        "instance_guid": "549a346b-cd76-4f04-bccd-a1168c870e97",
+        "token": "response_token",
+        "signal_type": "SignalResponse",
+        "short_label": "Claim offer",
+        "long_label": "Claim offer",
+        "short_success_label": "Claim offer",
+        "is_positive": true,
+        "url": ""
+      },
+      "negative": {
+        "id": "2732356166940819465",
+        "action": "CaptureOnly",
+        "instance_guid": "c94a4aab-8e73-47f1-ad5b-a07bf00703ec",
+        "token": "response_token",
+        "signal_type": "SignalResponse",
+        "short_label": "No thanks",
+        "long_label": "No thanks",
+        "short_success_label": "",
+        "is_positive": false,
+        "url": ""
       }
     }
   }

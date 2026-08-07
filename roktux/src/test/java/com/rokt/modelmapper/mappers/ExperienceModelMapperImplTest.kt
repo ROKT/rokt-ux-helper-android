@@ -3,7 +3,7 @@ package com.rokt.modelmapper.mappers
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.rokt.core.testutils.TestJsonLoader
 import com.rokt.modelmapper.data.DataBindingImpl
-import com.rokt.modelmapper.model.NetworkExperienceResponse
+import com.rokt.modelmapper.model.txn.SelectResponse
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 import org.junit.Assert.assertTrue
@@ -21,7 +21,7 @@ class ExperienceModelMapperImplTest {
     fun `transformResponse should return same model for string and parsed responses`() {
         // Arrange
         val experienceResponse = TestJsonLoader.loadJsonFromAssetsDirectory("Snapshot", "EmbeddedCompact.json")
-        val parsedExperienceResponse = json.decodeFromString<NetworkExperienceResponse>(experienceResponse)
+        val parsedExperienceResponse = json.decodeFromString<SelectResponse>(experienceResponse)
 
         // Act
         val stringResult = ExperienceModelMapperImpl(experienceResponse, DataBindingImpl()).transformResponse()
@@ -42,7 +42,7 @@ class ExperienceModelMapperImplTest {
     fun `transformResponse should not decode string when parsed response is provided`() {
         // Arrange
         val experienceResponse = TestJsonLoader.loadJsonFromAssetsDirectory("Snapshot", "EmbeddedCompact.json")
-        val parsedExperienceResponse = json.decodeFromString<NetworkExperienceResponse>(experienceResponse)
+        val parsedExperienceResponse = json.decodeFromString<SelectResponse>(experienceResponse)
 
         // Act
         val result = ExperienceModelMapperImpl("{", parsedExperienceResponse, DataBindingImpl()).transformResponse()
