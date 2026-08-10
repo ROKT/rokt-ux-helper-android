@@ -1,6 +1,6 @@
 package com.rokt.networkhelper.data
 
-import com.rokt.networkhelper.model.NetworkExperienceRequest
+import com.rokt.networkhelper.model.NetworkOffersRequest
 import com.rokt.networkhelper.network.RoktApiService
 import kotlinx.coroutines.delay
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
@@ -11,7 +11,7 @@ import kotlin.coroutines.cancellation.CancellationException
 import kotlin.math.pow
 
 internal interface RoktRepository {
-    suspend fun experience(experienceRequest: NetworkExperienceRequest): Result<String>
+    suspend fun offers(offersRequest: NetworkOffersRequest): Result<String>
     suspend fun postEvents(events: String): Result<Unit>
 }
 
@@ -20,16 +20,14 @@ internal interface RoktRepository {
  */
 internal class NetworkRoktRepository(private val roktApiService: RoktApiService) : RoktRepository {
 
-    override suspend fun experience(experienceRequest: NetworkExperienceRequest): Result<String> = retry {
-        roktApiService.experience(
-            experienceRequest,
+    override suspend fun offers(offersRequest: NetworkOffersRequest): Result<String> = retry {
+        roktApiService.offers(
+            offersRequest,
         ).string()
     }
 
     override suspend fun postEvents(events: String): Result<Unit> = retry {
-        roktApiService.postEvents(
-            events.toRequestBody("application/json".toMediaTypeOrNull()),
-        )
+        roktApiService.postEvents(events.toRequestBody("application/json".toMediaTypeOrNull()))
     }
 }
 
