@@ -310,7 +310,7 @@ private fun EventType.toRegistryEventType(): RegistryEventType = when (this) {
     EventType.SignalDismissal -> RegistryEventType("dismissal")
     EventType.SignalInitialize -> RegistryEventType("signal_initialize")
     EventType.SignalLoadComplete -> RegistryEventType("load_complete")
-    EventType.SignalActivation -> RegistryEventType("user_interaction", mapOf("interactionType" to "activation"))
+    EventType.SignalActivation -> RegistryEventType("user_interaction", mapOf("interaction_type" to "activation"))
     EventType.SignalUserInteraction -> RegistryEventType("user_interaction")
     EventType.SignalSdkDiagnostic -> RegistryEventType("sdk_diagnostic")
     EventType.SignalCartItemInstantPurchase -> RegistryEventType("cart_item_instant_purchase")

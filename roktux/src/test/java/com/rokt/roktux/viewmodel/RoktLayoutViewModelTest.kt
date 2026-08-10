@@ -1086,7 +1086,7 @@ class RoktLayoutViewModelTest : BaseViewModelTest() {
                             mapOf(
                                 "action" to "OfferProgression",
                                 "context" to "CustomStateValidationTriggerButton",
-                                "interactionType" to "OfferProgression",
+                                "interaction_type" to "OfferProgression",
                             ),
                         )
                     }
@@ -1135,7 +1135,7 @@ class RoktLayoutViewModelTest : BaseViewModelTest() {
                             mapOf(
                                 "action" to "ValidationTriggerFailed",
                                 "context" to "CustomStateValidationTriggerButton",
-                                "interactionType" to "ValidationTriggerFailed",
+                                "interaction_type" to "ValidationTriggerFailed",
                             ),
                         )
                     }
@@ -1170,7 +1170,7 @@ class RoktLayoutViewModelTest : BaseViewModelTest() {
                             mapOf(
                                 "action" to "ToggleButtonStateTriggerClick",
                                 "context" to "ToggleButtonStateTrigger",
-                                "interactionType" to "ToggleButtonStateTriggerClick",
+                                "interaction_type" to "ToggleButtonStateTriggerClick",
                             ),
                         )
                     }
@@ -1206,7 +1206,7 @@ class RoktLayoutViewModelTest : BaseViewModelTest() {
                             mapOf(
                                 "action" to "ThumbnailClick",
                                 "context" to "CatalogImageGallery",
-                                "interactionType" to "ThumbnailClick",
+                                "interaction_type" to "ThumbnailClick",
                             ),
                         )
                     }
@@ -1242,7 +1242,7 @@ class RoktLayoutViewModelTest : BaseViewModelTest() {
                             mapOf(
                                 "action" to "DropDownItemSelected",
                                 "context" to "CatalogDropDown",
-                                "interactionType" to "DropDownItemSelected",
+                                "interaction_type" to "DropDownItemSelected",
                             ),
                         )
                     }
@@ -1322,9 +1322,9 @@ class RoktLayoutViewModelTest : BaseViewModelTest() {
                         it.eventType == EventType.SignalImpression &&
                             it.parentGuid == "pluginInstanceGuid" &&
                             it.metadata.size == 5 &&
-                            it.metadata.any { data -> data.name == "pageRenderEngine" && data.value == "Layouts" } &&
-                            it.metadata.any { data -> data.name == "pageSignalLoadStart" } &&
-                            it.metadata.any { data -> data.name == "pageSignalLoadComplete" }
+                            it.metadata.any { data -> data.name == "page_render_engine" && data.value == "Layouts" } &&
+                            it.metadata.any { data -> data.name == "page_signal_load_start" } &&
+                            it.metadata.any { data -> data.name == "page_signal_load_complete" }
                     }
                 },
             )
