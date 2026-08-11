@@ -11,6 +11,7 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import java.util.Date
+import java.util.UUID
 
 sealed interface RoktEvent
 
@@ -234,9 +235,91 @@ data class RoktPlatformEventsWrapper(
     @SerialName("integration") val integration: RoktIntegrationConfig,
     @SerialName("events") val events: List<RoktPlatformEvent>,
 ) {
-    fun toJsonString(): String = Json { encodeDefaults = true }.encodeToString(this)
+    /**
+     * Serialises these events in the `POST v2/sessions/events` shape so the payload can
+     * be forwarded to the events API directly, without any further transformation.
+     */
+    fun toJsonString(): String = Json { encodeDefaults = true }.encodeToString(
+        SessionEventsBody(events = events.map { it.toSessionEvent() }),
+    )
+}
+
+// --- v2/sessions/events wire shape ------------------------------------------
+
+@Serializable
+private data class SessionEventsBody(
+    @SerialName("channel") val channel: SessionEventChannel = SessionEventChannel(),
+    // Pins the whole batch to the synchronous events path so every event lands on the same
+    // session (instead of the async intake path, which mints a fresh session per event).
+    @SerialName("single_session") val singleSession: Boolean = true,
+    @SerialName("events") val events: List<SessionEvent>,
+)
+
+@Serializable
+private data class SessionEventChannel(@SerialName("type") val type: String = CHANNEL_TYPE_S2S)
+
+@Serializable
+private data class SessionEvent(
+    @SerialName("event_type") val eventType: String,
+    @SerialName("instance_id") val instanceId: String,
+    @SerialName("session_id") val sessionId: String,
+    @SerialName("timestamp") val timestamp: Long,
+    @SerialName("data") val data: Map<String, String>,
+)
+
+private data class RegistryEventType(val type: String, val extraData: Map<String, String> = emptyMap())
+
+private fun RoktPlatformEvent.toSessionEvent(): SessionEvent {
+    val mapped = eventType.toRegistryEventType()
+    val data = buildMap {
+        eventData?.forEach { (key, value) -> put(key, value) }
+        objectData?.forEach { (key, value) -> put(key, value) }
+        metadata.forEach { (name, value) ->
+            when (name) {
+                KEY_CLIENT_TIMESTAMP -> Unit
+
+                // promoted to the top-level timestamp
+                KEY_CAPTURE_METHOD -> put("capture_method", value)
+
+                else -> put(name, value)
+            }
+        }
+        // parentGuid is already the bare instance_guid (no `type:` prefix).
+        put("parent_id", parentGuid)
+        put("token", token)
+        if (pageInstanceGuid.isNotEmpty()) put("page_instance_guid", pageInstanceGuid)
+        mapped.extraData.forEach { (key, value) -> put(key, value) }
+    }
+    return SessionEvent(
+        eventType = mapped.type,
+        instanceId = UUID.randomUUID().toString(),
+        // Canonical envelope field (not part of `data`). Carries the session on the
+        // S2S self-forward path, where there is no session JWT to derive it from.
+        sessionId = sessionId,
+        timestamp = runCatching { roktDateFormat.parse(eventTime)?.time }.getOrNull() ?: System.currentTimeMillis(),
+        data = data,
+    )
+}
+
+/** Fixed legacy-enum → Session API event-type string mapping (partner-independent). */
+private fun EventType.toRegistryEventType(): RegistryEventType = when (this) {
+    EventType.SignalImpression -> RegistryEventType("impression")
+    EventType.SignalViewed -> RegistryEventType("viewed")
+    EventType.SignalResponse -> RegistryEventType("signal_response")
+    EventType.SignalGatedResponse -> RegistryEventType("signal_gated_response")
+    EventType.SignalDismissal -> RegistryEventType("dismissal")
+    EventType.SignalInitialize -> RegistryEventType("signal_initialize")
+    EventType.SignalLoadComplete -> RegistryEventType("load_complete")
+    EventType.SignalActivation -> RegistryEventType("user_interaction", mapOf("interaction_type" to "activation"))
+    EventType.SignalUserInteraction -> RegistryEventType("user_interaction")
+    EventType.SignalSdkDiagnostic -> RegistryEventType("sdk_diagnostic")
+    EventType.SignalCartItemInstantPurchase -> RegistryEventType("cart_item_instant_purchase")
+    EventType.SignalCartItemInstantPurchaseFailure -> RegistryEventType("cart_item_instant_purchase_failure")
+    EventType.SignalCartItemInstantPurchaseInitiated -> RegistryEventType("cart_item_instant_purchase_initiated")
+    EventType.SignalInstantPurchaseDismissal -> RegistryEventType("instant_purchase_dismissal")
 }
 
 private const val KEY_CAPTURE_METHOD = "captureMethod"
 private const val KEY_CLIENT_TIMESTAMP = "clientTimeStamp"
 private const val CLIENT_PROVIDED = "ClientProvided"
+private const val CHANNEL_TYPE_S2S = "s2s"

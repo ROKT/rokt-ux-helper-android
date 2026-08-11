@@ -41,12 +41,19 @@ class TutorialViewModel @Inject constructor() : ViewModel() {
                 pageIdentifier = viewName,
                 attributes = attributes,
                 integrationInfo = integrationInfo,
+                packageName = BuildConfig.APPLICATION_ID,
             )
             RoktNetwork.experience(roktTagId, experienceRequest).onSuccess {
                 _state.value = UiState(data = UiContent.ExperienceContent(it, location))
             }.onFailure {
                 _state.value = UiState(error = RoktDemoErrorTypes.NETWORK)
             }
+        }
+    }
+
+    fun postEvents(toJsonString: String) {
+        viewModelScope.launch {
+            RoktNetwork.postEvents(toJsonString)
         }
     }
 }

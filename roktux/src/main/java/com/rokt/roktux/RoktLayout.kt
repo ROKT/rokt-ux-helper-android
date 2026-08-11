@@ -25,7 +25,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.rokt.core.composablescoped.WithComposableScopedViewModelStoreOwner
-import com.rokt.modelmapper.model.NetworkExperienceResponse
+import com.rokt.modelmapper.model.txn.SelectResponse
 import com.rokt.modelmapper.utils.FIRST_OFFER_INDEX
 import com.rokt.modelmapper.utils.ROKT_ICONS_FONT_FAMILY
 import com.rokt.roktux.component.LayoutUiModelFactory
@@ -106,7 +106,7 @@ fun RoktLayout(
  */
 @Composable
 fun RoktLayout(
-    experienceResponse: NetworkExperienceResponse,
+    experienceResponse: SelectResponse,
     location: String,
     modifier: Modifier = Modifier,
     roktUxConfig: RoktUxConfig,
@@ -134,7 +134,7 @@ fun RoktLayout(
 @Composable
 internal fun RoktLayout(
     experienceResponse: String?,
-    parsedExperienceResponse: NetworkExperienceResponse? = null,
+    parsedExperienceResponse: SelectResponse? = null,
     location: String,
     roktUxConfig: RoktUxConfig,
     mainDispatcher: CoroutineDispatcher,
@@ -235,8 +235,8 @@ internal fun RoktLayout(
     }
 }
 
-private fun NetworkExperienceResponse.stableExperienceKey(): String =
-    plugins.firstOrNull()?.plugin?.config?.instanceGuid ?: "$sessionId:${pageContext.pageInstanceGuid}"
+private fun SelectResponse.stableExperienceKey(): String = plugins?.firstOrNull()?.plugin?.config?.instanceGuid
+    ?: "$sessionId:${pageContext?.pageInstanceGuid ?: pageInstanceGuid}"
 
 @SuppressLint("ComposeViewModelInjection")
 @Composable

@@ -28,6 +28,8 @@ import com.rokt.demoapp.ui.common.error.RoktError
 import com.rokt.demoapp.ui.screen.layouts.HEADER_TOP_PADDING
 import com.rokt.demoapp.ui.screen.tutorials.TutorialViewModel
 import com.rokt.demoapp.ui.state.UiContent
+import com.rokt.networkhelper.data.RoktNetwork
+import com.rokt.networkhelper.data.RoktNetwork.postEvents
 import com.rokt.roktux.RoktLayout
 import com.rokt.roktux.RoktUx
 import com.rokt.roktux.RoktUxConfig
@@ -69,7 +71,10 @@ fun TutorialOneCompose(backPressed: () -> Unit, viewModel: TutorialViewModel = h
                             experienceResponse = content.experienceResponse,
                             location = content.location,
                             onUxEvent = { println("RoktEvent: UxEvent Received $it") },
-                            onPlatformEvent = { println("RoktEvent: onPlatformEvents received $it") },
+                            onPlatformEvent = {
+                                println("RoktEvent: onPlatformEvents received ${it.toJsonString()}")
+                                viewModel.postEvents(it.toJsonString())
+                            },
                             roktUxConfig = RoktUxConfig.builder()
                                 .imageHandlingStrategy(NetworkStrategy()).build(),
                         )
