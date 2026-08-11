@@ -13,6 +13,33 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Update Jetpack Compose BOM to 2026.05.01.
 
+## [2.0.0] - 2026-08-11
+
+### Breaking Changes
+
+- Make SelectResponse the canonical experience response ([#313](https://github.com/ROKT/rokt-ux-helper-android/pull/313))
+
+### Added
+
+- Include click destination URL metadata ([#308](https://github.com/ROKT/rokt-ux-helper-android/pull/308))
+- Populate interactionType on user_interaction objectData ([#304](https://github.com/ROKT/rokt-ux-helper-android/pull/304))
+
+### Fixed
+
+- Drop fat eventData from legacy InstantPurchase initiated ([#312](https://github.com/ROKT/rokt-ux-helper-android/pull/312))
+- Include pageInstanceGuid on ForwardPayment initiated ([#311](https://github.com/ROKT/rokt-ux-helper-android/pull/311))
+- Include pageInstanceGuid on user interaction signals ([#310](https://github.com/ROKT/rokt-ux-helper-android/pull/310))
+
+### Changed
+
+- Bump gradle/actions/setup-gradle from 6.2.0 to 6.3.0 ([#314](https://github.com/ROKT/rokt-ux-helper-android/pull/314))
+- Upgrade trunk ([#309](https://github.com/ROKT/rokt-ux-helper-android/pull/309))
+- Upgrade trunk ([#269](https://github.com/ROKT/rokt-ux-helper-android/pull/269))
+- Skip Dependabot-incompatible steps on Dependabot PRs ([#307](https://github.com/ROKT/rokt-ux-helper-android/pull/307))
+- Cache Gradle User Home in the snapshot-test job ([#306](https://github.com/ROKT/rokt-ux-helper-android/pull/306))
+- Bump actions/checkout from 6.0.3 to 7.0.1 ([#303](https://github.com/ROKT/rokt-ux-helper-android/pull/303))
+- Update Roborazzi screenshot testing ([#305](https://github.com/ROKT/rokt-ux-helper-android/pull/305))
+
 ## [1.0.0] - 2026-07-20
 
 ### Changed
@@ -227,7 +254,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Initial implementation of UX Helper
 
-[unreleased]: https://github.com/ROKT/rokt-ux-helper-android/compare/1.0.0...HEAD
+[unreleased]: https://github.com/ROKT/rokt-ux-helper-android/compare/2.0.0...HEAD
+[2.0.0]: https://github.com/ROKT/rokt-ux-helper-android/compare/1.0.0...2.0.0
 [1.0.0]: https://github.com/ROKT/rokt-ux-helper-android/compare/0.9.3...1.0.0
 [1.0.0-rc.1]: https://github.com/ROKT/rokt-ux-helper-android/compare/0.9.3...1.0.0-rc.1
 [0.9.3]: https://github.com/ROKT/rokt-ux-helper-android/compare/0.9.2...0.9.3
