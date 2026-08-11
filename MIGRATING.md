@@ -42,3 +42,47 @@ type and cached without a parallel model tree.
 `NetworkCatalogItemGroup`, `NetworkTransactionData`, `NetworkResponseOption`,
 `NetworkAction`, `NetworkSignalType`, `NetworkPageContext`, `NetworkOptions`, …) have
 been removed. Decode the snake_case `SelectResponse` instead.
+
+## Migrating to the LayoutFailure reason API
+
+`RoktUxEvent.LayoutFailure` now includes `sessionId` and a `reason` so partners can tell
+**no offer returned** apart from **rendering / integration failures**.
+
+Existing checks for `event is RoktUxEvent.LayoutFailure` continue to work. Switch on
+`reason` when you need the split:
+
+```kotlin
+when (val event = uxEvent) {
+    is RoktUxEvent.LayoutFailure -> when (event.reason) {
+        RoktUxEvent.LayoutFailure.Reason.NoOffers -> {
+            // Offers request succeeded but nothing to show — not an integration bug.
+            // Share event.sessionId with your account manager.
+        }
+        RoktUxEvent.LayoutFailure.Reason.InvalidResponse -> {
+            // Experience response could not be decoded or mapped.
+        }
+        RoktUxEvent.LayoutFailure.Reason.InvalidSchema -> {
+            // Layout schema failed validation/transform or a runtime render failure.
+        }
+        RoktUxEvent.LayoutFailure.Reason.MissingEmbeddedTarget -> {
+            // Host app location does not match the embedded placement target.
+        }
+        RoktUxEvent.LayoutFailure.Reason.PresentationFailed -> {
+            // Unused on Android Compose; present for cross-platform parity.
+        }
+    }
+    else -> Unit
+}
+```
+
+| Reason                  | Meaning                                                     |
+| ----------------------- | ----------------------------------------------------------- |
+| `NoOffers`              | Response decoded but contained no renderable offers/layouts |
+| `InvalidResponse`       | Response could not be decoded or mapped                     |
+| `InvalidSchema`         | Layout schema validation/transform or runtime render failed |
+| `MissingEmbeddedTarget` | Host location does not match the embedded placement target  |
+| `PresentationFailed`    | Unused on Android; API parity with iOS                      |
+
+Console logging (when enabled via `RoktUx.setLogLevel`) now appends
+`| sessionId=<id>` once the session is known, and uses distinct messages for `NoOffers`
+versus rendering failures.

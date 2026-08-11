@@ -18,11 +18,13 @@ class RoktUXLoggerTest {
         capturedLogs.clear()
         RoktUXLogger.handler = testHandler
         RoktUXLogger.logLevel = RoktUXLogLevel.NONE
+        RoktUXLogger.sessionId = null
     }
 
     @After
     fun tearDown() {
         RoktUXLogger.logLevel = RoktUXLogLevel.NONE
+        RoktUXLogger.sessionId = null
         RoktUXLogger.handler = LogcatLogHandler
     }
 
@@ -165,6 +167,39 @@ class RoktUXLoggerTest {
         assertEquals("first handler", capturedLogs[0].message)
         assertEquals(1, secondCapturedLogs.size)
         assertEquals("second handler", secondCapturedLogs[0].message)
+    }
+
+    @Test
+    fun `sessionId can be set and cleared`() {
+        assertEquals(null, RoktUXLogger.sessionId)
+
+        RoktUXLogger.sessionId = "session-abc"
+        assertEquals("session-abc", RoktUXLogger.sessionId)
+
+        RoktUXLogger.sessionId = null
+        assertEquals(null, RoktUXLogger.sessionId)
+    }
+
+    @Test
+    fun `log messages append sessionId suffix when set`() {
+        RoktUXLogger.logLevel = RoktUXLogLevel.VERBOSE
+        RoktUXLogger.sessionId = "session-for-log"
+
+        RoktUXLogger.info { "layout ready" }
+
+        assertEquals(1, capturedLogs.size)
+        assertEquals("layout ready | sessionId=session-for-log", capturedLogs[0].message)
+    }
+
+    @Test
+    fun `log messages do not append sessionId suffix when null`() {
+        RoktUXLogger.logLevel = RoktUXLogLevel.VERBOSE
+        RoktUXLogger.sessionId = null
+
+        RoktUXLogger.info { "layout ready" }
+
+        assertEquals(1, capturedLogs.size)
+        assertEquals("layout ready", capturedLogs[0].message)
     }
 
     private data class CapturedLog(

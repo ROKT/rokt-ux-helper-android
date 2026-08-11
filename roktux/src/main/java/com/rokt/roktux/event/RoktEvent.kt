@@ -54,10 +54,49 @@ sealed interface RoktUxEvent {
     data class LayoutCompleted(val layoutId: String) : RoktUxEvent
 
     /**
-     * LayoutFailure event will be triggered when placement could not be displayed due to some failure
+     * LayoutFailure event will be triggered when placement could not be displayed due to some failure.
+     *
+     * Inspect [reason] to distinguish "no offer returned" (not an integration bug)
+     * from rendering or host-integration failures.
+     *
      * @param layoutId - optional layout identifier
+     * @param sessionId - session identifier from the experience response, when known
+     * @param reason - why the layout could not be shown
      */
-    data class LayoutFailure(val layoutId: String? = null) : RoktUxEvent
+    data class LayoutFailure(val layoutId: String? = null, val sessionId: String? = null, val reason: Reason) :
+        RoktUxEvent {
+        /**
+         * Why a layout could not be displayed.
+         */
+        enum class Reason {
+            /**
+             * Experience response decoded but contained no renderable offers/layouts.
+             * Not an integration bug — contact your account manager with [LayoutFailure.sessionId].
+             */
+            NoOffers,
+
+            /**
+             * Experience response could not be decoded or mapped.
+             */
+            InvalidResponse,
+
+            /**
+             * Layout schema failed validation/transform or a runtime render failure occurred.
+             */
+            InvalidSchema,
+
+            /**
+             * Host app location does not match the embedded placement [targetElementSelector].
+             */
+            MissingEmbeddedTarget,
+
+            /**
+             * Overlay/bottom sheet could not be presented.
+             * Included for cross-platform parity; unused on Android Compose.
+             */
+            PresentationFailed,
+        }
+    }
 
     /**
      * OpenUrl event will be triggered when user clicks on a link or button with a Url action

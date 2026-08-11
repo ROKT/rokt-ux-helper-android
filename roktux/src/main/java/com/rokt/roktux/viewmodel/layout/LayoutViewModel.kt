@@ -91,6 +91,7 @@ internal class LayoutViewModel(
     private var pendingDevicePayCatalogItem: PendingDevicePayCatalogItem? = null
 
     init {
+        RoktUXLogger.sessionId = null
         // The buffer is a queue with max capacity of 20 and interval 25ms.
         // It queues the request in a chunk of 25ms and max buffer as 20 and sends
         // them together.
@@ -115,19 +116,18 @@ internal class LayoutViewModel(
     }
 
     private fun handleExecuteEvent() {
+        RoktUXLogger.sessionId = null
         RoktUXLogger.debug { "Processing layout execute event for location: $location" }
         safeLaunch {
             withContext(ioDispatcher) {
                 val response = modelMapper.transformResponse()
                 if (response.isSuccess) {
+                    response.getOrNull()?.sessionId?.let { RoktUXLogger.sessionId = it }
                     RoktUXLogger.debug { "Experience response parsed successfully for location: $location" }
                     createLayoutState(currentOffer)
                 } else {
                     response.exceptionOrNull()?.let { exception ->
-                        RoktUXLogger.error(error = exception) {
-                            "Failed to parse experience response for location: $location"
-                        }
-                        handleError(exception)
+                        handleInvalidResponse(exception)
                     }
                 }
             }
@@ -136,7 +136,13 @@ internal class LayoutViewModel(
 
     private fun createLayoutState(currentOffer: Int = FIRST_OFFER_INDEX, viewableItems: Int = DEFAULT_VIEWABLE_ITEMS) {
         experienceModel = modelMapper.getSavedExperience() ?: return
-        pluginModel = experienceModel.plugins.firstOrNull() ?: return
+        RoktUXLogger.sessionId = experienceModel.sessionId
+        val plugin = experienceModel.plugins.firstOrNull()
+        if (plugin == null) {
+            handleNoOffers(experienceModel.sessionId)
+            return
+        }
+        pluginModel = plugin
         var layoutSchema = pluginModel.outerLayoutSchema
         if (layoutSchema?.isEmbedded() == true &&
             !location.equals(
@@ -144,7 +150,8 @@ internal class LayoutViewModel(
                 ignoreCase = true,
             )
         ) {
-            handleError(IllegalArgumentException(LOCATION_TARGET_ELEMENT_DOES_NOT_MATCH))
+            pluginId = pluginModel.id
+            handleMissingEmbeddedTarget()
             return
         } else if (!edgeToEdgeDisplay) {
             if (layoutSchema is LayoutSchemaUiModel.OverlayUiModel) {
@@ -192,9 +199,75 @@ internal class LayoutViewModel(
                 ),
             )
         } else {
-            // Handle case where layoutSchema is null
-            uxEvent(RoktUxEvent.LayoutFailure())
+            handleNoOffers(experienceModel.sessionId)
         }
+    }
+
+    private fun handleNoOffers(sessionId: String) {
+        RoktUXLogger.sessionId = sessionId
+        RoktUXLogger.verbose {
+            "The offers request succeeded but no offer was returned. " +
+                "Please let your account manager know your session ID."
+        }
+        uxEvent(
+            RoktUxEvent.LayoutFailure(
+                sessionId = sessionId,
+                reason = RoktUxEvent.LayoutFailure.Reason.NoOffers,
+            ),
+        )
+    }
+
+    private fun handleInvalidResponse(exception: Throwable) {
+        RoktUXLogger.error(error = exception) {
+            "Failed to parse experience response. The response could not be decoded or mapped."
+        }
+        super.handleError(exception)
+        uxEvent(
+            RoktUxEvent.LayoutFailure(
+                sessionId = RoktUXLogger.sessionId,
+                reason = RoktUxEvent.LayoutFailure.Reason.InvalidResponse,
+            ),
+        )
+        sendDiagnosticIfEnabled(exception)
+    }
+
+    private fun handleMissingEmbeddedTarget() {
+        val exception = IllegalArgumentException(LOCATION_TARGET_ELEMENT_DOES_NOT_MATCH)
+        RoktUXLogger.error(error = exception) {
+            "Layout rendering failed: plugin targetElementSelector does not match the location. " +
+                "Check that the host app uses the correct location. " +
+                "This is a layout configuration issue, not a missing offer."
+        }
+        super.handleError(exception)
+        uxEvent(
+            RoktUxEvent.LayoutFailure(
+                layoutId = pluginId.takeIf { ::pluginId.isInitialized },
+                sessionId = currentSessionId(),
+                reason = RoktUxEvent.LayoutFailure.Reason.MissingEmbeddedTarget,
+            ),
+        )
+        sendDiagnosticIfEnabled(exception)
+    }
+
+    private fun currentSessionId(): String? = when {
+        ::experienceModel.isInitialized -> experienceModel.sessionId
+        else -> RoktUXLogger.sessionId
+    }
+
+    private fun sendDiagnosticIfEnabled(exception: Throwable) {
+        if (!(::experienceModel.isInitialized && experienceModel.options.useDiagnosticEvents)) {
+            return
+        }
+        handlePlatformEvent(
+            RoktPlatformEvent(
+                eventType = EventType.SignalSdkDiagnostic,
+                sessionId = experienceModel.sessionId,
+                parentGuid = if (::pluginModel.isInitialized) pluginModel.instanceGuid else "",
+                eventData = mapOf(
+                    "stacktrace" to exception.stackTrace.toString() + exception.localizedMessage,
+                ),
+            ),
+        )
     }
 
     override suspend fun handleEvents(event: LayoutContract.LayoutEvent) {
@@ -319,10 +392,20 @@ internal class LayoutViewModel(
 
             is LayoutContract.LayoutEvent.UiException -> {
                 if (::experienceModel.isInitialized && event.closeLayout) {
+                    RoktUXLogger.error(error = event.throwable) {
+                        "Layout rendering failed: ${event.throwable.message ?: "UI exception"}. " +
+                            "This is a layout configuration issue, not a missing offer."
+                    }
                     setEffect {
                         LayoutContract.LayoutEffect.CloseLayout(
                             onClose = {
-                                uxEvent(RoktUxEvent.LayoutFailure())
+                                uxEvent(
+                                    RoktUxEvent.LayoutFailure(
+                                        layoutId = pluginId.takeIf { ::pluginId.isInitialized },
+                                        sessionId = currentSessionId(),
+                                        reason = RoktUxEvent.LayoutFailure.Reason.InvalidSchema,
+                                    ),
+                                )
                             },
                         )
                     }
@@ -813,22 +896,19 @@ internal class LayoutViewModel(
     }
 
     override fun handleError(exception: Throwable) {
-        RoktUXLogger.error(error = exception) { "Layout error occurred" }
-        super.handleError(exception)
-        uxEvent.invoke(RoktUxEvent.LayoutFailure())
-        if (!(::experienceModel.isInitialized && experienceModel.options.useDiagnosticEvents)) {
-            return
+        RoktUXLogger.error(error = exception) {
+            "Layout rendering failed: ${exception.message ?: "unexpected error"}. " +
+                "This is a layout configuration issue, not a missing offer."
         }
-        handlePlatformEvent(
-            RoktPlatformEvent(
-                eventType = EventType.SignalSdkDiagnostic,
-                sessionId = experienceModel.sessionId,
-                parentGuid = pluginModel.instanceGuid,
-                eventData = mapOf(
-                    "stacktrace" to exception.stackTrace.toString() + exception.localizedMessage,
-                ),
+        super.handleError(exception)
+        uxEvent.invoke(
+            RoktUxEvent.LayoutFailure(
+                layoutId = pluginId.takeIf { ::pluginId.isInitialized },
+                sessionId = currentSessionId(),
+                reason = RoktUxEvent.LayoutFailure.Reason.InvalidSchema,
             ),
         )
+        sendDiagnosticIfEnabled(exception)
     }
 
     private fun sendOpenUrlEvent(
