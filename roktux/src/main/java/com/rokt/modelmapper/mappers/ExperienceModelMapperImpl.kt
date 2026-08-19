@@ -82,7 +82,6 @@ class ExperienceModelMapperImpl(
             )
             Result.success(response.toExperienceModel())
         } catch (e: Throwable) {
-            RoktUXLogger.error(error = e) { "Failed to transform experience response" }
             Result.failure(e)
         }
         return savedExperienceModel ?: Result.failure(Exception())

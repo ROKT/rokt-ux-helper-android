@@ -7,6 +7,9 @@ package com.rokt.roktux.logging
  * All logging functions use inline lambdas so that message construction is skipped
  * entirely when the current [logLevel] would filter the message out.
  *
+ * When [sessionId] is set, it is appended to every log line as `| sessionId=<id>`
+ * for easier support triage.
+ *
  * Example:
  * ```kotlin
  * RoktUXLogger.logLevel = RoktUXLogLevel.DEBUG
@@ -29,6 +32,13 @@ internal object RoktUXLogger {
     var handler: LogHandler = LogcatLogHandler
 
     /**
+     * Session identifier from the current experience response, when known.
+     * When set, appended to every log line as `| sessionId=<id>` for easier support triage.
+     */
+    @Volatile
+    var sessionId: String? = null
+
+    /**
      * Logs a verbose message for detailed diagnostic information.
      * The [message] lambda is only evaluated if the current level permits verbose output.
      *
@@ -37,7 +47,7 @@ internal object RoktUXLogger {
      */
     inline fun verbose(error: Throwable? = null, message: () -> String) {
         if (logLevel.priority <= RoktUXLogLevel.VERBOSE.priority) {
-            handler.log(RoktUXLogLevel.VERBOSE, TAG, message(), error)
+            handler.log(RoktUXLogLevel.VERBOSE, TAG, withSessionId(message()), error)
         }
     }
 
@@ -50,7 +60,7 @@ internal object RoktUXLogger {
      */
     inline fun debug(error: Throwable? = null, message: () -> String) {
         if (logLevel.priority <= RoktUXLogLevel.DEBUG.priority) {
-            handler.log(RoktUXLogLevel.DEBUG, TAG, message(), error)
+            handler.log(RoktUXLogLevel.DEBUG, TAG, withSessionId(message()), error)
         }
     }
 
@@ -63,7 +73,7 @@ internal object RoktUXLogger {
      */
     inline fun info(error: Throwable? = null, message: () -> String) {
         if (logLevel.priority <= RoktUXLogLevel.INFO.priority) {
-            handler.log(RoktUXLogLevel.INFO, TAG, message(), error)
+            handler.log(RoktUXLogLevel.INFO, TAG, withSessionId(message()), error)
         }
     }
 
@@ -76,7 +86,7 @@ internal object RoktUXLogger {
      */
     inline fun warning(error: Throwable? = null, message: () -> String) {
         if (logLevel.priority <= RoktUXLogLevel.WARNING.priority) {
-            handler.log(RoktUXLogLevel.WARNING, TAG, message(), error)
+            handler.log(RoktUXLogLevel.WARNING, TAG, withSessionId(message()), error)
         }
     }
 
@@ -89,8 +99,18 @@ internal object RoktUXLogger {
      */
     inline fun error(error: Throwable? = null, message: () -> String) {
         if (logLevel.priority <= RoktUXLogLevel.ERROR.priority) {
-            handler.log(RoktUXLogLevel.ERROR, TAG, message(), error)
+            handler.log(RoktUXLogLevel.ERROR, TAG, withSessionId(message()), error)
         }
+    }
+
+    /**
+     * Appends `| sessionId=<id>` when [sessionId] is set.
+     * Not inlined so [sessionId] is readable from inline log methods.
+     */
+    @PublishedApi
+    internal fun withSessionId(message: String): String {
+        val currentSessionId = sessionId ?: return message
+        return "$message | sessionId=$currentSessionId"
     }
 
     internal const val TAG: String = "RoktUX"

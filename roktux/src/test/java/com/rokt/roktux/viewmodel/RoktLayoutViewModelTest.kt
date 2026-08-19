@@ -26,6 +26,7 @@ import com.rokt.roktux.event.RoktPlatformEvent
 import com.rokt.roktux.event.RoktUserInteractionAction
 import com.rokt.roktux.event.RoktUserInteractionContext
 import com.rokt.roktux.event.RoktUxEvent
+import com.rokt.roktux.logging.RoktUXLogger
 import com.rokt.roktux.state.LayoutRuntimeState
 import com.rokt.roktux.validation.ValidationCoordinator
 import com.rokt.roktux.validation.ValidationStatus
@@ -115,8 +116,14 @@ class RoktLayoutViewModelTest : BaseViewModelTest() {
 
     @Before
     fun setup() {
+        RoktUXLogger.sessionId = null
         initialize()
         layoutViewModel.setEvent(LayoutContract.LayoutEvent.LayoutInitialised)
+    }
+
+    override fun onDestroy() {
+        RoktUXLogger.sessionId = null
+        super.onDestroy()
     }
 
     private fun initialize(
@@ -489,7 +496,11 @@ class RoktLayoutViewModelTest : BaseViewModelTest() {
 
         // Assert
         verify {
-            uxEvent.invoke(RoktUxEvent.LayoutFailure())
+            uxEvent.invoke(
+                RoktUxEvent.LayoutFailure(
+                    reason = RoktUxEvent.LayoutFailure.Reason.InvalidResponse,
+                ),
+            )
         }
 
         verify(exactly = 0) {
@@ -514,7 +525,101 @@ class RoktLayoutViewModelTest : BaseViewModelTest() {
 
         // Assert
         verify {
-            uxEvent.invoke(RoktUxEvent.LayoutFailure())
+            uxEvent.invoke(
+                match { event ->
+                    event is RoktUxEvent.LayoutFailure &&
+                        event.reason == RoktUxEvent.LayoutFailure.Reason.InvalidSchema
+                },
+            )
+        }
+    }
+
+    @Test
+    fun `LayoutInitialised with empty plugins emits NoOffers LayoutFailure with sessionId`() = runTest {
+        clearMocks(uxEvent)
+        every { mapper.transformResponse() } returns Result.success(mockk(relaxed = true))
+        every { mapper.getSavedExperience() } returns mockk(relaxed = true) {
+            every { sessionId } returns "empty-plugins-session"
+            every { plugins } returns persistentListOf()
+            every { options } returns OptionsModel(useDiagnosticEvents = false)
+        }
+
+        initialize()
+        layoutViewModel.setEvent(LayoutContract.LayoutEvent.LayoutInitialised)
+
+        verify {
+            uxEvent.invoke(
+                RoktUxEvent.LayoutFailure(
+                    sessionId = "empty-plugins-session",
+                    reason = RoktUxEvent.LayoutFailure.Reason.NoOffers,
+                ),
+            )
+        }
+        assertEquals("empty-plugins-session", RoktUXLogger.sessionId)
+    }
+
+    @Test
+    fun `LayoutInitialised with empty slots emits NoOffers LayoutFailure with sessionId`() = runTest {
+        clearMocks(uxEvent)
+        every { mapper.transformResponse() } returns Result.success(mockk(relaxed = true))
+        every { mapper.getSavedExperience() } returns mockk(relaxed = true) {
+            every { sessionId } returns "empty-slots-session"
+            every { plugins } returns persistentListOf(
+                mockk(relaxed = true) {
+                    every { id } returns "pluginId"
+                    every { targetElementSelector } returns "location1"
+                    every { outerLayoutSchema } returns mockk(relaxed = true)
+                    every { slots } returns persistentListOf()
+                    every { settings } returns LayoutSettings(closeOnComplete = true)
+                },
+            )
+            every { options } returns OptionsModel(useDiagnosticEvents = false)
+        }
+
+        initialize()
+        layoutViewModel.setEvent(LayoutContract.LayoutEvent.LayoutInitialised)
+
+        verify {
+            uxEvent.invoke(
+                RoktUxEvent.LayoutFailure(
+                    sessionId = "empty-slots-session",
+                    reason = RoktUxEvent.LayoutFailure.Reason.NoOffers,
+                ),
+            )
+        }
+        assertEquals("empty-slots-session", RoktUXLogger.sessionId)
+    }
+
+    @Test
+    fun `LayoutInitialised with location mismatch emits MissingEmbeddedTarget LayoutFailure`() = runTest {
+        clearMocks(uxEvent)
+        every { mapper.transformResponse() } returns Result.success(mockk(relaxed = true))
+        every { mapper.getSavedExperience() } returns mockk(relaxed = true) {
+            every { sessionId } returns "mismatch-session"
+            every { plugins } returns persistentListOf(
+                mockk(relaxed = true) {
+                    every { id } returns "pluginId"
+                    every { targetElementSelector } returns "other-location"
+                    // Non-overlay/bottom-sheet schema is treated as embedded
+                    every { outerLayoutSchema } returns mockk(relaxed = true)
+                    every { slots } returns persistentListOf(mockk(relaxed = true))
+                    every { settings } returns LayoutSettings(closeOnComplete = true)
+                },
+            )
+            every { options } returns OptionsModel(useDiagnosticEvents = false)
+        }
+
+        initialize()
+        layoutViewModel.setEvent(LayoutContract.LayoutEvent.LayoutInitialised)
+
+        verify {
+            uxEvent.invoke(
+                RoktUxEvent.LayoutFailure(
+                    layoutId = "pluginId",
+                    sessionId = "mismatch-session",
+                    reason = RoktUxEvent.LayoutFailure.Reason.MissingEmbeddedTarget,
+                ),
+            )
         }
     }
 
