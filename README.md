@@ -1,12 +1,6 @@
-# Rokt UX Helper Andriod
+# Rokt UX Helper Android
 
 The Rokt UX Helper for Android enables partner applications to render tailored user experiences, improving the velocity of testing and relevancy for the customer. This library offers an easy way to perform rendering and provides event hooks for integration into backend systems.
-
-## Resident Experts
-
-- Thomson Thomas - <thomson.thomas@rokt.com>
-- Sahil Suri - <sahil.suri@rokt.com>
-- Lewis Krishnamurti - <lewis.raj.krishnamurti@rokt.com>
 
 | Environment | Build                                                                                                        | Coverage                                                                                                                                            |
 | ----------- | ------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -14,22 +8,56 @@ The Rokt UX Helper for Android enables partner applications to render tailored u
 
 ## Requirements
 
-- The latest version of [Android Studio](https://developer.android.com/studio).
-- Android 5.0 (API level 21) and above
-- Android Gradle Plugin 8.1.2
-- Gradle 8.9+
+To consume `roktux` in an app:
+
+- Android 6.0 (API level 23) and above
+- A Jetpack Compose BOM compatible with the version you depend on (see [Jetpack Compose Compatibility](#jetpack-compose-compatibility))
+
+To build this repository:
+
+- The latest version of [Android Studio](https://developer.android.com/studio)
+- Android Gradle Plugin 8.6.1
+- Gradle 8.9
 - JDK 17
+- Kotlin 2.1.20
 
 ## Installation
 
-The library is published to [Maven Central](https://central.sonatype.com/artifact/com.rokt/roktux).
-Add `roktux` to your app-level `build.gradle.kts` dependencies.
+The library is published to [Maven Central](https://central.sonatype.com/artifact/com.rokt/roktux) as `com.rokt:roktux`. Add it to your app-level `build.gradle.kts` dependencies, using the version listed there.
 
 ```kotlin
 dependencies {
-    implementation("com.rokt:roktux:0.1.0")
+    implementation("com.rokt:roktux:<version>")
 }
 ```
+
+## Usage
+
+Include `RoktUx.getIntegrationConfig(context).toJsonString()` in the Rokt experience request from your backend. Pass the experience response into `RoktLayout`. The `location` value must match a placement location in that response.
+
+```kotlin
+val integrationConfig = RoktUx.getIntegrationConfig(context).toJsonString()
+// Send integrationConfig with your Rokt experience request, then:
+
+RoktLayout(
+    experienceResponse = experienceResponse,
+    location = "Location1",
+    onUxEvent = { event ->
+        if (event is RoktUxEvent.OpenUrl) {
+            // Open event.url, then notify the helper so offer progression can continue.
+            event.onClose(event.id)
+        }
+    },
+    onPlatformEvent = { events ->
+        // Forward events.toJsonString() to Rokt through your backend.
+    },
+    roktUxConfig = RoktUxConfig.builder().build(),
+)
+```
+
+`RoktUxConfig.builder()` defaults to `NetworkStrategy()` for images and `ColorMode.SYSTEM` for theming. For Views, use `RoktLayoutView` with `app:location` and `loadLayout(...)`.
+
+The [Android integration guide](https://docs.rokt.com/server-to-server/android/) covers UX events, platform events, fonts, and color mode in more detail.
 
 ## Releases
 
@@ -44,10 +72,10 @@ dependencies {
 
 As `roktux` uses Jetpack Compose, consuming projects should use Compose libraries with compatible versions:
 
-| roktux        | Compose BOM |
-| ------------- | ----------- |
-| Unreleased    | 2026.05.01  |
-| 0.1.0 - 0.9.3 | 2024.09.02  |
+| roktux             | Compose BOM |
+| ------------------ | ----------- |
+| 1.0.0 and later    | 2026.05.01  |
+| 0.1.0 – 1.0.0-rc.1 | 2024.09.02  |
 
 You can view the [BOM to library version mapping](https://developer.android.com/develop/ui/compose/bom/bom-mapping).
 
@@ -63,20 +91,23 @@ Before submitting changes ensure that:
 
 Additional checks are conducted using GitHub Actions which run on all pull requests and are required to pass before the changes are merged. You can find the [full pipeline details](.github/workflows/pull-request.yml).
 
-To publish the UX Helper modules locally for use in other projects, run
+To publish the UX Helper modules locally for use in other projects, run:
 
-- `./gradlew publishMavenPublicationToMavenLocal -PVERSION=x.y.z`
+```bash
+./gradlew publishMavenPublicationToMavenLocal -PVERSION=x.y.z
+```
 
-You should comment out the `signAllPublications()` line in `MavenCentralPublish.kt` if you do not wish to sign the modules.
+This publishes `roktux` (and the internal `testutils` artifact) to `~/.m2`. Signing is skipped unless `signingInMemoryKey` is set; see [`MavenCentralPublish.kt`](build-logic/convention/src/main/kotlin/com/rokt/roktux/MavenCentralPublish.kt).
 
 ## Modules
 
-| Module | Docs                                 |
-| ------ | ------------------------------------ |
-| roktux | [Testing](roktux/src/test/README.md) |
+| Module          | Description                                                                      |
+| --------------- | -------------------------------------------------------------------------------- |
+| `roktux`        | Published rendering library. [Testing notes](roktux/src/test/README.md)          |
+| `demoapp`       | Sample app for validating changes. [Demo app](demoapp/README.md)                 |
+| `networkhelper` | Demo-only network client used by the sample app. Not published to Maven Central. |
+| `testutils`     | Internal test helpers. Not a partner dependency.                                 |
 
-## FAQ
+## License
 
-### Documentation
-
-For detailed documentation, check the [Android integration guide](https://docs.rokt.com/server-to-server/android/).
+Licensed under the [Rokt SDK Terms of Use 2.0](https://rokt.com/sdk-license-2-0/). See [LICENSE.md](LICENSE.md).
