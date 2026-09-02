@@ -13,6 +13,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Update Jetpack Compose BOM to 2026.05.01.
 
+## [2.0.1] - 2026-09-02
+
+### Added
+
+- Surface sessionId and separate no-offers from render f… ([#315](https://github.com/ROKT/rokt-ux-helper-android/pull/315))
+
+### Fixed
+
+- Stop animating sheet height on offer change ([#322](https://github.com/ROKT/rokt-ux-helper-android/pull/322))
+
+### Changed
+
+- Scope Trunk Check to the PR diff instead of the whole repo ([#320](https://github.com/ROKT/rokt-ux-helper-android/pull/320))
+- Correct README against the library and drop resident experts ([#321](https://github.com/ROKT/rokt-ux-helper-android/pull/321))
+- Upgrade trunk ([#319](https://github.com/ROKT/rokt-ux-helper-android/pull/319))
+- Bump trunk-io/trunk-action from 1.3.1 to 2.0.0 ([#317](https://github.com/ROKT/rokt-ux-helper-android/pull/317))
+- Trim AGENTS.md to the non-derivable core ([#318](https://github.com/ROKT/rokt-ux-helper-android/pull/318))
+
 ## [2.0.0] - 2026-08-11
 
 ### Breaking Changes
@@ -254,7 +272,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Initial implementation of UX Helper
 
-[unreleased]: https://github.com/ROKT/rokt-ux-helper-android/compare/2.0.0...HEAD
+[unreleased]: https://github.com/ROKT/rokt-ux-helper-android/compare/2.0.1...HEAD
+[2.0.1]: https://github.com/ROKT/rokt-ux-helper-android/compare/2.0.0...2.0.1
 [2.0.0]: https://github.com/ROKT/rokt-ux-helper-android/compare/1.0.0...2.0.0
 [1.0.0]: https://github.com/ROKT/rokt-ux-helper-android/compare/0.9.3...1.0.0
 [1.0.0-rc.1]: https://github.com/ROKT/rokt-ux-helper-android/compare/0.9.3...1.0.0-rc.1
