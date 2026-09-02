@@ -1,7 +1,6 @@
 package com.rokt.roktux.component
 
 import androidx.activity.compose.BackHandler
-import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.waterfall
@@ -108,7 +107,6 @@ internal class BottomSheetComponent(
             factory.CreateComposable(
                 model = bottomSheetChild,
                 modifier = Modifier
-                    .animateContentSize()
                     .pointerInput(Unit) {
                         interceptTap { hasUserInteracted = true }
                     }
