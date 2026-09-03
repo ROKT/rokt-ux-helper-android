@@ -7,6 +7,11 @@ updates:
     open-pull-requests-limit: 2
     labels:
       - dependabot
+    ignore:
+      # Fans out to every Compose module via build-logic's compose plugin; bump deliberately.
+      - dependency-name: androidx.compose:compose-bom
+      # Pinned in gradle/libs.versions.toml.
+      - dependency-name: androidx.lifecycle:lifecycle-viewmodel-compose
   - package-ecosystem: github-actions
     directory: /
     schedule:
