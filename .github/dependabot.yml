@@ -8,7 +8,7 @@ updates:
     labels:
       - dependabot
     ignore:
-      # Fans out to every module via build-logic's compose plugin; bump deliberately.
+      # Fans out to every Compose module via build-logic's compose plugin; bump deliberately.
       - dependency-name: androidx.compose:compose-bom
       # Pinned in gradle/libs.versions.toml.
       - dependency-name: androidx.lifecycle:lifecycle-viewmodel-compose
