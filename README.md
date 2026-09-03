@@ -81,7 +81,7 @@ You can view the [BOM to library version mapping](https://developer.android.com/
 
 ## Development and useful commands
 
-When making changes to UX Helper you can utilise the [Demo app](demoapp/README.md) to validate your changes.
+When making changes to UX Helper you can utilise the [Demo app](demoapp/README.md) to validate your changes. It renders experience responses bundled in its assets, so it needs no credentials or network access to run.
 
 Before submitting changes ensure that:
 
@@ -101,12 +101,11 @@ This publishes `roktux` (and the internal `testutils` artifact) to `~/.m2`. Sign
 
 ## Modules
 
-| Module          | Description                                                                      |
-| --------------- | -------------------------------------------------------------------------------- |
-| `roktux`        | Published rendering library. [Testing notes](roktux/src/test/README.md)          |
-| `demoapp`       | Sample app for validating changes. [Demo app](demoapp/README.md)                 |
-| `networkhelper` | Demo-only network client used by the sample app. Not published to Maven Central. |
-| `testutils`     | Internal test helpers. Not a partner dependency.                                 |
+| Module      | Description                                                                                   |
+| ----------- | --------------------------------------------------------------------------------------------- |
+| `roktux`    | Published rendering library. [Testing notes](roktux/src/test/README.md)                       |
+| `demoapp`   | Sample app for validating changes, rendering bundled responses. [Demo app](demoapp/README.md) |
+| `testutils` | Internal test helpers. Not a partner dependency.                                              |
 
 ## License
 

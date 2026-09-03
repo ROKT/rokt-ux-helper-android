@@ -4,10 +4,9 @@ androidxActivity = "1.10.1"
 androidxAppCompat = "1.7.1"
 androidxComposeBom = "2026.05.01"
 androidxCore = "1.16.0"
-androidxCoreSplashscreen = "1.0.1"
 androidxEspresso = "3.6.1"
-androidxLifecycle = "2.8.7"             # Newer versions require kotlin 2+
-androidxNavigation = "2.8.9"            # Newer versions require kotlin 2+
+androidxLifecycle = "2.8.7"           # Newer versions require kotlin 2+
+androidxNavigation = "2.8.9"          # Newer versions require kotlin 2+
 androidxWindowManager = "1.4.0"
 androidXbrowser = "1.8.0"
 coil = "3.2.0"
@@ -15,25 +14,18 @@ junit4 = "4.13.2"
 junitParams = "1.1.1"
 kotlin = "2.1.20"
 kotlinxCoroutines = "1.10.2"
-kotlinxSerializationJson = "1.6.3"      # Newer versions require kotlin 2+
+kotlinxSerializationJson = "1.6.3"    # Newer versions require kotlin 2+
 kotlinxCollectionsImmutable = "0.3.7"
 okhttpBom = "4.12.0"
 rebugger = "1.0.0-rc03"
-retrofit = "2.11.0"
 mockk = "1.13.16"
 assertj-core = "3.15.0"
 dcui = "2.4.0"
 robolectric = "4.14.1"
 composeLint = "1.4.1"
-lifecycleRuntimeKtx = "2.8.7"           # Newer versions require kotlin 2+
+lifecycleRuntimeKtx = "2.8.7"         # Newer versions require kotlin 2+
 junit = "1.2.1"
-material = "1.12.0"
 dokka = "2.0.0"
-playServicesCodeScanner = "16.1.0"
-androidxHiltNavigationCompose = "1.2.0"
-hilt = "2.51.1"
-activity = "1.10.1"
-constraintlayout = "2.2.1"
 mavenPublish = "0.31.0"
 kover = "0.9.1"
 
@@ -47,7 +39,6 @@ androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version
 androidx-compose-bom = { group = "androidx.compose", name = "compose-bom", version.ref = "androidxComposeBom" }
 androidx-compose-foundation = { group = "androidx.compose.foundation", name = "foundation" }
 androidx-compose-foundation-layout = { group = "androidx.compose.foundation", name = "foundation-layout" }
-androidx-compose-material-icons-extended = { group = "androidx.compose.material", name = "material-icons-extended" }
 androidx-compose-material3 = { group = "androidx.compose.material3", name = "material3" }
 androidx-compose-runtime = { group = "androidx.compose.runtime", name = "runtime" }
 androidx-ui = { group = "androidx.compose.ui", name = "ui" }
@@ -58,7 +49,6 @@ androidx-compose-ui-tooling-preview = { group = "androidx.compose.ui", name = "u
 androidx-compose-ui-util = { group = "androidx.compose.ui", name = "ui-util" }
 androidx-ui-graphics = { group = "androidx.compose.ui", name = "ui-graphics" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "androidxCore" }
-androidx-core-splashscreen = { group = "androidx.core", name = "core-splashscreen", version.ref = "androidxCoreSplashscreen" }
 androidx-lifecycle-runtime-ktx = { group = "androidx.lifecycle", name = "lifecycle-runtime-ktx", version.ref = "lifecycleRuntimeKtx" }
 androidx-lifecycle-viewModelCompose = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-compose", version.ref = "androidxLifecycle" }
 androidx-navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version.ref = "androidxNavigation" }
@@ -72,30 +62,18 @@ coil-kt-svg = { group = "io.coil-kt.coil3", name = "coil-svg", version.ref = "co
 coil-test = { group = "io.coil-kt.coil3", name = "coil-test", version.ref = "coil" }
 junit4 = { group = "junit", name = "junit", version.ref = "junit4" }
 junit-params = { group = "pl.pragmatists", name = "JUnitParams", version.ref = "junitParams" }
-kotlinx-coroutines-android = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-android", version.ref = "kotlinxCoroutines" }
 kotlinx-coroutines-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test", version.ref = "kotlinxCoroutines" }
 kotlinx-collections-immutable = { group = "org.jetbrains.kotlinx", name = "kotlinx-collections-immutable", version.ref = "kotlinxCollectionsImmutable" }
 kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "kotlinxSerializationJson" }
 okhttp-bom = { group = "com.squareup.okhttp3", name = "okhttp-bom", version.ref = "okhttpBom" }
-okhttp-core = { group = "com.squareup.okhttp3", name = "okhttp" }
 okhttp-mockwebserver = { group = "com.squareup.okhttp3", name = "mockwebserver" }
 rebugger = { module = "io.github.theapache64:rebugger", version.ref = "rebugger" }
-retrofit-core = { group = "com.squareup.retrofit2", name = "retrofit", version.ref = "retrofit" }
-retrofit-converter-gson = { group = "com.squareup.retrofit2", name = "converter-gson", version.ref = "retrofit" }
-retrofit-kotlin-serialization = { group = "com.squareup.retrofit2", name = "converter-kotlinx-serialization", version.ref = "retrofit" }
-material = { group = "com.google.android.material", name = "material", version.ref = "material" }
 mockk-android = { group = "io.mockk", name = "mockk-android", version.ref = "mockk" }
 mockk-agent = { group = "io.mockk", name = "mockk-agent", version.ref = "mockk" }
 assertj-core = { group = "org.assertj", name = "assertj-core", version.ref = "assertj-core" }
 dcui-schema = { group = "com.rokt.internal.network.types", name = "dcui-schema", version.ref = "dcui" }
 robolectric = { group = "org.robolectric", name = "robolectric", version.ref = "robolectric" }
 dokka-android = { group = "org.jetbrains.dokka", name = "android-documentation-plugin", version.ref = "dokka" }
-play-services-code-scanner = { module = "com.google.android.gms:play-services-code-scanner", version.ref = "playServicesCodeScanner" }
-hilt-compiler = { group = "com.google.dagger", name = "hilt-android-compiler", version.ref = "hilt" }
-hilt-android = { group = "com.google.dagger", name = "hilt-android", version.ref = "hilt" }
-androidx-hilt-navigation-compose = { group = "androidx.hilt", name = "hilt-navigation-compose", version.ref = "androidxHiltNavigationCompose" }
-androidx-activity = { group = "androidx.activity", name = "activity", version.ref = "activity" }
-androidx-constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version.ref = "constraintlayout" }
 
 
 # Dependencies of the included build-logic
@@ -109,7 +87,6 @@ roborazzi-compose = { group = "io.github.takahirom.roborazzi", name = "roborazzi
 roborazzi-junit-rule = { group = "io.github.takahirom.roborazzi", name = "roborazzi-junit-rule", version.ref = "roborazzi" }
 
 [bundles]
-retrofit = ["retrofit-core", "retrofit-kotlin-serialization"]
 mockk = ["mockk-android", "mockk-agent"]
 
 [plugins]
@@ -121,7 +98,6 @@ kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 kotlinKapt = { id = "org.jetbrains.kotlin.kapt", version.ref = "kotlin" }
 dokka = { id = "org.jetbrains.dokka", version.ref = "dokka" }
-hilt = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
 maven-publish = { id = "com.vanniktech.maven.publish", version.ref = "mavenPublish" }
 kover = { id = "org.jetbrains.kotlinx.kover", version.ref = "kover" }
 

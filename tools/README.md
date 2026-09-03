@@ -23,7 +23,3 @@ Remember to add quotes to your json string.
 _Note:_ the `experience_response_file` should already exist and be correctly formatted, this script just updates the desired minified json. If there are multiple innerlayouts, it will update all of them.
 
 Usage: `python3 copy_to.py pretty_schema_input_file experience_response_file i`
-
-## apply_dcui.sh
-
-[apply_dcui.sh](apply_dcui.sh) is a helper script that merges inner and outer layouts, installs the Playground application and starts the Playground application to see the experience payload.
