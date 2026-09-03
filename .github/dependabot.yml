@@ -8,7 +8,8 @@ updates:
     labels:
       - dependabot
     ignore:
-      # Pinned in gradle/libs.versions.toml — bump deliberately, not via Dependabot.
+      # Both pinned in gradle/libs.versions.toml — bump deliberately, not via Dependabot.
+      - dependency-name: androidx.compose:compose-bom
       - dependency-name: androidx.lifecycle:lifecycle-viewmodel-compose
   - package-ecosystem: github-actions
     directory: /
