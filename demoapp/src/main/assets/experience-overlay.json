@@ -1,13 +1,13 @@
 {
-  "session_id": "dc5535be-ae43-46d6-b8ff-7826b3a571d8",
+  "session_id": "00000000-0000-4000-8000-000000000001",
   "session_token": {
     "token": "session-token",
     "expires_at": 0
   },
-  "page_instance_guid": "b46d00fd-45b7-440a-9b06-10f6f53ee941",
+  "page_instance_guid": "00000000-0000-4000-8000-000000000002",
   "page_context": {
-    "page_instance_guid": "b46d00fd-45b7-440a-9b06-10f6f53ee941",
-    "page_id": "1a232576-e728-4796-bc73-60c687a2aea2",
+    "page_instance_guid": "00000000-0000-4000-8000-000000000002",
+    "page_id": "00000000-0000-4000-8000-000000000003",
     "language": "en",
     "is_page_detected": true,
     "page_variant_name": "OverlayExample",
@@ -20,12 +20,12 @@
         "name": "Example overlay placement (S2S)",
         "target_element_selector": "",
         "config": {
-          "instance_guid": "b46d00fd-45b7-4302-8bb2-5eab2251fcef",
+          "instance_guid": "00000000-0000-4000-8000-000000000004",
           "token": "",
           "outer_layout_schema": "{\"breakpoints\":{\"tablet\":512.0,\"desktop\":640.0},\"layout\":{\"type\":\"Overlay\",\"node\":{\"allowBackdropToClose\":true,\"styles\":{\"elements\":{\"own\":[{\"default\":{\"background\":{\"backgroundColor\":{\"light\":\"#FFFFFF\",\"dark\":\"#FFFFFF\"}},\"border\":{\"borderRadius\":8.0,\"borderColor\":{\"light\":\"#CFCECC\",\"dark\":\"#CFCECC\"}},\"dimension\":{\"maxWidth\":650.0,\"width\":{\"type\":\"fit\",\"value\":\"wrap-content\"},\"height\":{\"type\":\"fit\",\"value\":\"wrap-content\"}},\"flexChild\":{\"alignSelf\":\"flex-start\"},\"spacing\":{\"margin\":\"10 10 10 10\"}}}],\"wrapper\":[{\"default\":{\"container\":{\"justifyContent\":\"center\"},\"background\":{\"backgroundColor\":{\"light\":\"#80000000\",\"dark\":\"#80000000\"}}}}]}},\"children\":[{\"type\":\"ScrollableColumn\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"container\":{},\"dimension\":{\"width\":{\"type\":\"fit\",\"value\":\"wrap-content\"},\"height\":{\"type\":\"fit\",\"value\":\"wrap-content\"}}}}]}},\"children\":[{\"type\":\"Row\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"container\":{\"alignItems\":\"center\"}}}]}},\"children\":[{\"type\":\"BasicText\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"flexChild\":{\"weight\":1.0},\"spacing\":{\"padding\":\"24 16 16 8\"},\"text\":{\"textColor\":{\"light\":\"#2E3136\",\"dark\":\"#2E3136\"},\"fontSize\":24.0,\"fontFamily\":\"System\",\"fontWeight\":\"700\",\"horizontalTextAlign\":\"left\"}}}]}},\"value\":\"Order confirmed\"}},{\"type\":\"CloseButton\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"dimension\":{\"width\":{\"type\":\"fixed\",\"value\":14.0},\"height\":{\"type\":\"fixed\",\"value\":14.0}},\"spacing\":{\"margin\":\"0 16 0 0\"}}}]}},\"children\":[{\"type\":\"StaticImage\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"flexChild\":{\"weight\":1.0}}}]}},\"url\":{\"light\":\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA4AAAAOCAYAAAAfSC3RAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAABgSURBVHgBrZLRCcAgDESPTpJRu0HdsKPYVOKH4HmiBg5B3wsSAgDmeeJU9TN3ZZMne14hWzA5nOaCyZQZybJxD5ASk6eknkylC4fKsPBVw8JwRgB9k10Zs7VyCfNLXtgP3EZAtmnzLFUAAAAASUVORK5CYII=\",\"dark\":\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA4AAAAOCAYAAAAfSC3RAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAABgSURBVHgBrZLRCcAgDESPTpJRu0HdsKPYVOKH4HmiBg5B3wsSAgDmeeJU9TN3ZZMne14hWzA5nOaCyZQZybJxD5ASk6eknkylC4fKsPBVw8JwRgB9k10Zs7VyCfNLXtgP3EZAtmnzLFUAAAAASUVORK5CYII=\"}}}]}}]}},{\"type\":\"Row\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"spacing\":{\"padding\":\"0 16 10 10\"}}}]}},\"children\":[{\"type\":\"Column\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"flexChild\":{\"weight\":1.0}}}]}},\"children\":[{\"type\":\"OneByOneDistribution\",\"node\":{\"transition\":{\"type\":\"FadeInOut\",\"settings\":{\"duration\":200}}}}]}}]}},{\"type\":\"ProgressIndicator\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"container\":{\"justifyContent\":\"center\"},\"flexChild\":{\"alignSelf\":\"center\"}}}],\"indicator\":[{\"default\":{\"container\":{\"justifyContent\":\"center\",\"alignItems\":\"center\"},\"background\":{\"backgroundColor\":{\"light\":\"#CFCECC\",\"dark\":\"#CFCECC\"}},\"dimension\":{\"width\":{\"type\":\"fixed\",\"value\":22.0},\"height\":{\"type\":\"fixed\",\"value\":5.5}},\"spacing\":{\"margin\":\"0 4 0 0\"}}}],\"activeIndicator\":[{\"default\":{\"background\":{\"backgroundColor\":{\"light\":\"#717170\",\"dark\":\"#717170\"}},\"text\":{\"textColor\":{\"light\":\"#FFFFFF\",\"dark\":\"#FFFFFF\"}}}}],\"seenIndicator\":[{\"default\":{\"background\":{\"backgroundColor\":{\"light\":\"#717170\",\"dark\":\"#717170\"}},\"text\":{\"textColor\":{\"light\":\"#FFFFFF\",\"dark\":\"#FFFFFF\"}}}}]}},\"indicator\":\"‏‏‎ ‎\",\"accessibilityHidden\":true}},{\"type\":\"Row\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"container\":{\"justifyContent\":\"flex-start\"}}}]}},\"children\":[{\"type\":\"RichText\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"spacing\":{\"margin\":\"10 16 24 8\"},\"text\":{\"textColor\":{\"light\":\"#999999\",\"dark\":\"#999999\"},\"fontSize\":11.0,\"fontFamily\":\"Arial\",\"fontWeight\":\"400\",\"horizontalTextAlign\":\"left\"}}}],\"link\":[{\"default\":{\"text\":{\"textColor\":{\"light\":\"#266DCC\",\"dark\":\"#266DCC\"},\"textDecoration\":\"underline\"}}}]}},\"value\":\"<a href=\\\"https://example.invalid/privacy-policy\\\">Privacy Policy</a>\"}}]}}]}}]}},\"display\":\"FULLSCREEN\"}",
           "slots": [
             {
-              "instance_guid": "b46d00fd-45b9-4284-9b8a-7f3da19f300b",
+              "instance_guid": "00000000-0000-4000-8000-000000000005",
               "token": "",
               "layout_variant": {
                 "layout_variant_id": "3586775795186925767",
@@ -36,8 +36,8 @@
               "offer": {
                 "campaign_id": "1",
                 "creative": {
-                  "referral_creative_id": "3484428650226843648",
-                  "instance_guid": "d7eb0871-19bc-4ad1-b233-aa32ab99c7ec",
+                  "referral_creative_id": "1",
+                  "instance_guid": "00000000-0000-4000-8000-000000000006",
                   "token": "",
                   "copy": {
                     "creative.disclaimer": "This is a disclaimer message.",
@@ -184,7 +184,7 @@
                     "positive": {
                       "id": "3484717293503971328",
                       "action": "Url",
-                      "instance_guid": "c51f8730-3197-4ebc-a7ab-9745505d4988",
+                      "instance_guid": "00000000-0000-4000-8000-000000000007",
                       "signal_type": "SignalResponse",
                       "short_label": "Yes please",
                       "long_label": "Yes please",
@@ -199,7 +199,7 @@
                     "negative": {
                       "id": "3484717293503971329",
                       "action": "CaptureOnly",
-                      "instance_guid": "8000ff3d-c81b-4d23-ba01-5e9a126d8403",
+                      "instance_guid": "00000000-0000-4000-8000-000000000008",
                       "signal_type": "SignalResponse",
                       "short_label": "Decline",
                       "long_label": "Decline",
@@ -216,7 +216,7 @@
               }
             },
             {
-              "instance_guid": "b46d00fd-45b9-494c-bf84-403a5e476f5a",
+              "instance_guid": "00000000-0000-4000-8000-000000000009",
               "token": "",
               "layout_variant": {
                 "layout_variant_id": "3586775795186925767",
@@ -227,12 +227,12 @@
               "offer": {
                 "campaign_id": "2",
                 "creative": {
-                  "referral_creative_id": "3478028740928602112",
-                  "instance_guid": "d001d6b1-2cbe-41b4-8873-2babf2d49bea",
+                  "referral_creative_id": "2",
+                  "instance_guid": "00000000-0000-4000-8000-000000000010",
                   "token": "",
                   "copy": {
                     "creative.disclaimer": "Disclaimer text strikes again. ",
-                    "creative.title": "Unlock exclusive videos with Laura Geller.",
+                    "creative.title": "Unlock exclusive videos with Acme Beauty.",
                     "creative.copy": "This is an uneditable creative copy that will come from the advertiser. This is where they show case their offer.",
                     "creative.headline.standalone": "You've unlocked 90$ in this standalone title",
                     "callout.1.text": "BFF Purchased",
@@ -315,7 +315,7 @@
                     "positive": {
                       "id": "3478041234988466176",
                       "action": "Url",
-                      "instance_guid": "d6cde28d-bcf7-4425-ac07-abb4880868ee",
+                      "instance_guid": "00000000-0000-4000-8000-000000000011",
                       "signal_type": "SignalResponse",
                       "short_label": "Yes please",
                       "long_label": "Yes please",
@@ -330,7 +330,7 @@
                     "negative": {
                       "id": "3478041234988466177",
                       "action": "CaptureOnly",
-                      "instance_guid": "67decca1-9751-45c1-bab4-a84d2a9cbe98",
+                      "instance_guid": "00000000-0000-4000-8000-000000000012",
                       "signal_type": "SignalResponse",
                       "short_label": "Decline",
                       "long_label": "Decline",
@@ -347,7 +347,7 @@
               }
             },
             {
-              "instance_guid": "b46d00fd-45b9-41b1-ba90-bb6e26e50ba5",
+              "instance_guid": "00000000-0000-4000-8000-000000000013",
               "token": "",
               "layout_variant": {
                 "layout_variant_id": "3586775795186925767",
@@ -358,8 +358,8 @@
               "offer": {
                 "campaign_id": "3",
                 "creative": {
-                  "referral_creative_id": "3484428650226843648",
-                  "instance_guid": "712aa583-6acf-4ad6-90b4-9b59fd35d69a",
+                  "referral_creative_id": "1",
+                  "instance_guid": "00000000-0000-4000-8000-000000000014",
                   "token": "",
                   "copy": {
                     "creative.disclaimer": "This is a disclaimer message.",
@@ -506,7 +506,7 @@
                     "positive": {
                       "id": "3484717293503971328",
                       "action": "Url",
-                      "instance_guid": "497b0148-2235-4043-90b1-5a1b71f697dc",
+                      "instance_guid": "00000000-0000-4000-8000-000000000015",
                       "signal_type": "SignalResponse",
                       "short_label": "Yes please",
                       "long_label": "Yes please",
@@ -521,7 +521,7 @@
                     "negative": {
                       "id": "3484717293503971329",
                       "action": "CaptureOnly",
-                      "instance_guid": "1a95bcb6-9473-4665-9cbc-ddf3908d4a63",
+                      "instance_guid": "00000000-0000-4000-8000-000000000016",
                       "signal_type": "SignalResponse",
                       "short_label": "Decline",
                       "long_label": "Decline",
@@ -538,7 +538,7 @@
               }
             },
             {
-              "instance_guid": "b46d00fd-45b9-4f4a-9082-f022e4cc608c",
+              "instance_guid": "00000000-0000-4000-8000-000000000017",
               "token": "",
               "layout_variant": {
                 "layout_variant_id": "3586775795186925767",
@@ -549,12 +549,12 @@
               "offer": {
                 "campaign_id": "4",
                 "creative": {
-                  "referral_creative_id": "3478028740928602112",
-                  "instance_guid": "5759244d-8c0d-4543-8480-34135fe45a21",
+                  "referral_creative_id": "2",
+                  "instance_guid": "00000000-0000-4000-8000-000000000018",
                   "token": "",
                   "copy": {
                     "creative.disclaimer": "Disclaimer text strikes again. ",
-                    "creative.title": "Unlock exclusive videos with Laura Geller.",
+                    "creative.title": "Unlock exclusive videos with Acme Beauty.",
                     "creative.copy": "This is an uneditable creative copy that will come from the advertiser. This is where they show case their offer.",
                     "creative.headline.standalone": "You've unlocked 90$ in this standalone title",
                     "callout.1.text": "BFF Purchased",
@@ -637,7 +637,7 @@
                     "positive": {
                       "id": "3478041234988466176",
                       "action": "Url",
-                      "instance_guid": "26e04226-b6ba-40d4-9dc3-d4451822553c",
+                      "instance_guid": "00000000-0000-4000-8000-000000000019",
                       "signal_type": "SignalResponse",
                       "short_label": "Yes please",
                       "long_label": "Yes please",
@@ -652,7 +652,7 @@
                     "negative": {
                       "id": "3478041234988466177",
                       "action": "CaptureOnly",
-                      "instance_guid": "7f97867f-d66b-4b9b-959b-fa2fb0bdde08",
+                      "instance_guid": "00000000-0000-4000-8000-000000000020",
                       "signal_type": "SignalResponse",
                       "short_label": "Decline",
                       "long_label": "Decline",
