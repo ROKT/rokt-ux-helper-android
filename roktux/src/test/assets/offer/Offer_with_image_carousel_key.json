@@ -1,17 +1,17 @@
 {
-  "campaign_id": "2732344566234284034",
+  "campaign_id": "5",
   "creative": {
-    "referral_creative_id": "2732356166940819466",
-    "instance_guid": "f5987bb9-f7ba-4a89-91e7-80a446c5d29c",
+    "referral_creative_id": "7",
+    "instance_guid": "00000000-0000-4000-8000-000000000003",
     "token": "creative_token",
     "copy": {
       "creative.copy": "Some copy",
       "creative.title": "You've unlocked a partner offer!",
       "creative.disclaimer": "This is a disclaimer here. Not all advertisers have one.",
-      "creative.termsAndConditions.link": "/LegalTerms/TermsAndConditions/2732356166940819466",
+      "creative.termsAndConditions.link": "/LegalTerms/TermsAndConditions/7",
       "creative.termsAndConditions.close.copy": "Close",
       "creative.termsAndConditions.title": "Terms of Use",
-      "creative.privacyPolicy.link": "/LegalTerms/PrivacyPolicy/2732356166940819466",
+      "creative.privacyPolicy.link": "/LegalTerms/PrivacyPolicy/7",
       "creative.privacyPolicy.close.copy": "Close",
       "creative.privacyPolicy.title": "Privacy Policy",
       "creative.confirmation.message": "Details will go to test1593754986316@rokt.com",
@@ -61,9 +61,9 @@
     },
     "response_options_map": {
       "positive": {
-        "id": "2732356166940819464",
+        "id": "17",
         "action": "CaptureOnly",
-        "instance_guid": "549a346b-cd76-4f04-bccd-a1168c870e97",
+        "instance_guid": "00000000-0000-4000-8000-000000000004",
         "token": "response_token",
         "signal_type": "SignalResponse",
         "short_label": "Claim offer",
@@ -73,9 +73,9 @@
         "url": ""
       },
       "negative": {
-        "id": "2732356166940819465",
+        "id": "18",
         "action": "CaptureOnly",
-        "instance_guid": "c94a4aab-8e73-47f1-ad5b-a07bf00703ec",
+        "instance_guid": "00000000-0000-4000-8000-000000000005",
         "token": "response_token",
         "signal_type": "SignalResponse",
         "short_label": "No thanks",
