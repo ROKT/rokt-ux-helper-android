@@ -38,6 +38,7 @@ local.properties
 
 # Gradle cache
 .gradle
+.kotlin
 
 # Sandbox stuff
 _sandbox

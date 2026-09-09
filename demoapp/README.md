@@ -1,61 +1,92 @@
-# Rokt UX Helper Demo App Android
+# Rokt UX Helper Sample App (Android)
 
-## Overview
+Renders Rokt experiences with `roktux`, using experience responses bundled in `src/main/assets/`.
 
-This demo app showcases the integration of the Rokt UX SDK into an Android application. It utilizes the `networkhelper` module to retrieve experiences from the Rokt backend and the `roktux` module to handle UI rendering and user interactions.
+The app makes **no calls to the Rokt API**, so it needs no account, no credentials and no
+configuration — clone, open, run. Only the offers' own images and links reach the network.
+This mirrors the [iOS Example app](https://github.com/ROKT/rokt-ux-helper-ios/tree/main/Example).
 
 ```kotlin
 dependencies {
-   implementation(projects.roktux)
-   implementation(projects.networkhelper)
+    implementation(projects.uxHelper.roktux)
 }
 ```
 
-## Resident Experts
+## Running
 
-- Thomson Thomas - <thomson.thomas@rokt.com>
-- Sahil Suri - <sahil.suri@rokt.com>
-- Lewis Krishnamurti - <lewis.raj.krishnamurti@rokt.com>
+Open the repository in [Android Studio](https://developer.android.com/studio) and run the
+`demoapp` configuration, or:
 
-## Requirements
-
-- The latest version of [Android Studio](https://developer.android.com/studio).
-- Android 5.0 (API level 21) and above
-- Android Gradle Plugin 8.1.2
-- Gradle 8.9+
-
-### Configure the app
-
-To run the demo app, you'll have to:
-
-1. Add a file local.properties in the root project (this file should NOT be under version control to protect your keys)
-2. Add below lines to local.properties that looks like
-
-```text
-BASE_URL=YOUR_BASE_URL, where YOUR_BASE_URL is the base url to your or Rokt backend.
-VIEW_NAME=YOUR_VIEW_NAME, where YOUR_VIEW_NAME is the view name you get from Rokt.
-ROKT_TAG_ID=YOUR_TAG_ID, where YOUR_TAG_ID is the tag id you get from Rokt.
-ROKT_PUB_ID=YOUR_PUB_ID, where YOUR_PUB_ID is the pub id you get from Rokt.
-ROKT_SECRET=YOUR_SECRET, where YOUR_SECRET is the secret you get from Rokt.
-ROKT_CLIENT_UNIQUE_ID=YOUR_CLIENT_UNIQUE_ID, where YOUR_CLIENT_UNIQUE_ID is the client unique id you get from Rokt.
+```bash
+./gradlew :demoapp:installDebug
 ```
 
-## Features
+## What the home screen launches
 
-### Interactive Tutorials
+| Button                 | Entry point             | Bundled response              |
+| ---------------------- | ----------------------- | ----------------------------- |
+| Compose                | `RoktLayout` composable | `experience.json`             |
+| Compose — overlay      | `RoktLayout` composable | `experience-overlay.json`     |
+| Compose — bottom sheet | `RoktLayout` composable | `experience-bottomsheet.json` |
+| View system            | `RoktLayoutView`        | `experience.json`             |
 
-The demo app provides a comprehensive set of interactive tutorials that guide you through the process of integrating Rokt UX into your app. These tutorials cover various configurations and use cases, allowing you to learn by doing.
+`RoktLayout` renders whichever container the response asks for — overlay or bottom sheet — so the
+host composes it in place rather than wrapping it in a dialog of its own.
 
-**Location:** `/src/main/java/com/rokt/demoapp/ui/screen/tutorials`
+## Compose: `RoktLayout`
 
-### QR Scanner Layout Builder (Internal Tool)
+Key parameters:
 
-This tool, intended for internal Rokt testing, allows you to create and preview layouts by scanning QR codes.
+1. `experienceResponse` — the layout's JSON string.
+2. `location` — the element RoktUX targets, matching `target_element_selector` in the response.
+   Overlay and bottom-sheet layouts carry their own container and render regardless.
+3. `roktUxConfig` — colour mode, fonts and image handling. Required; use `RoktUxConfig.builder().build()` for defaults.
+4. `onUxEvent` — user interaction callbacks (opening links, layout completion and failure).
+5. `onPlatformEvent` — integration data a production app forwards via its backend.
 
-**Location:** `demoapp/src/main/java/com/rokt/demoapp/ui/screen/layout`
+See the [Android integration guide](https://docs.rokt.com/server-to-server/android).
 
-### Custom Layout Builder (Internal Tool)
+```kotlin
+RoktLayout(
+    experienceResponse = experienceResponse,
+    location = "RoktTest", // "target_element_selector" in the experience JSON
+    roktUxConfig = RoktUxConfig.builder().build(),
+    onUxEvent = { event -> /* handle UX events here */ },
+    onPlatformEvent = { /* send these platform events to the Rokt API */ },
+)
+```
 
-This feature enables you to test custom layouts using custom attributes.
+`SampleScreen.kt` and `SampleEvents.kt` hold this wiring.
 
-**Location:** `demoapp/src/main/java/com/rokt/demoapp/ui/screen/custom`
+## View system: `RoktLayoutView`
+
+Same parameters, added to a view hierarchy instead — see `SampleLayoutViewActivity.kt`.
+
+```kotlin
+val layoutView = RoktLayoutView(this, location = "RoktTest")
+setContentView(layoutView)
+
+layoutView.loadLayout(
+    experienceResponse = experienceResponse,
+    roktUxConfig = RoktUxConfig.builder().build(),
+    onUxEvent = { event -> /* handle UX events here */ },
+    onPlatformEvent = { /* send these platform events to the Rokt API */ },
+)
+```
+
+## Bundled experience responses
+
+Copied from the iOS Example app's fixtures, so both samples render the same layouts.
+
+| File                          | Outer layout | `target_element_selector` |
+| ----------------------------- | ------------ | ------------------------- |
+| `experience.json`             | Overlay      | `RoktTest`                |
+| `experience-overlay.json`     | Overlay      | `""`                      |
+| `experience-bottomsheet.json` | BottomSheet  | `""`                      |
+
+Each was converted from a captured placement payload into a server-to-server shaped response, with
+the session tokens replaced by placeholders. Creative imagery does not load — the image URLs point
+at assets that no longer resolve — so the fixtures exercise layout and text, not images.
+
+To render a different layout, drop its JSON into `src/main/assets/`, add it to `ExperienceAssets`
+in `SampleScreen.kt`, and give it an entry in `SampleDestination` in `HomeScreen.kt`.
