@@ -13,6 +13,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Update Jetpack Compose BOM to 2026.05.01.
 
+## [2.0.2] - 2026-09-11
+
+### Changed
+
+- Allow unused models to shrink ([#332](https://github.com/ROKT/rokt-ux-helper-android/pull/332))
+- Render bundled experiences and drop the network layer ([#327](https://github.com/ROKT/rokt-ux-helper-android/pull/327))
+- Sanitise production-shaped values in offer test fixtures ([#328](https://github.com/ROKT/rokt-ux-helper-android/pull/328))
+- Ignore Compose BOM and lifecycle-viewmodel-compose updates ([#324](https://github.com/ROKT/rokt-ux-helper-android/pull/324))
+
 ## [2.0.1] - 2026-09-02
 
 ### Added
@@ -272,7 +281,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Initial implementation of UX Helper
 
-[unreleased]: https://github.com/ROKT/rokt-ux-helper-android/compare/2.0.1...HEAD
+[unreleased]: https://github.com/ROKT/rokt-ux-helper-android/compare/2.0.2...HEAD
+[2.0.2]: https://github.com/ROKT/rokt-ux-helper-android/compare/2.0.1...2.0.2
 [2.0.1]: https://github.com/ROKT/rokt-ux-helper-android/compare/2.0.0...2.0.1
 [2.0.0]: https://github.com/ROKT/rokt-ux-helper-android/compare/1.0.0...2.0.0
 [1.0.0]: https://github.com/ROKT/rokt-ux-helper-android/compare/0.9.3...1.0.0
