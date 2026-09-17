@@ -34,6 +34,15 @@ class DataImageComponentTest : BaseDcuiEspressoTest() {
     }
 
     @Test
+    @DcuiNodeJson(jsonFile = "DataImageComponent/DataImage_with_ValidImageKey.json")
+    @DcuiConfig(testInInnerLayout = true, isDarkModeEnabled = true)
+    @DcuiOfferJson(jsonFile = "offer/Offer_with_valid_key.json")
+    fun testDataImageComponentWithEmptyDarkUrlDoesNotRenderInDarkMode() {
+        composeTestRule.onNodeWithTag(DCUI_COMPONENT_TAG)
+            .assertDoesNotExist()
+    }
+
+    @Test
     @DcuiNodeJson(jsonFile = "DataImageComponent/DataImage_with_FallbackImageKey.json")
     @DcuiConfig(testInInnerLayout = true)
     @DcuiOfferJson(jsonFile = "offer/Offer_with_valid_key.json")

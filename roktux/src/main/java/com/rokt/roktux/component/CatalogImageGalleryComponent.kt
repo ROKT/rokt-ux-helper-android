@@ -64,12 +64,8 @@ internal class CatalogImageGalleryComponent(
             model.images
                 .asSequence()
                 .mapNotNull { (key, image) ->
-                    val url = if (isDarkModeEnabled) {
-                        image.darkUrl?.takeIf { it.isNotBlank() } ?: image.lightUrl
-                    } else {
-                        image.lightUrl
-                    }
-                    if (url.isNotEmpty()) {
+                    val url = if (isDarkModeEnabled) image.darkUrl ?: image.lightUrl else image.lightUrl
+                    if (url.isNotBlank()) {
                         key to image
                     } else {
                         null
