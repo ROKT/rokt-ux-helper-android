@@ -829,7 +829,7 @@ internal fun transformCatalogImageGallery(
                 containerProperties = null,
                 conditionalTransitionModifiers = null,
                 alt = entry.value.properties.get<String>(TypedKey<String>(KEY_ALT)),
-                darkUrl = entry.value.properties.get<String>(TypedKey<String>(KEY_DARK))?.takeIf(String::isNotEmpty),
+                darkUrl = entry.value.properties.get<String>(TypedKey<String>(KEY_DARK)),
                 lightUrl = entry.value.properties.get<String>(TypedKey<String>(KEY_LIGHT)).orEmpty(),
                 title = entry.value.properties.get<String>(TypedKey<String>(KEY_TITLE)),
                 scaleType = contentScale,
