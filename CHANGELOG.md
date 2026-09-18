@@ -13,6 +13,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Update Jetpack Compose BOM to 2026.05.01.
 
+## [2.0.3] - 2026-09-18
+
+### Fixed
+
+- Hide images with empty dark mode URLs ([#334](https://github.com/ROKT/rokt-ux-helper-android/pull/334))
+
+### Changed
+
+- Inherit org default PR template ([#335](https://github.com/ROKT/rokt-ux-helper-android/pull/335))
+
 ## [2.0.2] - 2026-09-11
 
 ### Changed
@@ -281,7 +291,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Initial implementation of UX Helper
 
-[unreleased]: https://github.com/ROKT/rokt-ux-helper-android/compare/2.0.2...HEAD
+[unreleased]: https://github.com/ROKT/rokt-ux-helper-android/compare/2.0.3...HEAD
+[2.0.3]: https://github.com/ROKT/rokt-ux-helper-android/compare/2.0.2...2.0.3
 [2.0.2]: https://github.com/ROKT/rokt-ux-helper-android/compare/2.0.1...2.0.2
 [2.0.1]: https://github.com/ROKT/rokt-ux-helper-android/compare/2.0.0...2.0.1
 [2.0.0]: https://github.com/ROKT/rokt-ux-helper-android/compare/1.0.0...2.0.0
