@@ -17,6 +17,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.BaselineShift
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.sp
 
 fun SemanticsNodeInteraction.assertFontSize(fontSize: Int) = assert(hasFontSize(fontSize))
@@ -24,6 +25,8 @@ fun SemanticsNodeInteraction.assertFontSize(fontSize: Int) = assert(hasFontSize(
 fun SemanticsNodeInteraction.assertFontWeight(fontWeight: Int) = assert(hasFontWeight(fontWeight))
 
 fun SemanticsNodeInteraction.assertLineHeight(lineHeight: Int) = assert(hasLineHeight(lineHeight))
+
+fun SemanticsNodeInteraction.assertLineHeightIsUnspecified() = assert(hasLineHeightUnspecified())
 
 fun SemanticsNodeInteraction.assertTextColor(textColor: String) = assert(hasTextColor(textColor))
 
@@ -78,6 +81,11 @@ private fun hasLinkFontWeight(fontWeight: Int) = SemanticsMatcher("FontWeight = 
 private fun hasLineHeight(lineHeight: Int) = SemanticsMatcher("LineHeight = $lineHeight") { node ->
     val targetLineHeight = getTextStyle(node)?.lineHeight
     validateAndPrintError("LineHeight", expected = lineHeight.sp, target = targetLineHeight)
+}
+
+private fun hasLineHeightUnspecified() = SemanticsMatcher("LineHeight = Unspecified") { node ->
+    val targetLineHeight = getTextStyle(node)?.lineHeight
+    validateAndPrintError("LineHeight", expected = TextUnit.Unspecified, target = targetLineHeight)
 }
 
 private fun hasTextColor(textColor: String) = SemanticsMatcher("TextColor = $textColor") { node ->

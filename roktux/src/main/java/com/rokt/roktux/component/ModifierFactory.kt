@@ -1238,7 +1238,8 @@ internal class ModifierFactory {
                 letterSpacing = stylingUiProperties.letterSpacing?.takeIf { it != Float.MIN_VALUE }?.sp
                     ?: TextUnit.Unspecified,
                 textDecoration = stylingUiProperties.textDecoration,
-                lineHeight = stylingUiProperties.lineHeight?.takeIf { it != Float.MIN_VALUE }?.sp
+                lineHeight = stylingUiProperties.lineHeight
+                    ?.takeIf { it != Float.MIN_VALUE && it.isFinite() && it >= 0f }?.sp
                     ?: TextUnit.Unspecified,
             ),
             transformedText,

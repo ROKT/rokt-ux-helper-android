@@ -29,6 +29,7 @@ import com.rokt.core.testutils.assertion.assertFontWeight
 import com.rokt.core.testutils.assertion.assertHorizontalTextAlign
 import com.rokt.core.testutils.assertion.assertLetterSpacing
 import com.rokt.core.testutils.assertion.assertLineHeight
+import com.rokt.core.testutils.assertion.assertLineHeightIsUnspecified
 import com.rokt.core.testutils.assertion.assertLinkBaselineTextAlign
 import com.rokt.core.testutils.assertion.assertLinkFontSize
 import com.rokt.core.testutils.assertion.assertLinkFontStyle
@@ -195,6 +196,18 @@ class TextComponentTest : BaseDcuiEspressoTest() {
             .assertFontStyle(FontStyle.Italic)
             .assertTextColor("#FF4400B3")
             .assertTextEquals("ORDER NUMBER: UK171359906")
+    }
+
+    @Test
+    @DcuiNodeJson(jsonFile = "TextComponent/BasicText_with_NegativeLineHeight.json")
+    fun testBasicTextComponentWithNegativeLineHeightFallsBackToDefault() {
+        // A negative lineHeight is not a valid text style value. Rendering it directly used to
+        // fail during text layout, so it should be treated the same as an absent/unspecified
+        // lineHeight instead of being passed through.
+        composeTestRule.onNodeWithTag(DCUI_COMPONENT_TAG)
+            .assertIsDisplayed()
+            .assertTextEquals("Test")
+            .assertLineHeightIsUnspecified()
     }
 
     @Test
