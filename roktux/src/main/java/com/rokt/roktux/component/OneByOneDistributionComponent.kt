@@ -1,7 +1,5 @@
 package com.rokt.roktux.component
 
-import androidx.compose.animation.EnterTransition
-import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.focusable
 import androidx.compose.runtime.Composable
@@ -10,26 +8,24 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
-import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
-import androidx.navigation.NavHostController
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
 import com.rokt.modelmapper.uimodel.LayoutSchemaUiModel
 import com.rokt.modelmapper.uimodel.TransitionUiModel
 import com.rokt.roktux.utils.AnimationState
-import com.rokt.roktux.utils.ComposeErrorBoundary
+import com.rokt.roktux.utils.OfferScopedViewModelStoreOwner
 import com.rokt.roktux.utils.fadeInOutAnimationModifier
 import com.rokt.roktux.viewmodel.layout.LayoutContract
 import com.rokt.roktux.viewmodel.layout.OfferUiState
-import kotlinx.serialization.Serializable
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 private const val ACCESSIBILITY_READOUT_TEXT = "Offer %d of %d"
 
@@ -48,143 +44,75 @@ internal class OneByOneDistributionComponent(
         breakpointIndex: Int,
         onEventSent: (LayoutContract.LayoutEvent) -> Unit,
     ) {
-        val navController: NavHostController = rememberNavController()
-        val startDestination = remember(offerState.currentOfferIndex) {
-            LayoutVariants.MarketingScreen(offerState.currentOfferIndex)
-        }
-
         var animationState by remember { mutableStateOf(AnimationState.Show) }
         var firstRender by rememberSaveable {
             mutableStateOf(true)
         }
         val focusRequester = remember { FocusRequester() }
+        val focusManager = LocalFocusManager.current
+        val coroutineScope = rememberCoroutineScope()
         LaunchedEffect(key1 = offerState.targetOfferIndex) {
             if (!firstRender) {
                 animationState = AnimationState.Hide
-                // the NavHost maintains focus so the same workaround as Carousel is not needed
-                focusRequester.requestFocus()
             } else {
                 firstRender = false
             }
         }
 
-        val viewModelStoreOwner = LocalViewModelStoreOwner.current
-        try {
-            checkNotNull(viewModelStoreOwner) {
-                "NavHost requires a ViewModelStoreOwner to be provided via LocalViewModelStoreOwner"
-            }
-            navController.setViewModelStore(viewModelStoreOwner.viewModelStore)
-        } catch (e: Exception) {
-            onEventSent(LayoutContract.LayoutEvent.UiException(e, true))
-            return
-        }
-
-        // See ComposeErrorBoundary's kdoc for why NavHost needs this.
-        ComposeErrorBoundary(
-            modifier = modifier,
-            // Not fatal: the fallback below keeps the offer showing, so this shouldn't close the layout.
-            onError = { e -> onEventSent(LayoutContract.LayoutEvent.UiException(e, false)) },
-            fallback = {
-                // No fade transition without NavHost, but the offer still renders and progresses.
-                LaunchedEffect(key1 = offerState.targetOfferIndex) {
-                    if (offerState.targetOfferIndex != offerState.currentOfferIndex) {
-                        onEventSent(LayoutContract.LayoutEvent.SetCurrentOffer(offerState.targetOfferIndex))
-                    }
-                }
-                // Keyed on the offer index: NavHost recreated this per back-stack entry, so
-                // without a matching key here, the composable/view-model below would be reused
-                // across offers instead, rendering the first offer forever.
-                key(offerState.currentOfferIndex) {
-                    factory.CreateComposable(
-                        model = LayoutSchemaUiModel.MarketingUiModel(),
-                        modifier = modifierFactory
-                            .createModifier(
-                                modifierPropertiesList = model.ownModifiers,
-                                conditionalTransitionModifier = model.conditionalTransitionModifiers,
-                                breakpointIndex = breakpointIndex,
-                                isPressed = isPressed,
-                                isDarkModeEnabled = isDarkModeEnabled,
-                                offerState = offerState,
-                            )
-                            .animateContentSize()
-                            .semantics {
-                                contentDescription =
-                                    ACCESSIBILITY_READOUT_TEXT.format(
-                                        offerState.currentOfferIndex + 1,
-                                        offerState.lastOfferIndex + 1,
-                                    )
-                            }
-                            .focusRequester(focusRequester)
-                            .focusable(),
-                        isPressed = isPressed,
-                        offerState = offerState,
-                        isDarkModeEnabled = isDarkModeEnabled,
-                        breakpointIndex = breakpointIndex,
-                    ) { event ->
-                        if (event is LayoutContract.LayoutEvent.ResponseOptionSelected) {
-                            onEventSent(event.copy(shouldProgress = true))
-                        } else {
-                            onEventSent.invoke(event)
-                        }
-                    }
-                }
-            },
-        ) {
-            NavHost(
-                modifier = modifierFactory
-                    .createModifier(
-                        modifierPropertiesList = model.ownModifiers,
-                        conditionalTransitionModifier = model.conditionalTransitionModifiers,
-                        breakpointIndex = breakpointIndex,
-                        isPressed = isPressed,
-                        isDarkModeEnabled = isDarkModeEnabled,
-                        offerState = offerState,
-                    )
-                    // For now fadeInOut is the only possible transition animation
-                    .fadeInOutAnimationModifier(
-                        animationState = animationState,
-                        duration = (
-                            (model.transition as? TransitionUiModel.FadeInOutTransition)?.duration?.div(
-                                2,
-                            )
-                            ) ?: 0,
-                    ) {
-                        navController.popBackStack()
-                        navController.navigate(
-                            LayoutVariants.MarketingScreen(offerIndex = offerState.targetOfferIndex),
+        key(offerState.currentOfferIndex) {
+            OfferScopedViewModelStoreOwner {
+                factory.CreateComposable(
+                    model = LayoutSchemaUiModel.MarketingUiModel(),
+                    modifier = modifierFactory
+                        .createModifier(
+                            modifierPropertiesList = model.ownModifiers,
+                            conditionalTransitionModifier = model.conditionalTransitionModifiers,
+                            breakpointIndex = breakpointIndex,
+                            isPressed = isPressed,
+                            isDarkModeEnabled = isDarkModeEnabled,
+                            offerState = offerState,
                         )
-                        onEventSent(LayoutContract.LayoutEvent.SetCurrentOffer(offerState.targetOfferIndex))
-                        animationState = AnimationState.Show
-                    }
-                    .animateContentSize()
-                    .semantics {
-                        contentDescription =
-                            ACCESSIBILITY_READOUT_TEXT.format(
-                                offerState.currentOfferIndex + 1,
-                                offerState.lastOfferIndex + 1,
-                            )
-                    }
-                    .focusRequester(focusRequester)
-                    .focusable(),
-                navController = navController,
-                startDestination = startDestination,
-                enterTransition = { EnterTransition.None },
-                exitTransition = { ExitTransition.None },
-            ) {
-                composable<LayoutVariants.MarketingScreen> { _ ->
-                    factory.CreateComposable(
-                        model = LayoutSchemaUiModel.MarketingUiModel(),
-                        modifier = modifier,
-                        isPressed = isPressed,
-                        offerState = offerState,
-                        isDarkModeEnabled = isDarkModeEnabled,
-                        breakpointIndex = breakpointIndex,
-                    ) { event ->
-                        if (event is LayoutContract.LayoutEvent.ResponseOptionSelected) {
-                            onEventSent(event.copy(shouldProgress = true))
-                        } else {
-                            onEventSent.invoke(event)
+                        .then(modifier)
+                        // For now fadeInOut is the only possible transition animation
+                        .fadeInOutAnimationModifier(
+                            animationState = animationState,
+                            duration = (
+                                (model.transition as? TransitionUiModel.FadeInOutTransition)?.duration?.div(
+                                    2,
+                                )
+                                ) ?: 0,
+                        ) {
+                            onEventSent(LayoutContract.LayoutEvent.SetCurrentOffer(offerState.targetOfferIndex))
+                            animationState = AnimationState.Show
+                            coroutineScope.launch {
+                                // requestFocus only works a single time so we need to clear focus and
+                                // request it again after a delay: the focus Active state is maintained
+                                // and not automatically set to Inactive.
+                                // See: androidx.compose.ui.focus.FocusTransactions.kt#64
+                                focusManager.clearFocus(true)
+                                delay(10)
+                                focusRequester.requestFocus()
+                            }
                         }
+                        .animateContentSize()
+                        .semantics {
+                            contentDescription =
+                                ACCESSIBILITY_READOUT_TEXT.format(
+                                    offerState.currentOfferIndex + 1,
+                                    offerState.lastOfferIndex + 1,
+                                )
+                        }
+                        .focusRequester(focusRequester)
+                        .focusable(),
+                    isPressed = isPressed,
+                    offerState = offerState,
+                    isDarkModeEnabled = isDarkModeEnabled,
+                    breakpointIndex = breakpointIndex,
+                ) { event ->
+                    if (event is LayoutContract.LayoutEvent.ResponseOptionSelected) {
+                        onEventSent(event.copy(shouldProgress = true))
+                    } else {
+                        onEventSent.invoke(event)
                     }
                 }
             }
@@ -195,9 +123,4 @@ internal class OneByOneDistributionComponent(
             )
         }
     }
-}
-
-internal sealed interface LayoutVariants {
-    @Serializable
-    data class MarketingScreen(val offerIndex: Int) : LayoutVariants
 }

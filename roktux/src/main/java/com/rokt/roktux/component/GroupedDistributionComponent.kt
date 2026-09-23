@@ -1,7 +1,5 @@
 package com.rokt.roktux.component
 
-import androidx.compose.animation.EnterTransition
-import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Column
@@ -11,28 +9,26 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
-import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
-import androidx.navigation.NavHostController
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
-import androidx.navigation.toRoute
 import com.rokt.modelmapper.uimodel.LayoutSchemaUiModel
 import com.rokt.modelmapper.uimodel.TransitionUiModel
 import com.rokt.modelmapper.utils.DEFAULT_VIEWABLE_ITEMS
 import com.rokt.roktux.utils.AnimationState
-import com.rokt.roktux.utils.ComposeErrorBoundary
+import com.rokt.roktux.utils.OfferScopedViewModelStoreOwner
 import com.rokt.roktux.utils.fadeInOutAnimationModifier
 import com.rokt.roktux.viewmodel.layout.LayoutContract
 import com.rokt.roktux.viewmodel.layout.OfferUiState
 import kotlinx.collections.immutable.ImmutableList
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import kotlin.math.ceil
 
 private const val ACCESSIBILITY_READOUT_TEXT = "Page %d of %d"
@@ -52,20 +48,16 @@ internal class GroupedDistributionComponent(
         breakpointIndex: Int,
         onEventSent: (LayoutContract.LayoutEvent) -> Unit,
     ) {
-        val navController: NavHostController = rememberNavController()
-        val startDestination = remember(offerState.currentOfferIndex) {
-            LayoutVariants.MarketingScreen(offerState.currentOfferIndex)
-        }
         var animationState by remember { mutableStateOf(AnimationState.Show) }
         val focusRequester = remember { FocusRequester() }
+        val focusManager = LocalFocusManager.current
+        val coroutineScope = rememberCoroutineScope()
         var firstRender by rememberSaveable {
             mutableStateOf(true)
         }
         LaunchedEffect(key1 = offerState.targetOfferIndex) {
             if (!firstRender) {
                 animationState = AnimationState.Hide
-                // the NavHost maintains focus so the same workaround as Carousel is not needed
-                focusRequester.requestFocus()
             } else {
                 firstRender = false
             }
@@ -79,142 +71,69 @@ internal class GroupedDistributionComponent(
             onEventSent(LayoutContract.LayoutEvent.ViewableItemsChanged(viewableItems))
         }
 
-        val viewModelStoreOwner = LocalViewModelStoreOwner.current
-        try {
-            checkNotNull(viewModelStoreOwner) {
-                "NavHost requires a ViewModelStoreOwner to be provided via LocalViewModelStoreOwner"
-            }
-            navController.setViewModelStore(viewModelStoreOwner.viewModelStore)
-        } catch (e: Exception) {
-            onEventSent(LayoutContract.LayoutEvent.UiException(e, true))
-            return
-        }
-
-        // See ComposeErrorBoundary's kdoc for why NavHost needs this.
-        ComposeErrorBoundary(
-            modifier = modifier,
-            // Not fatal: the fallback below keeps the offers showing, so this shouldn't close the layout.
-            onError = { e -> onEventSent(LayoutContract.LayoutEvent.UiException(e, false)) },
-            fallback = {
-                // No fade transition without NavHost, but the offers still render and progress.
-                LaunchedEffect(key1 = offerState.targetOfferIndex) {
-                    if (offerState.targetOfferIndex != offerState.currentOfferIndex) {
-                        onEventSent(LayoutContract.LayoutEvent.SetCurrentOffer(offerState.targetOfferIndex))
-                    }
-                }
-                Column(
-                    modifier = modifierFactory
-                        .createModifier(
-                            modifierPropertiesList = model.ownModifiers,
-                            conditionalTransitionModifier = model.conditionalTransitionModifiers,
-                            breakpointIndex = breakpointIndex,
-                            isPressed = isPressed,
-                            isDarkModeEnabled = isDarkModeEnabled,
-                            offerState = offerState,
+        Column(
+            modifier = modifierFactory
+                .createModifier(
+                    modifierPropertiesList = model.ownModifiers,
+                    conditionalTransitionModifier = model.conditionalTransitionModifiers,
+                    breakpointIndex = breakpointIndex,
+                    isPressed = isPressed,
+                    isDarkModeEnabled = isDarkModeEnabled,
+                    offerState = offerState,
+                )
+                .then(modifier)
+                // For now fadeInOut is the only possible transition animation
+                .fadeInOutAnimationModifier(
+                    animationState = animationState,
+                    duration = (
+                        (model.transition as? TransitionUiModel.FadeInOutTransition)?.duration?.div(
+                            2,
                         )
-                        .animateContentSize()
-                        .semantics {
-                            contentDescription =
-                                getAccessibilityDescription(offerState)
-                        }
-                        .focusRequester(focusRequester)
-                        .focusable(),
+                        ) ?: 0,
                 ) {
-                    for (offerIndexOffset in 0 until viewableItems) {
-                        // Keyed on the offer index: NavHost recreated this per back-stack entry,
-                        // so without a matching key here, each slot's composable/view-model would
-                        // be reused across offers instead, rendering the first set forever.
-                        key(offerState.currentOfferIndex + offerIndexOffset) {
-                            factory.CreateComposable(
-                                model = LayoutSchemaUiModel.MarketingUiModel(),
-                                modifier = modifier,
-                                isPressed = isPressed,
-                                offerState = offerState.copy(
-                                    currentOfferIndex = offerState.currentOfferIndex + offerIndexOffset,
-                                    viewableItems = viewableItems,
-                                ),
-                                isDarkModeEnabled = isDarkModeEnabled,
-                                breakpointIndex = breakpointIndex,
-                            ) { event ->
-                                if (event is LayoutContract.LayoutEvent.ResponseOptionSelected) {
-                                    // Only progress to next offer if viewableItems is 1
-                                    if (viewableItems == DEFAULT_VIEWABLE_ITEMS) {
-                                        onEventSent(event.copy(shouldProgress = true))
-                                    } else {
-                                        onEventSent(event)
-                                    }
-                                } else {
-                                    onEventSent.invoke(event)
-                                }
-                            }
-                        }
+                    onEventSent(LayoutContract.LayoutEvent.SetCurrentOffer(offerState.targetOfferIndex))
+                    animationState = AnimationState.Show
+                    coroutineScope.launch {
+                        // requestFocus only works a single time so we need to clear focus and
+                        // request it again after a delay: the focus Active state is maintained
+                        // and not automatically set to Inactive.
+                        // See: androidx.compose.ui.focus.FocusTransactions.kt#64
+                        focusManager.clearFocus(true)
+                        delay(10)
+                        focusRequester.requestFocus()
                     }
                 }
-            },
+                .animateContentSize()
+                .semantics {
+                    contentDescription =
+                        getAccessibilityDescription(offerState)
+                }
+                .focusRequester(focusRequester)
+                .focusable(),
         ) {
-            NavHost(
-                modifier = modifierFactory
-                    .createModifier(
-                        modifierPropertiesList = model.ownModifiers,
-                        conditionalTransitionModifier = model.conditionalTransitionModifiers,
-                        breakpointIndex = breakpointIndex,
-                        isPressed = isPressed,
-                        isDarkModeEnabled = isDarkModeEnabled,
-                        offerState = offerState,
-                    )
-                    // For now fadeInOut is the only possible transition animation
-                    .fadeInOutAnimationModifier(
-                        animationState = animationState,
-                        duration = (
-                            (model.transition as? TransitionUiModel.FadeInOutTransition)?.duration?.div(
-                                2,
-                            )
-                            ) ?: 0,
-                    ) {
-                        navController.popBackStack()
-                        navController.navigate(
-                            LayoutVariants.MarketingScreen(offerIndex = offerState.targetOfferIndex),
-                        )
-                        onEventSent(LayoutContract.LayoutEvent.SetCurrentOffer(offerState.targetOfferIndex))
-                        animationState = AnimationState.Show
-                    }
-                    .animateContentSize()
-                    .semantics {
-                        contentDescription =
-                            getAccessibilityDescription(offerState)
-                    }
-                    .focusRequester(focusRequester)
-                    .focusable(),
-                navController = navController,
-                startDestination = startDestination,
-                enterTransition = { EnterTransition.None },
-                exitTransition = { ExitTransition.None },
-            ) {
-                composable<LayoutVariants.MarketingScreen> { backStackEntry ->
-                    val root: LayoutVariants.MarketingScreen = backStackEntry.toRoute()
-                    Column {
-                        for (offerIndexOffset in 0 until viewableItems) {
-                            factory.CreateComposable(
-                                model = LayoutSchemaUiModel.MarketingUiModel(),
-                                modifier = modifier,
-                                isPressed = isPressed,
-                                offerState = offerState.copy(
-                                    currentOfferIndex = root.offerIndex + offerIndexOffset,
-                                    viewableItems = viewableItems,
-                                ),
-                                isDarkModeEnabled = isDarkModeEnabled,
-                                breakpointIndex = breakpointIndex,
-                            ) { event ->
-                                if (event is LayoutContract.LayoutEvent.ResponseOptionSelected) {
-                                    // Only progress to next offer if viewableItems is 1
-                                    if (viewableItems == DEFAULT_VIEWABLE_ITEMS) {
-                                        onEventSent(event.copy(shouldProgress = true))
-                                    } else {
-                                        onEventSent(event)
-                                    }
+            for (offerIndexOffset in 0 until viewableItems) {
+                key(offerState.currentOfferIndex + offerIndexOffset) {
+                    OfferScopedViewModelStoreOwner {
+                        factory.CreateComposable(
+                            model = LayoutSchemaUiModel.MarketingUiModel(),
+                            modifier = modifier,
+                            isPressed = isPressed,
+                            offerState = offerState.copy(
+                                currentOfferIndex = offerState.currentOfferIndex + offerIndexOffset,
+                                viewableItems = viewableItems,
+                            ),
+                            isDarkModeEnabled = isDarkModeEnabled,
+                            breakpointIndex = breakpointIndex,
+                        ) { event ->
+                            if (event is LayoutContract.LayoutEvent.ResponseOptionSelected) {
+                                // Only progress to next offer if viewableItems is 1
+                                if (viewableItems == DEFAULT_VIEWABLE_ITEMS) {
+                                    onEventSent(event.copy(shouldProgress = true))
                                 } else {
-                                    onEventSent.invoke(event)
+                                    onEventSent(event)
                                 }
+                            } else {
+                                onEventSent.invoke(event)
                             }
                         }
                     }
