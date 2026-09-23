@@ -1,5 +1,6 @@
 package com.rokt.roktux.utils
 
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
@@ -29,13 +30,110 @@ class OfferScopedViewModelStoreOwnerTest {
         }
     }
 
+    // -- OfferViewModelStoreCache: direct unit tests of its own eviction contract --
+
     @Test
-    fun `same key reuses the same store across recompositions`() {
+    fun `storeFor returns the same store for the same offer index until evicted`() {
+        val cache = OfferViewModelStoreCache()
+        val store = cache.storeFor(0)
+
+        assertTrue(cache.storeFor(0) === store)
+        cache.retainOnly(setOf(0))
+        assertTrue("keeping an index must not evict its store", cache.storeFor(0) === store)
+    }
+
+    @Test
+    fun `retainOnly clears and evicts stores outside the keep set, then a fresh lookup creates a new store`() {
+        val cache = OfferViewModelStoreCache()
+        val probe = ProbeViewModel()
+        val originalStore = cache.storeFor(0)
+        originalStore.put("probe", probe)
+
+        cache.retainOnly(setOf(1))
+
+        assertTrue("evicted offer's ViewModel must be cleared", probe.cleared)
+        assertFalse(
+            "a fresh lookup for the evicted offer must return a new store, not the cleared original",
+            cache.storeFor(0) === originalStore,
+        )
+    }
+
+    @Test
+    fun `a store never targeted by retainOnly is never evicted, however long it goes unused`() {
+        // Models a breakpoint-driven viewableItems shrink: an offer briefly leaves the visible
+        // range, but nothing calls retainOnly excluding it (production code only calls retainOnly
+        // when the *current offer* changes, not on every viewableItems recomputation) — so it must
+        // still be there, unevicted, whenever it's looked up again.
+        val cache = OfferViewModelStoreCache()
+        val store = cache.storeFor(1)
+
+        cache.retainOnly(setOf(0, 1, 2))
+        cache.retainOnly(setOf(0, 1, 2))
+
+        assertTrue(cache.storeFor(1) === store)
+    }
+
+    // -- rememberOfferViewModelStoreCache: call-site-scoped, not just ambient-owner-scoped --
+
+    @Test
+    fun `rememberOfferViewModelStoreCache resolves the same cache across recompositions of the same call site`() {
+        val caches = mutableListOf<OfferViewModelStoreCache>()
+        var recomposeTrigger by mutableStateOf(0)
+        composeTestRule.setContent {
+            @Suppress("UNUSED_EXPRESSION")
+            recomposeTrigger
+            caches.add(rememberOfferViewModelStoreCache())
+        }
+
+        composeTestRule.runOnIdle { recomposeTrigger = 1 }
+
+        composeTestRule.runOnIdle {
+            assertEquals(2, caches.size)
+            assertTrue(
+                "the same call site must resolve the same cache across recompositions — this is what " +
+                    "lets it survive host Activity recreation in production, since the real Activity's " +
+                    "own ViewModelStore (which backs the resolving viewModel() call) is retained across that",
+                caches[0] === caches[1],
+            )
+        }
+    }
+
+    @Test
+    fun `rememberOfferViewModelStoreCache resolves distinct caches for distinct call sites under the same owner`() {
+        // Models two Distribution components composed under one experience-scoped owner (e.g. two
+        // Distribution nodes in one schema) — they must not collide on the same per-offer stores.
+        val caches = mutableListOf<OfferViewModelStoreCache>()
+        composeTestRule.setContent {
+            FirstDistributionSite { caches.add(rememberOfferViewModelStoreCache()) }
+            SecondDistributionSite { caches.add(rememberOfferViewModelStoreCache()) }
+        }
+
+        composeTestRule.runOnIdle {
+            assertEquals(2, caches.size)
+            assertFalse(
+                "two distinct component call sites must not resolve the same cache, or they'd collide " +
+                    "on the same per-offer-index ViewModelStores",
+                caches[0] === caches[1],
+            )
+        }
+    }
+
+    @Composable
+    private fun FirstDistributionSite(content: @Composable () -> Unit) = content()
+
+    @Composable
+    private fun SecondDistributionSite(content: @Composable () -> Unit) = content()
+
+    // -- OfferScopedViewModelStoreOwner: the composable wiring on top of the cache --
+
+    @Test
+    fun `same offer index resolves the same store across recompositions`() {
+        val cache = OfferViewModelStoreCache()
         val owners = mutableListOf<ViewModelStoreOwner>()
         var recomposeTrigger by mutableStateOf(0)
         composeTestRule.setContent {
             key(0) {
-                OfferScopedViewModelStoreOwner {
+                OfferScopedViewModelStoreOwner(offerIndex = 0, cache = cache) {
                     @Suppress("UNUSED_EXPRESSION")
                     recomposeTrigger
                     owners.add(LocalViewModelStoreOwner.current!!)
@@ -52,50 +150,29 @@ class OfferScopedViewModelStoreOwnerTest {
     }
 
     @Test
-    fun `changing the key disposes the old store exactly once and creates a distinct new one`() {
-        var currentKey by mutableStateOf(0)
-        val owners = mutableMapOf<Int, ViewModelStoreOwner>()
-        composeTestRule.setContent {
-            key(currentKey) {
-                OfferScopedViewModelStoreOwner {
-                    owners[currentKey] = LocalViewModelStoreOwner.current!!
-                }
-            }
-        }
-        val probe = ProbeViewModel()
-        composeTestRule.runOnIdle {
-            owners.getValue(0).viewModelStore.put("probe", probe)
-        }
-
-        composeTestRule.runOnIdle { currentKey = 1 }
-
-        composeTestRule.runOnIdle {
-            assertTrue("old store's ViewModel should be cleared exactly once it's superseded", probe.cleared)
-            assertFalse("new key must get a distinct store instance", owners.getValue(0) === owners.getValue(1))
-        }
-    }
-
-    @Test
-    fun `returning to a previously visited key creates a brand-new store, not the original`() {
-        var currentKey by mutableStateOf(0)
+    fun `evicting the current offer index from the cache surfaces a distinct new store on the next composition`() {
+        val cache = OfferViewModelStoreCache()
         val owners = mutableListOf<ViewModelStoreOwner>()
+        var generation by mutableStateOf(0)
         composeTestRule.setContent {
-            key(currentKey) {
-                OfferScopedViewModelStoreOwner {
+            key(generation) {
+                OfferScopedViewModelStoreOwner(offerIndex = 0, cache = cache) {
                     owners.add(LocalViewModelStoreOwner.current!!)
                 }
             }
         }
 
-        composeTestRule.runOnIdle { currentKey = 1 }
-        composeTestRule.runOnIdle { currentKey = 0 }
+        val probe = ProbeViewModel()
+        composeTestRule.runOnIdle { owners[0].viewModelStore.put("probe", probe) }
 
         composeTestRule.runOnIdle {
-            assertEquals(3, owners.size)
-            assertFalse(
-                "revisiting a key must not resolve the original, never-cleared store",
-                owners[0] === owners[2],
-            )
+            cache.retainOnly(emptySet())
+            generation = 1
+        }
+
+        composeTestRule.runOnIdle {
+            assertTrue("evicted offer's ViewModel should be cleared", probe.cleared)
+            assertFalse("revisiting offer index 0 after eviction must not resolve the original store", owners[0] === owners[1])
         }
     }
 }

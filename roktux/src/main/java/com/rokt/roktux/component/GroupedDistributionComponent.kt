@@ -24,6 +24,7 @@ import com.rokt.modelmapper.utils.DEFAULT_VIEWABLE_ITEMS
 import com.rokt.roktux.utils.AnimationState
 import com.rokt.roktux.utils.OfferScopedViewModelStoreOwner
 import com.rokt.roktux.utils.fadeInOutAnimationModifier
+import com.rokt.roktux.utils.rememberOfferViewModelStoreCache
 import com.rokt.roktux.viewmodel.layout.LayoutContract
 import com.rokt.roktux.viewmodel.layout.OfferUiState
 import kotlinx.collections.immutable.ImmutableList
@@ -70,6 +71,15 @@ internal class GroupedDistributionComponent(
         LaunchedEffect(key1 = viewableItems) {
             onEventSent(LayoutContract.LayoutEvent.ViewableItemsChanged(viewableItems))
         }
+        val storeCache = rememberOfferViewModelStoreCache()
+        // Keyed on currentOfferIndex only, not viewableItems: a breakpoint-driven change in how many
+        // offers are visible at once must never evict an offer's ViewModelStore on its own, or a
+        // shrink-then-regrow (e.g. rotation) would silently duplicate signals like SignalViewed.
+        LaunchedEffect(key1 = offerState.currentOfferIndex) {
+            storeCache.retainOnly(
+                (offerState.currentOfferIndex until offerState.currentOfferIndex + viewableItems).toSet(),
+            )
+        }
 
         Column(
             modifier = modifierFactory
@@ -112,14 +122,15 @@ internal class GroupedDistributionComponent(
                 .focusable(),
         ) {
             for (offerIndexOffset in 0 until viewableItems) {
-                key(offerState.currentOfferIndex + offerIndexOffset) {
-                    OfferScopedViewModelStoreOwner {
+                val offerIndex = offerState.currentOfferIndex + offerIndexOffset
+                key(offerIndex) {
+                    OfferScopedViewModelStoreOwner(offerIndex = offerIndex, cache = storeCache) {
                         factory.CreateComposable(
                             model = LayoutSchemaUiModel.MarketingUiModel(),
                             modifier = modifier,
                             isPressed = isPressed,
                             offerState = offerState.copy(
-                                currentOfferIndex = offerState.currentOfferIndex + offerIndexOffset,
+                                currentOfferIndex = offerIndex,
                                 viewableItems = viewableItems,
                             ),
                             isDarkModeEnabled = isDarkModeEnabled,
