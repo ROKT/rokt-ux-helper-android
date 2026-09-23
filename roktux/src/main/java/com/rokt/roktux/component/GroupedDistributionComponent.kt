@@ -1,36 +1,35 @@
 package com.rokt.roktux.component
 
-import androidx.compose.animation.EnterTransition
-import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
-import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
-import androidx.navigation.NavHostController
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
-import androidx.navigation.toRoute
 import com.rokt.modelmapper.uimodel.LayoutSchemaUiModel
 import com.rokt.modelmapper.uimodel.TransitionUiModel
 import com.rokt.modelmapper.utils.DEFAULT_VIEWABLE_ITEMS
 import com.rokt.roktux.utils.AnimationState
+import com.rokt.roktux.utils.OfferScopedViewModelStoreOwner
 import com.rokt.roktux.utils.fadeInOutAnimationModifier
+import com.rokt.roktux.utils.rememberOfferViewModelStoreCache
 import com.rokt.roktux.viewmodel.layout.LayoutContract
 import com.rokt.roktux.viewmodel.layout.OfferUiState
 import kotlinx.collections.immutable.ImmutableList
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import kotlin.math.ceil
 
 private const val ACCESSIBILITY_READOUT_TEXT = "Page %d of %d"
@@ -50,20 +49,16 @@ internal class GroupedDistributionComponent(
         breakpointIndex: Int,
         onEventSent: (LayoutContract.LayoutEvent) -> Unit,
     ) {
-        val navController: NavHostController = rememberNavController()
-        val startDestination = remember(offerState.currentOfferIndex) {
-            LayoutVariants.MarketingScreen(offerState.currentOfferIndex)
-        }
         var animationState by remember { mutableStateOf(AnimationState.Show) }
         val focusRequester = remember { FocusRequester() }
+        val focusManager = LocalFocusManager.current
+        val coroutineScope = rememberCoroutineScope()
         var firstRender by rememberSaveable {
             mutableStateOf(true)
         }
         LaunchedEffect(key1 = offerState.targetOfferIndex) {
             if (!firstRender) {
                 animationState = AnimationState.Hide
-                // the NavHost maintains focus so the same workaround as Carousel is not needed
-                focusRequester.requestFocus()
             } else {
                 firstRender = false
             }
@@ -76,19 +71,17 @@ internal class GroupedDistributionComponent(
         LaunchedEffect(key1 = viewableItems) {
             onEventSent(LayoutContract.LayoutEvent.ViewableItemsChanged(viewableItems))
         }
-
-        val viewModelStoreOwner = LocalViewModelStoreOwner.current
-        try {
-            checkNotNull(viewModelStoreOwner) {
-                "NavHost requires a ViewModelStoreOwner to be provided via LocalViewModelStoreOwner"
-            }
-            navController.setViewModelStore(viewModelStoreOwner.viewModelStore)
-        } catch (e: Exception) {
-            onEventSent(LayoutContract.LayoutEvent.UiException(e, true))
-            return
+        val storeCache = rememberOfferViewModelStoreCache()
+        // Keyed on currentOfferIndex only, not viewableItems: a breakpoint-driven change in how many
+        // offers are visible at once must never evict an offer's ViewModelStore on its own, or a
+        // shrink-then-regrow (e.g. rotation) would silently duplicate signals like SignalViewed.
+        LaunchedEffect(key1 = offerState.currentOfferIndex) {
+            storeCache.retainOnly(
+                (offerState.currentOfferIndex until offerState.currentOfferIndex + viewableItems).toSet(),
+            )
         }
 
-        NavHost(
+        Column(
             modifier = modifierFactory
                 .createModifier(
                     modifierPropertiesList = model.ownModifiers,
@@ -98,41 +91,46 @@ internal class GroupedDistributionComponent(
                     isDarkModeEnabled = isDarkModeEnabled,
                     offerState = offerState,
                 )
+                .then(modifier)
                 // For now fadeInOut is the only possible transition animation
                 .fadeInOutAnimationModifier(
                     animationState = animationState,
-                    duration = ((model.transition as? TransitionUiModel.FadeInOutTransition)?.duration?.div(2)) ?: 0,
+                    duration = (
+                        (model.transition as? TransitionUiModel.FadeInOutTransition)?.duration?.div(
+                            2,
+                        )
+                        ) ?: 0,
                 ) {
-                    navController.popBackStack()
-                    navController.navigate(
-                        LayoutVariants.MarketingScreen(offerIndex = offerState.targetOfferIndex),
-                    )
                     onEventSent(LayoutContract.LayoutEvent.SetCurrentOffer(offerState.targetOfferIndex))
                     animationState = AnimationState.Show
+                    coroutineScope.launch {
+                        // requestFocus only works a single time so we need to clear focus and
+                        // request it again after a delay: the focus Active state is maintained
+                        // and not automatically set to Inactive.
+                        // See: androidx.compose.ui.focus.FocusTransactions.kt#64
+                        focusManager.clearFocus(true)
+                        delay(10)
+                        focusRequester.requestFocus()
+                    }
                 }
                 .animateContentSize()
-                .then(modifier)
                 .semantics {
                     contentDescription =
                         getAccessibilityDescription(offerState)
                 }
                 .focusRequester(focusRequester)
                 .focusable(),
-            navController = navController,
-            startDestination = startDestination,
-            enterTransition = { EnterTransition.None },
-            exitTransition = { ExitTransition.None },
         ) {
-            composable<LayoutVariants.MarketingScreen> { backStackEntry ->
-                val root: LayoutVariants.MarketingScreen = backStackEntry.toRoute()
-                Column {
-                    for (offerIndexOffset in 0 until viewableItems) {
+            for (offerIndexOffset in 0 until viewableItems) {
+                val offerIndex = offerState.currentOfferIndex + offerIndexOffset
+                key(offerIndex) {
+                    OfferScopedViewModelStoreOwner(offerIndex = offerIndex, cache = storeCache) {
                         factory.CreateComposable(
                             model = LayoutSchemaUiModel.MarketingUiModel(),
                             modifier = modifier,
                             isPressed = isPressed,
                             offerState = offerState.copy(
-                                currentOfferIndex = root.offerIndex + offerIndexOffset,
+                                currentOfferIndex = offerIndex,
                                 viewableItems = viewableItems,
                             ),
                             isDarkModeEnabled = isDarkModeEnabled,
