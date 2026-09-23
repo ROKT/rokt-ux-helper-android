@@ -236,7 +236,12 @@ internal class DataImageCarouselComponent(
                                         }
 
                                         index == carouselPosition -> {
-                                            needsAnimation = true
+                                            // A negative duration must not reach the progress animation below,
+                                            // similar in spirit to auto-scroll's own guard above. Unlike that
+                                            // guard (duration > 0), this uses duration >= 0: a duration of 0
+                                            // still animates the active indicator (it just does so instantly),
+                                            // matching existing behavior; only a negative value disables it.
+                                            needsAnimation = model.duration >= 0
                                             model.activeIndicator ?: model.seenIndicator ?: defaultIndicator
                                         }
 
