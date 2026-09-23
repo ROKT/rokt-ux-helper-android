@@ -248,7 +248,7 @@ internal class CarouselDistributionComponent(
 }
 
 @Composable
-private fun getPeekThroughDimension(
+internal fun getPeekThroughDimension(
     breakpointIndex: Int,
     viewWidth: Int,
     peekThroughSizeItems: ImmutableList<PeekThroughSizeUiModel>,
@@ -268,6 +268,8 @@ private fun getPeekThroughDimension(
             is PeekThroughSizeUiModel.Percentage ->
                 (viewWidth.toFloat() * (peekThroughSize.value / 100)).dp
         }
+            // Defensive clamp: PaddingValues/HorizontalPager require non-negative padding.
+            .coerceAtLeast(0.dp)
         PaddingValues(
             start = transformedPeekThroughSize,
             end = transformedPeekThroughSize,
