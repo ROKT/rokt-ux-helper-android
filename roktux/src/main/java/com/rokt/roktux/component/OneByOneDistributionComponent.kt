@@ -7,6 +7,7 @@ import androidx.compose.foundation.focusable
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -80,6 +81,7 @@ internal class OneByOneDistributionComponent(
 
         // See ComposeErrorBoundary's kdoc for why NavHost needs this.
         ComposeErrorBoundary(
+            modifier = modifier,
             // Not fatal: the fallback below keeps the offer showing, so this shouldn't close the layout.
             onError = { e -> onEventSent(LayoutContract.LayoutEvent.UiException(e, false)) },
             fallback = {
@@ -89,37 +91,41 @@ internal class OneByOneDistributionComponent(
                         onEventSent(LayoutContract.LayoutEvent.SetCurrentOffer(offerState.targetOfferIndex))
                     }
                 }
-                factory.CreateComposable(
-                    model = LayoutSchemaUiModel.MarketingUiModel(),
-                    modifier = modifierFactory
-                        .createModifier(
-                            modifierPropertiesList = model.ownModifiers,
-                            conditionalTransitionModifier = model.conditionalTransitionModifiers,
-                            breakpointIndex = breakpointIndex,
-                            isPressed = isPressed,
-                            isDarkModeEnabled = isDarkModeEnabled,
-                            offerState = offerState,
-                        )
-                        .animateContentSize()
-                        .then(modifier)
-                        .semantics {
-                            contentDescription =
-                                ACCESSIBILITY_READOUT_TEXT.format(
-                                    offerState.currentOfferIndex + 1,
-                                    offerState.lastOfferIndex + 1,
-                                )
+                // Keyed on the offer index: NavHost recreated this per back-stack entry, so
+                // without a matching key here, the composable/view-model below would be reused
+                // across offers instead, rendering the first offer forever.
+                key(offerState.currentOfferIndex) {
+                    factory.CreateComposable(
+                        model = LayoutSchemaUiModel.MarketingUiModel(),
+                        modifier = modifierFactory
+                            .createModifier(
+                                modifierPropertiesList = model.ownModifiers,
+                                conditionalTransitionModifier = model.conditionalTransitionModifiers,
+                                breakpointIndex = breakpointIndex,
+                                isPressed = isPressed,
+                                isDarkModeEnabled = isDarkModeEnabled,
+                                offerState = offerState,
+                            )
+                            .animateContentSize()
+                            .semantics {
+                                contentDescription =
+                                    ACCESSIBILITY_READOUT_TEXT.format(
+                                        offerState.currentOfferIndex + 1,
+                                        offerState.lastOfferIndex + 1,
+                                    )
+                            }
+                            .focusRequester(focusRequester)
+                            .focusable(),
+                        isPressed = isPressed,
+                        offerState = offerState,
+                        isDarkModeEnabled = isDarkModeEnabled,
+                        breakpointIndex = breakpointIndex,
+                    ) { event ->
+                        if (event is LayoutContract.LayoutEvent.ResponseOptionSelected) {
+                            onEventSent(event.copy(shouldProgress = true))
+                        } else {
+                            onEventSent.invoke(event)
                         }
-                        .focusRequester(focusRequester)
-                        .focusable(),
-                    isPressed = isPressed,
-                    offerState = offerState,
-                    isDarkModeEnabled = isDarkModeEnabled,
-                    breakpointIndex = breakpointIndex,
-                ) { event ->
-                    if (event is LayoutContract.LayoutEvent.ResponseOptionSelected) {
-                        onEventSent(event.copy(shouldProgress = true))
-                    } else {
-                        onEventSent.invoke(event)
                     }
                 }
             },
@@ -151,7 +157,6 @@ internal class OneByOneDistributionComponent(
                         animationState = AnimationState.Show
                     }
                     .animateContentSize()
-                    .then(modifier)
                     .semantics {
                         contentDescription =
                             ACCESSIBILITY_READOUT_TEXT.format(

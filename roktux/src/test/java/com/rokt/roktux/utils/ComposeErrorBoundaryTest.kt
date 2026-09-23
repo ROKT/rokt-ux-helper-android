@@ -1,6 +1,12 @@
 package com.rokt.roktux.utils
 
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.height
 import androidx.compose.material3.Text
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.window.Popup
@@ -56,5 +62,42 @@ class ComposeErrorBoundaryTest {
 
         composeTestRule.onNodeWithText("fallback").assertExists()
         assertEquals("boom inside popup", reportedError?.message)
+    }
+
+    @Test
+    fun `does not crash when a sibling's Stretch alignment forces an intrinsic-size query`() {
+        // A Row with a Modifier.fillMaxHeight() sibling gets Modifier.height(IntrinsicSize.Min)
+        // (mirrors RowComponent's Stretch handling), which queries every child's intrinsic
+        // height, including this one's — SubcomposeLayout can't answer that and throws by
+        // default. This must not surface as a crash, on the success path or the fallback one.
+        composeTestRule.setContent {
+            Row(Modifier.height(IntrinsicSize.Min)) {
+                ComposeErrorBoundary(fallback = { Text("fallback") }) {
+                    Text("content")
+                }
+                Box(Modifier.fillMaxHeight())
+            }
+        }
+
+        composeTestRule.onNodeWithText("content").assertExists()
+    }
+
+    @Test
+    fun `content that throws does not crash under a sibling's intrinsic-size query either`() {
+        // Same setup, but content throws: NoIntrinsicsModifier must apply before the failure
+        // state is even known, so this must not crash regardless of which branch ends up
+        // showing. (Robolectric's test dispatcher doesn't reliably drain the fallback's
+        // LaunchedEffect within a manual clock advance here — see the Popup-nested test above
+        // for that assertion — so this only checks setContent+advance complete without crashing.)
+        composeTestRule.mainClock.autoAdvance = false
+        composeTestRule.setContent {
+            Row(Modifier.height(IntrinsicSize.Min)) {
+                ComposeErrorBoundary(fallback = { Text("fallback") }) {
+                    error("boom")
+                }
+                Box(Modifier.fillMaxHeight())
+            }
+        }
+        composeTestRule.mainClock.advanceTimeBy(5_000)
     }
 }

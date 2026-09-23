@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -91,6 +92,7 @@ internal class GroupedDistributionComponent(
 
         // See ComposeErrorBoundary's kdoc for why NavHost needs this.
         ComposeErrorBoundary(
+            modifier = modifier,
             // Not fatal: the fallback below keeps the offers showing, so this shouldn't close the layout.
             onError = { e -> onEventSent(LayoutContract.LayoutEvent.UiException(e, false)) },
             fallback = {
@@ -111,7 +113,6 @@ internal class GroupedDistributionComponent(
                             offerState = offerState,
                         )
                         .animateContentSize()
-                        .then(modifier)
                         .semantics {
                             contentDescription =
                                 getAccessibilityDescription(offerState)
@@ -120,26 +121,31 @@ internal class GroupedDistributionComponent(
                         .focusable(),
                 ) {
                     for (offerIndexOffset in 0 until viewableItems) {
-                        factory.CreateComposable(
-                            model = LayoutSchemaUiModel.MarketingUiModel(),
-                            modifier = modifier,
-                            isPressed = isPressed,
-                            offerState = offerState.copy(
-                                currentOfferIndex = offerState.currentOfferIndex + offerIndexOffset,
-                                viewableItems = viewableItems,
-                            ),
-                            isDarkModeEnabled = isDarkModeEnabled,
-                            breakpointIndex = breakpointIndex,
-                        ) { event ->
-                            if (event is LayoutContract.LayoutEvent.ResponseOptionSelected) {
-                                // Only progress to next offer if viewableItems is 1
-                                if (viewableItems == DEFAULT_VIEWABLE_ITEMS) {
-                                    onEventSent(event.copy(shouldProgress = true))
+                        // Keyed on the offer index: NavHost recreated this per back-stack entry,
+                        // so without a matching key here, each slot's composable/view-model would
+                        // be reused across offers instead, rendering the first set forever.
+                        key(offerState.currentOfferIndex + offerIndexOffset) {
+                            factory.CreateComposable(
+                                model = LayoutSchemaUiModel.MarketingUiModel(),
+                                modifier = modifier,
+                                isPressed = isPressed,
+                                offerState = offerState.copy(
+                                    currentOfferIndex = offerState.currentOfferIndex + offerIndexOffset,
+                                    viewableItems = viewableItems,
+                                ),
+                                isDarkModeEnabled = isDarkModeEnabled,
+                                breakpointIndex = breakpointIndex,
+                            ) { event ->
+                                if (event is LayoutContract.LayoutEvent.ResponseOptionSelected) {
+                                    // Only progress to next offer if viewableItems is 1
+                                    if (viewableItems == DEFAULT_VIEWABLE_ITEMS) {
+                                        onEventSent(event.copy(shouldProgress = true))
+                                    } else {
+                                        onEventSent(event)
+                                    }
                                 } else {
-                                    onEventSent(event)
+                                    onEventSent.invoke(event)
                                 }
-                            } else {
-                                onEventSent.invoke(event)
                             }
                         }
                     }
@@ -173,7 +179,6 @@ internal class GroupedDistributionComponent(
                         animationState = AnimationState.Show
                     }
                     .animateContentSize()
-                    .then(modifier)
                     .semantics {
                         contentDescription =
                             getAccessibilityDescription(offerState)
