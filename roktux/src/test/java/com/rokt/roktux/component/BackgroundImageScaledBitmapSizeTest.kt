@@ -1,8 +1,14 @@
 package com.rokt.roktux.component
 
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.times
+import androidx.compose.ui.unit.IntSize
+import androidx.compose.ui.unit.LayoutDirection
+import androidx.compose.ui.unit.toIntSize
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNotEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
@@ -53,5 +59,74 @@ class BackgroundImageScaledBitmapSizeTest {
             "expected a bounded height, but was ${scaledBitmapSize.height}",
             scaledBitmapSize.height <= maxReasonableDimensionPx,
         )
+    }
+
+    @Test
+    fun `clamping scales both dimensions by the same factor instead of distorting aspect ratio`() {
+        // Only the height (100000) is outside the safe range here; the width (1000) is not.
+        // Coercing each axis independently would leave width at 1000 and crush height to 4096,
+        // stretching the image roughly 24x wider than tall instead of preserving its ~1:100 ratio.
+        val targetSize = Size(width = 1000f, height = 100000f)
+
+        val scaledBitmapSize = backgroundImageScaledBitmapSize(targetSize)
+
+        assertTrue(
+            "expected width to be scaled down from the original 1000, but was ${scaledBitmapSize.width}",
+            scaledBitmapSize.width < 1000,
+        )
+        assertTrue(
+            "expected a bounded width, but was ${scaledBitmapSize.width}",
+            scaledBitmapSize.width <= 4096,
+        )
+        assertTrue(
+            "expected a bounded height, but was ${scaledBitmapSize.height}",
+            scaledBitmapSize.height <= 4096,
+        )
+
+        val originalRatio = targetSize.height / targetSize.width
+        val scaledRatio = scaledBitmapSize.height.toFloat() / scaledBitmapSize.width.toFloat()
+        assertEquals(
+            "expected the ~1:100 aspect ratio to be preserved after clamping",
+            originalRatio,
+            scaledRatio,
+            originalRatio * 0.05f,
+        )
+    }
+
+    @Test
+    fun `a target already within the safe range is left unscaled`() {
+        val targetSize = Size(width = 200f, height = 100f)
+
+        val scaledBitmapSize = backgroundImageScaledBitmapSize(targetSize)
+
+        assertEquals(IntSize(width = 200, height = 100), scaledBitmapSize)
+    }
+
+    @Test
+    fun `offset is derived from the same clamped size that is actually drawn`() {
+        // A target size that gets clamped (see the aspect-ratio test above). If the offset were
+        // computed from the raw, unclamped target size instead, it would place the bitmap as if
+        // it were still 1000x100000, even though the bitmap actually drawn is much smaller -
+        // pushing it outside the visible container.
+        val targetSize = Size(width = 1000f, height = 100000f)
+        val containerSize = IntSize(width = 2000, height = 2000)
+        val alignment = Alignment.BottomEnd
+        val layoutDirection = LayoutDirection.Ltr
+        val clampedSize = backgroundImageScaledBitmapSize(targetSize)
+
+        val offset = backgroundImageOffset(
+            scaledBitmapSize = clampedSize,
+            containerSize = containerSize,
+            alignment = alignment,
+            layoutDirection = layoutDirection,
+        )
+
+        val expectedOffset = alignment.align(clampedSize, containerSize, layoutDirection)
+        assertEquals(expectedOffset, offset)
+
+        // Sanity check that this test actually exercises the fix: an offset computed from the
+        // raw, unclamped target size would be a different (wrong) value.
+        val unclampedOffset = alignment.align(targetSize.toIntSize(), containerSize, layoutDirection)
+        assertNotEquals(unclampedOffset, offset)
     }
 }
