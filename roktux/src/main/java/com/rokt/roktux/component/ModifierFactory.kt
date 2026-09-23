@@ -86,6 +86,7 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.IntOffset
+import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -647,7 +648,8 @@ internal class ModifierFactory {
                     space = this.size.toIntSize(),
                     layoutDirection = layoutDirection,
                 )
-                Bitmap.createScaledBitmap(it, targetSize.width.toInt(), targetSize.height.toInt(), false)
+                val scaledBitmapSize = backgroundImageScaledBitmapSize(targetSize)
+                Bitmap.createScaledBitmap(it, scaledBitmapSize.width, scaledBitmapSize.height, false)
             }?.asImageBitmap()?.let {
                 it.prepareToDraw()
                 translate(offset.x.toFloat(), offset.y.toFloat()) {
@@ -1572,3 +1574,20 @@ internal class ModifierFactory {
         private const val MATCH_PARENT = -1f
     }
 }
+
+/**
+ * The pixel size to scale a background image's decoded bitmap to before drawing it.
+ *
+ * [targetSize] is the mathematically "correct" scaled size for the source image (preserving its
+ * aspect ratio), computed from [ContentScale.computeScaleFactor]. When the source image's aspect
+ * ratio is very different from the destination's, that computation can drive one dimension down
+ * to (or below) zero, which [Bitmap.createScaledBitmap] rejects with [IllegalArgumentException],
+ * or drive it up to an excessive value, which can exhaust available memory. Both dimensions are
+ * coerced to a safe range so the scaled bitmap is always a reasonable size to allocate.
+ */
+internal fun backgroundImageScaledBitmapSize(targetSize: Size): IntSize = IntSize(
+    width = targetSize.width.toInt().coerceIn(1, MAX_BACKGROUND_IMAGE_DIMENSION_PX),
+    height = targetSize.height.toInt().coerceIn(1, MAX_BACKGROUND_IMAGE_DIMENSION_PX),
+)
+
+private const val MAX_BACKGROUND_IMAGE_DIMENSION_PX = 4096
