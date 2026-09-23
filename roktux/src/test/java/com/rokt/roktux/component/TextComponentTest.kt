@@ -1,6 +1,9 @@
 package com.rokt.roktux.component
 
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.semantics.SemanticsActions
+import androidx.compose.ui.semantics.getOrNull
+import androidx.compose.ui.test.SemanticsNodeInteraction
 import androidx.compose.ui.test.assertHeightIsEqualTo
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertTextEquals
@@ -8,11 +11,13 @@ import androidx.compose.ui.test.assertWidthIsEqualTo
 import androidx.compose.ui.test.click
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performTouchInput
+import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.BaselineShift
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.isSpecified
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.rokt.core.testutils.annotations.DCUI_COMPONENT_TAG
 import com.rokt.core.testutils.annotations.DcuiBreakpoint
@@ -427,4 +432,67 @@ class TextComponentTest : BaseDcuiEspressoTest() {
         composeTestRule.onNodeWithTag(DCUI_COMPONENT_TAG)
             .assertTextEquals("Offers 1 of 3")
     }
+
+    // No "styles" are set on this node, so the surrounding font size is unresolved. Relative-size
+    // tags must still degrade gracefully instead of producing an invalid (NaN/infinite) span size
+    // that Compose's text layout cannot handle.
+    @Test
+    @DcuiNodeJson(
+        jsonString = """
+            {
+              "type": "RichText",
+              "node": {
+                "value": "Try <big>big</big>, <small>small</small> and <h1>heading</h1> sizing"
+              }
+            }
+        """,
+    )
+    fun testRichTextRelativeSizeTagsRenderSafelyWithoutExplicitFontSize() {
+        composeTestRule.onNodeWithTag(DCUI_COMPONENT_TAG)
+            .assertIsDisplayed()
+            .assertAllSpanFontSizesAreFinite()
+    }
+
+    @Test
+    @DcuiNodeJson(jsonFile = "TextComponent/RichText_with_relative_size_tags.json")
+    fun testRichTextRelativeSizeTagsScaleFromExplicitBaseFontSize() {
+        composeTestRule.onNodeWithTag(DCUI_COMPONENT_TAG)
+            .assertIsDisplayed()
+            .assertRelativeFontSizesScaleAroundBase(baseFontSizeSp = 16)
+    }
+}
+
+private fun SemanticsNodeInteraction.getRelativeSizeSpanFontSizesSp(): List<Float> {
+    val textLayoutResults = mutableListOf<TextLayoutResult>()
+    fetchSemanticsNode().config.getOrNull(SemanticsActions.GetTextLayoutResult)?.action?.invoke(textLayoutResults)
+    val annotatedString = textLayoutResults.getOrNull(0)?.layoutInput?.text ?: return emptyList()
+    return annotatedString.spanStyles
+        .sortedBy { it.start }
+        .mapNotNull { range -> range.item.fontSize.takeIf { it.isSpecified }?.value }
+}
+
+// Regression coverage: relative-size tags (<big>, <small>, <h1>-<h6>) must never surface a
+// NaN/infinite font size in the rendered AnnotatedString, which crashes Compose text layout.
+private fun SemanticsNodeInteraction.assertAllSpanFontSizesAreFinite(): SemanticsNodeInteraction {
+    val spanFontSizes = getRelativeSizeSpanFontSizesSp()
+    Assert.assertTrue("Expected relative-size spans to be present", spanFontSizes.isNotEmpty())
+    spanFontSizes.forEach { fontSize ->
+        Assert.assertTrue(
+            "Relative-size span produced a non-finite font size: $fontSize",
+            fontSize.isFinite(),
+        )
+    }
+    return this
+}
+
+private fun SemanticsNodeInteraction.assertRelativeFontSizesScaleAroundBase(
+    baseFontSizeSp: Int,
+): SemanticsNodeInteraction {
+    val spanFontSizes = getRelativeSizeSpanFontSizesSp()
+    Assert.assertTrue("Expected 3 relative-size spans, got $spanFontSizes", spanFontSizes.size == 3)
+    val (big, small, heading) = spanFontSizes
+    Assert.assertTrue("<big> ($big) should render larger than the base font size ($baseFontSizeSp)", big > baseFontSizeSp)
+    Assert.assertTrue("<small> ($small) should render smaller than the base font size ($baseFontSizeSp)", small < baseFontSizeSp)
+    Assert.assertTrue("<h1> ($heading) should render larger than <big> ($big)", heading > big)
+    return this
 }
