@@ -587,7 +587,7 @@ internal class ModifierFactory {
             val bottomPixel = (this.size.height + spreadPixel + offsetY.toPx())
             paint.asFrameworkPaint().apply {
                 this.color = color.toArgb()
-                if (blurRadius != 0.dp) {
+                if (blurRadius > 0.dp) {
                     this.maskFilter = (BlurMaskFilter(blurRadius.toPx(), BlurMaskFilter.Blur.NORMAL))
                 }
             }
