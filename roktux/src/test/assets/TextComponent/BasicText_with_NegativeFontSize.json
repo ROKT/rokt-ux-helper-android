@@ -1,0 +1,19 @@
+{
+  "type": "BasicText",
+  "node": {
+    "value": "Test",
+    "styles": {
+      "elements": {
+        "own": [
+          {
+            "default": {
+              "text": {
+                "fontSize": -12
+              }
+            }
+          }
+        ]
+      }
+    }
+  }
+}
