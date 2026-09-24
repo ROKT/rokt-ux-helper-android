@@ -86,6 +86,8 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.IntOffset
+import androidx.compose.ui.unit.IntSize
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -642,12 +644,14 @@ internal class ModifierFactory {
             bitmap?.let {
                 val srcSize = Size(it.width.toFloat(), it.height.toFloat())
                 val targetSize = srcSize.times(scale.computeScaleFactor(srcSize, this.size))
-                offset = alignment.align(
-                    size = targetSize.toIntSize(),
-                    space = this.size.toIntSize(),
+                val scaledBitmapSize = backgroundImageScaledBitmapSize(targetSize)
+                offset = backgroundImageOffset(
+                    scaledBitmapSize = scaledBitmapSize,
+                    containerSize = this.size.toIntSize(),
+                    alignment = alignment,
                     layoutDirection = layoutDirection,
                 )
-                Bitmap.createScaledBitmap(it, targetSize.width.toInt(), targetSize.height.toInt(), false)
+                Bitmap.createScaledBitmap(it, scaledBitmapSize.width, scaledBitmapSize.height, false)
             }?.asImageBitmap()?.let {
                 it.prepareToDraw()
                 translate(offset.x.toFloat(), offset.y.toFloat()) {
@@ -1572,3 +1576,50 @@ internal class ModifierFactory {
         private const val MATCH_PARENT = -1f
     }
 }
+
+/**
+ * The pixel size to scale a background image's decoded bitmap to before drawing it.
+ *
+ * [targetSize] is the mathematically "correct" scaled size for the source image (preserving its
+ * aspect ratio), computed from [ContentScale.computeScaleFactor]. When the source image's aspect
+ * ratio is very different from the destination's, that computation can drive one dimension down
+ * to (or below) zero, which [Bitmap.createScaledBitmap] rejects with [IllegalArgumentException],
+ * or drive it up to an excessive value, which can exhaust available memory. Both dimensions are
+ * scaled down together by whichever factor is needed to bring the larger one within range, so the
+ * scaled bitmap is always a reasonable size to allocate without distorting the image's aspect
+ * ratio, then floored to at least one pixel each.
+ */
+internal fun backgroundImageScaledBitmapSize(targetSize: Size): IntSize {
+    val scaleDownFactor = minOf(
+        1f,
+        MAX_BACKGROUND_IMAGE_DIMENSION_PX / targetSize.width,
+        MAX_BACKGROUND_IMAGE_DIMENSION_PX / targetSize.height,
+    )
+    return IntSize(
+        width = (targetSize.width * scaleDownFactor).toInt().coerceAtLeast(1),
+        height = (targetSize.height * scaleDownFactor).toInt().coerceAtLeast(1),
+    )
+}
+
+/**
+ * The offset at which to draw a background image's scaled bitmap, for the given [alignment].
+ *
+ * [scaledBitmapSize] must be the same (clamped) size returned by [backgroundImageScaledBitmapSize]
+ * that the bitmap is actually scaled to before drawing, not the raw, unclamped target size --
+ * otherwise the offset is computed for a size the drawn bitmap no longer has, and the image is
+ * positioned incorrectly whenever clamping engages. Callers should compute
+ * [backgroundImageScaledBitmapSize] once and pass its result to both this function and
+ * `Bitmap.createScaledBitmap`, so the two can never diverge.
+ */
+internal fun backgroundImageOffset(
+    scaledBitmapSize: IntSize,
+    containerSize: IntSize,
+    alignment: Alignment,
+    layoutDirection: LayoutDirection,
+): IntOffset = alignment.align(
+    size = scaledBitmapSize,
+    space = containerSize,
+    layoutDirection = layoutDirection,
+)
+
+private const val MAX_BACKGROUND_IMAGE_DIMENSION_PX = 4096f
