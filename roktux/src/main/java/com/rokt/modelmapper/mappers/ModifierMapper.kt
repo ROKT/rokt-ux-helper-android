@@ -117,7 +117,7 @@ internal fun transformModifier(
     rotateZ = dimensionProperties?.rotateZ,
     shadowColor = containerProperties?.shadow?.color?.let { ThemeColorUiModel(it.light, it.dark) },
     shadowOffset = containerProperties?.shadow?.let { DpOffset(it.offsetX?.dp ?: 0.dp, it.offsetY?.dp ?: 0.dp) },
-    shadowBlurRadius = containerProperties?.shadow?.blurRadius?.dp,
+    shadowBlurRadius = containerProperties?.shadow?.blurRadius?.coerceAtLeast(0f)?.dp,
     shadowSpreadRadius = containerProperties?.shadow?.spreadRadius,
     borderColor = borderProperties?.borderColor?.let { ThemeColorUiModel(it.light, it.dark) },
     borderRadius = borderProperties?.borderRadius?.dp,
