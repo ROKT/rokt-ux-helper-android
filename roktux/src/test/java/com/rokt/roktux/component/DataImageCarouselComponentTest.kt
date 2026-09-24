@@ -1,6 +1,7 @@
 package com.rokt.roktux.component
 
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.assertHeightIsEqualTo
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertWidthIsEqualTo
@@ -14,6 +15,7 @@ import com.rokt.core.testutils.annotations.DcuiConfig
 import com.rokt.core.testutils.annotations.DcuiNodeJson
 import com.rokt.core.testutils.annotations.DcuiOfferJson
 import com.rokt.core.testutils.assertion.assertBackgroundColor
+import com.rokt.core.testutils.assertion.hasBackgroundColor
 import com.rokt.roktux.testutil.BaseDcuiEspressoTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotEquals
@@ -133,5 +135,22 @@ class DataImageCarouselComponentTest : BaseDcuiEspressoTest() {
     fun testDataImageCarouselComponentWithFallbackImageKey() {
         composeTestRule.onNodeWithTag(DCUI_COMPONENT_TAG).assertIsDisplayed().assertHeightIsEqualTo(180.dp)
             .assertWidthIsEqualTo(150.dp).assertBackgroundColor("#d51a1a")
+    }
+
+    @Test
+    @DcuiNodeJson(jsonFile = "DataImageCarouselComponent/DataImageCarousel_Negative_Duration.json")
+    @DcuiConfig(testInInnerLayout = true)
+    @DcuiOfferJson(jsonFile = "offer/Offer_with_image_carousel_key.json")
+    fun testDataImageCarouselComponentWithNegativeDurationDisablesIndicatorAnimation() {
+        // A negative duration must not start the progress indicator's animation, the same
+        // way auto-scroll itself already goes idle for a non-positive duration. Duration 0
+        // is unaffected here (the indicator still animates instantly), so only a negative
+        // value is expected to disable it.
+        composeTestRule.onNodeWithTag(DCUI_COMPONENT_TAG).assertIsDisplayed()
+
+        val indicatorRow = composeTestRule.onNodeWithTag(DCUI_COMPONENT_TAG, useUnmergedTree = true).onChildren()[1]
+        // The active indicator only picks up this highlight background while its
+        // progress animation is running, so its absence confirms the animation was skipped.
+        indicatorRow.onChildren()[0].assert(!hasBackgroundColor("#d3d3d3"))
     }
 }
