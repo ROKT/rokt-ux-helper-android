@@ -43,14 +43,14 @@ internal fun transformBasicText(
                 it.value.own?.background,
             ),
             predicates = it.predicates.map { predicate -> predicate.transformWhenPredicate() }.toImmutableList(),
-            duration = it.duration,
+            duration = it.duration.coerceAtLeast(0),
         )
         conditionalTransitionTextStyling = ConditionalTransitionTextStyling(
             textStyles = transformTextStylingProperties(
                 it.value.own?.text,
             ),
             predicates = it.predicates.map { predicate -> predicate.transformWhenPredicate() }.toImmutableList(),
-            duration = it.duration,
+            duration = it.duration.coerceAtLeast(0),
         )
     }
 
@@ -92,14 +92,14 @@ internal fun transformRichText(
                 it.value.own?.background,
             ),
             predicates = it.predicates.map { predicate -> predicate.transformWhenPredicate() }.toImmutableList(),
-            duration = it.duration,
+            duration = it.duration.coerceAtLeast(0),
         )
         conditionalTransitionTextStyling = ConditionalTransitionTextStyling(
             textStyles = transformTextStylingProperties(
                 it.value.own?.text,
             ),
             predicates = it.predicates.map { predicate -> predicate.transformWhenPredicate() }.toImmutableList(),
-            duration = it.duration,
+            duration = it.duration.coerceAtLeast(0),
         )
     }
 
@@ -152,7 +152,7 @@ internal fun transformDataImage(
                 it.value.own?.border,
             ),
             predicates = it.predicates.map { predicate -> predicate.transformWhenPredicate() }.toImmutableList(),
-            duration = it.duration,
+            duration = it.duration.coerceAtLeast(0),
         )
     }
 
@@ -192,7 +192,7 @@ internal fun transformStaticImage(staticImageModel: LayoutSchemaModel.StaticImag
                 it.value.own?.border,
             ),
             predicates = it.predicates.map { predicate -> predicate.transformWhenPredicate() }.toImmutableList(),
-            duration = it.duration,
+            duration = it.duration.coerceAtLeast(0),
         )
     }
 
@@ -233,7 +233,7 @@ internal fun transformDataIcon(
                 it.value.own?.border,
             ),
             predicates = it.predicates.map { predicate -> predicate.transformWhenPredicate() }.toImmutableList(),
-            duration = it.duration,
+            duration = it.duration.coerceAtLeast(0),
         )
     }
 
@@ -271,7 +271,7 @@ internal fun transformStaticIcon(staticIconModel: LayoutSchemaModel.StaticIcon):
                 it.value.own?.border,
             ),
             predicates = it.predicates.map { predicate -> predicate.transformWhenPredicate() }.toImmutableList(),
-            duration = it.duration,
+            duration = it.duration.coerceAtLeast(0),
         )
     }
 
