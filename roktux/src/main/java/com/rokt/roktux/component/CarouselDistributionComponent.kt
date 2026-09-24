@@ -142,8 +142,12 @@ internal class CarouselDistributionComponent(
                         contentPadding.calculateEndPadding(layoutDirection)
                     ).toPx()
                 val totalPageSpacing = (pageSpacing * (viewableItems - 1)).toPx()
-                val availableWidthForContent =
-                    (constraints.maxWidth - totalHorizontalPadding - totalPageSpacing) / viewableItems
+                val availableWidthForContent = calculateAvailableWidthForContent(
+                    maxWidth = constraints.maxWidth,
+                    totalHorizontalPaddingPx = totalHorizontalPadding,
+                    totalPageSpacingPx = totalPageSpacing,
+                    viewableItems = viewableItems,
+                )
 
                 // Create adjusted constraints that respect the actual available space per page
                 val adjustedConstraints = constraints.copy(
@@ -248,7 +252,7 @@ internal class CarouselDistributionComponent(
 }
 
 @Composable
-private fun getPeekThroughDimension(
+internal fun getPeekThroughDimension(
     breakpointIndex: Int,
     viewWidth: Int,
     peekThroughSizeItems: ImmutableList<PeekThroughSizeUiModel>,
@@ -268,12 +272,30 @@ private fun getPeekThroughDimension(
             is PeekThroughSizeUiModel.Percentage ->
                 (viewWidth.toFloat() * (peekThroughSize.value / 100)).dp
         }
+            // Defensive clamp: PaddingValues/HorizontalPager require non-negative padding.
+            .coerceAtLeast(0.dp)
         PaddingValues(
             start = transformedPeekThroughSize,
             end = transformedPeekThroughSize,
         )
     }
 }
+
+/**
+ * Computes the width available to a single page's content once peek-through padding and
+ * inter-page spacing are accounted for.
+ *
+ * A peek-through size at the edge of its valid range (e.g. a 100% peek-through, or a very
+ * large fixed value) can make the combined padding meet or exceed [maxWidth]. Coercing the
+ * result to a minimum of zero keeps it a valid width that can be fed into [androidx.compose.ui.unit.Constraints],
+ * which throws if given a negative value, instead of crashing composition.
+ */
+internal fun calculateAvailableWidthForContent(
+    maxWidth: Int,
+    totalHorizontalPaddingPx: Float,
+    totalPageSpacingPx: Float,
+    viewableItems: Int,
+): Float = ((maxWidth - totalHorizontalPaddingPx - totalPageSpacingPx) / viewableItems).coerceAtLeast(0f)
 
 private fun carouselPageSize(viewableItems: Int) = object : PageSize {
     override fun Density.calculateMainAxisPageSize(availableSpace: Int, pageSpacing: Int): Int =
