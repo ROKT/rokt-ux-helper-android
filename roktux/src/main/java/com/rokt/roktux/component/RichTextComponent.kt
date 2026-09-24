@@ -25,6 +25,8 @@ import androidx.compose.ui.text.style.BaselineShift
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.TextUnit
+import androidx.compose.ui.unit.em
+import androidx.compose.ui.unit.isSpecified
 import androidx.compose.ui.unit.sp
 import androidx.core.text.HtmlCompat
 import androidx.core.text.getSpans
@@ -176,8 +178,18 @@ private fun BackgroundColorSpan.spanStyle(): SpanStyle = SpanStyle(background = 
 
 private fun StrikethroughSpan.spanStyle(): SpanStyle = SpanStyle(textDecoration = TextDecoration.LineThrough)
 
-private fun RelativeSizeSpan.spanStyle(fontSize: TextUnit): SpanStyle =
-    SpanStyle(fontSize = (fontSize.value * sizeChange).sp)
+private fun RelativeSizeSpan.spanStyle(fontSize: TextUnit): SpanStyle = SpanStyle(
+    fontSize = if (fontSize.isSpecified && fontSize.value.isFinite()) {
+        // Base size is known, so scale it directly to an absolute size.
+        (fontSize.value * sizeChange).sp
+    } else {
+        // No usable base size (e.g. no surrounding font size was set). Express the change
+        // relative to whatever size Compose ultimately resolves for this text instead of
+        // multiplying an unspecified/non-finite value, which would produce a NaN/infinite
+        // Sp that Compose's text layout cannot handle.
+        sizeChange.em
+    },
+)
 
 private fun StyleSpan.spanStyle(): SpanStyle? = when (style) {
     Typeface.BOLD -> SpanStyle(fontWeight = FontWeight.Bold)
