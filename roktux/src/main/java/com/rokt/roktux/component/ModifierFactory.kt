@@ -1228,14 +1228,16 @@ internal class ModifierFactory {
                     stylingUiProperties.textColor,
                     isDarkModeEnabled,
                 ),
-                fontSize = stylingUiProperties.fontSize?.takeIf { it != Float.MIN_VALUE }?.sp
+                fontSize = stylingUiProperties.fontSize
+                    ?.takeIf { it != Float.MIN_VALUE && it.isFinite() && it >= 0f }?.sp
                     ?: TextUnit.Unspecified,
                 fontFamily = fontFamily,
                 fontWeight = stylingUiProperties.fontWeight?.let { FontWeight(it) },
                 fontStyle = stylingUiProperties.fontStyle,
                 textAlign = stylingUiProperties.horizontalTextAlign ?: TextAlign.Start,
                 baselineShift = stylingUiProperties.baselineTextAlign,
-                letterSpacing = stylingUiProperties.letterSpacing?.takeIf { it != Float.MIN_VALUE }?.sp
+                letterSpacing = stylingUiProperties.letterSpacing
+                    ?.takeIf { it != Float.MIN_VALUE && it.isFinite() }?.sp
                     ?: TextUnit.Unspecified,
                 textDecoration = stylingUiProperties.textDecoration,
                 lineHeight = stylingUiProperties.lineHeight

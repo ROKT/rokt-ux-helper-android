@@ -28,6 +28,8 @@ fun SemanticsNodeInteraction.assertLineHeight(lineHeight: Int) = assert(hasLineH
 
 fun SemanticsNodeInteraction.assertLineHeightIsUnspecified() = assert(hasLineHeightUnspecified())
 
+fun SemanticsNodeInteraction.assertFontSizeIsUnspecified() = assert(hasFontSizeUnspecified())
+
 fun SemanticsNodeInteraction.assertTextColor(textColor: String) = assert(hasTextColor(textColor))
 
 fun SemanticsNodeInteraction.assertLetterSpacing(letterSpacing: Int) = assert(hasLetterSpacing(letterSpacing))
@@ -86,6 +88,11 @@ private fun hasLineHeight(lineHeight: Int) = SemanticsMatcher("LineHeight = $lin
 private fun hasLineHeightUnspecified() = SemanticsMatcher("LineHeight = Unspecified") { node ->
     val targetLineHeight = getTextStyle(node)?.lineHeight
     validateAndPrintError("LineHeight", expected = TextUnit.Unspecified, target = targetLineHeight)
+}
+
+private fun hasFontSizeUnspecified() = SemanticsMatcher("FontSize = Unspecified") { node ->
+    val targetFontSize = getTextStyle(node)?.fontSize
+    validateAndPrintError("FontSize", expected = TextUnit.Unspecified, target = targetFontSize)
 }
 
 private fun hasTextColor(textColor: String) = SemanticsMatcher("TextColor = $textColor") { node ->

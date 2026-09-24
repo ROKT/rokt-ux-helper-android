@@ -24,6 +24,7 @@ import com.rokt.core.testutils.annotations.WindowSize
 import com.rokt.core.testutils.assertion.assertBackgroundColor
 import com.rokt.core.testutils.assertion.assertBaselineTextAlign
 import com.rokt.core.testutils.assertion.assertFontSize
+import com.rokt.core.testutils.assertion.assertFontSizeIsUnspecified
 import com.rokt.core.testutils.assertion.assertFontStyle
 import com.rokt.core.testutils.assertion.assertFontWeight
 import com.rokt.core.testutils.assertion.assertHorizontalTextAlign
@@ -208,6 +209,29 @@ class TextComponentTest : BaseDcuiEspressoTest() {
             .assertIsDisplayed()
             .assertTextEquals("Test")
             .assertLineHeightIsUnspecified()
+    }
+
+    @Test
+    @DcuiNodeJson(jsonFile = "TextComponent/BasicText_with_NegativeFontSize.json")
+    fun testBasicTextComponentWithNegativeFontSizeFallsBackToDefault() {
+        // A negative fontSize is not a valid text style value, the same malformed-value class
+        // that used to fail during text layout for lineHeight. It should fall back to
+        // unspecified instead of being passed through to text layout.
+        composeTestRule.onNodeWithTag(DCUI_COMPONENT_TAG)
+            .assertIsDisplayed()
+            .assertTextEquals("Test")
+            .assertFontSizeIsUnspecified()
+    }
+
+    @Test
+    @DcuiNodeJson(jsonFile = "TextComponent/BasicText_with_NegativeLetterSpacing.json")
+    fun testBasicTextComponentWithNegativeLetterSpacingIsPreserved() {
+        // Unlike fontSize/lineHeight, a negative letterSpacing is a legitimate value (condensed
+        // text) and must not be treated as malformed or coerced to unspecified.
+        composeTestRule.onNodeWithTag(DCUI_COMPONENT_TAG)
+            .assertIsDisplayed()
+            .assertTextEquals("Test")
+            .assertLetterSpacing(-2)
     }
 
     @Test
