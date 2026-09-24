@@ -13,6 +13,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Update Jetpack Compose BOM to 2026.05.01.
 
+## [2.0.4] - 2026-09-24
+
+### Fixed
+
+- Remove NavHost entirely instead of catching its crash ([#340](https://github.com/ROKT/rokt-ux-helper-android/pull/340))
+
+### Changed
+
+- Bump androidx.test.espresso:espresso-core from 3.6.1 to 3.7.0 ([#338](https://github.com/ROKT/rokt-ux-helper-android/pull/338))
+- Bump codecov/codecov-action from 7.0.0 to 7.1.0 ([#337](https://github.com/ROKT/rokt-ux-helper-android/pull/337))
+
 ## [2.0.3] - 2026-09-18
 
 ### Fixed
@@ -291,7 +302,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Initial implementation of UX Helper
 
-[unreleased]: https://github.com/ROKT/rokt-ux-helper-android/compare/2.0.3...HEAD
+[unreleased]: https://github.com/ROKT/rokt-ux-helper-android/compare/2.0.4...HEAD
+[2.0.4]: https://github.com/ROKT/rokt-ux-helper-android/compare/2.0.3...2.0.4
 [2.0.3]: https://github.com/ROKT/rokt-ux-helper-android/compare/2.0.2...2.0.3
 [2.0.2]: https://github.com/ROKT/rokt-ux-helper-android/compare/2.0.1...2.0.2
 [2.0.1]: https://github.com/ROKT/rokt-ux-helper-android/compare/2.0.0...2.0.1
