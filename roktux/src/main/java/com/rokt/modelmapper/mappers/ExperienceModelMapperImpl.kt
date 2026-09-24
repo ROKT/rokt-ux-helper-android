@@ -127,12 +127,13 @@ class ExperienceModelMapperImpl(
 
     private fun HashMap<String, Float>?.buildBreakpoints(): ImmutableMap<String, Int> {
         val breakpoints = mutableMapOf<String, Int>()
-        // Add the default breakpoint
-        breakpoints["default"] = 0
-        // Add the other breakpoints
+        // Add the other breakpoints first
         this?.let {
             breakpoints.putAll(it.mapValues { pair -> pair.value.toInt() })
         }
+        // Add the default breakpoint last so a response-supplied "default" entry can never
+        // override the 0 sentinel that the smallest layout relies on.
+        breakpoints["default"] = 0
         return breakpoints.toImmutableMap()
     }
 

@@ -166,7 +166,10 @@ internal fun Activity.getScreenHeightInPixels(): Int = remember(LocalConfigurati
 internal fun getBreakpointIndex(width: Int, breakpoints: ImmutableMap<String, Int>): Int {
     if (breakpoints.size == 1) return 0
     val sortedBreakpoints = breakpoints.toList().sortedBy { it.second }
-    return (sortedBreakpoints.indexOfFirst { width < it.second }.takeIf { it != -1 } ?: sortedBreakpoints.size) - 1
+    val index = (sortedBreakpoints.indexOfFirst { width < it.second }.takeIf { it != -1 } ?: sortedBreakpoints.size) - 1
+    // A malformed breakpoints map (e.g. every value larger than the current width) can otherwise
+    // resolve to -1; clamp to the smallest breakpoint so callers never index out of bounds.
+    return index.coerceAtLeast(0)
 }
 
 internal fun Context.findActivity(): Activity {

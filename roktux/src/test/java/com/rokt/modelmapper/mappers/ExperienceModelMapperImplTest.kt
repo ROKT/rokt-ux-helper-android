@@ -4,8 +4,10 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.rokt.core.testutils.TestJsonLoader
 import com.rokt.modelmapper.data.DataBindingImpl
 import com.rokt.modelmapper.model.txn.SelectResponse
+import com.rokt.roktux.utils.getBreakpointIndex
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -49,5 +51,26 @@ class ExperienceModelMapperImplTest {
 
         // Assert
         assertTrue(result.isSuccess)
+    }
+
+    @Test
+    fun `buildBreakpoints does not let a payload-supplied 'default' entry replace the 0 sentinel`() {
+        // Arrange: the response's breakpoints map declares its own "default" entry alongside
+        // other breakpoints that are all larger than any plausible window width.
+        val experienceResponse = TestJsonLoader.loadJsonFromAssetsDirectory(
+            "ExperienceModelMapper",
+            "Breakpoints_with_default_override.json",
+        )
+
+        // Act
+        val result = ExperienceModelMapperImpl(experienceResponse, DataBindingImpl()).transformResponse()
+        val breakpoints = result.getOrThrow().plugins.first().breakpoint
+
+        // Assert: the sentinel used to select the smallest layout must remain 0 regardless of
+        // what the payload contains, and resolving an index for a narrow window must never go
+        // negative (which would otherwise crash any component indexing into a breakpoint list).
+        assertEquals(0, breakpoints["default"])
+        val resolvedIndex = getBreakpointIndex(width = 200, breakpoints = breakpoints)
+        assertTrue("resolved breakpoint index must never be negative, was $resolvedIndex", resolvedIndex >= 0)
     }
 }
