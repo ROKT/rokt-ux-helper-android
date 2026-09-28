@@ -74,7 +74,7 @@ dependencies {
     implementation(libs.androidx.compose.material3)
     implementation(libs.kotlinx.collections.immutable)
     implementation(libs.androidx.lifecycle.viewModelCompose)
-    implementation(libs.androidx.navigation.compose)
+    implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.window.manager)
     debugApi(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.tooling.preview)

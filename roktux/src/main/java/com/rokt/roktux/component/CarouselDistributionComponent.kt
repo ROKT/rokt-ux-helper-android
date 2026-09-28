@@ -261,11 +261,10 @@ internal fun getPeekThroughDimension(
     if (peekThroughSizeItems.isEmpty()) {
         PaddingValues(0.dp)
     } else {
-        val peekThroughBreakpointIndex = if (breakpointIndex <= peekThroughSizeItems.size - 1) {
-            breakpointIndex
-        } else {
-            peekThroughSizeItems.size - 1
-        }
+        // Coerce into range rather than only clamping the upper bound, so an unexpected
+        // negative breakpoint index (e.g. from a malformed breakpoints payload) can never
+        // index out of bounds.
+        val peekThroughBreakpointIndex = breakpointIndex.coerceIn(0, peekThroughSizeItems.size - 1)
         val transformedPeekThroughSize = when (val peekThroughSize = peekThroughSizeItems[peekThroughBreakpointIndex]) {
             is PeekThroughSizeUiModel.Fixed -> peekThroughSize.value.dp
 

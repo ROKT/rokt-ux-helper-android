@@ -49,7 +49,7 @@ internal fun transformColumn(
                 it.value.own?.container,
             ),
             predicates = it.predicates.map { predicate -> predicate.transformWhenPredicate() }.toImmutableList(),
-            duration = it.duration,
+            duration = it.duration.coerceAtLeast(0),
         )
     }
 
@@ -104,7 +104,7 @@ internal fun transformRow(
                 it.value.own?.container,
             ),
             predicates = it.predicates.map { predicate -> predicate.transformWhenPredicate() }.toImmutableList(),
-            duration = it.duration,
+            duration = it.duration.coerceAtLeast(0),
         )
     }
 
@@ -149,7 +149,7 @@ internal fun transformZStack(
                 it.value.own?.container?.toContainerStyling(),
             ),
             predicates = it.predicates.map { predicate -> predicate.transformWhenPredicate() }.toImmutableList(),
-            duration = it.duration,
+            duration = it.duration.coerceAtLeast(0),
         )
     }
 
@@ -194,7 +194,7 @@ internal fun transformCatalogStackedCollection(
                 it.value.own?.container,
             ),
             predicates = it.predicates.map { predicate -> predicate.transformWhenPredicate() }.toImmutableList(),
-            duration = it.duration,
+            duration = it.duration.coerceAtLeast(0),
         )
     }
     val catalogItemList = mutableListOf<LayoutSchemaUiModel>()
@@ -244,7 +244,7 @@ internal fun transformCatalogCombinedCollection(
                 it.value.own?.container,
             ),
             predicates = it.predicates.map { predicate -> predicate.transformWhenPredicate() }.toImmutableList(),
-            duration = it.duration,
+            duration = it.duration.coerceAtLeast(0),
         )
     }
 

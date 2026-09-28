@@ -100,7 +100,7 @@ internal fun transformProgressIndicator(
                 it.value.own?.container,
             ),
             predicates = it.predicates.map { predicate -> predicate.transformWhenPredicate() }.toImmutableList(),
-            duration = it.duration,
+            duration = it.duration.coerceAtLeast(0),
         )
     }
 
@@ -178,7 +178,7 @@ internal fun transformCreativeResponse(
                 it.value.own?.container,
             ),
             predicates = it.predicates.map { predicate -> predicate.transformWhenPredicate() }.toImmutableList(),
-            duration = it.duration,
+            duration = it.duration.coerceAtLeast(0),
         )
     }
 
@@ -224,7 +224,7 @@ internal fun transformCatalogResponseButton(
                 it.value.own?.container,
             ),
             predicates = it.predicates.map { predicate -> predicate.transformWhenPredicate() }.toImmutableList(),
-            duration = it.duration,
+            duration = it.duration.coerceAtLeast(0),
         )
     }
 
@@ -269,7 +269,7 @@ internal fun transformCatalogDevicePayButton(
                 it.value.own?.container,
             ),
             predicates = it.predicates.map { predicate -> predicate.transformWhenPredicate() }.toImmutableList(),
-            duration = it.duration,
+            duration = it.duration.coerceAtLeast(0),
         )
     }
 
@@ -317,7 +317,7 @@ internal fun transformCloseButton(
                 it.value.own?.container,
             ),
             predicates = it.predicates.map { predicate -> predicate.transformWhenPredicate() }.toImmutableList(),
-            duration = it.duration,
+            duration = it.duration.coerceAtLeast(0),
         )
     }
 
@@ -359,7 +359,7 @@ internal fun transformStaticLink(
                 it.value.own?.container,
             ),
             predicates = it.predicates.map { predicate -> predicate.transformWhenPredicate() }.toImmutableList(),
-            duration = it.duration,
+            duration = it.duration.coerceAtLeast(0),
         )
     }
 
@@ -403,7 +403,7 @@ internal fun transformToggleButtonStateTrigger(
                 it.value.own?.container,
             ),
             predicates = it.predicates.map { predicate -> predicate.transformWhenPredicate() }.toImmutableList(),
-            duration = it.duration,
+            duration = it.duration.coerceAtLeast(0),
         )
     }
 
@@ -446,7 +446,7 @@ internal fun transformProgressControl(
                 it.value.own?.container,
             ),
             predicates = it.predicates.map { predicate -> predicate.transformWhenPredicate() }.toImmutableList(),
-            duration = it.duration,
+            duration = it.duration.coerceAtLeast(0),
         )
     }
 
@@ -613,7 +613,7 @@ internal fun transformDataImageCarousel(
                 it.value.own?.container,
             ),
             predicates = it.predicates.map { predicate -> predicate.transformWhenPredicate() }.toImmutableList(),
-            duration = it.duration,
+            duration = it.duration.coerceAtLeast(0),
         )
     }
 
@@ -681,7 +681,7 @@ internal fun transformCatalogDropdown(
                 it.value.own?.container,
             ),
             predicates = it.predicates.map { predicate -> predicate.transformWhenPredicate() }.toImmutableList(),
-            duration = it.duration,
+            duration = it.duration.coerceAtLeast(0),
         )
     }
 
@@ -808,7 +808,7 @@ internal fun transformCatalogImageGallery(
                 it.value.own?.container,
             ),
             predicates = it.predicates.map { predicate -> predicate.transformWhenPredicate() }.toImmutableList(),
-            duration = it.duration,
+            duration = it.duration.coerceAtLeast(0),
         )
     }
 
@@ -991,7 +991,7 @@ private fun WhenTransition.toTransitionUiModel(): WhenUiTransition {
     inTransition?.forEach {
         when (it) {
             is InTransition.FadeIn -> inUiTransition += fadeIn(
-                animationSpec = tween(durationMillis = it.settings.duration),
+                animationSpec = tween(durationMillis = it.settings.duration.coerceAtLeast(0)),
             )
         }
     }
@@ -999,7 +999,7 @@ private fun WhenTransition.toTransitionUiModel(): WhenUiTransition {
     outTransition?.map {
         when (it) {
             is OutTransition.FadeOut -> outUiTransition += fadeOut(
-                animationSpec = tween(durationMillis = it.settings.duration),
+                animationSpec = tween(durationMillis = it.settings.duration.coerceAtLeast(0)),
             )
         }
     }
