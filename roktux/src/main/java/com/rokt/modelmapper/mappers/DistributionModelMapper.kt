@@ -32,7 +32,7 @@ internal fun transformOneByOneDistribution(
                 it.value.own?.container,
             ),
             predicates = it.predicates.map { predicate -> predicate.transformWhenPredicate() }.toImmutableList(),
-            duration = it.duration,
+            duration = it.duration.coerceAtLeast(0),
         )
     }
 
@@ -69,7 +69,7 @@ internal fun transformGroupedDistribution(
                 it.value.own?.container,
             ),
             predicates = it.predicates.map { predicate -> predicate.transformWhenPredicate() }.toImmutableList(),
-            duration = it.duration,
+            duration = it.duration.coerceAtLeast(0),
         )
     }
 
@@ -108,7 +108,7 @@ internal fun transformCarouselDistribution(
                 it.value.own?.container,
             ),
             predicates = it.predicates.map { predicate -> predicate.transformWhenPredicate() }.toImmutableList(),
-            duration = it.duration,
+            duration = it.duration.coerceAtLeast(0),
         )
     }
 
@@ -130,5 +130,5 @@ internal fun transformCarouselDistribution(
 }
 
 private fun Transition.toTransitionUiModel(): TransitionUiModel = when (this) {
-    is Transition.FadeInOut -> TransitionUiModel.FadeInOutTransition(this.settings.duration)
+    is Transition.FadeInOut -> TransitionUiModel.FadeInOutTransition(this.settings.duration.coerceAtLeast(0))
 }
