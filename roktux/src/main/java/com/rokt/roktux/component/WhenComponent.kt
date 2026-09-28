@@ -157,15 +157,17 @@ internal fun evaluatePredicates(
             }
 
             is WhenUiPredicate.Progression -> {
-                getNormalisedProgression(
-                    (offerState.lastOfferIndex.toDouble() / offerState.viewableItems).toInt(),
-                    predicate.value.toInt(),
-                )
+                predicate.value.toIntOrNull()?.let {
+                    getNormalisedProgression(
+                        (offerState.lastOfferIndex.toDouble() / offerState.viewableItems).toInt(),
+                        it,
+                    )
+                }
             }
 
             is WhenUiPredicate.Position -> {
-                predicate.value?.let {
-                    getNormalisedPosition(offerState.lastOfferIndex, it.toInt())
+                predicate.value?.toIntOrNull()?.let {
+                    getNormalisedPosition(offerState.lastOfferIndex, it)
                 }
             }
 

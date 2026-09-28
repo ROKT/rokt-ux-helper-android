@@ -225,13 +225,17 @@ private fun transformContainerProperties(
     flexChildProperties: FlexChildStylingProperties?,
     containerProperties: ContainerStylingProperties?,
 ): ContainerProperties = ContainerProperties(
-    weight = flexChildProperties?.weight,
+    weight = transformWeight(flexChildProperties?.weight),
     arrangementUiModel = transformArrangement(containerProperties?.justifyContent),
     alignmentUiModel = transformAlignment(containerProperties?.alignItems),
     gap = containerProperties?.gap,
     alignSelfVertical = transformSelfAlignment(flexChildProperties?.alignSelf),
     alignSelfHorizontal = transformSelfAlignment(flexChildProperties?.alignSelf),
 )
+
+// A layout weight must be finite and strictly greater than zero, otherwise Modifier.weight
+// throws at composition time. Normalize any other value to null so no weight modifier is applied.
+private fun transformWeight(weight: Float?): Float? = weight?.takeIf { it > 0f && it.isFinite() }
 
 private fun transformArrangement(arrangementModel: FlexJustification?) = arrangementModel?.let { arrangement ->
     when (arrangement) {

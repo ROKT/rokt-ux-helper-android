@@ -587,6 +587,214 @@ class WhenComponentEvaluationTest {
     }
 
     @Test
+    fun `given predicate target is progression and value is a non-numeric string, then evaluate should return false instead of throwing`() {
+        // Arrange
+        val predicate =
+            WhenUiPredicate.Progression(condition = OrderableWhenUiCondition.Is, value = "not-a-number")
+        val uiModel = createWhenUiModel(predicate)
+
+        // Act
+        val evaluationResult = evaluatePredicates(
+            predicates = uiModel.predicates,
+            breakpointIndex = 0,
+            isDarkModeEnabled = false,
+            offerState = OfferUiState(
+                currentOfferIndex = 1,
+                lastOfferIndex = 1,
+                viewableItems = 1,
+                creativeCopy = persistentMapOf(),
+                breakpoints = persistentMapOf(),
+                customState = persistentMapOf(),
+            ),
+        )
+
+        // Assert
+        assertFalse(evaluationResult)
+    }
+
+    @Test
+    fun `given predicate target is progression and value is an empty string, then evaluate should return false instead of throwing`() {
+        // Arrange
+        val predicate =
+            WhenUiPredicate.Progression(condition = OrderableWhenUiCondition.Is, value = "")
+        val uiModel = createWhenUiModel(predicate)
+
+        // Act
+        val evaluationResult = evaluatePredicates(
+            predicates = uiModel.predicates,
+            breakpointIndex = 0,
+            isDarkModeEnabled = false,
+            offerState = OfferUiState(
+                currentOfferIndex = 1,
+                lastOfferIndex = 1,
+                viewableItems = 1,
+                creativeCopy = persistentMapOf(),
+                breakpoints = persistentMapOf(),
+                customState = persistentMapOf(),
+            ),
+        )
+
+        // Assert
+        assertFalse(evaluationResult)
+    }
+
+    @Test
+    fun `given predicate target is progression and value is far outside the Int range, then evaluate should return false instead of throwing`() {
+        // Arrange
+        val predicate =
+            WhenUiPredicate.Progression(condition = OrderableWhenUiCondition.Is, value = "99999999999999999999")
+        val uiModel = createWhenUiModel(predicate)
+
+        // Act
+        val evaluationResult = evaluatePredicates(
+            predicates = uiModel.predicates,
+            breakpointIndex = 0,
+            isDarkModeEnabled = false,
+            offerState = OfferUiState(
+                currentOfferIndex = 1,
+                lastOfferIndex = 1,
+                viewableItems = 1,
+                creativeCopy = persistentMapOf(),
+                breakpoints = persistentMapOf(),
+                customState = persistentMapOf(),
+            ),
+        )
+
+        // Assert
+        assertFalse(evaluationResult)
+    }
+
+    @Test
+    fun `given predicate target is position and condition is 'is', when the current offer position matches the value, then evaluate should return true`() {
+        // Arrange
+        val predicate =
+            WhenUiPredicate.Position(condition = OrderableWhenUiCondition.Is, value = "1")
+        val uiModel = createWhenUiModel(predicate)
+
+        // Act
+        val evaluationResult = evaluatePredicates(
+            predicates = uiModel.predicates,
+            breakpointIndex = 0,
+            isDarkModeEnabled = false,
+            offerState = OfferUiState(
+                currentOfferIndex = 1,
+                lastOfferIndex = 1,
+                viewableItems = 1,
+                creativeCopy = persistentMapOf(),
+                breakpoints = persistentMapOf(),
+                customState = persistentMapOf(),
+            ),
+        )
+
+        // Assert
+        assertTrue(evaluationResult)
+    }
+
+    @Test
+    fun `given predicate target is position and condition is 'is', when the current offer position does not match the value, then evaluate should return false`() {
+        // Arrange
+        val predicate =
+            WhenUiPredicate.Position(condition = OrderableWhenUiCondition.Is, value = "1")
+        val uiModel = createWhenUiModel(predicate)
+
+        // Act
+        val evaluationResult = evaluatePredicates(
+            predicates = uiModel.predicates,
+            breakpointIndex = 0,
+            isDarkModeEnabled = false,
+            offerState = OfferUiState(
+                currentOfferIndex = 0,
+                lastOfferIndex = 1,
+                viewableItems = 1,
+                creativeCopy = persistentMapOf(),
+                breakpoints = persistentMapOf(),
+                customState = persistentMapOf(),
+            ),
+        )
+
+        // Assert
+        assertFalse(evaluationResult)
+    }
+
+    @Test
+    fun `given predicate target is position and value is a non-numeric string, then evaluate should return false instead of throwing`() {
+        // Arrange
+        val predicate =
+            WhenUiPredicate.Position(condition = OrderableWhenUiCondition.Is, value = "not-a-number")
+        val uiModel = createWhenUiModel(predicate)
+
+        // Act
+        val evaluationResult = evaluatePredicates(
+            predicates = uiModel.predicates,
+            breakpointIndex = 0,
+            isDarkModeEnabled = false,
+            offerState = OfferUiState(
+                currentOfferIndex = 1,
+                lastOfferIndex = 1,
+                viewableItems = 1,
+                creativeCopy = persistentMapOf(),
+                breakpoints = persistentMapOf(),
+                customState = persistentMapOf(),
+            ),
+        )
+
+        // Assert
+        assertFalse(evaluationResult)
+    }
+
+    @Test
+    fun `given predicate target is position and value is an empty string, then evaluate should return false instead of throwing`() {
+        // Arrange
+        val predicate =
+            WhenUiPredicate.Position(condition = OrderableWhenUiCondition.Is, value = "")
+        val uiModel = createWhenUiModel(predicate)
+
+        // Act
+        val evaluationResult = evaluatePredicates(
+            predicates = uiModel.predicates,
+            breakpointIndex = 0,
+            isDarkModeEnabled = false,
+            offerState = OfferUiState(
+                currentOfferIndex = 1,
+                lastOfferIndex = 1,
+                viewableItems = 1,
+                creativeCopy = persistentMapOf(),
+                breakpoints = persistentMapOf(),
+                customState = persistentMapOf(),
+            ),
+        )
+
+        // Assert
+        assertFalse(evaluationResult)
+    }
+
+    @Test
+    fun `given predicate target is position and value is far outside the Int range, then evaluate should return false instead of throwing`() {
+        // Arrange
+        val predicate =
+            WhenUiPredicate.Position(condition = OrderableWhenUiCondition.Is, value = "-99999999999999999999")
+        val uiModel = createWhenUiModel(predicate)
+
+        // Act
+        val evaluationResult = evaluatePredicates(
+            predicates = uiModel.predicates,
+            breakpointIndex = 0,
+            isDarkModeEnabled = false,
+            offerState = OfferUiState(
+                currentOfferIndex = 1,
+                lastOfferIndex = 1,
+                viewableItems = 1,
+                creativeCopy = persistentMapOf(),
+                breakpoints = persistentMapOf(),
+                customState = persistentMapOf(),
+            ),
+        )
+
+        // Assert
+        assertFalse(evaluationResult)
+    }
+
+    @Test
     fun `given one breakpoint predicate and one progression predicate are there and all the predicates pass, then evaluate should return true`() {
         // Arrange
         val breakPoints = persistentMapOf("Landscape" to 560)
