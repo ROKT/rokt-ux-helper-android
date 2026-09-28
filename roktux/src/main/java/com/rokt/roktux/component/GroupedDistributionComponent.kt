@@ -165,11 +165,10 @@ internal fun getViewableItems(breakpointIndex: Int, viewableItemsList: Immutable
         if (viewableItemsList.isEmpty()) {
             DEFAULT_VIEWABLE_ITEMS
         } else {
-            val viewableItemsBreakpointIndex = if (breakpointIndex <= viewableItemsList.size - 1) {
-                breakpointIndex
-            } else {
-                viewableItemsList.size - 1
-            }
+            // Coerce into range rather than only clamping the upper bound, so an unexpected
+            // negative breakpoint index (e.g. from a malformed breakpoints payload) can never
+            // index out of bounds.
+            val viewableItemsBreakpointIndex = breakpointIndex.coerceIn(0, viewableItemsList.size - 1)
             viewableItemsList[viewableItemsBreakpointIndex].coerceIn(DEFAULT_VIEWABLE_ITEMS, lastOfferIndex + 1)
         }
     }

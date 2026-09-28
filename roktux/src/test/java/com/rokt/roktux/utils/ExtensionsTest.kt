@@ -68,6 +68,18 @@ class ExtensionsTest {
     }
 
     @Test
+    fun `test breakpointIndex when every breakpoint value exceeds the window width`() {
+        // A malformed breakpoints map (e.g. one whose "default" entry was overridden to a
+        // non-zero value) can leave every value larger than the current window width. The
+        // resolved index must still land on the smallest breakpoint (index 0), never negative.
+        val breakpoints = persistentMapOf("default" to 999, "tablet" to 1200, "desktop" to 1600)
+
+        val index = getBreakpointIndex(200, breakpoints)
+
+        assertEquals(0, index)
+    }
+
+    @Test
     fun `fadeInOutAnimationModifier sets alpha to 0 and executes callback when animationState changes to Hide`() {
         composeTestRule.setContent {
             FadeInOutButton(AnimationState.Show)
