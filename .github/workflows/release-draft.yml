@@ -126,8 +126,10 @@ jobs:
           echo "new-version=$new_version" >> $GITHUB_OUTPUT
 
       - name: Save updated version to file
+        env:
+          NEW_VERSION: ${{ steps.compose-version.outputs.new-version }}
         run: |
-          echo "${{ steps.compose-version.outputs.new-version }}" > VERSION
+          echo "$NEW_VERSION" > VERSION
 
       - name: Generate changelog from git history
         id: changelog
@@ -135,7 +137,9 @@ jobs:
         with:
           version: ${{ steps.compose-version.outputs.new-version }}
       - name: Publish to Maven local
-        run: ./gradlew publishMavenPublicationToMavenLocal -PVERSION=${{ steps.compose-version.outputs.new-version }}
+        env:
+          NEW_VERSION: ${{ steps.compose-version.outputs.new-version }}
+        run: ./gradlew publishMavenPublicationToMavenLocal -PVERSION="$NEW_VERSION"
       - name: Upload AAR artifacts
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:

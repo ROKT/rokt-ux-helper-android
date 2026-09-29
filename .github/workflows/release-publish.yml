@@ -94,7 +94,9 @@ jobs:
         with:
           cache-provider: basic
       - name: Publish to Maven Central
-        run: ./gradlew publishMavenPublicationToMavenCentralRepository -PVERSION=${{ needs.setup-and-version.outputs.next_snapshot_version }} --no-configuration-cache
+        env:
+          RELEASE_VERSION: ${{ needs.setup-and-version.outputs.next_snapshot_version }}
+        run: ./gradlew publishMavenPublicationToMavenCentralRepository -PVERSION="$RELEASE_VERSION" --no-configuration-cache
 
   build-full-release:
     needs: setup-and-version
@@ -117,9 +119,13 @@ jobs:
         with:
           cache-provider: basic
       - name: Publish to Maven local
-        run: ./gradlew publishMavenPublicationToMavenLocal -PVERSION=${{ needs.setup-and-version.outputs.full_release_version }}
+        env:
+          RELEASE_VERSION: ${{ needs.setup-and-version.outputs.full_release_version }}
+        run: ./gradlew publishMavenPublicationToMavenLocal -PVERSION="$RELEASE_VERSION"
       - name: Publish to Maven Central
-        run: ./gradlew publishMavenPublicationToMavenCentralRepository -PVERSION=${{ needs.setup-and-version.outputs.full_release_version }} --no-configuration-cache
+        env:
+          RELEASE_VERSION: ${{ needs.setup-and-version.outputs.full_release_version }}
+        run: ./gradlew publishMavenPublicationToMavenCentralRepository -PVERSION="$RELEASE_VERSION" --no-configuration-cache
 
       - name: Find release AAR Files
         id: find-aar
@@ -128,21 +134,26 @@ jobs:
           echo "aar_files=$file_list" >> $GITHUB_OUTPUT
       - name: Rename AAR Files
         id: rename-aar
+        env:
+          AAR_FILES: ${{ steps.find-aar.outputs.aar_files }}
+          RELEASE_VERSION: ${{ needs.setup-and-version.outputs.full_release_version }}
         run: |
-          IFS=',' read -r -a aar_files <<< "${{ steps.find-aar.outputs.aar_files }}"
+          IFS=',' read -r -a aar_files <<< "$AAR_FILES"
           new_files=()
 
           for file in "${aar_files[@]}"; do
             dir=$(dirname "$file")
             base=$(basename "$file" -release.aar)
-            new_file="$dir/$base-${{ needs.setup-and-version.outputs.full_release_version }}.aar"
+            new_file="$dir/$base-${RELEASE_VERSION}.aar"
             mv "$file" "$new_file"
             new_files+=("$new_file")
           done
           echo "renamed_aar_files=$(IFS=','; echo "${new_files[*]}")" >> $GITHUB_OUTPUT
       - name: Print Renamed AAR Files
+        env:
+          RENAMED_AAR_FILES: ${{ steps.rename-aar.outputs.renamed_aar_files }}
         run: |
-          echo "Renamed AAR Files: ${{ steps.rename-aar.outputs.renamed_aar_files }}"
+          echo "Renamed AAR Files: $RENAMED_AAR_FILES"
       - name: Upload AAR artifacts
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a #v7.0.1
         with:
@@ -156,9 +167,10 @@ jobs:
           echo "pom_files=$pom_files" >> $GITHUB_OUTPUT
       - name: Rename POM files
         id: rename-pom
+        env:
+          RELEASE_VERSION: ${{ needs.setup-and-version.outputs.full_release_version }}
+          POM_FILES: ${{ steps.find-pom.outputs.pom_files }}
         run: |
-          RELEASE_VERSION=${{ needs.setup-and-version.outputs.full_release_version }}
-          POM_FILES=${{ steps.find-pom.outputs.pom_files }}
           IFS="," read -r -a FILES <<< "$POM_FILES"
           RENAMED_FILES=()
           for file in "${FILES[@]}"; do
@@ -177,10 +189,11 @@ jobs:
 
       - name: Concatenate Renamed Files
         id: concat-files
+        env:
+          RENAMED_AAR_FILES: ${{ steps.rename-aar.outputs.renamed_aar_files }}
+          RENAMED_POM_FILES: ${{ steps.rename-pom.outputs.renamed_pom_files }}
         run: |
-          aar_files="${{ steps.rename-aar.outputs.renamed_aar_files }}"
-          pom_files="${{ steps.rename-pom.outputs.renamed_pom_files }}"
-          concatenated_files="${aar_files},${pom_files}"
+          concatenated_files="${RENAMED_AAR_FILES},${RENAMED_POM_FILES}"
           echo "concatenated_files=$concatenated_files" >> $GITHUB_OUTPUT
 
       - uses: ffurrer2/extract-release-notes@273da39a24fb7db106a35526c8162815faffd31d # v3.1.0
@@ -188,7 +201,9 @@ jobs:
         with:
           changelog_file: CHANGELOG.md
       - name: Changelog
-        run: echo "${{ steps.extract-release-notes.outputs.release_notes }}"
+        env:
+          RELEASE_NOTES: ${{ steps.extract-release-notes.outputs.release_notes }}
+        run: echo "$RELEASE_NOTES"
 
       - name: Create Github release
         uses: ncipollo/release-action@339a81892b84b4eeb0f6e744e4574d79d0d9b8dd # v1.21.0
