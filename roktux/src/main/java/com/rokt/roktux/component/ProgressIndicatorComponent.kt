@@ -37,8 +37,14 @@ internal class ProgressIndicatorComponent(
         breakpointIndex: Int,
         onEventSent: (LayoutContract.LayoutEvent) -> Unit,
     ) {
-        val startPosition = remember(model.startPosition) {
-            model.startPosition - 1 // startPosition is 1-based
+        val totalPages = remember(offerState.lastOfferIndex + 1, offerState.viewableItems) {
+            ceil((offerState.lastOfferIndex + 1).toDouble() / offerState.viewableItems).toInt()
+        }
+        val startPosition = remember(model.startPosition, totalPages) {
+            // startPosition is 1-based from the payload; coerce it into a valid page index so a
+            // missing, zero, negative, or too-large value degrades to the nearest valid page
+            // instead of producing an out-of-range index below.
+            (model.startPosition - 1).coerceIn(0, (totalPages - 1).coerceAtLeast(0))
         }
         if (offerState.currentOfferIndex >= startPosition) {
             val container = modifierFactory.createContainerUiProperties(
@@ -46,9 +52,6 @@ internal class ProgressIndicatorComponent(
                 index = breakpointIndex,
                 isPressed = isPressed,
             )
-            val totalPages = remember(offerState.lastOfferIndex + 1, offerState.viewableItems) {
-                ceil((offerState.lastOfferIndex + 1).toDouble() / offerState.viewableItems).toInt()
-            }
             val textList: List<String>? = remember(model, totalPages) {
                 when (val indicatorText = model.indicatorText) {
                     is BindData.State -> when (indicatorText.state) {

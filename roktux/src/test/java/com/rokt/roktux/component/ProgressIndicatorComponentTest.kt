@@ -406,4 +406,39 @@ class ProgressIndicatorComponentTest : BaseDcuiEspressoTest() {
         composeTestRule.onNodeWithText("2", useUnmergedTree = true).assertTextColor("#aa0000")
         composeTestRule.onNodeWithText("3", useUnmergedTree = true).assertTextColor("#000000")
     }
+
+    @Test
+    @DcuiNodeJson(jsonFile = "ProgressIndicatorComponent/ProgressIndicator_startPositionZero.json")
+    @DcuiNodeComponentState(currentOffer = 1, totalOffer = 3)
+    fun testProgressIndicatorWithStartPositionZeroFallsBackToFirstPage() {
+        // A startPosition of 0 is out of the valid 1-based range and should behave like the
+        // default (first page) instead of crashing.
+        composeTestRule.onNodeWithTag(DCUI_COMPONENT_TAG).assertIsDisplayed()
+        composeTestRule.onNodeWithText("1", useUnmergedTree = true).assertIsDisplayed()
+        composeTestRule.onNodeWithText("2", useUnmergedTree = true).assertIsDisplayed()
+        composeTestRule.onNodeWithText("3", useUnmergedTree = true).assertIsDisplayed()
+    }
+
+    @Test
+    @DcuiNodeJson(jsonFile = "ProgressIndicatorComponent/ProgressIndicator_startPositionNegative.json")
+    @DcuiNodeComponentState(currentOffer = 1, totalOffer = 3)
+    fun testProgressIndicatorWithNegativeStartPositionFallsBackToFirstPage() {
+        // A negative startPosition should also behave like the default (first page) instead of
+        // crashing.
+        composeTestRule.onNodeWithTag(DCUI_COMPONENT_TAG).assertIsDisplayed()
+        composeTestRule.onNodeWithText("1", useUnmergedTree = true).assertIsDisplayed()
+        composeTestRule.onNodeWithText("2", useUnmergedTree = true).assertIsDisplayed()
+        composeTestRule.onNodeWithText("3", useUnmergedTree = true).assertIsDisplayed()
+    }
+
+    @Test
+    @DcuiNodeJson(jsonFile = "ProgressIndicatorComponent/ProgressIndicator_startPositionExceedsPages.json")
+    @DcuiNodeComponentState(currentOffer = 5, totalOffer = 6, viewableItems = [3])
+    fun testProgressIndicatorWithStartPositionExceedingPageCountFallsBackToLastPage() {
+        // startPosition (5) is beyond the actual page count (2 pages for 6 offers with 3
+        // viewable items), so it should be coerced to the last valid page instead of crashing.
+        composeTestRule.onNodeWithTag(DCUI_COMPONENT_TAG).assertIsDisplayed()
+        composeTestRule.onNodeWithText("1", useUnmergedTree = true).assertDoesNotExist()
+        composeTestRule.onNodeWithText("2", useUnmergedTree = true).assertIsDisplayed()
+    }
 }
