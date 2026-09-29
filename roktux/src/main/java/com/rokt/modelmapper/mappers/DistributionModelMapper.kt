@@ -120,10 +120,14 @@ internal fun transformCarouselDistribution(
         ),
         conditionalTransitionModifiers = conditionalStyleTransition,
         viewableItems = carouselDistributionModel.node.viewableItems.map { it.toInt() }.toImmutableList(),
+        // Clamp to a valid range so malformed payload data degrades gracefully instead of
+        // producing a padding value the carousel's layout can't apply.
         peekThroughSizeUiModel = carouselDistributionModel.node.peekThroughSize.map { peekThroughSize ->
             when (peekThroughSize) {
-                is PeekThroughSize.Fixed -> PeekThroughSizeUiModel.Fixed(peekThroughSize.value)
-                is PeekThroughSize.Percentage -> PeekThroughSizeUiModel.Percentage(peekThroughSize.value)
+                is PeekThroughSize.Fixed -> PeekThroughSizeUiModel.Fixed(peekThroughSize.value.coerceAtLeast(0f))
+
+                is PeekThroughSize.Percentage ->
+                    PeekThroughSizeUiModel.Percentage(peekThroughSize.value.coerceIn(0f, 100f))
             }
         }.toImmutableList(),
     )
