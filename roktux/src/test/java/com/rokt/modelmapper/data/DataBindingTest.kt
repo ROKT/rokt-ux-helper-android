@@ -26,6 +26,8 @@ import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import org.junit.runner.RunWith
+import java.util.concurrent.TimeUnit
+import kotlin.system.measureNanoTime
 
 @RunWith(JUnitParamsRunner::class)
 class DataBindingImplTest : MockkUnitTest() {
@@ -407,6 +409,51 @@ class DataBindingImplTest : MockkUnitTest() {
 
         // Assert
         assertThat(result.isEmpty(), `is`(true))
+    }
+
+    @Test
+    fun `when bind value is called with a long unterminated data token, it should complete quickly and leave the text unchanged`() {
+        // Arrange - a long run of key characters with no closing "^%" delimiter. This shape used
+        // to make the placeholder regex's matching cost grow quadratically with the input length
+        // because two adjacent greedy character classes could split the run between them in many
+        // equivalent ways before giving up.
+        val unterminatedToken = "%^DATA." + "a".repeat(20_000)
+
+        // Act
+        var value: BindData? = null
+        val elapsedNanos = measureNanoTime {
+            value = dataBinding.bindValue(unterminatedToken, offerModel = offer)
+        }
+
+        // Assert - completes well within a generous bound (fixed matching is linear and takes low
+        // single-digit milliseconds for this input; a reintroduced quadratic regex would take
+        // several seconds or more here), and since no closing delimiter exists, no substitution
+        // happens and the original text passes through unchanged.
+        assertTrue(
+            "expected placeholder matching to complete quickly, took ${elapsedNanos / 1_000_000}ms",
+            elapsedNanos < TimeUnit.SECONDS.toNanos(5),
+        )
+        assertTrue(value is BindData.Value && (value as BindData.Value).text == unterminatedToken)
+    }
+
+    @Test
+    fun `when bind value is called with a long unterminated state token, it should complete quickly and leave the text unchanged`() {
+        // Arrange - same shape as above but for the STATE namespace, which is also checked by the
+        // separately anchored isStateTemplate regex.
+        val unterminatedToken = "%^STATE." + "a".repeat(20_000)
+
+        // Act
+        var value: BindData? = null
+        val elapsedNanos = measureNanoTime {
+            value = dataBinding.bindValue(unterminatedToken, offerModel = offer)
+        }
+
+        // Assert
+        assertTrue(
+            "expected placeholder matching to complete quickly, took ${elapsedNanos / 1_000_000}ms",
+            elapsedNanos < TimeUnit.SECONDS.toNanos(5),
+        )
+        assertTrue(value is BindData.Value && (value as BindData.Value).text == unterminatedToken)
     }
 
     @Test

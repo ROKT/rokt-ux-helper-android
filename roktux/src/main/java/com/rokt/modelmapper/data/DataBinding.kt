@@ -299,9 +299,14 @@ private fun String.trailingNumber(): Int? = Regex("(\\d+)$").find(this)?.value?.
 
 private val startsWithNamespace = Regex("^(${TemplateDataPrefix.DATA}|${TemplateDataPrefix.STATE})")
 private val isDataTemplate = Regex("^${TemplateDataPrefix.DATA}")
-private val isStateTemplate = Regex("%\\^(${TemplateDataPrefix.STATE})\\.[a-zA-Z0-9]+[a-zA-Z0-9.]*(?:\\|.*?)?\\^%")
+
+// The key portion uses a single character class loop (rather than two adjacent, overlapping
+// `[a-zA-Z0-9]+[a-zA-Z0-9.]*` loops) so an unterminated token can't force the regex engine to
+// backtrack through every possible split between two quantifiers that accept overlapping
+// character sets, which made matching take quadratic time on long, unterminated input.
+private val isStateTemplate = Regex("%\\^(${TemplateDataPrefix.STATE})\\.[a-zA-Z0-9][a-zA-Z0-9.]*(?:\\|.*?)?\\^%")
 private val templatePattern = Regex(
-    "%\\^(?:${TemplateDataPrefix.DATA}|${TemplateDataPrefix.STATE})\\.[a-zA-Z0-9]+[a-zA-Z0-9.]*(?:\\s*\\|.*?)?\\^%",
+    "%\\^(?:${TemplateDataPrefix.DATA}|${TemplateDataPrefix.STATE})\\.[a-zA-Z0-9][a-zA-Z0-9.]*(?:\\s*\\|.*?)?\\^%",
 )
 
 private const val CATALOG_ITEM_IMAGES_PREFIX = "images."
