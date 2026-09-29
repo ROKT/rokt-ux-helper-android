@@ -53,6 +53,15 @@ class CatalogImageGalleryComponentTest : BaseDcuiEspressoTest() {
 
     @Test
     @DcuiNodeJson(jsonFile = "CatalogImageGalleryComponent/CatalogImageGallery_with_Images_Indicators.json")
+    @DcuiConfig(testInInnerLayout = true, isDarkModeEnabled = true)
+    @DcuiOfferJson(jsonFile = "offer/Offer_with_catalog_item_images_without_dark_urls.json")
+    fun testCatalogImageGalleryWithoutDarkUrlsDoesNotRenderInDarkMode() {
+        composeTestRule.onNodeWithTag(DCUI_COMPONENT_TAG)
+            .assertDoesNotExist()
+    }
+
+    @Test
+    @DcuiNodeJson(jsonFile = "CatalogImageGalleryComponent/CatalogImageGallery_with_Images_Indicators.json")
     @DcuiConfig(testInInnerLayout = true)
     @DcuiOfferJson(jsonFile = "offer/Offer_with_catalog_item_images.json")
     fun testCatalogImageGallerySideTapMovesForward() {

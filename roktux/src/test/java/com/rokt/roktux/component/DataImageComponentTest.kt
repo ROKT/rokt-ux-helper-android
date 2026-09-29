@@ -43,6 +43,33 @@ class DataImageComponentTest : BaseDcuiEspressoTest() {
     }
 
     @Test
+    @DcuiNodeJson(jsonFile = "DataImageComponent/DataImage_with_ValidImageKey.json")
+    @DcuiConfig(testInInnerLayout = true, isDarkModeEnabled = true)
+    @DcuiOfferJson(jsonFile = "offer/Offer_with_valid_key_without_dark_url.json")
+    fun testDataImageComponentWithoutDarkUrlDoesNotRenderInDarkMode() {
+        composeTestRule.onNodeWithTag(DCUI_COMPONENT_TAG)
+            .assertDoesNotExist()
+    }
+
+    @Test
+    @DcuiNodeJson(jsonFile = "DataImageComponent/DataImage_with_ValidImageKey.json")
+    @DcuiConfig(testInInnerLayout = true)
+    @DcuiOfferJson(jsonFile = "offer/Offer_with_valid_key_without_dark_url.json")
+    fun testDataImageComponentWithoutDarkUrlRendersInLightMode() {
+        composeTestRule.onNodeWithTag(DCUI_COMPONENT_TAG)
+            .assertIsDisplayed()
+    }
+
+    @Test
+    @DcuiNodeJson(jsonFile = "DataImageComponent/DataImage_with_ValidImageKey.json")
+    @DcuiConfig(testInInnerLayout = true, isDarkModeEnabled = true)
+    @DcuiOfferJson(jsonFile = "offer/Offer_with_valid_key_with_dark_url.json")
+    fun testDataImageComponentWithDarkUrlRendersInDarkMode() {
+        composeTestRule.onNodeWithTag(DCUI_COMPONENT_TAG)
+            .assertIsDisplayed()
+    }
+
+    @Test
     @DcuiNodeJson(jsonFile = "DataImageComponent/DataImage_with_FallbackImageKey.json")
     @DcuiConfig(testInInnerLayout = true)
     @DcuiOfferJson(jsonFile = "offer/Offer_with_valid_key.json")
