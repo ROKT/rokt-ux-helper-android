@@ -13,6 +13,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Update Jetpack Compose BOM to 2026.05.01.
 
+## [2.0.5] - 2026-09-29
+
+### Fixed
+
+- Hide data-bound images without a dark variant in dark mode ([#358](https://github.com/ROKT/rokt-ux-helper-android/pull/358))
+- Clamp negative container shadow blurRadius ([#345](https://github.com/ROKT/rokt-ux-helper-android/pull/345))
+- Clamp peek-through size to a valid range ([#343](https://github.com/ROKT/rokt-ux-helper-android/pull/343))
+- Avoid quadratic backtracking in placeholder regex ([#353](https://github.com/ROKT/rokt-ux-helper-android/pull/353))
+- Clamp startPosition to a valid page range ([#352](https://github.com/ROKT/rokt-ux-helper-android/pull/352))
+- Pass release notes to shell via env instead of direct interpolation ([#351](https://github.com/ROKT/rokt-ux-helper-android/pull/351))
+- Avoid invalid font size when scaling relative-size tags ([#350](https://github.com/ROKT/rokt-ux-helper-android/pull/350))
+- Clamp background image scale target to a safe pixel range ([#342](https://github.com/ROKT/rokt-ux-helper-android/pull/342))
+- Coerce transition durations to non-negative values ([#344](https://github.com/ROKT/rokt-ux-helper-android/pull/344))
+- Treat malformed lineHeight as unspecified ([#346](https://github.com/ROKT/rokt-ux-helper-android/pull/346))
+- Guard invalid flexChild weight before applying layout weight ([#347](https://github.com/ROKT/rokt-ux-helper-android/pull/347))
+- Guard Position/Progression predicates against malformed values ([#348](https://github.com/ROKT/rokt-ux-helper-android/pull/348))
+- Guard progress indicator animation against negative duration ([#349](https://github.com/ROKT/rokt-ux-helper-android/pull/349))
+- Clamp breakpoint index to avoid out-of-range list access ([#341](https://github.com/ROKT/rokt-ux-helper-android/pull/341))
+
+### Changed
+
+- Bump codecov/codecov-action from 7.1.0 to 7.1.1 ([#355](https://github.com/ROKT/rokt-ux-helper-android/pull/355))
+
 ## [2.0.4] - 2026-09-24
 
 ### Fixed
@@ -302,7 +325,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Initial implementation of UX Helper
 
-[unreleased]: https://github.com/ROKT/rokt-ux-helper-android/compare/2.0.4...HEAD
+[unreleased]: https://github.com/ROKT/rokt-ux-helper-android/compare/2.0.5...HEAD
+[2.0.5]: https://github.com/ROKT/rokt-ux-helper-android/compare/2.0.4...2.0.5
 [2.0.4]: https://github.com/ROKT/rokt-ux-helper-android/compare/2.0.3...2.0.4
 [2.0.3]: https://github.com/ROKT/rokt-ux-helper-android/compare/2.0.2...2.0.3
 [2.0.2]: https://github.com/ROKT/rokt-ux-helper-android/compare/2.0.1...2.0.2
