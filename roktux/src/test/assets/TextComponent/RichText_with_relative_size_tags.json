@@ -1,0 +1,19 @@
+{
+  "type": "RichText",
+  "node": {
+    "value": "Try <big>big</big>, <small>small</small> and <h1>heading</h1> sizing",
+    "styles": {
+      "elements": {
+        "own": [
+          {
+            "default": {
+              "text": {
+                "fontSize": 16
+              }
+            }
+          }
+        ]
+      }
+    }
+  }
+}
