@@ -163,7 +163,8 @@ internal fun transformDataImage(
         ),
         conditionalTransitionModifiers = conditionalStyleTransition,
         lightUrl = boundModel?.properties?.get<String>(TypedKey<String>(KEY_LIGHT)).orEmpty(),
-        darkUrl = boundModel?.properties?.get<String>(TypedKey<String>(KEY_DARK)),
+        // A creative image without a dark variant is hidden in dark mode rather than showing the light variant.
+        darkUrl = boundModel?.properties?.get<String>(TypedKey<String>(KEY_DARK)).orEmpty(),
         title = boundModel?.properties?.get<String>(TypedKey<String>(KEY_TITLE)),
         alt = boundModel?.properties?.get<String>(TypedKey<String>(KEY_ALT)),
         scaleType = contentScale,

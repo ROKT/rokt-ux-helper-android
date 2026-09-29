@@ -829,7 +829,8 @@ internal fun transformCatalogImageGallery(
                 containerProperties = null,
                 conditionalTransitionModifiers = null,
                 alt = entry.value.properties.get<String>(TypedKey<String>(KEY_ALT)),
-                darkUrl = entry.value.properties.get<String>(TypedKey<String>(KEY_DARK)),
+                // A catalog image without a dark variant is hidden in dark mode rather than showing the light variant.
+                darkUrl = entry.value.properties.get<String>(TypedKey<String>(KEY_DARK)).orEmpty(),
                 lightUrl = entry.value.properties.get<String>(TypedKey<String>(KEY_LIGHT)).orEmpty(),
                 title = entry.value.properties.get<String>(TypedKey<String>(KEY_TITLE)),
                 scaleType = contentScale,
