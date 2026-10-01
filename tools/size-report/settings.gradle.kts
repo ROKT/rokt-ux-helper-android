@@ -40,5 +40,4 @@ includeBuild(uxHelperRoot) {
 }
 
 rootProject.name = "ux-helper-size-report"
-include(":baseline")
-include(":with-helper")
+include(":app")

@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 #
-# Builds two otherwise-identical release apps and measures the size difference:
-#   - baseline     — a bare Compose app (Activity + Material 3)
-#   - with-helper  — the same app plus roktux, calling RoktLayout
+# Builds two flavors of one release app and measures the size difference:
+#   - baseline    — a bare Compose app (Activity + Material 3)
+#   - withHelper  — the same app plus roktux, calling RoktLayout
 #
 # Both are minified and resource-shrunk by R8, so the delta is what roktux and the
 # dependencies it adds on top of Compose cost a partner app after shrinking.
@@ -33,14 +33,14 @@ while [[ $# -gt 0 ]]; do
 	shift
 done
 
-rm -rf "${SCRIPT_DIR}"/{baseline,with-helper}/build/outputs/apk
+rm -rf "${SCRIPT_DIR}"/app/build/outputs/apk
 
 # Gradle output goes to stderr so stdout stays clean for JSON.
 "${SCRIPT_DIR}/../../gradlew" -p "${SCRIPT_DIR}" -PuxHelperRoot="${ROOT}" \
-	:baseline:assembleRelease :with-helper:assembleRelease --quiet >&2
+	:app:assembleBaselineRelease :app:assembleWithHelperRelease --quiet >&2
 
 apk_path() {
-	echo "${SCRIPT_DIR}/$1/build/outputs/apk/release/$1-release.apk"
+	echo "${SCRIPT_DIR}/app/build/outputs/apk/$1/release/app-$1-release.apk"
 }
 
 file_size_bytes() {
@@ -53,7 +53,7 @@ dex_size_bytes() {
 }
 
 BASELINE_APK="$(apk_path baseline)"
-WITH_HELPER_APK="$(apk_path with-helper)"
+WITH_HELPER_APK="$(apk_path withHelper)"
 
 BASELINE_APK_BYTES=$(file_size_bytes "${BASELINE_APK}")
 BASELINE_DEX_BYTES=$(dex_size_bytes "${BASELINE_APK}")

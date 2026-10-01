@@ -4,12 +4,19 @@ plugins {
 }
 
 android {
-    namespace = "com.rokt.sizereport.baseline"
+    namespace = "com.rokt.sizereport"
 
     defaultConfig {
-        applicationId = "com.rokt.sizereport.baseline"
+        applicationId = "com.rokt.sizereport"
         versionCode = 1
         versionName = "1.0"
+    }
+
+    // Two flavors of one app, differing only in whether they depend on roktux.
+    flavorDimensions += "sizevariant"
+    productFlavors {
+        create("baseline") { dimension = "sizevariant" }
+        create("withHelper") { dimension = "sizevariant" }
     }
 
     buildTypes {
@@ -27,7 +34,7 @@ android {
 }
 
 dependencies {
-
+    "withHelperImplementation"("com.rokt:roktux")
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.compose.material3)
 }

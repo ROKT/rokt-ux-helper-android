@@ -6,9 +6,9 @@ partners deciding to adopt the SDK.
 
 ## How it works
 
-1. `measure_size.sh` builds two release apps from this standalone Gradle build:
+1. `measure_size.sh` builds two release flavors of one app in this standalone Gradle build:
     - **baseline** — a Compose activity showing a `Text`, with no Rokt dependency.
-    - **with-helper** — the same app plus `roktux`, calling `RoktLayout` so R8 keeps
+    - **withHelper** — the same app plus `roktux`, calling `RoktLayout` so R8 keeps
       the rendering pipeline. `roktux` comes from the checkout passed as `--root`
       through a composite build, so local source changes are measured directly.
 2. Both apps are minified and resource-shrunk by R8. The script reports the APK size
