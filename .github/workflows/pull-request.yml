@@ -61,6 +61,8 @@ jobs:
             roktux/src/test/assets/**
             roktux/src/test/snapshots/**
             .github/workflows/pull-request.yml
+            .github/workflows/ci-size-report.yml
+            tools/size-report/**
             .github/actions/**
 
   lint:
@@ -183,6 +185,15 @@ jobs:
             **/build/reports/roborazzi
             **/build/test-results/roborazzi
           retention-days: 7
+
+  size-report:
+    needs: detect-source-changes
+    if: github.event_name == 'pull_request' && needs.detect-source-changes.outputs.relevant == 'true'
+    name: Size Report
+    uses: ./.github/workflows/ci-size-report.yml
+    permissions:
+      contents: read
+      pull-requests: write
 
   pr-notify:
     # `always()` keeps this job alive when snapshot-test is skipped by the path filter;
