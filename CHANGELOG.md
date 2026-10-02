@@ -13,6 +13,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Update Jetpack Compose BOM to 2026.05.01.
 
+## [2.0.6] - 2026-10-02
+
+### Changed
+
+- Bump gradle/actions/setup-gradle from 6.3.0 to 6.4.0 ([#364](https://github.com/ROKT/rokt-ux-helper-android/pull/364))
+- Bump org.assertj:assertj-core from 3.15.0 to 3.27.7 ([#363](https://github.com/ROKT/rokt-ux-helper-android/pull/363))
+- Upgrade trunk ([#360](https://github.com/ROKT/rokt-ux-helper-android/pull/360))
+- Post roktux size impact on pull requests ([#361](https://github.com/ROKT/rokt-ux-helper-android/pull/361))
+
 ## [2.0.5] - 2026-09-29
 
 ### Fixed
@@ -325,7 +334,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Initial implementation of UX Helper
 
-[unreleased]: https://github.com/ROKT/rokt-ux-helper-android/compare/2.0.5...HEAD
+[unreleased]: https://github.com/ROKT/rokt-ux-helper-android/compare/2.0.6...HEAD
+[2.0.6]: https://github.com/ROKT/rokt-ux-helper-android/compare/2.0.5...2.0.6
 [2.0.5]: https://github.com/ROKT/rokt-ux-helper-android/compare/2.0.4...2.0.5
 [2.0.4]: https://github.com/ROKT/rokt-ux-helper-android/compare/2.0.3...2.0.4
 [2.0.3]: https://github.com/ROKT/rokt-ux-helper-android/compare/2.0.2...2.0.3
