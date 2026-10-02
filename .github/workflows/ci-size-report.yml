@@ -1,0 +1,101 @@
+name: CI – Size Report
+
+on:
+  workflow_call:
+
+concurrency:
+  group: size-report-${{ github.event.pull_request.number || github.run_id }}
+  cancel-in-progress: true
+
+permissions: {}
+
+env:
+  COMMENT_IDENTIFIER: <!-- ux-helper-size-report -->
+
+jobs:
+  # Builds the PR's code, so it gets a read-only token. Posting happens in `comment`.
+  measure-size:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout PR branch
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          path: pr-branch
+
+      - name: Checkout target branch
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          ref: ${{ github.event.pull_request.base.sha || 'main' }}
+          path: base-branch
+
+      - name: Setup JDK
+        uses: ./pr-branch/.github/actions/setup-java
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@9c971963bec38e04b3d30dcc455b5382be2fdbfb # v6.3.0
+        with:
+          cache-provider: basic
+
+      # Both branches are measured with the PR's tooling, so the target branch has a
+      # number before this tooling merges and a change to the test apps is not a delta.
+      # A failed build degrades to "N/A" instead of failing the job.
+      - name: Build and measure target branch
+        run: |
+          pr-branch/tools/size-report/measure_size.sh --json --root base-branch > "${RUNNER_TEMP}/base.json" || echo '{}' > "${RUNNER_TEMP}/base.json"
+          cat "${RUNNER_TEMP}/base.json"
+
+      - name: Build and measure PR branch
+        run: |
+          pr-branch/tools/size-report/measure_size.sh --json --root pr-branch > "${RUNNER_TEMP}/pr.json" || echo '{}' > "${RUNNER_TEMP}/pr.json"
+          cat "${RUNNER_TEMP}/pr.json"
+
+      - name: Generate size report
+        env:
+          BASE_REF: ${{ github.base_ref || 'main' }}
+        run: |
+          mkdir -p "${RUNNER_TEMP}/size-report"
+          python3 pr-branch/tools/size-report/report.py "${RUNNER_TEMP}/base.json" "${RUNNER_TEMP}/pr.json" --base-ref "${BASE_REF}" > "${RUNNER_TEMP}/size-report/size-report.md"
+          cat "${RUNNER_TEMP}/size-report/size-report.md" >> "${GITHUB_STEP_SUMMARY}"
+
+      - name: Upload size report artifact
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: size-report
+          path: ${{ runner.temp }}/size-report/size-report.md
+
+  comment:
+    needs: measure-size
+    # Fork PRs get a read-only token, so they keep the report in the job summary only.
+    if: >
+      github.event_name == 'pull_request' &&
+      github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+    steps:
+      - name: Download size report
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: size-report
+          path: ${{ runner.temp }}/size-report
+
+      - name: Find comment
+        uses: peter-evans/find-comment@b30e6a3c0ed37e7c023ccd3f1db5c6c0b0c23aad # v4
+        id: fc
+        with:
+          issue-number: ${{ github.event.pull_request.number }}
+          comment-author: github-actions[bot]
+          body-includes: ${{ env.COMMENT_IDENTIFIER }}
+
+      - name: Create or update PR comment
+        uses: peter-evans/create-or-update-comment@e8674b075228eee787fea43ef493e45ece1004c9 # v5
+        with:
+          comment-id: ${{ steps.fc.outputs.comment-id }}
+          issue-number: ${{ github.event.pull_request.number }}
+          edit-mode: replace
+          body-path: ${{ runner.temp }}/size-report/size-report.md
