@@ -265,7 +265,7 @@ internal fun getOfferImages(inputKey: String = "", offerModel: OfferModel?): Map
     val prefixes = inputKey.split('|').map { it.trim() }.filter(String::isNotEmpty)
     val images = offerModel?.creative?.images ?: return emptyMap()
 
-    return images.mapNotNull { (imageKey, imageValue) ->
+    val numberedImages = images.mapNotNull { (imageKey, imageValue) ->
         val matchingPrefix = prefixes.find { prefix -> imageKey.startsWith(prefix) }
         if (matchingPrefix != null && imageKey.length > matchingPrefix.length) {
             val suffix = imageKey.substring(matchingPrefix.length + 1)
@@ -276,6 +276,10 @@ internal fun getOfferImages(inputKey: String = "", offerModel: OfferModel?): Map
             null
         }
     }.toMap(TreeMap())
+    if (numberedImages.isNotEmpty()) return numberedImages
+
+    // A creative with a single image may carry it only under the exact key, without a number.
+    return prefixes.firstNotNullOfOrNull { images[it] }?.let { mapOf(1 to it) } ?: emptyMap()
 }
 
 internal fun getCatalogItemImages(offerModel: OfferModel?, itemIndex: Int, module: Module): Map<Int, OfferImageModel> {

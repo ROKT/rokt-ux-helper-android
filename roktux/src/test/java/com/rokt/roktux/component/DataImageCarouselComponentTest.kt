@@ -138,6 +138,15 @@ class DataImageCarouselComponentTest : BaseDcuiEspressoTest() {
     }
 
     @Test
+    @DcuiNodeJson(jsonFile = "DataImageCarouselComponent/DataImageCarousel_Basic_Properties.json")
+    @DcuiConfig(testInInnerLayout = true)
+    @DcuiOfferJson(jsonFile = "offer/Offer_with_image_carousel_exact_key_only.json")
+    fun testDataImageCarouselComponentRendersImageUnderExactKeyWhenNoNumberedImages() {
+        composeTestRule.onNodeWithTag(DCUI_COMPONENT_TAG).assertIsDisplayed().assertHeightIsEqualTo(180.dp)
+            .assertWidthIsEqualTo(150.dp).assertBackgroundColor("#d51a1a")
+    }
+
+    @Test
     @DcuiNodeJson(jsonFile = "DataImageCarouselComponent/DataImageCarousel_Negative_Duration.json")
     @DcuiConfig(testInInnerLayout = true)
     @DcuiOfferJson(jsonFile = "offer/Offer_with_image_carousel_key.json")
