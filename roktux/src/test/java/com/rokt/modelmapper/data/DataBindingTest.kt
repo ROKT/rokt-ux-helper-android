@@ -1,5 +1,6 @@
 package com.rokt.modelmapper.data
 
+import com.rokt.modelmapper.hmap.HMap
 import com.rokt.modelmapper.hmap.TypedKey
 import com.rokt.modelmapper.hmap.get
 import com.rokt.modelmapper.testutils.MockkUnitTest
@@ -409,6 +410,43 @@ class DataBindingImplTest : MockkUnitTest() {
 
         // Assert
         assertThat(result.isEmpty(), `is`(true))
+    }
+
+    @Test
+    fun `when getOfferImages finds no numbered images, it should fall back to the image under the exact key`() {
+        // Arrange
+        val image = OfferImageModel(HMap())
+        val offer = offerWithImages("creativeImage.hero" to image)
+
+        // Act
+        val result = getOfferImages("invalidKey|creativeImage.hero", offer)
+
+        // Assert
+        assertThat(result, `is`(mapOf(1 to image)))
+    }
+
+    @Test
+    fun `when getOfferImages finds numbered images, it should ignore the image under the exact key`() {
+        // Arrange
+        val first = OfferImageModel(HMap())
+        val second = OfferImageModel(HMap())
+        val offer = offerWithImages(
+            "creativeImage.hero" to OfferImageModel(HMap()),
+            "creativeImage.hero.2" to second,
+            "creativeImage.hero.1" to first,
+        )
+
+        // Act
+        val result = getOfferImages("creativeImage.hero", offer)
+
+        // Assert
+        assertThat(result, `is`(mapOf(1 to first, 2 to second)))
+    }
+
+    private fun offerWithImages(vararg entries: Pair<String, OfferImageModel>): OfferModel = mockk(relaxed = true) {
+        every { creative } returns mockk(relaxed = true) {
+            every { images } returns persistentMapOf(*entries)
+        }
     }
 
     @Test
