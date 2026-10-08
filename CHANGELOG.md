@@ -13,6 +13,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Update Jetpack Compose BOM to 2026.05.01.
 
+## [2.0.7] - 2026-10-08
+
+### Fixed
+
+- Fall back to the exact image key when a creative has no numbered images ([#366](https://github.com/ROKT/rokt-ux-helper-android/pull/366))
+
 ## [2.0.6] - 2026-10-02
 
 ### Changed
@@ -334,7 +340,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Initial implementation of UX Helper
 
-[unreleased]: https://github.com/ROKT/rokt-ux-helper-android/compare/2.0.6...HEAD
+[unreleased]: https://github.com/ROKT/rokt-ux-helper-android/compare/2.0.7...HEAD
+[2.0.7]: https://github.com/ROKT/rokt-ux-helper-android/compare/2.0.6...2.0.7
 [2.0.6]: https://github.com/ROKT/rokt-ux-helper-android/compare/2.0.5...2.0.6
 [2.0.5]: https://github.com/ROKT/rokt-ux-helper-android/compare/2.0.4...2.0.5
 [2.0.4]: https://github.com/ROKT/rokt-ux-helper-android/compare/2.0.3...2.0.4
