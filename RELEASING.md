@@ -100,25 +100,40 @@ gitGraph
    release such as `1.0.0`, create `maintenance/1.0.x` from the stable release
    tag or release commit.
 2. On the maintenance branch, make or cherry-pick the required changes.
-3. Run "Release – Draft" **with the branch selector set to `maintenance/4.7.x`**
+3. Ask a repository admin to protect `maintenance/4.7.x` with a ruleset and add
+   it to the deployment branches of the `sdk-release-app` and `maven-central`
+   environments (Settings → Environments). Without this, the draft in step 4
+   and the publish in step 6 fail.
+4. Run "Release – Draft" **with the branch selector set to `maintenance/4.7.x`**
    (the "Use workflow from" dropdown). The draft workflow respects the dispatch
    branch and will:
     - Check out, bump, and changelog against `maintenance/4.7.x`.
     - Open a PR targeting `maintenance/4.7.x` (not `main`).
     - Reject `minor` and `major` bumps on maintenance branches.
-4. Approve and merge the resulting `release-prep/...` PR into the maintenance
+5. Approve and merge the resulting `release-prep/...` PR into the maintenance
    branch.
-5. Once merged, `Release – Publish` will run from `maintenance/4.7.x` and:
+6. Once merged, `Release – Publish` will run from `maintenance/4.7.x` and:
     - Upload the build to Maven Central.
     - Create a GitHub release with the relevant build files. Maintenance
       releases are not marked as GitHub "Latest"; only stable releases from
       `main` update the latest release badge.
     - Tag the commit with the version number (e.g. `4.7.2`).
 
+    If step 3 was missed, the publish jobs fail before uploading anything. Once
+    an admin has allowed the branch, re-run the failed jobs of that
+    `Release – Publish` run.
+
 > [!NOTE]
 > `Release – Publish` is triggered by pushes to `main` and `maintenance/*`
 > branches only. Any other branch (e.g. `feat/...`, `chore/...`,
 > `workstation/...`) will not publish.
+>
+> Release secrets are stored in deployment environments, not as repository
+> secrets: the Maven Central signing key and credentials in `maven-central`,
+> and the GitHub App key that opens release and Trunk upgrade PRs in
+> `sdk-release-app`. Only branches in an environment's deployment policy
+> (`main`, plus any maintenance branch an admin has added) can use it; a run
+> from any other branch fails at the job that needs it.
 >
 > Snapshot version logic:
 >

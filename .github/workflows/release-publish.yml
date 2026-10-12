@@ -76,12 +76,23 @@ jobs:
   generate-next-snapshot:
     needs: setup-and-version
     runs-on: ubuntu-latest
+    # The publishing secrets live in this environment, which only allows the
+    # branches in its deployment policy. See RELEASING.md.
+    environment: maven-central
     env:
       ORG_GRADLE_PROJECT_signingInMemoryKey: ${{ secrets.MAVEN_SIGNING_KEY }}
       ORG_GRADLE_PROJECT_signingInMemoryKeyPassword: ${{ secrets.MAVEN_SIGNING_PASSWORD }}
       ORG_GRADLE_PROJECT_mavenCentralUsername: ${{ secrets.SONATYPE_USERNAME }}
       ORG_GRADLE_PROJECT_mavenCentralPassword: ${{ secrets.SONATYPE_PASSWORD }}
     steps:
+      - name: Check publishing secrets are set
+        run: |
+          for name in ORG_GRADLE_PROJECT_signingInMemoryKey ORG_GRADLE_PROJECT_signingInMemoryKeyPassword ORG_GRADLE_PROJECT_mavenCentralUsername ORG_GRADLE_PROJECT_mavenCentralPassword; do
+            if [ -z "${!name}" ]; then
+              echo "::error::$name is empty. Check the secrets of the maven-central environment."
+              exit 1
+            fi
+          done
       - name: Checkout repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -101,12 +112,21 @@ jobs:
     needs: setup-and-version
     if: needs.setup-and-version.outputs.full_release_needed == 'true'
     runs-on: ubuntu-latest
+    environment: maven-central
     env:
       ORG_GRADLE_PROJECT_signingInMemoryKey: ${{ secrets.MAVEN_SIGNING_KEY }}
       ORG_GRADLE_PROJECT_signingInMemoryKeyPassword: ${{ secrets.MAVEN_SIGNING_PASSWORD }}
       ORG_GRADLE_PROJECT_mavenCentralUsername: ${{ secrets.SONATYPE_USERNAME }}
       ORG_GRADLE_PROJECT_mavenCentralPassword: ${{ secrets.SONATYPE_PASSWORD }}
     steps:
+      - name: Check publishing secrets are set
+        run: |
+          for name in ORG_GRADLE_PROJECT_signingInMemoryKey ORG_GRADLE_PROJECT_signingInMemoryKeyPassword ORG_GRADLE_PROJECT_mavenCentralUsername ORG_GRADLE_PROJECT_mavenCentralPassword; do
+            if [ -z "${!name}" ]; then
+              echo "::error::$name is empty. Check the secrets of the maven-central environment."
+              exit 1
+            fi
+          done
       - name: Checkout repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:

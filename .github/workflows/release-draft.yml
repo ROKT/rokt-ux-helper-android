@@ -36,6 +36,9 @@ permissions:
 jobs:
   publish-draft-release:
     runs-on: ubuntu-latest
+    # The GitHub App key that opens the release-prep PR lives in this
+    # environment, which only allows the branches in its deployment policy.
+    environment: sdk-release-app
     steps:
       - name: Validate release branch
         env:
