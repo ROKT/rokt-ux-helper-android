@@ -58,6 +58,8 @@ jobs:
             **/gradle.properties
             **/res/**
             gradle/wrapper/**
+            gradlew
+            gradlew.bat
             roktux/src/test/assets/**
             roktux/src/test/snapshots/**
             .github/workflows/pull-request.yml
