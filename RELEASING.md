@@ -120,6 +120,15 @@ gitGraph
 > `workstation/*` branches only. Any other branch (e.g. `feat/...`,
 > `chore/...`) will not publish.
 >
+> The Maven Central signing key and credentials are stored in the
+> `maven-central` deployment environment, not as repository secrets. Only
+> branches allowed by that environment's deployment policy can publish; a run
+> from any other branch fails at the publish job. Before publishing from a
+> `maintenance/*` or `workstation/*` branch, a repository admin must add that
+> branch to the policy (Settings → Environments → `maven-central`). Make sure
+> the branch is protected by a ruleset first. `Release – Draft` does not use
+> these secrets.
+>
 > Snapshot version logic:
 >
 > - On `maintenance/*` and `workstation/*`, snapshots use a `patch` bump from

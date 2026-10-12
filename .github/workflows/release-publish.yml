@@ -77,6 +77,9 @@ jobs:
   generate-next-snapshot:
     needs: setup-and-version
     runs-on: ubuntu-latest
+    # The publishing secrets live in this environment, which only allows the
+    # branches listed in its deployment policy. See RELEASING.md.
+    environment: maven-central
     env:
       ORG_GRADLE_PROJECT_signingInMemoryKey: ${{ secrets.MAVEN_SIGNING_KEY }}
       ORG_GRADLE_PROJECT_signingInMemoryKeyPassword: ${{ secrets.MAVEN_SIGNING_PASSWORD }}
@@ -102,6 +105,7 @@ jobs:
     needs: setup-and-version
     if: needs.setup-and-version.outputs.full_release_needed == 'true'
     runs-on: ubuntu-latest
+    environment: maven-central
     env:
       ORG_GRADLE_PROJECT_signingInMemoryKey: ${{ secrets.MAVEN_SIGNING_KEY }}
       ORG_GRADLE_PROJECT_signingInMemoryKeyPassword: ${{ secrets.MAVEN_SIGNING_PASSWORD }}
