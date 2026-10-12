@@ -13,6 +13,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Update Jetpack Compose BOM to 2026.05.01.
 
+## [2.0.8] - 2026-10-12
+
+### Changed
+
+- Keep release secrets in deployment environments ([#374](https://github.com/ROKT/rokt-ux-helper-android/pull/374))
+- Pin the Trunk plugin to a fixed commit ([#372](https://github.com/ROKT/rokt-ux-helper-android/pull/372))
+- Run the Gradle jobs when gradlew or gradlew.bat change ([#371](https://github.com/ROKT/rokt-ux-helper-android/pull/371))
+- Run release workflows from main and maintenance branches only ([#370](https://github.com/ROKT/rokt-ux-helper-android/pull/370))
+
 ## [2.0.7] - 2026-10-08
 
 ### Fixed
@@ -340,7 +349,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Initial implementation of UX Helper
 
-[unreleased]: https://github.com/ROKT/rokt-ux-helper-android/compare/2.0.7...HEAD
+[unreleased]: https://github.com/ROKT/rokt-ux-helper-android/compare/2.0.8...HEAD
+[2.0.8]: https://github.com/ROKT/rokt-ux-helper-android/compare/2.0.7...2.0.8
 [2.0.7]: https://github.com/ROKT/rokt-ux-helper-android/compare/2.0.6...2.0.7
 [2.0.6]: https://github.com/ROKT/rokt-ux-helper-android/compare/2.0.5...2.0.6
 [2.0.5]: https://github.com/ROKT/rokt-ux-helper-android/compare/2.0.4...2.0.5
