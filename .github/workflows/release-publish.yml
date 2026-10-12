@@ -5,7 +5,6 @@ on:
     branches:
       - main
       - maintenance/*
-      - workstation/*
 
 permissions:
   contents: write
@@ -46,7 +45,7 @@ jobs:
         env:
           BRANCH: ${{ github.ref_name }}
         run: |
-          if [[ "$BRANCH" == maintenance/* || "$BRANCH" == workstation/* ]]; then
+          if [[ "$BRANCH" == maintenance/* ]]; then
             echo "level=patch" >> $GITHUB_OUTPUT
           else
             echo "level=minor" >> $GITHUB_OUTPUT
