@@ -36,29 +36,24 @@ permissions:
 jobs:
   publish-draft-release:
     runs-on: ubuntu-latest
-    env:
-      ORG_GRADLE_PROJECT_signingInMemoryKey: ${{ secrets.MAVEN_SIGNING_KEY }}
-      ORG_GRADLE_PROJECT_signingInMemoryKeyPassword: ${{ secrets.MAVEN_SIGNING_PASSWORD }}
-      ORG_GRADLE_PROJECT_mavenCentralUsername: ${{ secrets.SONATYPE_USERNAME }}
-      ORG_GRADLE_PROJECT_mavenCentralPassword: ${{ secrets.SONATYPE_PASSWORD }}
     steps:
       - name: Validate release branch
         env:
           BUMP_TYPE: ${{ github.event.inputs.bump-type }}
         run: |
-          release_branch="${GITHUB_REF_NAME}"
+          release_ref="${GITHUB_REF}"
           bump_type="${BUMP_TYPE}"
 
-          case "$release_branch" in
-            main|maintenance/*|workstation/*)
+          case "$release_ref" in
+            refs/heads/main|refs/heads/maintenance/*)
               ;;
             *)
-              echo "::error::Release drafts can only run from main, maintenance/*, or workstation/* branches."
+              echo "::error::Release drafts can only run from the main or maintenance/* branches."
               exit 1
               ;;
           esac
 
-          if [[ "$release_branch" == maintenance/* && "$bump_type" != "patch" && "$bump_type" != "none" ]]; then
+          if [[ "$release_ref" == refs/heads/maintenance/* && "$bump_type" != "patch" && "$bump_type" != "none" ]]; then
             echo "::error::Maintenance branch releases must use a patch bump, or none when finalising an existing pre-release."
             exit 1
           fi
@@ -66,7 +61,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          ref: ${{ github.ref_name }}
+          persist-credentials: false
           fetch-depth: 0
       - name: Setup JDK
         uses: ./.github/actions/setup-java

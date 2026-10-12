@@ -116,14 +116,14 @@ gitGraph
     - Tag the commit with the version number (e.g. `4.7.2`).
 
 > [!NOTE]
-> `Release – Publish` is triggered by pushes to `main`, `maintenance/*`, and
-> `workstation/*` branches only. Any other branch (e.g. `feat/...`,
-> `chore/...`) will not publish.
+> `Release – Publish` is triggered by pushes to `main` and `maintenance/*`
+> branches only. Any other branch (e.g. `feat/...`, `chore/...`,
+> `workstation/...`) will not publish.
 >
 > Snapshot version logic:
 >
-> - On `maintenance/*` and `workstation/*`, snapshots use a `patch` bump from
->   the current `VERSION` (so `maintenance/4.7.x` at VERSION `4.7.1` produces
+> - On `maintenance/*`, snapshots use a `patch` bump from the current
+>   `VERSION` (so `maintenance/4.7.x` at VERSION `4.7.1` produces
 >   `4.7.2-SNAPSHOT`).
 > - On `main`, snapshots use a `minor` bump (VERSION `4.7.1` → `4.8.0-SNAPSHOT`).
 > - If `VERSION` is already a pre-release (e.g. `1.0.0-rc1`), snapshots track
@@ -131,5 +131,6 @@ gitGraph
 >
 > The PR branch created by `Release – Draft` is named `release-prep/<version>`
 > so it does not collide with workstation or release branches.
-> `Release – Draft` can only run from `main`, `maintenance/*`, or
-> `workstation/*` branches.
+> `Release – Draft` can only run from `main` or `maintenance/*` branches. It
+> builds to Maven local without the signing key or the Sonatype credential; the
+> signed release comes from `Release – Publish`.
