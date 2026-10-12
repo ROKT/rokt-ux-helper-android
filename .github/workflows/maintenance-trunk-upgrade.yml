@@ -13,6 +13,7 @@ permissions:
 jobs:
   generate-and-call-upgrade:
     runs-on: ubuntu-latest
+    environment: sdk-release-app
     outputs:
       generated-token: ${{ steps.generate-token.outputs.token }}
     steps:
