@@ -13,7 +13,7 @@ cli:
 plugins:
   sources:
     - id: rokt-trunk-plugin
-      ref: main
+      ref: 1859338d7c2c2b873233505c751acbf09fb218d5 # main
       uri: https://github.com/ROKT/rokt-workflows
     - id: trunk
       ref: v1.11.0
