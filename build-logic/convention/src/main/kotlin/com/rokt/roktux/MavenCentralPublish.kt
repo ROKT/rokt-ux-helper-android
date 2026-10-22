@@ -2,7 +2,6 @@ package com.rokt.roktux
 
 import com.rokt.roktux.publish.RoktMavenPublishExtension
 import com.vanniktech.maven.publish.MavenPublishBaseExtension
-import com.vanniktech.maven.publish.SonatypeHost
 import org.gradle.api.Project
 import org.gradle.api.publish.maven.tasks.PublishToMavenLocal
 
@@ -14,7 +13,7 @@ fun Project.configureMavenPublishing(roktMavenPublish: RoktMavenPublishExtension
 
     extensions.configure<MavenPublishBaseExtension>("mavenPublishing") {
         afterEvaluate {
-            publishToMavenCentral(SonatypeHost.CENTRAL_PORTAL)
+            publishToMavenCentral()
             coordinates(
                 artifactId = roktMavenPublish.artifactId.get(),
                 groupId = roktMavenPublish.groupId.get(),
