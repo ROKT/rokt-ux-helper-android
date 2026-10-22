@@ -40,6 +40,10 @@ import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
 
 private const val paddingArraySize: Int = 4
+private const val MAX_SHADOW_BLUR_RADIUS_DP = 1000f
+private const val MAX_BLUR_RADIUS_DP = 100f
+private const val MAX_SPACING_DP = 1000
+private const val MAX_GAP_DP = 1000f
 private const val offsetArraySize: Int = 2
 private const val top = 0
 private const val end = 1
@@ -117,7 +121,10 @@ internal fun transformModifier(
     rotateZ = dimensionProperties?.rotateZ,
     shadowColor = containerProperties?.shadow?.color?.let { ThemeColorUiModel(it.light, it.dark) },
     shadowOffset = containerProperties?.shadow?.let { DpOffset(it.offsetX?.dp ?: 0.dp, it.offsetY?.dp ?: 0.dp) },
-    shadowBlurRadius = containerProperties?.shadow?.blurRadius?.coerceAtLeast(0f)?.dp,
+    shadowBlurRadius = containerProperties?.shadow?.blurRadius
+        ?.takeIf { it.isFinite() }
+        ?.coerceIn(0f, MAX_SHADOW_BLUR_RADIUS_DP)
+        ?.dp,
     shadowSpreadRadius = containerProperties?.shadow?.spreadRadius,
     borderColor = borderProperties?.borderColor?.let { ThemeColorUiModel(it.light, it.dark) },
     borderRadius = borderProperties?.borderRadius?.dp,
@@ -130,7 +137,7 @@ internal fun transformModifier(
         BorderStyleUiModel.Solid
     },
     borderUseTopCornerRadius = false,
-    blurRadius = containerProperties?.blur,
+    blurRadius = transformBlur(containerProperties?.blur),
     backgroundColor = backgroundProperties?.backgroundColor?.let { ThemeColorUiModel(it.light, it.dark) },
     backgroundImage = transformBackgroundImage(backgroundProperties?.backgroundImage),
 )
@@ -228,7 +235,7 @@ private fun transformContainerProperties(
     weight = transformWeight(flexChildProperties?.weight),
     arrangementUiModel = transformArrangement(containerProperties?.justifyContent),
     alignmentUiModel = transformAlignment(containerProperties?.alignItems),
-    gap = containerProperties?.gap,
+    gap = transformGap(containerProperties?.gap),
     alignSelfVertical = transformSelfAlignment(flexChildProperties?.alignSelf),
     alignSelfHorizontal = transformSelfAlignment(flexChildProperties?.alignSelf),
 )
@@ -236,6 +243,14 @@ private fun transformContainerProperties(
 // A layout weight must be finite and strictly greater than zero, otherwise Modifier.weight
 // throws at composition time. Normalize any other value to null so no weight modifier is applied.
 private fun transformWeight(weight: Float?): Float? = weight?.takeIf { it > 0f && it.isFinite() }
+
+// A container blur must be finite and within [0, MAX_BLUR_RADIUS_DP]. Keep an explicit 0 as 0 so a larger
+// breakpoint can switch a smaller breakpoint's blur off; an unbounded radius makes the blur effect throw.
+private fun transformBlur(blur: Float?): Float? = blur?.takeIf { it.isFinite() }?.coerceIn(0f, MAX_BLUR_RADIUS_DP)
+
+// A gap must be finite and within [0, MAX_GAP_DP]. Compose throws during layout once a measured size grows past
+// its pixel limit, and a negative gap breaks the carousel page width.
+private fun transformGap(gap: Float?): Float? = gap?.takeIf { it.isFinite() }?.coerceIn(0f, MAX_GAP_DP)
 
 private fun transformArrangement(arrangementModel: FlexJustification?) = arrangementModel?.let { arrangement ->
     when (arrangement) {
@@ -290,7 +305,8 @@ private fun transformOffset(offset: String): DpOffset {
 private fun transformPadding(padding: String?): PaddingValues {
     val defaultPadding = PaddingValues(0.dp)
     return padding?.let {
-        val values = splitValues(it, paddingArraySize)
+        // Padding and margin must be within [0, MAX_SPACING_DP], otherwise the layout fails.
+        val values = splitValues(it, paddingArraySize).map { v -> v.coerceIn(0.dp, MAX_SPACING_DP.dp) }
         when (values.size) {
             1 -> PaddingValues(values[top])
             2 -> PaddingValues(values[end], values[top])

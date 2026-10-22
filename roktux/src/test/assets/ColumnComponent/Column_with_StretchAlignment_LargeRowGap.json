@@ -1,0 +1,52 @@
+{
+  "type": "Column",
+  "node": {
+    "styles": {
+      "elements": {
+        "own": [
+          {
+            "default": {
+              "container": {
+                "alignItems": "stretch"
+              }
+            }
+          }
+        ]
+      }
+    },
+    "children": [
+      {
+        "type": "Row",
+        "node": {
+          "styles": {
+            "elements": {
+              "own": [
+                {
+                  "default": {
+                    "container": {
+                      "gap": 300000
+                    }
+                  }
+                }
+              ]
+            }
+          },
+          "children": [
+            {
+              "type": "BasicText",
+              "node": {
+                "value": "Child1"
+              }
+            },
+            {
+              "type": "BasicText",
+              "node": {
+                "value": "Child2"
+              }
+            }
+          ]
+        }
+      }
+    ]
+  }
+}
