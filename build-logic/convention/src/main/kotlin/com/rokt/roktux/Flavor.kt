@@ -10,7 +10,7 @@ enum class FlavorDimension {
     RoktEnvironment,
     ;
 
-    override fun toString(): String = super.toString().toLowerCase(Locale.ENGLISH)
+    override fun toString(): String = super.toString().lowercase(Locale.ENGLISH)
 }
 
 enum class Flavor(val dimension: FlavorDimension, val applicationIdSuffix: String? = null) {
@@ -18,7 +18,7 @@ enum class Flavor(val dimension: FlavorDimension, val applicationIdSuffix: Strin
     Dev(FlavorDimension.RoktEnvironment, ".prod"),
     ;
 
-    override fun toString(): String = super.toString().toLowerCase(Locale.ENGLISH)
+    override fun toString(): String = super.toString().lowercase(Locale.ENGLISH)
 }
 
 data class BuildConfigs(val versionName: String, val dcuiVersion: String)

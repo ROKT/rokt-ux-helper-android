@@ -23,8 +23,8 @@ fun Project.configureAndroidCompose(commonExtension: CommonExtension<*, *, *, *,
         }
 
         tasks.withType<KotlinCompile>().configureEach {
-            kotlinOptions {
-                freeCompilerArgs = freeCompilerArgs + buildComposeMetricsParameters()
+            compilerOptions {
+                freeCompilerArgs.addAll(buildComposeMetricsParameters())
             }
         }
     }
