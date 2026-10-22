@@ -494,6 +494,60 @@ class DataBindingImplTest : MockkUnitTest() {
         assertTrue(value is BindData.Value && (value as BindData.Value).text == unterminatedToken)
     }
 
+    @Test(timeout = 2000)
+    fun `when bind value is called with many unterminated data tokens, it should complete quickly and leave the text unchanged`() {
+        // Arrange - every token opens a fallback but none closes it, so each opener used to scan
+        // the rest of the text for a terminator that never comes.
+        val text = "%^DATA.a|".repeat(50_000)
+
+        // Act
+        val result = dataBinding.bindValue(text, offerModel = offer)
+
+        // Assert
+        assertEquals(BindData.Value(text), result)
+    }
+
+    @Test(timeout = 2000)
+    fun `when bind value is called with many unterminated state tokens, it should complete quickly and leave the text unchanged`() {
+        // Arrange - same shape as above for the STATE namespace, which the anchored isStateTemplate
+        // regex also checks.
+        val text = "%^STATE.a|".repeat(50_000)
+
+        // Act
+        val result = dataBinding.bindValue(text, offerModel = offer)
+
+        // Assert
+        assertEquals(BindData.Value(text), result)
+    }
+
+    @Test
+    fun `when bind value is called with a missing key and fallback text, it should bind to the fallback text`() {
+        // Act
+        val result = dataBinding.bindValue("%^DATA.missing|fallback^%", offerModel = offer)
+
+        // Assert
+        assertEquals(BindData.Value("fallback"), result)
+    }
+
+    @Test
+    fun `when bind value is called with fallback text that contains a caret, it should leave the text unchanged`() {
+        // Act
+        val result = dataBinding.bindValue("%^DATA.x|a^b^%", offerModel = offer)
+
+        // Assert - fallback text ends at the next caret, so this token is not a placeholder.
+        assertEquals(BindData.Value("%^DATA.x|a^b^%"), result)
+    }
+
+    @Test
+    fun `when bind value is called with an unterminated token before a valid token, it should still bind the valid token`() {
+        // Act
+        val result = dataBinding.bindValue("%^DATA.a|%^DATA.missing|ok^%", offerModel = offer)
+
+        // Assert - the unterminated token stays as text and does not swallow the token after it,
+        // which resolves to its fallback.
+        assertEquals(BindData.Value("%^DATA.a|ok"), result)
+    }
+
     @Test
     @Parameters(method = "getDataBindingParameters")
     fun testDataValueBinding(input: String, output: String, contextKey: String?, clazz: Class<*>, itemIndex: Int = 0) {

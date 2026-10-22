@@ -308,9 +308,15 @@ private val isDataTemplate = Regex("^${TemplateDataPrefix.DATA}")
 // `[a-zA-Z0-9]+[a-zA-Z0-9.]*` loops) so an unterminated token can't force the regex engine to
 // backtrack through every possible split between two quantifiers that accept overlapping
 // character sets, which made matching take quadratic time on long, unterminated input.
-private val isStateTemplate = Regex("%\\^(${TemplateDataPrefix.STATE})\\.[a-zA-Z0-9][a-zA-Z0-9.]*(?:\\|.*?)?\\^%")
+// The fallback stops at the next caret, so each token's scan ends at its own terminator or the next token.
+// Its class excludes the same line terminators that `.` excludes on Android, so keep that list as is.
+private val isStateTemplate = Regex(
+    "%\\^(${TemplateDataPrefix.STATE})\\.[a-zA-Z0-9][a-zA-Z0-9.]*" +
+        "(?:\\|[^\\^\\r\\n\\u000B\\u000C\\u0085\\u2028\\u2029]*)?\\^%",
+)
 private val templatePattern = Regex(
-    "%\\^(?:${TemplateDataPrefix.DATA}|${TemplateDataPrefix.STATE})\\.[a-zA-Z0-9][a-zA-Z0-9.]*(?:\\s*\\|.*?)?\\^%",
+    "%\\^(?:${TemplateDataPrefix.DATA}|${TemplateDataPrefix.STATE})\\.[a-zA-Z0-9][a-zA-Z0-9.]*" +
+        "(?:\\s*\\|[^\\^\\r\\n\\u000B\\u000C\\u0085\\u2028\\u2029]*)?\\^%",
 )
 
 private const val CATALOG_ITEM_IMAGES_PREFIX = "images."
