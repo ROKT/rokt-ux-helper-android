@@ -1,0 +1,19 @@
+{
+  "type": "BasicText",
+  "node": {
+    "value": "Hello",
+    "styles": {
+      "elements": {
+        "own": [
+          {
+            "default": {
+              "text": {
+                "lineLimit": 0
+              }
+            }
+          }
+        ]
+      }
+    }
+  }
+}

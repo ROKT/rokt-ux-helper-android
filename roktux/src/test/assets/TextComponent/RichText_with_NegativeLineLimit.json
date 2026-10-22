@@ -1,0 +1,19 @@
+{
+  "type": "RichText",
+  "node": {
+    "value": "Hello",
+    "styles": {
+      "elements": {
+        "own": [
+          {
+            "default": {
+              "text": {
+                "lineLimit": -1
+              }
+            }
+          }
+        ]
+      }
+    }
+  }
+}

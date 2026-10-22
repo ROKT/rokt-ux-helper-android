@@ -1250,7 +1250,9 @@ internal class ModifierFactory {
             ),
             transformedText,
             stylingUiProperties.textTransform ?: TextUiTransform.None,
-            stylingUiProperties.lineLimit ?: Int.MAX_VALUE,
+            // A line limit must be at least one, otherwise Text throws at composition time.
+            // Treat zero or below as "no limit".
+            stylingUiProperties.lineLimit?.takeIf { it > 0 } ?: Int.MAX_VALUE,
         )
     }
 

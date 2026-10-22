@@ -1,0 +1,38 @@
+{
+  "type": "BasicText",
+  "node": {
+    "value": "Hello",
+    "styles": {
+      "elements": {
+        "own": [
+          {
+            "default": {
+              "text": {
+                "lineLimit": 2
+              }
+            }
+          }
+        ]
+      },
+      "conditionalTransitions": {
+        "predicates": [
+          {
+            "type": "StaticBoolean",
+            "predicate": {
+              "condition": "is-true",
+              "value": true
+            }
+          }
+        ],
+        "duration": 0,
+        "value": {
+          "own": {
+            "text": {
+              "lineLimit": 0
+            }
+          }
+        }
+      }
+    }
+  }
+}

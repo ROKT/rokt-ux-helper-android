@@ -10,6 +10,7 @@ import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.assertWidthIsEqualTo
 import androidx.compose.ui.test.click
 import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.font.FontStyle
@@ -237,6 +238,28 @@ class TextComponentTest : BaseDcuiEspressoTest() {
             .assertIsDisplayed()
             .assertTextEquals("Test")
             .assertLetterSpacing(-2)
+    }
+
+    @Test
+    @DcuiNodeJson(jsonFile = "TextComponent/BasicText_with_ZeroLineLimit.json")
+    fun testBasicTextComponentWithZeroLineLimitRenders() {
+        // A lineLimit of zero is not a valid line count. It should mean "no limit" instead of
+        // being passed through to text layout, which requires a positive maximum line count.
+        composeTestRule.onNodeWithText("Hello").assertIsDisplayed()
+    }
+
+    @Test
+    @DcuiNodeJson(jsonFile = "TextComponent/RichText_with_NegativeLineLimit.json")
+    fun testRichTextComponentWithNegativeLineLimitRenders() {
+        // A negative lineLimit is treated the same as zero: no line limit.
+        composeTestRule.onNodeWithText("Hello").assertIsDisplayed()
+    }
+
+    @Test
+    @DcuiNodeJson(jsonFile = "TextComponent/BasicText_with_ZeroLineLimit_Transition.json")
+    fun testBasicTextComponentWithZeroLineLimitInConditionalTransitionRenders() {
+        // The same value set through a conditional transition is clamped the same way.
+        composeTestRule.onNodeWithText("Hello").assertIsDisplayed()
     }
 
     @Test
