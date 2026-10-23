@@ -1,0 +1,64 @@
+{
+  "type": "Row",
+  "node": {
+    "styles": {
+      "elements": {
+        "own": [
+          {
+            "default": {
+              "dimension": {
+                "width": {
+                  "type": "fixed",
+                  "value": 100
+                }
+              }
+            }
+          }
+        ]
+      }
+    },
+    "children": [
+      {
+        "type": "ProgressIndicator",
+        "node": {
+          "indicator": "%^STATE.IndicatorPosition^%",
+          "accessibilityHidden": false,
+          "styles": {
+            "elements": {
+              "own": [
+                {
+                  "default": {
+                    "container": {
+                      "gap": "4"
+                    }
+                  }
+                }
+              ],
+              "indicator": [
+                {
+                  "default": {
+                    "background": {
+                      "backgroundColor": {
+                        "light": "#CCCCCC"
+                      }
+                    },
+                    "dimension": {
+                      "width": {
+                        "type": "fixed",
+                        "value": 16
+                      },
+                      "height": {
+                        "type": "fixed",
+                        "value": 16
+                      }
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        }
+      }
+    ]
+  }
+}

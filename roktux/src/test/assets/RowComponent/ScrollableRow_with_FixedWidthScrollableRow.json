@@ -1,0 +1,52 @@
+{
+  "type": "ScrollableRow",
+  "node": {
+    "styles": {
+      "elements": {
+        "own": [
+          {
+            "default": {
+              "dimension": {
+                "width": {
+                  "type": "fixed",
+                  "value": 300
+                }
+              }
+            }
+          }
+        ]
+      }
+    },
+    "children": [
+      {
+        "type": "ScrollableRow",
+        "node": {
+          "styles": {
+            "elements": {
+              "own": [
+                {
+                  "default": {
+                    "dimension": {
+                      "width": {
+                        "type": "fixed",
+                        "value": 1000
+                      }
+                    }
+                  }
+                }
+              ]
+            }
+          },
+          "children": [
+            {
+              "type": "BasicText",
+              "node": {
+                "value": "Child1"
+              }
+            }
+          ]
+        }
+      }
+    ]
+  }
+}

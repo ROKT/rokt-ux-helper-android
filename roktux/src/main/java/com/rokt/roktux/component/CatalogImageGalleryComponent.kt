@@ -179,7 +179,7 @@ internal class CatalogImageGalleryComponent(
                             RoktUserInteractionAction.MainImageScrollIconRightClick,
                         )
                     },
-                ),
+                ).boundedWidthWhenUnbounded(),
                 flingBehavior = PagerDefaults.flingBehavior(
                     state = pagerState,
                     snapAnimationSpec = tween(),

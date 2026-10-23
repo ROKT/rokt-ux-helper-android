@@ -37,6 +37,11 @@ internal class RowComponent(private val factory: LayoutUiModelFactory, private v
             isPressed = isPressed,
         )
         var anyStretchChild by remember { mutableStateOf(false) }
+        // A carousel or gallery below cannot report an intrinsic size, so stretch skips intrinsic sizing.
+        val offerLayoutsHostSubcomposition = LocalOfferLayoutsHostSubcomposition.current
+        val canUseIntrinsicSize = remember(model, offerLayoutsHostSubcomposition) {
+            !model.hostsSubcomposition(offerLayoutsHostSubcomposition)
+        }
         Row(
             modifier = modifierFactory
                 .createModifier(
@@ -49,7 +54,9 @@ internal class RowComponent(private val factory: LayoutUiModelFactory, private v
                 )
                 .then(modifier)
                 .then(
-                    if (container.alignmentBias == AlignmentUiModel.Stretch.bias || anyStretchChild) {
+                    if ((container.alignmentBias == AlignmentUiModel.Stretch.bias || anyStretchChild) &&
+                        canUseIntrinsicSize
+                    ) {
                         Modifier.height(IntrinsicSize.Min)
                     } else {
                         Modifier
@@ -57,7 +64,7 @@ internal class RowComponent(private val factory: LayoutUiModelFactory, private v
                 )
                 .then(
                     if (model.isScrollable) {
-                        Modifier.horizontalScroll(rememberScrollState())
+                        Modifier.boundedWidthWhenUnbounded().horizontalScroll(rememberScrollState())
                     } else {
                         Modifier
                     },
@@ -88,12 +95,14 @@ internal class RowComponent(private val factory: LayoutUiModelFactory, private v
                         childContainer.selfAlignmentBias?.let {
                             if (it == AlignmentUiModel.Stretch.bias) {
                                 anyStretchChild = true
-                                childModifier = childModifier.then(Modifier.fillMaxHeight())
+                                if (canUseIntrinsicSize) {
+                                    childModifier = childModifier.then(Modifier.fillMaxHeight())
+                                }
                             } else {
                                 childModifier = childModifier.then(Modifier.align(BiasAlignment.Vertical(it)))
                             }
                         }
-                        if (container.alignmentBias == AlignmentUiModel.Stretch.bias) {
+                        if (container.alignmentBias == AlignmentUiModel.Stretch.bias && canUseIntrinsicSize) {
                             childModifier = childModifier.then(Modifier.fillMaxHeight())
                         }
                     }

@@ -23,6 +23,7 @@ import com.rokt.modelmapper.utils.DEFAULT_VIEWABLE_ITEMS
 import com.rokt.modelmapper.utils.FIRST_OFFER_INDEX
 import com.rokt.modelmapper.utils.roktDateFormat
 import com.rokt.roktux.RoktViewState
+import com.rokt.roktux.component.hostsSubcomposition
 import com.rokt.roktux.event.DevicePayResult
 import com.rokt.roktux.event.EventNameValue
 import com.rokt.roktux.event.EventType
@@ -196,6 +197,12 @@ internal class LayoutViewModel(
                         domainStates = runtimeState.domainStates().toImmutableMap(),
                         offerCustomStates = runtimeState.immutableOfferCustomStates(),
                     ),
+                    // Offer layouts hold no distributions, so they are checked with the flag off.
+                    offerLayoutsHostSubcomposition = pluginModel.slots.any { slot ->
+                        slot.layoutVariant?.layoutVariantSchema?.hostsSubcomposition(
+                            offerLayoutsHostSubcomposition = false,
+                        ) == true
+                    },
                 ),
             )
         } else {

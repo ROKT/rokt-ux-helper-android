@@ -39,6 +39,11 @@ internal class ColumnComponent(
             isPressed = isPressed,
         )
         var anyStretchChild by remember { mutableStateOf(false) }
+        // A carousel or gallery below cannot report an intrinsic size, so stretch skips intrinsic sizing.
+        val offerLayoutsHostSubcomposition = LocalOfferLayoutsHostSubcomposition.current
+        val canUseIntrinsicSize = remember(model, offerLayoutsHostSubcomposition) {
+            !model.hostsSubcomposition(offerLayoutsHostSubcomposition)
+        }
 
         Column(
             modifier = modifierFactory
@@ -52,7 +57,9 @@ internal class ColumnComponent(
                 )
                 .then(modifier)
                 .then(
-                    if (container.alignmentBias == AlignmentUiModel.Stretch.bias || anyStretchChild) {
+                    if ((container.alignmentBias == AlignmentUiModel.Stretch.bias || anyStretchChild) &&
+                        canUseIntrinsicSize
+                    ) {
                         Modifier.width(IntrinsicSize.Min)
                     } else {
                         Modifier
@@ -91,12 +98,14 @@ internal class ColumnComponent(
                         childContainer.selfAlignmentBias?.let {
                             if (it == AlignmentUiModel.Stretch.bias) {
                                 anyStretchChild = true
-                                childModifier = childModifier.then(Modifier.fillMaxWidth())
+                                if (canUseIntrinsicSize) {
+                                    childModifier = childModifier.then(Modifier.fillMaxWidth())
+                                }
                             } else {
                                 childModifier = childModifier.then(Modifier.align(BiasAlignment.Horizontal(it)))
                             }
                         }
-                        if (container.alignmentBias == AlignmentUiModel.Stretch.bias) {
+                        if (container.alignmentBias == AlignmentUiModel.Stretch.bias && canUseIntrinsicSize) {
                             childModifier = childModifier.then(Modifier.fillMaxWidth())
                         }
                     }

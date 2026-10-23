@@ -4,21 +4,29 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.calculateEndPadding
 import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.rokt.core.testutils.annotations.DCUI_COMPONENT_TAG
+import com.rokt.core.testutils.annotations.DcuiNodeJson
 import com.rokt.modelmapper.uimodel.PeekThroughSizeUiModel
+import com.rokt.roktux.testutil.BaseDcuiEspressoTest
 import kotlinx.collections.immutable.persistentListOf
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
-import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
-class CarouselDistributionComponentTest {
-    @get:Rule val composeTestRule = createComposeRule()
+class CarouselDistributionComponentTest : BaseDcuiEspressoTest() {
+
+    @Test
+    @DcuiNodeJson(jsonFile = "CarouselDistributionComponent/ScrollableRow_with_CarouselDistribution.json")
+    fun `carousel renders inside a scrollable row`() {
+        composeTestRule.onNodeWithTag(DCUI_COMPONENT_TAG).assertIsDisplayed()
+    }
 
     @Test
     fun `getPeekThroughDimension clamps negative breakpoint index`() {

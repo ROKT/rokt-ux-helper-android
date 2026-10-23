@@ -1,0 +1,112 @@
+{
+  "session_id": "",
+  "session_token": {
+    "token": "session-token",
+    "expires_at": 0
+  },
+  "page_instance_guid": "",
+  "page_context": {
+    "page_instance_guid": "",
+    "page_id": "",
+    "language": "en",
+    "is_page_detected": true,
+    "page_variant_name": "",
+    "token": ""
+  },
+  "plugins": [
+    {
+      "plugin": {
+        "id": "EmbeddedStretchSiblingAboveOneByOneWithCarousel",
+        "name": "EmbeddedStretchSiblingAboveOneByOneWithCarousel",
+        "target_element_selector": "Location1",
+        "config": {
+          "instance_guid": "EmbeddedStretchSiblingAboveOneByOneWithCarousel-instance",
+          "token": "token",
+          "outer_layout_schema": "{\"layout\":{\"type\":\"Column\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"background\":{\"backgroundColor\":{\"light\":\"#EEEEEE\"}},\"border\":{\"borderColor\":{\"light\":\"#333333\"},\"borderWidth\":\"1\"},\"spacing\":{\"padding\":\"8 8 8 8\"},\"container\":{\"gap\":\"8\"}}}]}},\"children\":[{\"type\":\"BasicText\",\"node\":{\"value\":\"Stretched sibling\",\"styles\":{\"elements\":{\"own\":[{\"default\":{\"text\":{\"fontSize\":14,\"textColor\":{\"light\":\"#FFFFFF\"}},\"background\":{\"backgroundColor\":{\"light\":\"#0066CC\"}},\"flexChild\":{\"alignSelf\":\"stretch\"}}}]}}}},{\"type\":\"OneByOneDistribution\",\"node\":{\"transition\":{\"type\":\"FadeInOut\",\"settings\":{\"duration\":10}}}}]}},\"display\":\"EMBEDDED\",\"settings\":{\"closeOnComplete\":true},\"breakpoints\":{}}",
+          "slots": [
+            {
+              "instance_guid": "slot-1",
+              "token": "token",
+              "layout_variant": {
+                "layout_variant_id": "layout-1",
+                "module_name": "standard-marketing",
+                "layout_variant_schema": "{\"type\":\"Column\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"background\":{\"backgroundColor\":{\"light\":\"#22AA66\"}},\"border\":{\"borderColor\":{\"light\":\"#333333\"},\"borderWidth\":\"1\"},\"container\":{\"gap\":\"8\"}}}]}},\"children\":[{\"type\":\"BasicText\",\"node\":{\"value\":\"Offer with a carousel\",\"styles\":{\"elements\":{\"own\":[{\"default\":{\"text\":{\"fontSize\":14,\"textColor\":{\"light\":\"#FFFFFF\"}},\"background\":{\"backgroundColor\":{\"light\":\"#22AA66\"}}}}]}}}},{\"type\":\"DataImageCarousel\",\"node\":{\"imageKey\":\"creativeCarouselImageVertical\",\"duration\":0,\"styles\":{\"elements\":{\"own\":[{\"default\":{\"background\":{\"backgroundColor\":{\"light\":\"#CC3366\"}},\"dimension\":{\"height\":{\"type\":\"fixed\",\"value\":80}}}}]}}}}]}}"
+              },
+              "offer": {
+                "campaign_id": "campaign-1",
+                "creative": {
+                  "referral_creative_id": "creative-1",
+                  "instance_guid": "creative-guid-1",
+                  "token": "token",
+                  "copy": {
+                    "creative.title": "Offer 1"
+                  },
+                  "images": {
+                    "creativeImage": {
+                      "light": "https://example.com/image.png",
+                      "dark": "",
+                      "alt": "",
+                      "title": ""
+                    },
+                    "creativeCarouselImageVertical.1": {
+                      "light": "https://example.com/image.png",
+                      "dark": "",
+                      "alt": "",
+                      "title": ""
+                    },
+                    "creativeCarouselImageVertical.2": {
+                      "light": "https://example.com/image.png",
+                      "dark": "",
+                      "alt": "",
+                      "title": ""
+                    },
+                    "creativeCarouselImageVertical.3": {
+                      "light": "https://example.com/image.png",
+                      "dark": "",
+                      "alt": "",
+                      "title": ""
+                    }
+                  },
+                  "links": {},
+                  "icons": {},
+                  "response_options_map": {}
+                }
+              }
+            },
+            {
+              "instance_guid": "slot-2",
+              "token": "token",
+              "layout_variant": {
+                "layout_variant_id": "layout-2",
+                "module_name": "standard-marketing",
+                "layout_variant_schema": "{\"type\":\"Column\",\"node\":{\"styles\":{\"elements\":{\"own\":[{\"default\":{\"background\":{\"backgroundColor\":{\"light\":\"#22AA66\"}},\"border\":{\"borderColor\":{\"light\":\"#333333\"},\"borderWidth\":\"1\"},\"container\":{\"gap\":\"8\"},\"dimension\":{\"width\":{\"type\":\"fixed\",\"value\":240}}}}]}},\"children\":[{\"type\":\"BasicText\",\"node\":{\"value\":\"Offer without a carousel\",\"styles\":{\"elements\":{\"own\":[{\"default\":{\"text\":{\"fontSize\":14,\"textColor\":{\"light\":\"#FFFFFF\"}},\"background\":{\"backgroundColor\":{\"light\":\"#22AA66\"}}}}]}}}}]}}"
+              },
+              "offer": {
+                "campaign_id": "campaign-2",
+                "creative": {
+                  "referral_creative_id": "creative-2",
+                  "instance_guid": "creative-guid-2",
+                  "token": "token",
+                  "copy": {
+                    "creative.title": "Offer 2"
+                  },
+                  "images": {
+                    "creativeImage": {
+                      "light": "https://example.com/image.png",
+                      "dark": "",
+                      "alt": "",
+                      "title": ""
+                    }
+                  },
+                  "links": {},
+                  "icons": {},
+                  "response_options_map": {}
+                }
+              }
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

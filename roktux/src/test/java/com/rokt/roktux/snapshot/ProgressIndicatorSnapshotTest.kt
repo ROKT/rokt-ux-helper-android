@@ -61,6 +61,11 @@ class ProgressIndicatorSnapshotTest : BaseDcuiEspressoTest() {
     @DcuiNodeComponentState(currentOffer = 1, totalOffer = 4)
     fun testJustifyContentCenter() = capture()
 
+    @Test
+    @DcuiNodeJson(jsonString = INDICATOR_OVERFLOWING)
+    @DcuiNodeComponentState(currentOffer = 1, totalOffer = 12)
+    fun testIndicatorsOverflowingTheirWidth() = capture()
+
     private fun capture() {
         composeTestRule.onRoot().captureRoboImage(roborazziOptions = snapshotRoborazziOptions)
     }
@@ -132,6 +137,37 @@ class ProgressIndicatorSnapshotTest : BaseDcuiEspressoTest() {
                         "own": [{"default": {
                             "container": {"gap": "10", "justifyContent": "center", "alignItems": "center"},
                             "spacing": {"padding": "8 8 8 8"}
+                        }}],
+                        "indicator": [{"default": {
+                            "background": {"backgroundColor": {"light": "#FFFFFF"}},
+                            "border": {"borderColor": {"light": "#999999"}, "borderWidth": "1", "borderRadius": 12},
+                            "container": {"alignItems": "center", "justifyContent": "center"},
+                            "text": {"fontSize": 12, "textColor": {"light": "#999999"}, "horizontalTextAlign": "center"},
+                            "dimension": {"width": {"type": "fixed", "value": 24}, "height": {"type": "fixed", "value": 24}}
+                        }}],
+                        "activeIndicator": [{"default": {
+                            "background": {"backgroundColor": {"light": "#0066CC"}},
+                            "border": {"borderColor": {"light": "#0066CC"}, "borderWidth": "1", "borderRadius": 12},
+                            "container": {"alignItems": "center", "justifyContent": "center"},
+                            "text": {"fontSize": 12, "textColor": {"light": "#FFFFFF"}, "horizontalTextAlign": "center", "fontWeight": "700"},
+                            "dimension": {"width": {"type": "fixed", "value": 24}, "height": {"type": "fixed", "value": 24}}
+                        }}]
+                    }
+                }
+            }
+        }"""
+
+        // Twelve 24dp indicators need more than 200dp, so the ones past the edge keep their size and are clipped.
+        const val INDICATOR_OVERFLOWING = """{
+            "type": "ProgressIndicator",
+            "node": {
+                "indicator": "%^STATE.IndicatorPosition^%",
+                "styles": {
+                    "elements": {
+                        "own": [{"default": {
+                            "container": {"gap": "8", "justifyContent": "flex-start", "alignItems": "center"},
+                            "dimension": {"width": {"type": "fixed", "value": 200}, "height": {"type": "fixed", "value": 40}},
+                            "background": {"backgroundColor": {"light": "#EEEEEE"}}
                         }}],
                         "indicator": [{"default": {
                             "background": {"backgroundColor": {"light": "#FFFFFF"}},
