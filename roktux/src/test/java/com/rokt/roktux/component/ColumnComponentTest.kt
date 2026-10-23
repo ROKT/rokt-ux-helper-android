@@ -5,6 +5,10 @@ import androidx.compose.ui.test.assertHeightIsEqualTo
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertWidthIsEqualTo
 import androidx.compose.ui.test.getUnclippedBoundsInRoot
+import androidx.compose.ui.test.hasAnyAncestor
+import androidx.compose.ui.test.hasScrollAction
+import androidx.compose.ui.test.hasTestTag
+import androidx.compose.ui.test.junit4.AndroidComposeTestRule
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
@@ -35,6 +39,7 @@ import org.junit.Assert.assertNotEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.robolectric.annotation.Config
 
 @RunWith(AndroidJUnit4::class)
 class ColumnComponentTest : BaseDcuiEspressoTest() {
@@ -330,6 +335,63 @@ class ColumnComponentTest : BaseDcuiEspressoTest() {
     fun testRowComponentGapProperty() {
         composeTestRule.onNodeWithTag(DCUI_COMPONENT_TAG).assertIsDisplayed()
             .assertHeightIsEqualTo(80.dp)
+    }
+
+    @Test
+    @DcuiNodeJson(jsonFile = "ColumnComponent/ScrollableColumn_with_ScrollableColumn.json")
+    fun testScrollableColumnComponentRendersNestedScrollableColumn() {
+        composeTestRule.onNodeWithTag(DCUI_COMPONENT_TAG).assertIsDisplayed()
+        composeTestRule.onNodeWithText("Child1").assertIsDisplayed()
+        // The child is taller than the window, so the inner column takes the window height, which the code reads
+        // from LocalWindowInfo.containerSize. That size comes from the activity's current window metrics.
+        val windowHeightPx = (composeTestRule as AndroidComposeTestRule<*, *>).activity
+            .windowManager.currentWindowMetrics.bounds.height()
+        val innerHeightPx = composeTestRule
+            .onNode(hasScrollAction() and hasAnyAncestor(hasTestTag(DCUI_COMPONENT_TAG)))
+            .fetchSemanticsNode().size.height
+        assertEquals(windowHeightPx, innerHeightPx)
+    }
+
+    @Test
+    @DcuiNodeJson(jsonFile = "ColumnComponent/ScrollableColumn_with_FixedHeightScrollableColumn.json")
+    fun testScrollableColumnComponentKeepsChildFixedHeightTallerThanWindow() {
+        composeTestRule.onNode(hasScrollAction() and hasAnyAncestor(hasTestTag(DCUI_COMPONENT_TAG)))
+            .assertHeightIsEqualTo(1000.dp)
+    }
+
+    @Test
+    @DcuiNodeJson(jsonFile = "ColumnComponent/ScrollableColumn_with_Column_ScrollableColumn.json")
+    fun testScrollableColumnComponentRendersScrollableColumnInsideColumn() {
+        composeTestRule.onNodeWithTag(DCUI_COMPONENT_TAG).assertIsDisplayed()
+        composeTestRule.onNodeWithText("Child1").assertIsDisplayed()
+    }
+
+    @Test
+    @DcuiNodeJson(jsonFile = "ColumnComponent/Column_with_OversizedFixedDimensionChild.json")
+    fun testColumnComponentRendersChildWithOversizedFixedDimension() {
+        composeTestRule.onNodeWithTag(DCUI_COMPONENT_TAG).assertIsDisplayed()
+        val columnWidth = composeTestRule.onNodeWithTag(DCUI_COMPONENT_TAG).getUnclippedBoundsInRoot().width
+        val textWidth = composeTestRule.onNodeWithText("Child1").getUnclippedBoundsInRoot().width
+        assertTrue("text width $textWidth should be at most column width $columnWidth", textWidth <= columnWidth)
+    }
+
+    @Test
+    @Config(qualifiers = "xxxhdpi")
+    @DcuiNodeJson(jsonFile = "ColumnComponent/ScrollableColumn_with_ScrollableRow_OversizedFixedDimensionChild.json")
+    fun testScrollableColumnComponentRendersChildWithOversizedFixedDimensionInScrollableRow() {
+        composeTestRule.onNodeWithTag(DCUI_COMPONENT_TAG).assertIsDisplayed()
+    }
+
+    @Test
+    @DcuiNodeJson(jsonFile = "ColumnComponent/ScrollableColumn_with_OversizedMinHeightChild.json")
+    fun testScrollableColumnComponentRendersChildWithOversizedMinHeight() {
+        composeTestRule.onNodeWithTag(DCUI_COMPONENT_TAG).assertIsDisplayed()
+    }
+
+    @Test
+    @DcuiNodeJson(jsonFile = "ColumnComponent/ScrollableColumn_with_OversizedMaxDimensionChild.json")
+    fun testScrollableColumnComponentRendersChildWithOversizedMaxDimensions() {
+        composeTestRule.onNodeWithTag(DCUI_COMPONENT_TAG).assertIsDisplayed()
     }
 
     // Renders a full experience through RoktLayout, so the outer layout's slots are mapped and provided.
