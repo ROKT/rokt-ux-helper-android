@@ -1,7 +1,9 @@
 package com.rokt.roktux.snapshot
 
+import androidx.compose.ui.test.onRoot
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.takahirom.roborazzi.ExperimentalRoborazziApi
+import com.github.takahirom.roborazzi.captureRoboImage
 import com.github.takahirom.roborazzi.captureScreenRoboImage
 import kotlinx.coroutines.test.runTest
 import org.junit.Test
@@ -44,5 +46,15 @@ class EmbeddedSnapshotTest : RoktLayoutSnapshotTest() {
         composeTestRule.waitForIdle()
 
         captureScreenRoboImage(roborazziOptions = snapshotRoborazziOptions)
+    }
+
+    @OptIn(ExperimentalRoborazziApi::class)
+    @Test
+    fun testEmbeddedStretchedSiblingFillsWidthAboveOneByOne() = runTest(testDispatcher) {
+        renderLayout("EmbeddedStretchSiblingAboveOneByOne.json")
+        composeTestRule.waitForIdle()
+
+        // Captures the Compose root: a screen capture of this small layout was not stable between runs.
+        composeTestRule.onRoot().captureRoboImage(roborazziOptions = snapshotRoborazziOptions)
     }
 }

@@ -4,10 +4,17 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.test.assertHeightIsEqualTo
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertWidthIsEqualTo
+import androidx.compose.ui.test.getUnclippedBoundsInRoot
+import androidx.compose.ui.test.hasAnyAncestor
+import androidx.compose.ui.test.hasScrollAction
+import androidx.compose.ui.test.hasTestTag
+import androidx.compose.ui.test.onChildAt
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.height
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.platform.app.InstrumentationRegistry
 import com.rokt.core.testutils.annotations.DCUI_COMPONENT_TAG
 import com.rokt.core.testutils.annotations.DcuiBreakpoint
 import com.rokt.core.testutils.annotations.DcuiConfig
@@ -27,6 +34,7 @@ import com.rokt.core.testutils.assertion.assertWidthWrapContent
 import com.rokt.roktux.testutil.BaseDcuiEspressoTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotEquals
+import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.junit.runner.RunWith
 
@@ -154,6 +162,74 @@ class RowComponentTest : BaseDcuiEspressoTest() {
         val childRect2 = composeTestRule.onNodeWithText("Child2").fetchSemanticsNode().boundsInRoot
         assertEquals(childRect1.height, childRect2.height)
         assertEquals(200.dp, childRect1.height.dp)
+    }
+
+    @Test
+    @DcuiNodeJson(jsonFile = "RowComponent/Row_with_StretchAlignment_When_Column_DataImageCarousel.json")
+    @DcuiConfig(testInInnerLayout = true)
+    @DcuiOfferJson(jsonFile = "offer/Offer_with_image_carousel_key.json")
+    fun testRowComponentWithStretchAlignmentRendersNestedDataImageCarousel() {
+        composeTestRule.onNodeWithTag(DCUI_COMPONENT_TAG).assertIsDisplayed()
+    }
+
+    @Test
+    @DcuiNodeJson(jsonFile = "RowComponent/Row_with_StretchAlignment_When_Column_DataImageCarousel.json")
+    @DcuiConfig(testInInnerLayout = true)
+    @DcuiOfferJson(jsonFile = "offer/Offer_with_image_carousel_key.json")
+    fun testRowComponentWithStretchAlignmentKeepsSiblingHeightAboveDataImageCarousel() {
+        // Stretch sizing is skipped above a carousel, so the text wraps instead of filling the row.
+        val rowHeight = composeTestRule.onNodeWithTag(DCUI_COMPONENT_TAG).getUnclippedBoundsInRoot().height
+        val textHeight = composeTestRule.onNodeWithText("Child1").getUnclippedBoundsInRoot().height
+        assertTrue("text height $textHeight should be less than row height $rowHeight", textHeight < rowHeight)
+    }
+
+    @Test
+    @DcuiNodeJson(jsonFile = "RowComponent/ScrollableRow_with_ProgressIndicator.json")
+    @DcuiNodeComponentState(currentOffer = 1, totalOffer = 2)
+    fun testScrollableRowComponentRendersProgressIndicator() {
+        composeTestRule.onNodeWithTag(DCUI_COMPONENT_TAG).assertIsDisplayed()
+    }
+
+    @Test
+    @DcuiNodeJson(jsonFile = "RowComponent/ScrollableRow_with_DataImageCarousel.json")
+    @DcuiConfig(testInInnerLayout = true)
+    @DcuiOfferJson(jsonFile = "offer/Offer_with_image_carousel_key.json")
+    fun testScrollableRowComponentRendersDataImageCarousel() {
+        composeTestRule.onNodeWithTag(DCUI_COMPONENT_TAG).assertIsDisplayed()
+    }
+
+    @Test
+    @DcuiNodeJson(jsonFile = "RowComponent/ScrollableRow_with_DataImageCarousel.json")
+    @DcuiConfig(testInInnerLayout = true)
+    @DcuiOfferJson(jsonFile = "offer/Offer_with_image_carousel_key.json")
+    fun testScrollableRowComponentGivesDataImageCarouselTheWindowWidth() {
+        // The carousel has no semantics of its own, so it is reached as the scrollable row's first child.
+        // The code prefers LocalWindowInfo.containerSize and falls back to screenWidthDp; both agree under Robolectric.
+        val windowWidth = InstrumentationRegistry.getInstrumentation().targetContext
+            .resources.configuration.screenWidthDp.dp
+        composeTestRule.onNodeWithTag(DCUI_COMPONENT_TAG).onChildAt(0).assertWidthIsEqualTo(windowWidth)
+    }
+
+    @Test
+    @DcuiNodeJson(jsonFile = "RowComponent/ScrollableRow_with_CatalogImageGallery.json")
+    @DcuiConfig(testInInnerLayout = true)
+    @DcuiOfferJson(jsonFile = "offer/Offer_with_catalog_item_images.json")
+    fun testScrollableRowComponentRendersCatalogImageGallery() {
+        composeTestRule.onNodeWithTag(DCUI_COMPONENT_TAG).assertIsDisplayed()
+    }
+
+    @Test
+    @DcuiNodeJson(jsonFile = "RowComponent/ScrollableRow_with_ScrollableRow.json")
+    fun testScrollableRowComponentRendersNestedScrollableRow() {
+        composeTestRule.onNodeWithTag(DCUI_COMPONENT_TAG).assertIsDisplayed()
+        composeTestRule.onNodeWithText("Child1").assertIsDisplayed()
+    }
+
+    @Test
+    @DcuiNodeJson(jsonFile = "RowComponent/ScrollableRow_with_FixedWidthScrollableRow.json")
+    fun testScrollableRowComponentKeepsChildFixedWidthWiderThanWindow() {
+        composeTestRule.onNode(hasScrollAction() and hasAnyAncestor(hasTestTag(DCUI_COMPONENT_TAG)))
+            .assertWidthIsEqualTo(1000.dp)
     }
 
     @Test

@@ -42,6 +42,16 @@ class CatalogCombinedCollectionComponentTest : BaseDcuiEspressoTest() {
 
     @Test
     @DcuiNodeJson(
+        jsonFile = "CatalogCombinedCollectionComponent/CatalogCombinedCollection_with_StretchAlignment_CatalogImageGallery.json",
+    )
+    @DcuiConfig(testInInnerLayout = true)
+    @DcuiOfferJson(jsonFile = "offer/Offer_with_catalog_item_images.json")
+    fun testCatalogCombinedCollectionComponentWithStretchAlignmentRendersCatalogImageGallery() {
+        composeTestRule.onNodeWithTag(DCUI_COMPONENT_TAG).assertIsDisplayed()
+    }
+
+    @Test
+    @DcuiNodeJson(
         jsonFile = "CatalogCombinedCollectionComponent/CatalogCombinedCollection_with_Dropdown.json",
         loadComponent = false,
     )

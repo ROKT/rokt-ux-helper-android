@@ -36,6 +36,11 @@ internal class CatalogStackedCollectionComponent(
             isPressed = isPressed,
         )
         var anyStretchChild by remember { mutableStateOf(false) }
+        // A carousel or gallery below cannot report an intrinsic size, so stretch skips intrinsic sizing.
+        val offerLayoutsHostSubcomposition = LocalOfferLayoutsHostSubcomposition.current
+        val canUseIntrinsicSize = remember(model, offerLayoutsHostSubcomposition) {
+            !model.hostsSubcomposition(offerLayoutsHostSubcomposition)
+        }
 
         Column(
             modifier = modifierFactory
@@ -49,7 +54,9 @@ internal class CatalogStackedCollectionComponent(
                 )
                 .then(modifier)
                 .then(
-                    if (container.alignmentBias == AlignmentUiModel.Stretch.bias || anyStretchChild) {
+                    if ((container.alignmentBias == AlignmentUiModel.Stretch.bias || anyStretchChild) &&
+                        canUseIntrinsicSize
+                    ) {
                         Modifier.width(IntrinsicSize.Min)
                     } else {
                         Modifier

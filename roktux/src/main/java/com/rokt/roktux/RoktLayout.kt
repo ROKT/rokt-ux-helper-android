@@ -29,6 +29,7 @@ import com.rokt.modelmapper.model.txn.SelectResponse
 import com.rokt.modelmapper.utils.FIRST_OFFER_INDEX
 import com.rokt.modelmapper.utils.ROKT_ICONS_FONT_FAMILY
 import com.rokt.roktux.component.LayoutUiModelFactory
+import com.rokt.roktux.component.LocalOfferLayoutsHostSubcomposition
 import com.rokt.roktux.di.layout.LocalFontFamilyProvider
 import com.rokt.roktux.di.layout.LocalLayoutComponent
 import com.rokt.roktux.event.RoktPlatformEventsWrapper
@@ -364,6 +365,7 @@ private fun RoktLayout(
                             ),
                         ) + fontMap
                         ).toImmutableMap(),
+                    LocalOfferLayoutsHostSubcomposition provides state.value.offerLayoutsHostSubcomposition,
                 ) {
                     factory.CreateComposable(
                         model = state.value.model,

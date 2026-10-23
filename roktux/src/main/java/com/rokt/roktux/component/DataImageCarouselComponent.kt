@@ -140,6 +140,7 @@ internal class DataImageCarouselComponent(
                 val currentPage = pagerState.currentPage
                 HorizontalPager(
                     state = pagerState,
+                    modifier = Modifier.boundedWidthWhenUnbounded(),
                     flingBehavior = PagerDefaults.flingBehavior(
                         state = pagerState,
                         snapAnimationSpec = tween(),

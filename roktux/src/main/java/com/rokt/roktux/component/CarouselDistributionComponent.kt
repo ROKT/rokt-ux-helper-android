@@ -132,7 +132,7 @@ internal class CarouselDistributionComponent(
                 .focusable(),
         ) {
             SubcomposeLayout(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth().boundedWidthWhenUnbounded(),
             ) { constraints ->
                 val measuredHeights = mutableListOf<Dp>()
 

@@ -5,7 +5,12 @@ import com.rokt.modelmapper.uimodel.LayoutSchemaUiModel
 import kotlinx.collections.immutable.ImmutableMap
 import kotlinx.collections.immutable.toImmutableMap
 
-internal data class LayoutUiState(val model: LayoutSchemaUiModel, val offerUiState: OfferUiState)
+internal data class LayoutUiState(
+    val model: LayoutSchemaUiModel,
+    val offerUiState: OfferUiState,
+    // Whether any slot's offer layout holds a carousel or gallery, which stretch containers cannot size intrinsically.
+    val offerLayoutsHostSubcomposition: Boolean,
+)
 
 @Immutable
 internal data class OfferUiState(

@@ -1,0 +1,55 @@
+{
+  "type": "Column",
+  "node": {
+    "styles": {
+      "elements": {
+        "own": [
+          {
+            "default": {
+              "container": {
+                "alignItems": "stretch"
+              }
+            }
+          }
+        ]
+      }
+    },
+    "children": [
+      {
+        "type": "ProgressIndicator",
+        "node": {
+          "indicator": "%^STATE.IndicatorPosition^%",
+          "styles": {
+            "elements": {
+              "own": [
+                {
+                  "default": {
+                    "container": {
+                      "justifyContent": "flex-end"
+                    }
+                  }
+                }
+              ],
+              "indicator": [
+                {
+                  "default": {
+                    "dimension": {
+                      "width": {
+                        "type": "fixed",
+                        "value": 20
+                      },
+                      "height": {
+                        "type": "fixed",
+                        "value": 20
+                      }
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        }
+      }
+    ]
+  }
+}

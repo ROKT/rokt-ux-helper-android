@@ -3,13 +3,18 @@ package com.rokt.roktux.component
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.test.assertHeightIsEqualTo
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.assertWidthIsEqualTo
 import androidx.compose.ui.test.filter
+import androidx.compose.ui.test.getUnclippedBoundsInRoot
 import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onChildren
+import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.onParent
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.height
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.rokt.core.testutils.annotations.DCUI_COMPONENT_TAG
 import com.rokt.core.testutils.annotations.DcuiBreakpoint
@@ -26,6 +31,7 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotEquals
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.robolectric.annotation.GraphicsMode
 
 @RunWith(AndroidJUnit4::class)
 class ProgressIndicatorComponentTest : BaseDcuiEspressoTest() {
@@ -440,5 +446,28 @@ class ProgressIndicatorComponentTest : BaseDcuiEspressoTest() {
         composeTestRule.onNodeWithTag(DCUI_COMPONENT_TAG).assertIsDisplayed()
         composeTestRule.onNodeWithText("1", useUnmergedTree = true).assertDoesNotExist()
         composeTestRule.onNodeWithText("2", useUnmergedTree = true).assertIsDisplayed()
+    }
+
+    @Test
+    @DcuiNodeJson(jsonFile = "ProgressIndicatorComponent/ProgressIndicator_in_FixedWidthRow.json")
+    @DcuiNodeComponentState(currentOffer = 1, totalOffer = 20)
+    fun testProgressIndicatorWithMoreIndicatorsThanFitStaysWithinItsContainer() {
+        // 20 indicators of 16dp need more than the row's 100dp, so the indicator fills the row and stops there.
+        composeTestRule.onNodeWithContentDescription("Offer 1 of 19").assertIsDisplayed().assertWidthIsEqualTo(100.dp)
+        // Every indicator is composed, so one past the row's end exists but has no room to be displayed.
+        composeTestRule.onNodeWithText("18", useUnmergedTree = true).assertExists().assertIsNotDisplayed()
+    }
+
+    @Test
+    @DcuiNodeJson(jsonFile = "ProgressIndicatorComponent/ProgressIndicator_numbered_in_FixedWidthRow.json")
+    @DcuiNodeComponentState(currentOffer = 1, totalOffer = 20)
+    @GraphicsMode(GraphicsMode.Mode.NATIVE) // Real text layout, so a number squeezed below its width wraps.
+    fun testNumberedIndicatorsThatOverflowKeepTheirSizeAndTheRowHeight() {
+        // 20 indicators of 24dp overflow the row's 100dp. Each keeps its width, so no number wraps onto a second line.
+        val firstItem = composeTestRule.onNodeWithText("1", useUnmergedTree = true).onParent()
+        firstItem.assertWidthIsEqualTo(24.dp)
+        composeTestRule.onNodeWithContentDescription("Offer 1 of 19")
+            .assertHeightIsEqualTo(firstItem.getUnclippedBoundsInRoot().height)
+        composeTestRule.onNodeWithText("20", useUnmergedTree = true).assertExists().assertIsNotDisplayed()
     }
 }

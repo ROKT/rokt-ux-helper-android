@@ -1,7 +1,9 @@
 package com.rokt.roktux.component
 
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -66,7 +68,7 @@ internal class ProgressIndicatorComponent(
                 }
             }
             if (textList != null) {
-                LazyRow(
+                Row(
                     modifier = modifierFactory
                         .createModifier(
                             modifierPropertiesList = model.ownModifiers,
@@ -87,13 +89,16 @@ internal class ProgressIndicatorComponent(
                                     offerState.lastOfferIndex,
                                 )
                             }
-                        },
+                        }
+                        // Indicators that do not fit keep their size and are clipped; the row can be dragged to them.
+                        .boundedWidthWhenUnbounded()
+                        .horizontalScroll(rememberScrollState()),
                     horizontalArrangement = container.horizontalArrangement,
                     verticalAlignment = BiasAlignment.Vertical(
                         container.alignmentBias,
                     ),
                 ) {
-                    items(totalPages - (startPosition)) { index ->
+                    for (index in 0 until totalPages - startPosition) {
                         val indicatorIndex = index + startPosition
                         val indicator = when {
                             indicatorIndex < ceil(

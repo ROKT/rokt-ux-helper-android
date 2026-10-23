@@ -4,15 +4,20 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.test.assertHeightIsEqualTo
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertWidthIsEqualTo
+import androidx.compose.ui.test.getUnclippedBoundsInRoot
+import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.width
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.rokt.core.testutils.TestJsonLoader
 import com.rokt.core.testutils.annotations.DCUI_COMPONENT_TAG
 import com.rokt.core.testutils.annotations.DcuiBreakpoint
 import com.rokt.core.testutils.annotations.DcuiConfig
 import com.rokt.core.testutils.annotations.DcuiNodeComponentState
 import com.rokt.core.testutils.annotations.DcuiNodeJson
+import com.rokt.core.testutils.annotations.DcuiOfferJson
 import com.rokt.core.testutils.annotations.WindowSize
 import com.rokt.core.testutils.assertion.assertBackgroundColor
 import com.rokt.core.testutils.assertion.assertHeightFit
@@ -21,9 +26,13 @@ import com.rokt.core.testutils.assertion.assertOffsetValues
 import com.rokt.core.testutils.assertion.assertPaddingValues
 import com.rokt.core.testutils.assertion.assertWidthFit
 import com.rokt.core.testutils.assertion.assertWidthWrapContent
+import com.rokt.roktux.RoktLayout
+import com.rokt.roktux.RoktUxConfig
 import com.rokt.roktux.testutil.BaseDcuiEspressoTest
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotEquals
+import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.junit.runner.RunWith
 
@@ -130,6 +139,56 @@ class ColumnComponentTest : BaseDcuiEspressoTest() {
     @DcuiNodeJson(jsonFile = "ColumnComponent/Column_with_StretchAlignment_LargeRowGap.json")
     fun testColumnComponentWithStretchAlignmentAndLargeRowGap() {
         composeTestRule.onNodeWithTag(DCUI_COMPONENT_TAG).assertIsDisplayed()
+    }
+
+    @Test
+    @DcuiNodeJson(jsonFile = "ColumnComponent/Column_with_StretchAlignment_ProgressIndicator.json")
+    @DcuiNodeComponentState(currentOffer = 1, totalOffer = 2)
+    fun testColumnComponentWithStretchAlignmentRendersProgressIndicator() {
+        composeTestRule.onNodeWithTag(DCUI_COMPONENT_TAG).assertIsDisplayed()
+    }
+
+    @Test
+    @DcuiNodeJson(jsonFile = "ColumnComponent/Column_with_StretchAlignment_DataImageCarousel.json")
+    @DcuiConfig(testInInnerLayout = true)
+    @DcuiOfferJson(jsonFile = "offer/Offer_with_image_carousel_key.json")
+    fun testColumnComponentWithStretchAlignmentRendersDataImageCarousel() {
+        composeTestRule.onNodeWithTag(DCUI_COMPONENT_TAG).assertIsDisplayed()
+    }
+
+    @Test
+    @DcuiNodeJson(jsonFile = "ColumnComponent/Column_with_StretchAlignment_DataImageCarousel.json")
+    @DcuiConfig(testInInnerLayout = true)
+    @DcuiOfferJson(jsonFile = "offer/Offer_with_image_carousel_key.json")
+    fun testColumnComponentWithStretchAlignmentKeepsSiblingWidthAboveDataImageCarousel() {
+        // Stretch sizing is skipped above a carousel, so the text wraps instead of filling the column.
+        val columnWidth = composeTestRule.onNodeWithTag(DCUI_COMPONENT_TAG).getUnclippedBoundsInRoot().width
+        val textWidth = composeTestRule.onNodeWithText("Child1").getUnclippedBoundsInRoot().width
+        assertTrue("text width $textWidth should be less than column width $columnWidth", textWidth < columnWidth)
+    }
+
+    @Test
+    @DcuiNodeJson(jsonFile = "ColumnComponent/CatalogStackedCollection_with_StretchAlignment_CatalogImageGallery.json")
+    @DcuiConfig(testInInnerLayout = true)
+    @DcuiOfferJson(jsonFile = "offer/Offer_with_catalog_item_images.json")
+    fun testCatalogStackedCollectionWithStretchAlignmentRendersCatalogImageGallery() {
+        composeTestRule.onNodeWithTag(DCUI_COMPONENT_TAG).assertIsDisplayed()
+    }
+
+    @Test
+    fun testColumnComponentStretchesSiblingAboveOneByOneDistributionWithoutCarousel() {
+        renderExperience("EmbeddedStretchSiblingAboveOneByOne.json")
+        // No offer layout holds a carousel, so the stretched text fills the column, which is as wide as the offer.
+        composeTestRule.onNodeWithContentDescription("Offer 1 of 2").assertWidthIsEqualTo(240.dp)
+        composeTestRule.onNodeWithText("Stretched sibling").assertWidthIsEqualTo(240.dp)
+    }
+
+    @Test
+    fun testColumnComponentRendersStretchSiblingAboveOneByOneDistributionWithCarousel() {
+        renderExperience("EmbeddedStretchSiblingAboveOneByOneWithCarousel.json")
+        // An offer layout holds a carousel, so stretch skips the intrinsic query the carousel cannot answer.
+        composeTestRule.onNodeWithText("Stretched sibling").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Offer with a carousel").assertIsDisplayed()
     }
 
     @Test
@@ -271,5 +330,20 @@ class ColumnComponentTest : BaseDcuiEspressoTest() {
     fun testRowComponentGapProperty() {
         composeTestRule.onNodeWithTag(DCUI_COMPONENT_TAG).assertIsDisplayed()
             .assertHeightIsEqualTo(80.dp)
+    }
+
+    // Renders a full experience through RoktLayout, so the outer layout's slots are mapped and provided.
+    private fun renderExperience(fileName: String) {
+        val experienceResponse = TestJsonLoader.loadJsonFromAssetsDirectory("Snapshot", fileName)
+        val dispatcher = UnconfinedTestDispatcher()
+        composeTestRule.setContent {
+            RoktLayout(
+                experienceResponse = experienceResponse,
+                location = "Location1",
+                roktUxConfig = RoktUxConfig.builder().build(),
+                mainDispatcher = dispatcher,
+                ioDispatcher = dispatcher,
+            )
+        }
     }
 }

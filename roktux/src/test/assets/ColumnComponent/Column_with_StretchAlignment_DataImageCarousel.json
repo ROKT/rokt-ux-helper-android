@@ -1,0 +1,55 @@
+{
+  "type": "Column",
+  "node": {
+    "styles": {
+      "elements": {
+        "own": [
+          {
+            "default": {
+              "container": {
+                "alignItems": "stretch"
+              }
+            }
+          }
+        ]
+      }
+    },
+    "children": [
+      {
+        "type": "BasicText",
+        "node": {
+          "value": "Child1"
+        }
+      },
+      {
+        "type": "DataImageCarousel",
+        "node": {
+          "imageKey": "creativeCarouselImageVertical",
+          "duration": 0,
+          "styles": {
+            "elements": {
+              "own": [
+                {
+                  "default": {
+                    "background": {
+                      "backgroundColor": {
+                        "light": "#d51a1a",
+                        "dark": "#cdcdcd"
+                      }
+                    },
+                    "dimension": {
+                      "height": {
+                        "type": "fixed",
+                        "value": 180
+                      }
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        }
+      }
+    ]
+  }
+}
