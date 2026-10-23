@@ -23,6 +23,7 @@ import com.rokt.modelmapper.uimodel.StringWhenUiCondition
 import com.rokt.modelmapper.uimodel.TransactionData
 import com.rokt.modelmapper.uimodel.WhenUiPredicate
 import com.rokt.modelmapper.uimodel.WidthUiModel
+import com.rokt.modelmapper.utils.MAX_STACKED_CATALOG_ITEMS
 import com.rokt.network.model.BackgroundStylingProperties
 import com.rokt.network.model.BasicStateStylingBlock
 import com.rokt.network.model.BasicTextModel
@@ -37,6 +38,8 @@ import com.rokt.network.model.CatalogDropdownStyles
 import com.rokt.network.model.CatalogImageGalleryElements
 import com.rokt.network.model.CatalogImageGalleryModel
 import com.rokt.network.model.CatalogImageGalleryStyles
+import com.rokt.network.model.CatalogStackedCollectionLayoutSchemaTemplateNode
+import com.rokt.network.model.CatalogStackedCollectionModel
 import com.rokt.network.model.ColumnModel
 import com.rokt.network.model.ContainerStylingProperties
 import com.rokt.network.model.DimensionHeightValue
@@ -224,6 +227,48 @@ class ContainerModelMapperTest {
         assertThat(result.childrenByCatalogItem).containsOnlyKeys(0, 1)
         assertThat(result.childrenByCatalogItem[0]?.single()?.text()).isEqualTo("item-0")
         assertThat(result.childrenByCatalogItem[1]?.single()?.text()).isEqualTo("item-1")
+    }
+
+    @Test
+    fun `transformCatalogStackedCollection builds at most the maximum number of items bound to leading indices`() {
+        val calls = mutableListOf<Int>()
+
+        val result = transformCatalogStackedCollection(createStackedCollection(), createOfferModel(catalogItemCount = 25)) { index, module, _ ->
+            assertThat(module).isEqualTo(Module.AddToCart)
+            calls += index
+            createTextUiModel("item-$index")
+        }
+
+        assertThat(MAX_STACKED_CATALOG_ITEMS).isEqualTo(20)
+        assertThat(calls).containsExactlyElementsOf((0 until MAX_STACKED_CATALOG_ITEMS).toList())
+        assertThat(result.children.map { it?.text() }).containsExactlyElementsOf(List(MAX_STACKED_CATALOG_ITEMS) { "item-$it" })
+    }
+
+    @Test
+    fun `transformCatalogStackedCollection builds every item when under the maximum`() {
+        val result = transformCatalogStackedCollection(createStackedCollection(), createOfferModel(catalogItemCount = 3)) { index, _, _ ->
+            createTextUiModel("item-$index")
+        }
+
+        assertThat(result.children.map { it?.text() }).containsExactly("item-0", "item-1", "item-2")
+    }
+
+    @Test
+    fun `transformCatalogStackedCollection builds no items when the offer has none`() {
+        val result = transformCatalogStackedCollection(createStackedCollection(), createOfferModel(catalogItemCount = 0)) { index, _, _ ->
+            createTextUiModel("item-$index")
+        }
+
+        assertThat(result.children).isEmpty()
+    }
+
+    @Test
+    fun `transformCatalogStackedCollection item that maps to null is skipped and the remaining items keep their item index`() {
+        val result = transformCatalogStackedCollection(createStackedCollection(), createOfferModel(catalogItemCount = 3)) { index, _, _ ->
+            if (index == 0) null else createTextUiModel("item-$index")
+        }
+
+        assertThat(result.children.map { it?.text() }).containsExactly("item-1", "item-2")
     }
 
     @Test
@@ -437,6 +482,18 @@ class ContainerModelMapperTest {
         assertThat(result.option?.disabled?.textStyles?.firstOrNull()?.default?.textColor?.light)
             .isEqualTo("#9ca3af")
     }
+
+    private fun createStackedCollection() = LayoutSchemaModel.CatalogStackedCollection(
+        CatalogStackedCollectionModel<CatalogStackedCollectionLayoutSchemaTemplateNode, WhenPredicate>(
+            styles = null,
+            template = CatalogStackedCollectionLayoutSchemaTemplateNode.Column(
+                ColumnModel<LayoutSchemaModel, WhenPredicate>(
+                    styles = null,
+                    children = emptyList(),
+                ),
+            ),
+        ),
+    )
 
     private fun createTextUiModel(value: String): LayoutSchemaUiModel.BasicTextUiModel = LayoutSchemaUiModel.BasicTextUiModel(
         ownModifiers = null,

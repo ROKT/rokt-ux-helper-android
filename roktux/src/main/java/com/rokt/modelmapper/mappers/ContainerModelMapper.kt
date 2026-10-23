@@ -7,6 +7,7 @@ import com.rokt.modelmapper.uimodel.Module
 import com.rokt.modelmapper.uimodel.OfferModel
 import com.rokt.modelmapper.uimodel.StateBlock
 import com.rokt.modelmapper.uimodel.WidthUiModel
+import com.rokt.modelmapper.utils.MAX_STACKED_CATALOG_ITEMS
 import com.rokt.network.model.BasicStateStylingBlock
 import com.rokt.network.model.CatalogCombinedCollectionLayoutSchemaTemplateNode
 import com.rokt.network.model.CatalogStackedCollectionLayoutSchemaTemplateNode
@@ -197,16 +198,11 @@ internal fun transformCatalogStackedCollection(
             duration = it.duration.coerceAtLeast(0),
         )
     }
-    val catalogItemList = mutableListOf<LayoutSchemaUiModel>()
-    offerModel?.catalogItems?.forEachIndexed { i, _ ->
-        transformLayoutSchemaChildren(
-            i,
-            Module.AddToCart,
-            catalogStackedCollection.node.template.toLayoutSchemaModel(),
-        )?.let {
-            catalogItemList.add(i, it)
-        }
-    }
+    // Build at most MAX_STACKED_CATALOG_ITEMS items, each bound to its own catalog item index, to limit composition work.
+    val template = catalogStackedCollection.node.template.toLayoutSchemaModel()
+    val catalogItemList = offerModel?.catalogItems.orEmpty()
+        .take(MAX_STACKED_CATALOG_ITEMS)
+        .mapIndexedNotNull { i, _ -> transformLayoutSchemaChildren(i, Module.AddToCart, template) }
     return LayoutSchemaUiModel.CatalogStackedCollectionUiModel(
         ownModifiers = ownModifiers,
         containerProperties = ownStyles.transformContainer(

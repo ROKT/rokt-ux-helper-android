@@ -8,6 +8,7 @@ const val CURRENT_POSITION_PLACEHOLDER = "%^CURRENT_OFFER^%"
 const val TOTAL_OFFERS_PLACEHOLDER = "%^TOTAL_OFFERS^%"
 const val FIRST_OFFER_INDEX = 0
 const val DEFAULT_VIEWABLE_ITEMS = 1
+const val MAX_STACKED_CATALOG_ITEMS = 20
 const val ROKT_ICONS_FONT_FAMILY = "rokt-icons"
 
 val roktDateFormat
