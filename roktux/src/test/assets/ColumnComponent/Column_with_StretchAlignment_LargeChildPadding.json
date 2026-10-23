@@ -1,0 +1,39 @@
+{
+  "type": "Column",
+  "node": {
+    "styles": {
+      "elements": {
+        "own": [
+          {
+            "default": {
+              "container": {
+                "alignItems": "stretch"
+              }
+            }
+          }
+        ]
+      }
+    },
+    "children": [
+      {
+        "type": "BasicText",
+        "node": {
+          "styles": {
+            "elements": {
+              "own": [
+                {
+                  "default": {
+                    "spacing": {
+                      "padding": "131072"
+                    }
+                  }
+                }
+              ]
+            }
+          },
+          "value": "Child1"
+        }
+      }
+    ]
+  }
+}

@@ -121,6 +121,18 @@ class ColumnComponentTest : BaseDcuiEspressoTest() {
     }
 
     @Test
+    @DcuiNodeJson(jsonFile = "ColumnComponent/Column_with_StretchAlignment_LargeChildPadding.json")
+    fun testColumnComponentWithStretchAlignmentAndLargeChildPadding() {
+        composeTestRule.onNodeWithTag(DCUI_COMPONENT_TAG).assertIsDisplayed()
+    }
+
+    @Test
+    @DcuiNodeJson(jsonFile = "ColumnComponent/Column_with_StretchAlignment_LargeRowGap.json")
+    fun testColumnComponentWithStretchAlignmentAndLargeRowGap() {
+        composeTestRule.onNodeWithTag(DCUI_COMPONENT_TAG).assertIsDisplayed()
+    }
+
+    @Test
     @DcuiNodeJson(jsonFile = "ColumnComponent/Column_with_Padding.json")
     fun testColumnComponentWithPadding() {
         composeTestRule.onNodeWithTag(DCUI_COMPONENT_TAG)
