@@ -44,6 +44,7 @@ private const val MAX_SHADOW_BLUR_RADIUS_DP = 1000f
 private const val MAX_BLUR_RADIUS_DP = 100f
 private const val MAX_SPACING_DP = 1000
 private const val MAX_GAP_DP = 1000f
+private const val MAX_DIMENSION_DP = 5_000f
 private const val offsetArraySize: Int = 2
 private const val top = 0
 private const val end = 1
@@ -109,10 +110,10 @@ internal fun transformModifier(
     borderProperties: BorderStylingProperties? = null,
     containerProperties: ContainerStylingProperties? = null,
 ): ModifierProperties = ModifierProperties(
-    minHeight = dimensionProperties?.minHeight?.dp,
-    minWidth = dimensionProperties?.minWidth?.dp,
-    maxHeight = dimensionProperties?.maxHeight?.dp,
-    maxWidth = dimensionProperties?.maxWidth?.dp,
+    minHeight = transformSize(dimensionProperties?.minHeight)?.dp,
+    minWidth = transformSize(dimensionProperties?.minWidth)?.dp,
+    maxHeight = transformSize(dimensionProperties?.maxHeight)?.dp,
+    maxWidth = transformSize(dimensionProperties?.maxWidth)?.dp,
     height = transformHeight(dimensionProperties?.height),
     width = transformWidth(dimensionProperties?.width),
     padding = spacingProperties?.padding?.let { transformPadding(it) },
@@ -150,7 +151,7 @@ private fun transformHeight(height: DimensionHeightValue?): HeightUiModel? = hei
             HeightUiModel.MatchParent
         }
 
-        is DimensionHeightValue.Fixed -> HeightUiModel.Fixed(heightValue.value)
+        is DimensionHeightValue.Fixed -> transformSize(heightValue.value)?.let { HeightUiModel.Fixed(it) }
 
         is DimensionHeightValue.Percentage -> HeightUiModel.Percentage(heightValue.value.div(100))
     }
@@ -164,7 +165,7 @@ private fun transformWidth(width: DimensionWidthValue?): WidthUiModel? = width?.
             WidthUiModel.MatchParent
         }
 
-        is DimensionWidthValue.Fixed -> WidthUiModel.Fixed(widthValue.value)
+        is DimensionWidthValue.Fixed -> transformSize(widthValue.value)?.let { WidthUiModel.Fixed(it) }
 
         is DimensionWidthValue.Percentage -> WidthUiModel.Percentage(widthValue.value.div(100))
     }
@@ -251,6 +252,10 @@ private fun transformBlur(blur: Float?): Float? = blur?.takeIf { it.isFinite() }
 // A gap must be finite and within [0, MAX_GAP_DP]. Compose throws during layout once a measured size grows past
 // its pixel limit, and a negative gap breaks the carousel page width.
 private fun transformGap(gap: Float?): Float? = gap?.takeIf { it.isFinite() }?.coerceIn(0f, MAX_GAP_DP)
+
+// A fixed, min or max size must be finite and within [0, MAX_DIMENSION_DP]. Width and height share one
+// pixel limit in Compose constraints, so the cap must fit both axes at once, otherwise measuring throws.
+private fun transformSize(value: Float?): Float? = value?.takeIf { it.isFinite() }?.coerceIn(0f, MAX_DIMENSION_DP)
 
 private fun transformArrangement(arrangementModel: FlexJustification?) = arrangementModel?.let { arrangement ->
     when (arrangement) {
