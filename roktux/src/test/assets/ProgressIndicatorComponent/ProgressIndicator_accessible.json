@@ -2,6 +2,42 @@
   "type": "ProgressIndicator",
   "node": {
     "indicator": "%^STATE.IndicatorPosition^%",
-    "accessibilityHidden": false
+    "accessibilityHidden": false,
+    "styles": {
+      "elements": {
+        "own": [],
+        "indicator": [
+          {
+            "default": {
+              "dimension": {
+                "width": { "type": "fixed", "value": 24 },
+                "height": { "type": "fixed", "value": 24 }
+              },
+              "background": {
+                "backgroundColor": { "light": "#CCCCCC" }
+              }
+            }
+          }
+        ],
+        "activeIndicator": [
+          {
+            "default": {
+              "background": {
+                "backgroundColor": { "light": "#0066CC" }
+              }
+            }
+          }
+        ],
+        "seenIndicator": [
+          {
+            "default": {
+              "background": {
+                "backgroundColor": { "light": "#22AA66" }
+              }
+            }
+          }
+        ]
+      }
+    }
   }
 }

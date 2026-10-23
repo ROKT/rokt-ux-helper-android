@@ -22,6 +22,7 @@ import com.rokt.core.testutils.annotations.DcuiConfig
 import com.rokt.core.testutils.annotations.DcuiNodeComponentState
 import com.rokt.core.testutils.annotations.DcuiNodeJson
 import com.rokt.core.testutils.annotations.WindowSize
+import com.rokt.core.testutils.assertion.assertBackgroundColor
 import com.rokt.core.testutils.assertion.assertHeightWrapContent
 import com.rokt.core.testutils.assertion.assertTextColor
 import com.rokt.core.testutils.assertion.assertWidthWrapContent
@@ -40,6 +41,9 @@ class ProgressIndicatorComponentTest : BaseDcuiEspressoTest() {
     @DcuiNodeComponentState(currentOffer = 0, totalOffer = 3)
     fun testProgressIndicatorAnnouncesFirstPage() {
         composeTestRule.onNodeWithContentDescription("1 of 3").assertIsDisplayed()
+        composeTestRule.onNodeWithText("1", useUnmergedTree = true).onParent().assertBackgroundColor("#0066CC")
+        composeTestRule.onNodeWithText("2", useUnmergedTree = true).onParent().assertBackgroundColor("#CCCCCC")
+        composeTestRule.onNodeWithText("3", useUnmergedTree = true).onParent().assertBackgroundColor("#CCCCCC")
     }
 
     @Test
@@ -47,6 +51,9 @@ class ProgressIndicatorComponentTest : BaseDcuiEspressoTest() {
     @DcuiNodeComponentState(currentOffer = 2, totalOffer = 3)
     fun testProgressIndicatorAnnouncesLastPage() {
         composeTestRule.onNodeWithContentDescription("3 of 3").assertIsDisplayed()
+        composeTestRule.onNodeWithText("1", useUnmergedTree = true).onParent().assertBackgroundColor("#22AA66")
+        composeTestRule.onNodeWithText("2", useUnmergedTree = true).onParent().assertBackgroundColor("#22AA66")
+        composeTestRule.onNodeWithText("3", useUnmergedTree = true).onParent().assertBackgroundColor("#0066CC")
     }
 
     @Test
@@ -54,6 +61,7 @@ class ProgressIndicatorComponentTest : BaseDcuiEspressoTest() {
     @DcuiNodeComponentState(currentOffer = 0, totalOffer = 1)
     fun testProgressIndicatorAnnouncesSinglePage() {
         composeTestRule.onNodeWithContentDescription("1 of 1").assertIsDisplayed()
+        composeTestRule.onNodeWithText("1", useUnmergedTree = true).onParent().assertBackgroundColor("#0066CC")
     }
 
     @Test
@@ -61,6 +69,9 @@ class ProgressIndicatorComponentTest : BaseDcuiEspressoTest() {
     @DcuiNodeComponentState(currentOffer = 1, totalOffer = 6, viewableItems = [2])
     fun testProgressIndicatorAnnouncesFirstPageWithMultipleViewableOffers() {
         composeTestRule.onNodeWithContentDescription("1 of 3").assertIsDisplayed()
+        composeTestRule.onNodeWithText("1", useUnmergedTree = true).onParent().assertBackgroundColor("#0066CC")
+        composeTestRule.onNodeWithText("2", useUnmergedTree = true).onParent().assertBackgroundColor("#CCCCCC")
+        composeTestRule.onNodeWithText("3", useUnmergedTree = true).onParent().assertBackgroundColor("#CCCCCC")
     }
 
     @Test
@@ -68,6 +79,9 @@ class ProgressIndicatorComponentTest : BaseDcuiEspressoTest() {
     @DcuiNodeComponentState(currentOffer = 3, totalOffer = 6, viewableItems = [2])
     fun testProgressIndicatorAnnouncesCurrentPageWithMultipleViewableOffers() {
         composeTestRule.onNodeWithContentDescription("2 of 3").assertIsDisplayed()
+        composeTestRule.onNodeWithText("1", useUnmergedTree = true).onParent().assertBackgroundColor("#22AA66")
+        composeTestRule.onNodeWithText("2", useUnmergedTree = true).onParent().assertBackgroundColor("#0066CC")
+        composeTestRule.onNodeWithText("3", useUnmergedTree = true).onParent().assertBackgroundColor("#CCCCCC")
     }
 
     @Test
@@ -75,6 +89,9 @@ class ProgressIndicatorComponentTest : BaseDcuiEspressoTest() {
     @DcuiNodeComponentState(currentOffer = 4, totalOffer = 5, viewableItems = [2])
     fun testProgressIndicatorAnnouncesPartiallyFilledLastPage() {
         composeTestRule.onNodeWithContentDescription("3 of 3").assertIsDisplayed()
+        composeTestRule.onNodeWithText("1", useUnmergedTree = true).onParent().assertBackgroundColor("#22AA66")
+        composeTestRule.onNodeWithText("2", useUnmergedTree = true).onParent().assertBackgroundColor("#22AA66")
+        composeTestRule.onNodeWithText("3", useUnmergedTree = true).onParent().assertBackgroundColor("#0066CC")
     }
 
     @Test

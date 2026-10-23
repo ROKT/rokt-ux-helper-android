@@ -39,6 +39,7 @@ internal class ProgressIndicatorComponent(
         breakpointIndex: Int,
         onEventSent: (LayoutContract.LayoutEvent) -> Unit,
     ) {
+        val currentPageIndex = offerState.currentOfferIndex / offerState.viewableItems
         val totalPages = remember(offerState.lastOfferIndex + 1, offerState.viewableItems) {
             ceil((offerState.lastOfferIndex + 1).toDouble() / offerState.viewableItems).toInt()
         }
@@ -85,7 +86,7 @@ internal class ProgressIndicatorComponent(
                                 hideFromAccessibility()
                             } else {
                                 contentDescription = accessibilityReadOutText.format(
-                                    offerState.currentOfferIndex / offerState.viewableItems + 1,
+                                    currentPageIndex + 1,
                                     totalPages,
                                 )
                             }
@@ -101,14 +102,11 @@ internal class ProgressIndicatorComponent(
                     for (index in 0 until totalPages - startPosition) {
                         val indicatorIndex = index + startPosition
                         val indicator = when {
-                            indicatorIndex < ceil(
-                                offerState.currentOfferIndex.toDouble() / offerState.viewableItems,
-                            ) -> {
+                            indicatorIndex < currentPageIndex -> {
                                 model.seenIndicator ?: model.indicator
                             }
 
-                            indicatorIndex ==
-                                ceil(offerState.currentOfferIndex.toDouble() / offerState.viewableItems).toInt() -> {
+                            indicatorIndex == currentPageIndex -> {
                                 model.activeIndicator ?: model.seenIndicator ?: model.indicator
                             }
 
