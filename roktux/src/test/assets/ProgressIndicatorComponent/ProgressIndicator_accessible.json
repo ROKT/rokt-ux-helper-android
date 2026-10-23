@@ -1,0 +1,7 @@
+{
+  "type": "ProgressIndicator",
+  "node": {
+    "indicator": "%^STATE.IndicatorPosition^%",
+    "accessibilityHidden": false
+  }
+}

@@ -27,7 +27,7 @@ internal class ProgressIndicatorComponent(
     private val modifierFactory: ModifierFactory,
 ) : ComposableComponent<LayoutSchemaUiModel.ProgressIndicatorUiModel> {
 
-    private val accessibilityReadOutText = "Offer %d of %d"
+    private val accessibilityReadOutText = "%d of %d"
 
     @Composable
     override fun Render(
@@ -85,8 +85,8 @@ internal class ProgressIndicatorComponent(
                                 hideFromAccessibility()
                             } else {
                                 contentDescription = accessibilityReadOutText.format(
-                                    offerState.currentOfferIndex,
-                                    offerState.lastOfferIndex,
+                                    offerState.currentOfferIndex / offerState.viewableItems + 1,
+                                    totalPages,
                                 )
                             }
                         }

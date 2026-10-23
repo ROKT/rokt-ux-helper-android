@@ -36,6 +36,48 @@ import org.robolectric.annotation.GraphicsMode
 @RunWith(AndroidJUnit4::class)
 class ProgressIndicatorComponentTest : BaseDcuiEspressoTest() {
     @Test
+    @DcuiNodeJson(jsonFile = "ProgressIndicatorComponent/ProgressIndicator_accessible.json")
+    @DcuiNodeComponentState(currentOffer = 0, totalOffer = 3)
+    fun testProgressIndicatorAnnouncesFirstPage() {
+        composeTestRule.onNodeWithContentDescription("1 of 3").assertIsDisplayed()
+    }
+
+    @Test
+    @DcuiNodeJson(jsonFile = "ProgressIndicatorComponent/ProgressIndicator_accessible.json")
+    @DcuiNodeComponentState(currentOffer = 2, totalOffer = 3)
+    fun testProgressIndicatorAnnouncesLastPage() {
+        composeTestRule.onNodeWithContentDescription("3 of 3").assertIsDisplayed()
+    }
+
+    @Test
+    @DcuiNodeJson(jsonFile = "ProgressIndicatorComponent/ProgressIndicator_accessible.json")
+    @DcuiNodeComponentState(currentOffer = 0, totalOffer = 1)
+    fun testProgressIndicatorAnnouncesSinglePage() {
+        composeTestRule.onNodeWithContentDescription("1 of 1").assertIsDisplayed()
+    }
+
+    @Test
+    @DcuiNodeJson(jsonFile = "ProgressIndicatorComponent/ProgressIndicator_accessible.json")
+    @DcuiNodeComponentState(currentOffer = 1, totalOffer = 6, viewableItems = [2])
+    fun testProgressIndicatorAnnouncesFirstPageWithMultipleViewableOffers() {
+        composeTestRule.onNodeWithContentDescription("1 of 3").assertIsDisplayed()
+    }
+
+    @Test
+    @DcuiNodeJson(jsonFile = "ProgressIndicatorComponent/ProgressIndicator_accessible.json")
+    @DcuiNodeComponentState(currentOffer = 3, totalOffer = 6, viewableItems = [2])
+    fun testProgressIndicatorAnnouncesCurrentPageWithMultipleViewableOffers() {
+        composeTestRule.onNodeWithContentDescription("2 of 3").assertIsDisplayed()
+    }
+
+    @Test
+    @DcuiNodeJson(jsonFile = "ProgressIndicatorComponent/ProgressIndicator_accessible.json")
+    @DcuiNodeComponentState(currentOffer = 4, totalOffer = 5, viewableItems = [2])
+    fun testProgressIndicatorAnnouncesPartiallyFilledLastPage() {
+        composeTestRule.onNodeWithContentDescription("3 of 3").assertIsDisplayed()
+    }
+
+    @Test
     @DcuiNodeJson(jsonFile = "ProgressIndicatorComponent/ProgressIndicator_with_FixedDimension.json")
     @DcuiNodeComponentState(currentOffer = 1, totalOffer = 2)
     fun testProgressIndicatorComponentWithFixedDimension() {
@@ -453,7 +495,7 @@ class ProgressIndicatorComponentTest : BaseDcuiEspressoTest() {
     @DcuiNodeComponentState(currentOffer = 1, totalOffer = 20)
     fun testProgressIndicatorWithMoreIndicatorsThanFitStaysWithinItsContainer() {
         // 20 indicators of 16dp need more than the row's 100dp, so the indicator fills the row and stops there.
-        composeTestRule.onNodeWithContentDescription("Offer 1 of 19").assertIsDisplayed().assertWidthIsEqualTo(100.dp)
+        composeTestRule.onNodeWithContentDescription("2 of 20").assertIsDisplayed().assertWidthIsEqualTo(100.dp)
         // Every indicator is composed, so one past the row's end exists but has no room to be displayed.
         composeTestRule.onNodeWithText("18", useUnmergedTree = true).assertExists().assertIsNotDisplayed()
     }
@@ -466,7 +508,7 @@ class ProgressIndicatorComponentTest : BaseDcuiEspressoTest() {
         // 20 indicators of 24dp overflow the row's 100dp. Each keeps its width, so no number wraps onto a second line.
         val firstItem = composeTestRule.onNodeWithText("1", useUnmergedTree = true).onParent()
         firstItem.assertWidthIsEqualTo(24.dp)
-        composeTestRule.onNodeWithContentDescription("Offer 1 of 19")
+        composeTestRule.onNodeWithContentDescription("2 of 20")
             .assertHeightIsEqualTo(firstItem.getUnclippedBoundsInRoot().height)
         composeTestRule.onNodeWithText("20", useUnmergedTree = true).assertExists().assertIsNotDisplayed()
     }
