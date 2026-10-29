@@ -67,7 +67,7 @@ internal class ColumnComponent(
                 )
                 .then(
                     if (model.isScrollable) {
-                        Modifier.verticalScroll(rememberScrollState())
+                        Modifier.boundedHeightWhenUnbounded().verticalScroll(rememberScrollState())
                     } else {
                         Modifier
                     },

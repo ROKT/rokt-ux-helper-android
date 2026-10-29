@@ -5,9 +5,15 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import com.rokt.modelmapper.uimodel.ContainerProperties
+import com.rokt.modelmapper.uimodel.HeightUiModel
+import com.rokt.modelmapper.uimodel.ModifierProperties
 import com.rokt.modelmapper.uimodel.StateBlock
+import com.rokt.modelmapper.uimodel.WidthUiModel
 import com.rokt.network.model.BasicStateStylingBlock
 import com.rokt.network.model.ContainerStylingProperties
+import com.rokt.network.model.DimensionHeightValue
+import com.rokt.network.model.DimensionStylingProperties
+import com.rokt.network.model.DimensionWidthValue
 import com.rokt.network.model.FlexChildStylingProperties
 import com.rokt.network.model.Shadow
 import com.rokt.network.model.SpacingStylingProperties
@@ -172,6 +178,58 @@ class ModifierMapperTest {
         assertThat(gapOf(null)).isNull()
     }
 
+    @Test
+    fun `oversized fixed width and height are capped at 5000`() {
+        listOf(1e7f, Float.MAX_VALUE).forEach { value ->
+            val result = dimensionOf(value)
+            assertThat(result.width).isEqualTo(WidthUiModel.Fixed(5000f))
+            assertThat(result.height).isEqualTo(HeightUiModel.Fixed(5000f))
+        }
+    }
+
+    @Test
+    fun `oversized min and max sizes are capped at 5000dp`() {
+        assertThat(dimensionOf(1e7f).minMax()).containsExactly(5000.dp, 5000.dp, 5000.dp, 5000.dp)
+    }
+
+    @Test
+    fun `negative sizes become zero`() {
+        val result = dimensionOf(-5f)
+        assertThat(result.width).isEqualTo(WidthUiModel.Fixed(0f))
+        assertThat(result.height).isEqualTo(HeightUiModel.Fixed(0f))
+        assertThat(result.minMax()).containsExactly(0.dp, 0.dp, 0.dp, 0.dp)
+    }
+
+    @Test
+    fun `in-range sizes are preserved`() {
+        listOf(0f, 240f, 5000f).forEach { value ->
+            val result = dimensionOf(value)
+            assertThat(result.width).isEqualTo(WidthUiModel.Fixed(value))
+            assertThat(result.height).isEqualTo(HeightUiModel.Fixed(value))
+            assertThat(result.minMax()).containsExactly(value.dp, value.dp, value.dp, value.dp)
+        }
+    }
+
+    @Test
+    fun `non-finite sizes become null`() {
+        listOf(Float.NaN, Float.POSITIVE_INFINITY, Float.NEGATIVE_INFINITY).forEach { value ->
+            val result = dimensionOf(value)
+            assertThat(result.width).isNull()
+            assertThat(result.height).isNull()
+            assertThat(result.minMax()).containsExactly(null, null, null, null)
+        }
+    }
+
+    @Test
+    fun `percentage width is preserved`() {
+        val result = transformModifier(
+            spacingProperties = null,
+            dimensionProperties = DimensionStylingProperties(width = DimensionWidthValue.Percentage(50f)),
+            backgroundProperties = null,
+        )
+        assertThat(result.width).isEqualTo(WidthUiModel.Percentage(0.5f))
+    }
+
     private fun transformContainerForWeight(
         block: BasicStateStylingBlock<FlexChildStylingProperties?>,
     ): ImmutableList<StateBlock<ContainerProperties>>? = persistentListOf(block).transformContainer(
@@ -234,6 +292,22 @@ class ModifierMapperTest {
         assertThat(result?.first()?.pressed?.gap).isEqualTo(result?.first()?.default?.gap)
         return result?.first()?.default?.gap
     }
+
+    // Sets every size field to the same value.
+    private fun dimensionOf(value: Float): ModifierProperties = transformModifier(
+        spacingProperties = null,
+        dimensionProperties = DimensionStylingProperties(
+            minWidth = value,
+            maxWidth = value,
+            width = DimensionWidthValue.Fixed(value),
+            minHeight = value,
+            maxHeight = value,
+            height = DimensionHeightValue.Fixed(value),
+        ),
+        backgroundProperties = null,
+    )
+
+    private fun ModifierProperties.minMax(): List<Dp?> = listOf(minWidth, minHeight, maxWidth, maxHeight)
 
     private fun shadow(blurRadius: Float) = Shadow(0f, 0f, blurRadius, 0f, ThemeColor(light = "#000000"))
 }

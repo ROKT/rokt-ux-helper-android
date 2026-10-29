@@ -75,6 +75,24 @@ internal fun Modifier.boundedWidthWhenUnbounded(): Modifier {
     }
 }
 
+// A scrolling column must be measured with a finite height. Under a vertical scroll the height
+// is unbounded, so cap it at the window height; a height the layout already bounds is left unchanged.
+@Composable
+internal fun Modifier.boundedHeightWhenUnbounded(): Modifier {
+    val windowHeightPx = LocalWindowInfo.current.containerSize.height.takeIf { it > 0 }
+        ?: with(LocalDensity.current) { LocalConfiguration.current.screenHeightDp.dp.roundToPx() }
+    return layout { measurable, constraints ->
+        val placeable = measurable.measure(
+            if (constraints.hasBoundedHeight) {
+                constraints
+            } else {
+                constraints.copy(maxHeight = maxOf(windowHeightPx, constraints.minHeight))
+            },
+        )
+        layout(placeable.width, placeable.height) { placeable.place(0, 0) }
+    }
+}
+
 @Composable
 internal fun evaluateState(
     predicates: ImmutableList<WhenUiPredicate>?,

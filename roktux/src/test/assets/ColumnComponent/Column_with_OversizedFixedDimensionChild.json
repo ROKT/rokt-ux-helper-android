@@ -1,0 +1,33 @@
+{
+  "type": "Column",
+  "node": {
+    "children": [
+      {
+        "type": "BasicText",
+        "node": {
+          "value": "Child1",
+          "styles": {
+            "elements": {
+              "own": [
+                {
+                  "default": {
+                    "dimension": {
+                      "width": {
+                        "type": "fixed",
+                        "value": 10000000
+                      },
+                      "height": {
+                        "type": "fixed",
+                        "value": 10000000
+                      }
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        }
+      }
+    ]
+  }
+}
