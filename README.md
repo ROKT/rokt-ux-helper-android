@@ -2,9 +2,9 @@
 
 The Rokt UX Helper for Android enables partner applications to render tailored user experiences, improving the velocity of testing and relevancy for the customer. This library offers an easy way to perform rendering and provides event hooks for integration into backend systems.
 
-| Environment | Build                                                                                                        | Coverage                                                                                                                                            |
-| ----------- | ------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------- |
-| main        | ![Build status](https://github.com/ROKT/rokt-ux-helper-android/actions/workflows/pull-request.yml/badge.svg) | [![codecov](https://codecov.io/gh/ROKT/rokt-ux-helper-android/graph/badge.svg?token=inV3Xb1tK9)](https://codecov.io/gh/ROKT/rokt-ux-helper-android) |
+| Environment | Build                                                                                                        |
+| ----------- | ------------------------------------------------------------------------------------------------------------ |
+| main        | ![Build status](https://github.com/ROKT/rokt-ux-helper-android/actions/workflows/pull-request.yml/badge.svg) |
 
 ## Requirements
 
