@@ -22,7 +22,7 @@ import com.rokt.roktux.component.findWrappedChild
 import com.rokt.roktux.viewmodel.layout.LayoutContract
 import com.rokt.roktux.viewmodel.layout.OfferUiState
 
-// Button labels may be nested inside layout containers.
+// Whether a composable sits inside a button, which merges its descendants into one screen reader stop.
 @Suppress("ComposeCompositionLocalUsage")
 internal val LocalIsButtonContent = compositionLocalOf { false }
 
@@ -73,26 +73,26 @@ internal fun ButtonComponent(
         ),
         horizontalArrangement = container.horizontalArrangement,
     ) {
-        CompositionLocalProvider(LocalIsButtonContent provides true) {
-            model.children.forEach { child ->
-                child?.let {
-                    val nonWhenChild = findWrappedChild(child)
-                    var childModifier: Modifier = Modifier
-                    modifierFactory.createContainerUiProperties(
-                        containerProperties = nonWhenChild.containerProperties,
-                        index = breakpointIndex,
-                        isPressed = isPressed,
-                    ).also { container ->
-                        container.weight?.let {
-                            childModifier = childModifier.then(Modifier.weight(it))
-                        }
-                        container.selfAlignmentBias?.let {
-                            childModifier = childModifier.then(Modifier.align(BiasAlignment.Vertical(it)))
-                        }
-                        if (ignoreChildrenForAccessibility) {
-                            childModifier = childModifier.semantics { hideFromAccessibility() }
-                        }
+        model.children.forEach { child ->
+            child?.let {
+                val nonWhenChild = findWrappedChild(child)
+                var childModifier: Modifier = Modifier
+                modifierFactory.createContainerUiProperties(
+                    containerProperties = nonWhenChild.containerProperties,
+                    index = breakpointIndex,
+                    isPressed = isPressed,
+                ).also { container ->
+                    container.weight?.let {
+                        childModifier = childModifier.then(Modifier.weight(it))
                     }
+                    container.selfAlignmentBias?.let {
+                        childModifier = childModifier.then(Modifier.align(BiasAlignment.Vertical(it)))
+                    }
+                    if (ignoreChildrenForAccessibility) {
+                        childModifier = childModifier.semantics { hideFromAccessibility() }
+                    }
+                }
+                CompositionLocalProvider(LocalIsButtonContent provides true) {
                     factory.CreateComposable(
                         model = child,
                         modifier = childModifier,
