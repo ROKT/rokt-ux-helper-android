@@ -57,6 +57,43 @@ class StaticLinkTest : BaseDcuiEspressoTest() {
     }
 
     @Test
+    @DcuiNodeJson(
+        jsonString = """{
+            "type": "StaticLink",
+            "node": {
+                "src": "https://example.com",
+                "open": "externally",
+                "children": [{"type": "RichText", "node": {"value": "<b>Continue</b>"}}]
+            }
+        }""",
+    )
+    fun `rich text labels the link button`() {
+        composeTestRule.onNodeWithTag(DCUI_COMPONENT_TAG)
+            .assertHasClickAction()
+            .assertTextEquals("Continue")
+    }
+
+    @Test
+    @DcuiNodeJson(
+        jsonString = """{
+            "type": "StaticLink",
+            "node": {
+                "src": "https://example.com",
+                "open": "externally",
+                "children": [{"type": "Column", "node": {"children": [{
+                    "type": "RichText",
+                    "node": {"value": "Continue. <a href='https://example.com/terms'>Terms</a>"}
+                }]}}]
+            }
+        }""",
+    )
+    fun `nested rich text with links labels the link button`() {
+        composeTestRule.onNodeWithTag(DCUI_COMPONENT_TAG)
+            .assertHasClickAction()
+            .assertTextEquals("Continue. Terms")
+    }
+
+    @Test
     @DcuiNodeJson(jsonFile = "StaticLinkComponent/StaticLink_with_FixedDimension.json")
     @DcuiConfig(testInInnerLayout = true)
     @DcuiOfferJson(jsonFile = "offer/Offer_with_valid_key.json")

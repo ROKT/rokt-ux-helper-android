@@ -51,6 +51,25 @@ class CreativeResponseComponentTest : BaseDcuiEspressoTest() {
     }
 
     @Test
+    @DcuiNodeJson(
+        jsonString = """{
+            "type": "CreativeResponse",
+            "node": {
+                "responseKey": "positive",
+                "openLinks": "internally",
+                "children": [{"type": "RichText", "node": {"value": "<b>Continue</b>"}}]
+            }
+        }""",
+    )
+    @DcuiConfig(testInInnerLayout = true)
+    @DcuiOfferJson(jsonFile = "offer/Offer_with_valid_key.json")
+    fun `rich text labels the response button`() {
+        composeTestRule.onNodeWithTag(DCUI_COMPONENT_TAG)
+            .assertHasClickAction()
+            .assertTextEquals("Continue")
+    }
+
+    @Test
     @DcuiNodeJson(jsonFile = "CreativeResponseComponent/ResponseButton_with_FixedDimension.json")
     @DcuiConfig(testInInnerLayout = true)
     @DcuiOfferJson(jsonFile = "offer/Offer_with_valid_key.json")

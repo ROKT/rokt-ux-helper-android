@@ -5,6 +5,8 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Row
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.BiasAlignment
@@ -19,6 +21,10 @@ import com.rokt.roktux.component.ModifierFactory
 import com.rokt.roktux.component.findWrappedChild
 import com.rokt.roktux.viewmodel.layout.LayoutContract
 import com.rokt.roktux.viewmodel.layout.OfferUiState
+
+// Button labels may be nested inside layout containers.
+@Suppress("ComposeCompositionLocalUsage")
+internal val LocalIsButtonContent = compositionLocalOf { false }
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
@@ -67,34 +73,36 @@ internal fun ButtonComponent(
         ),
         horizontalArrangement = container.horizontalArrangement,
     ) {
-        model.children.forEach { child ->
-            child?.let {
-                val nonWhenChild = findWrappedChild(child)
-                var childModifier: Modifier = Modifier
-                modifierFactory.createContainerUiProperties(
-                    containerProperties = nonWhenChild.containerProperties,
-                    index = breakpointIndex,
-                    isPressed = isPressed,
-                ).also { container ->
-                    container.weight?.let {
-                        childModifier = childModifier.then(Modifier.weight(it))
+        CompositionLocalProvider(LocalIsButtonContent provides true) {
+            model.children.forEach { child ->
+                child?.let {
+                    val nonWhenChild = findWrappedChild(child)
+                    var childModifier: Modifier = Modifier
+                    modifierFactory.createContainerUiProperties(
+                        containerProperties = nonWhenChild.containerProperties,
+                        index = breakpointIndex,
+                        isPressed = isPressed,
+                    ).also { container ->
+                        container.weight?.let {
+                            childModifier = childModifier.then(Modifier.weight(it))
+                        }
+                        container.selfAlignmentBias?.let {
+                            childModifier = childModifier.then(Modifier.align(BiasAlignment.Vertical(it)))
+                        }
+                        if (ignoreChildrenForAccessibility) {
+                            childModifier = childModifier.semantics { hideFromAccessibility() }
+                        }
                     }
-                    container.selfAlignmentBias?.let {
-                        childModifier = childModifier.then(Modifier.align(BiasAlignment.Vertical(it)))
-                    }
-                    if (ignoreChildrenForAccessibility) {
-                        childModifier = childModifier.semantics { hideFromAccessibility() }
-                    }
+                    factory.CreateComposable(
+                        model = child,
+                        modifier = childModifier,
+                        isPressed = isPressed,
+                        offerState = offerState,
+                        isDarkModeEnabled = isDarkModeEnabled,
+                        breakpointIndex = breakpointIndex,
+                        onEventSent = onEventSent,
+                    )
                 }
-                factory.CreateComposable(
-                    model = child,
-                    modifier = childModifier,
-                    isPressed = isPressed,
-                    offerState = offerState,
-                    isDarkModeEnabled = isDarkModeEnabled,
-                    breakpointIndex = breakpointIndex,
-                    onEventSent = onEventSent,
-                )
             }
         }
     }

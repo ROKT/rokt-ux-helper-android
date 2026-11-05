@@ -33,6 +33,7 @@ import androidx.core.text.HtmlCompat
 import androidx.core.text.getSpans
 import com.rokt.modelmapper.uimodel.LayoutSchemaUiModel
 import com.rokt.modelmapper.uimodel.TextUiTransform
+import com.rokt.roktux.component.button.LocalIsButtonContent
 import com.rokt.roktux.utils.getValue
 import com.rokt.roktux.viewmodel.layout.LayoutContract
 import com.rokt.roktux.viewmodel.layout.OfferUiState
@@ -106,8 +107,11 @@ internal class RichTextComponent(private val modifierFactory: ModifierFactory) :
                         offerState = offerState,
                     )
                     .then(modifier)
-                    // Links make the text a parent node, which screen readers otherwise place out of reading order.
-                    .semantics(mergeDescendants = true) {},
+                    // Keep linked paragraphs in reading order while letting button labels merge into their button.
+                    .semantics(
+                        mergeDescendants =
+                        content.hasLinkAnnotations(0, content.length) && !LocalIsButtonContent.current,
+                    ) {},
                 maxLines = textStyleUiState.lineLimit,
                 overflow = TextOverflow.Ellipsis,
             )
