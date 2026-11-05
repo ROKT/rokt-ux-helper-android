@@ -5,6 +5,8 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Row
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.BiasAlignment
@@ -19,6 +21,10 @@ import com.rokt.roktux.component.ModifierFactory
 import com.rokt.roktux.component.findWrappedChild
 import com.rokt.roktux.viewmodel.layout.LayoutContract
 import com.rokt.roktux.viewmodel.layout.OfferUiState
+
+// Whether a composable sits inside a button, which merges its descendants into one screen reader stop.
+@Suppress("ComposeCompositionLocalUsage")
+internal val LocalIsButtonContent = compositionLocalOf { false }
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
@@ -86,15 +92,17 @@ internal fun ButtonComponent(
                         childModifier = childModifier.semantics { hideFromAccessibility() }
                     }
                 }
-                factory.CreateComposable(
-                    model = child,
-                    modifier = childModifier,
-                    isPressed = isPressed,
-                    offerState = offerState,
-                    isDarkModeEnabled = isDarkModeEnabled,
-                    breakpointIndex = breakpointIndex,
-                    onEventSent = onEventSent,
-                )
+                CompositionLocalProvider(LocalIsButtonContent provides true) {
+                    factory.CreateComposable(
+                        model = child,
+                        modifier = childModifier,
+                        isPressed = isPressed,
+                        offerState = offerState,
+                        isDarkModeEnabled = isDarkModeEnabled,
+                        breakpointIndex = breakpointIndex,
+                        onEventSent = onEventSent,
+                    )
+                }
             }
         }
     }

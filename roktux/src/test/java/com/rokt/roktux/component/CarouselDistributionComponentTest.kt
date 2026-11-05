@@ -4,12 +4,20 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.calculateEndPadding
 import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.test.SemanticsMatcher
+import androidx.compose.ui.test.assert
+import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.getUnclippedBoundsInRoot
+import androidx.compose.ui.test.hasContentDescription
+import androidx.compose.ui.test.hasScrollToIndexAction
+import androidx.compose.ui.test.onChildren
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.rokt.core.testutils.annotations.DCUI_COMPONENT_TAG
+import com.rokt.core.testutils.annotations.DcuiNodeComponentState
 import com.rokt.core.testutils.annotations.DcuiNodeJson
 import com.rokt.modelmapper.uimodel.PeekThroughSizeUiModel
 import com.rokt.roktux.testutil.BaseDcuiEspressoTest
@@ -26,6 +34,22 @@ class CarouselDistributionComponentTest : BaseDcuiEspressoTest() {
     @DcuiNodeJson(jsonFile = "CarouselDistributionComponent/ScrollableRow_with_CarouselDistribution.json")
     fun `carousel renders inside a scrollable row`() {
         composeTestRule.onNodeWithTag(DCUI_COMPONENT_TAG).assertIsDisplayed()
+    }
+
+    @Test
+    @DcuiNodeJson(jsonFile = "CarouselDistributionComponent/ScrollableRow_with_CarouselDistribution.json")
+    @DcuiNodeComponentState(totalOffer = 4)
+    fun `the page position announcement does not wrap the carousel pages`() {
+        composeTestRule.onNode(hasContentDescription("Page 1 of 4")).onChildren().assertCountEquals(0)
+    }
+
+    @Test
+    @DcuiNodeJson(jsonFile = "CarouselDistributionComponent/ScrollableRow_with_CarouselDistribution.json")
+    @DcuiNodeComponentState(totalOffer = 4)
+    fun `the page position announcement sits above the pages, so it is read first`() {
+        val announcement = composeTestRule.onNode(hasContentDescription("Page 1 of 4")).getUnclippedBoundsInRoot()
+        val pager = composeTestRule.onNode(hasScrollToIndexAction()).getUnclippedBoundsInRoot()
+        assertTrue("announcement must end above the pages", announcement.bottom <= pager.top)
     }
 
     @Test

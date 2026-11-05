@@ -15,6 +15,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.LinkAnnotation
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextLinkStyles
@@ -32,6 +33,7 @@ import androidx.core.text.HtmlCompat
 import androidx.core.text.getSpans
 import com.rokt.modelmapper.uimodel.LayoutSchemaUiModel
 import com.rokt.modelmapper.uimodel.TextUiTransform
+import com.rokt.roktux.component.button.LocalIsButtonContent
 import com.rokt.roktux.utils.getValue
 import com.rokt.roktux.viewmodel.layout.LayoutContract
 import com.rokt.roktux.viewmodel.layout.OfferUiState
@@ -104,7 +106,12 @@ internal class RichTextComponent(private val modifierFactory: ModifierFactory) :
                         isDarkModeEnabled = isDarkModeEnabled,
                         offerState = offerState,
                     )
-                    .then(modifier),
+                    .then(modifier)
+                    // Keep linked paragraphs in reading order while letting button labels merge into their button.
+                    .semantics(
+                        mergeDescendants =
+                        content.hasLinkAnnotations(0, content.length) && !LocalIsButtonContent.current,
+                    ) {},
                 maxLines = textStyleUiState.lineLimit,
                 overflow = TextOverflow.Ellipsis,
             )

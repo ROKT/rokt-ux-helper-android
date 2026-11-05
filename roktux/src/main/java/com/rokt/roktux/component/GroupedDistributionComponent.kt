@@ -1,7 +1,6 @@
 package com.rokt.roktux.component
 
 import androidx.compose.animation.animateContentSize
-import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -14,10 +13,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.platform.LocalFocusManager
-import androidx.compose.ui.semantics.contentDescription
-import androidx.compose.ui.semantics.semantics
 import com.rokt.modelmapper.uimodel.LayoutSchemaUiModel
 import com.rokt.modelmapper.uimodel.TransitionUiModel
 import com.rokt.modelmapper.utils.DEFAULT_VIEWABLE_ITEMS
@@ -113,14 +109,9 @@ internal class GroupedDistributionComponent(
                         focusRequester.requestFocus()
                     }
                 }
-                .animateContentSize()
-                .semantics {
-                    contentDescription =
-                        getAccessibilityDescription(offerState)
-                }
-                .focusRequester(focusRequester)
-                .focusable(),
+                .animateContentSize(),
         ) {
+            OfferPositionAnnouncement(text = getAccessibilityDescription(offerState), focusRequester = focusRequester)
             for (offerIndexOffset in 0 until viewableItems) {
                 val offerIndex = offerState.currentOfferIndex + offerIndexOffset
                 key(offerIndex) {

@@ -3,7 +3,9 @@ package com.rokt.roktux.component
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.semantics.SemanticsActions
 import androidx.compose.ui.semantics.getOrNull
+import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.test.SemanticsNodeInteraction
+import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.assertHeightIsEqualTo
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertTextEquals
@@ -519,6 +521,15 @@ class TextComponentTest : BaseDcuiEspressoTest() {
         composeTestRule.onNodeWithTag(DCUI_COMPONENT_TAG)
             .assertIsDisplayed()
             .assertRelativeFontSizesScaleAroundBase(baseFontSizeSp = 16)
+    }
+
+    @Test
+    @DcuiNodeJson(
+        jsonString = """{"type": "RichText", "node": {"value": "Offer copy. <a href='https://example.com/terms'>Terms</a>"}}""",
+    )
+    fun `rich text with links is one screen reader stop, so it keeps its place in the reading order`() {
+        composeTestRule.onNodeWithTag(DCUI_COMPONENT_TAG)
+            .assert(SemanticsMatcher("merges its descendants") { it.config.isMergingSemanticsOfDescendants })
     }
 }
 

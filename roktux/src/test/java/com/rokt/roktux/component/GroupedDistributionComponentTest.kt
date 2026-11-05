@@ -5,7 +5,13 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.semantics.SemanticsActions
+import androidx.compose.ui.test.SemanticsMatcher
+import androidx.compose.ui.test.assert
+import androidx.compose.ui.test.assertCountEquals
+import androidx.compose.ui.test.hasContentDescription
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onChildren
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.rokt.modelmapper.uimodel.LayoutSchemaUiModel
@@ -202,5 +208,16 @@ class GroupedDistributionComponentTest {
         composeTestRule.mainClock.advanceTimeBy(1_000)
 
         assertEquals(1, events.count { it is LayoutContract.LayoutEvent.SetCurrentOffer })
+    }
+
+    @Test
+    fun `the page position announcement is a focus target that wraps no content`() {
+        setContent({ offerState(current = 0) }, onEventSent = {})
+        composeTestRule.waitForIdle()
+
+        composeTestRule.onNode(hasContentDescription("Page 1 of 4"))
+            .assert(SemanticsMatcher.keyIsDefined(SemanticsActions.RequestFocus))
+            .onChildren()
+            .assertCountEquals(0)
     }
 }

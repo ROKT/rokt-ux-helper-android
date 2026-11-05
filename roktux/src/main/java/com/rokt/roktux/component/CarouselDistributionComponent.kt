@@ -1,12 +1,13 @@
 package com.rokt.roktux.component
 
-import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.calculateEndPadding
 import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PageSize
 import androidx.compose.foundation.pager.PagerDefaults
@@ -24,15 +25,14 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.BiasAlignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.layout.SubcomposeLayout
 import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalLayoutDirection
-import androidx.compose.ui.semantics.contentDescription
-import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import com.rokt.modelmapper.uimodel.LayoutSchemaUiModel
 import com.rokt.modelmapper.uimodel.PeekThroughSizeUiModel
@@ -122,15 +122,15 @@ internal class CarouselDistributionComponent(
 
         Box(
             modifier = Modifier
-                .semantics {
-                    contentDescription =
-                        getAccessibilityDescription(offerState)
-                }
-                .focusRequester(
-                    focusRequester,
-                )
-                .focusable(),
+                // A one-pixel row above the offer for the position announcement: composed first so screen readers read
+                // it first, and outside the offer, which would otherwise cover it and drop it from the accessibility tree.
+                .padding(top = with(LocalDensity.current) { 1.toDp() }),
         ) {
+            OfferPositionAnnouncement(
+                text = getAccessibilityDescription(offerState),
+                focusRequester = focusRequester,
+                modifier = Modifier.offset { IntOffset(0, -1) },
+            )
             SubcomposeLayout(
                 modifier = Modifier.fillMaxWidth().boundedWidthWhenUnbounded(),
             ) { constraints ->

@@ -3,6 +3,9 @@ package com.rokt.roktux.component
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.hideFromAccessibility
+import androidx.compose.ui.semantics.semantics
 import com.rokt.modelmapper.uimodel.LayoutSchemaUiModel
 import com.rokt.modelmapper.utils.ROKT_ICONS_FONT_FAMILY
 import com.rokt.roktux.viewmodel.layout.LayoutContract
@@ -44,8 +47,12 @@ internal class IconComponent(private val modifierFactory: ModifierFactory) :
                         isDarkModeEnabled = isDarkModeEnabled,
                         offerState = offerState,
                     )
-                    .then(modifier),
-                // Apply textStyles and other properties as needed
+                    .then(modifier)
+                    .semantics {
+                        // The rendered text is an icon-font glyph name, never a label a user should hear.
+                        val label = model.alt?.takeUnless { model.accessibilityHidden || it.isBlank() }
+                        if (label == null) hideFromAccessibility() else contentDescription = label
+                    },
             )
         }
     }
