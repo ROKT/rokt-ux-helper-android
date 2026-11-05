@@ -13,6 +13,32 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Update Jetpack Compose BOM to 2026.05.01.
 
+## [2.0.9] - 2026-11-05
+
+### Fixed
+
+- Make offer text and links reachable by screen readers ([#393](https://github.com/ROKT/rokt-ux-helper-android/pull/393))
+- Bound nested scroll height and cap layout sizes ([#389](https://github.com/ROKT/rokt-ux-helper-android/pull/389))
+- Align page highlights and announcements ([#387](https://github.com/ROKT/rokt-ux-helper-android/pull/387))
+- Render carousels inside stretch and scrollable containers ([#383](https://github.com/ROKT/rokt-ux-helper-android/pull/383))
+- End placeholder fallback text at the next token ([#382](https://github.com/ROKT/rokt-ux-helper-android/pull/382))
+- Clamp out-of-range blur, shadow, spacing and gap values ([#381](https://github.com/ROKT/rokt-ux-helper-android/pull/381))
+- Treat a lineLimit of zero or below as no limit ([#379](https://github.com/ROKT/rokt-ux-helper-android/pull/379))
+- Show at most 20 catalog items ([#380](https://github.com/ROKT/rokt-ux-helper-android/pull/380))
+
+### Changed
+
+- Upgrade trunk ([#392](https://github.com/ROKT/rokt-ux-helper-android/pull/392))
+- Bump org.gradle.toolchains.foojay-resolver-convention from 0.8.0 to 1.0.0 ([#391](https://github.com/ROKT/rokt-ux-helper-android/pull/391))
+- Remove Codecov ([#390](https://github.com/ROKT/rokt-ux-helper-android/pull/390))
+- Bump org.jetbrains.kotlinx.kover from 0.9.1 to 0.9.11 ([#386](https://github.com/ROKT/rokt-ux-helper-android/pull/386))
+- Bump actions/create-github-app-token from 3.2.0 to 3.3.0 ([#384](https://github.com/ROKT/rokt-ux-helper-android/pull/384))
+- Bump mavenPublish from 0.31.0 to 0.37.0 ([#368](https://github.com/ROKT/rokt-ux-helper-android/pull/368))
+- Bump roborazzi from 1.60.0 to 1.76.0 ([#369](https://github.com/ROKT/rokt-ux-helper-android/pull/369))
+- Upgrade to Gradle 9.5, AGP 8.13 and Kotlin 2.3 ([#378](https://github.com/ROKT/rokt-ux-helper-android/pull/378))
+- Bump actions/upload-artifact from 7.0.1 to 7.0.2 ([#376](https://github.com/ROKT/rokt-ux-helper-android/pull/376))
+- Bump actions/download-artifact from 8.0.1 to 8.0.2 ([#377](https://github.com/ROKT/rokt-ux-helper-android/pull/377))
+
 ## [2.0.8] - 2026-10-12
 
 ### Changed
@@ -349,7 +375,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Initial implementation of UX Helper
 
-[unreleased]: https://github.com/ROKT/rokt-ux-helper-android/compare/2.0.8...HEAD
+[unreleased]: https://github.com/ROKT/rokt-ux-helper-android/compare/2.0.9...HEAD
+[2.0.9]: https://github.com/ROKT/rokt-ux-helper-android/compare/2.0.8...2.0.9
 [2.0.8]: https://github.com/ROKT/rokt-ux-helper-android/compare/2.0.7...2.0.8
 [2.0.7]: https://github.com/ROKT/rokt-ux-helper-android/compare/2.0.6...2.0.7
 [2.0.6]: https://github.com/ROKT/rokt-ux-helper-android/compare/2.0.5...2.0.6
