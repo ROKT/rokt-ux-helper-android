@@ -27,7 +27,8 @@ class EmbeddedSnapshotTest : RoktLayoutSnapshotTest() {
         renderLayout("EmbeddedOneByOne.json")
         composeTestRule.waitForIdle()
 
-        captureScreenRoboImage(roborazziOptions = snapshotRoborazziOptions)
+        // Captures the Compose root: a screen capture of this layout changed height between runs.
+        composeTestRule.onRoot().captureRoboImage(roborazziOptions = snapshotRoborazziOptions)
     }
 
     @OptIn(ExperimentalRoborazziApi::class)
@@ -36,7 +37,8 @@ class EmbeddedSnapshotTest : RoktLayoutSnapshotTest() {
         renderLayout("EmbeddedCompact.json")
         composeTestRule.waitForIdle()
 
-        captureScreenRoboImage(roborazziOptions = snapshotRoborazziOptions)
+        // Captures the Compose root: a screen capture of this layout changed height between runs.
+        composeTestRule.onRoot().captureRoboImage(roborazziOptions = snapshotRoborazziOptions)
     }
 
     @OptIn(ExperimentalRoborazziApi::class)
