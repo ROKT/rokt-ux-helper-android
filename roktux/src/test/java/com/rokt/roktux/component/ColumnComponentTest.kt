@@ -9,7 +9,6 @@ import androidx.compose.ui.test.hasAnyAncestor
 import androidx.compose.ui.test.hasScrollAction
 import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.junit4.AndroidComposeTestRule
-import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.unit.dp
@@ -183,8 +182,7 @@ class ColumnComponentTest : BaseDcuiEspressoTest() {
     @Test
     fun testColumnComponentStretchesSiblingAboveOneByOneDistributionWithoutCarousel() {
         renderExperience("EmbeddedStretchSiblingAboveOneByOne.json")
-        // No offer layout holds a carousel, so the stretched text fills the column, which is as wide as the offer.
-        composeTestRule.onNodeWithContentDescription("Offer 1 of 2").assertWidthIsEqualTo(240.dp)
+        // No offer layout holds a carousel, so the stretched text fills the column, which is as wide as the 240dp offer.
         composeTestRule.onNodeWithText("Stretched sibling").assertWidthIsEqualTo(240.dp)
     }
 

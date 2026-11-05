@@ -15,6 +15,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.LinkAnnotation
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextLinkStyles
@@ -104,7 +105,9 @@ internal class RichTextComponent(private val modifierFactory: ModifierFactory) :
                         isDarkModeEnabled = isDarkModeEnabled,
                         offerState = offerState,
                     )
-                    .then(modifier),
+                    .then(modifier)
+                    // Links make the text a parent node, which screen readers otherwise place out of reading order.
+                    .semantics(mergeDescendants = true) {},
                 maxLines = textStyleUiState.lineLimit,
                 overflow = TextOverflow.Ellipsis,
             )

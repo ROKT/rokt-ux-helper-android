@@ -1,8 +1,9 @@
 package com.rokt.roktux.component
 
 import androidx.compose.animation.animateContentSize
-import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -14,10 +15,9 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFocusManager
-import androidx.compose.ui.semantics.contentDescription
-import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.unit.IntOffset
 import com.rokt.modelmapper.uimodel.LayoutSchemaUiModel
 import com.rokt.modelmapper.uimodel.TransitionUiModel
 import com.rokt.roktux.utils.AnimationState
@@ -51,6 +51,7 @@ internal class OneByOneDistributionComponent(
             mutableStateOf(true)
         }
         val focusRequester = remember { FocusRequester() }
+        val onePixel = with(LocalDensity.current) { 1.toDp() }
         val focusManager = LocalFocusManager.current
         val coroutineScope = rememberCoroutineScope()
         val storeCache = rememberOfferViewModelStoreCache()
@@ -101,16 +102,18 @@ internal class OneByOneDistributionComponent(
                     }
                 }
                 .animateContentSize()
-                .semantics {
-                    contentDescription =
-                        ACCESSIBILITY_READOUT_TEXT.format(
-                            offerState.currentOfferIndex + 1,
-                            offerState.lastOfferIndex + 1,
-                        )
-                }
-                .focusRequester(focusRequester)
-                .focusable(),
+                // A one-pixel row above the offer for the position announcement: composed first so screen readers read
+                // it first, and outside the offer, which would otherwise cover it and drop it from the accessibility tree.
+                .padding(top = onePixel),
         ) {
+            OfferPositionAnnouncement(
+                text = ACCESSIBILITY_READOUT_TEXT.format(
+                    offerState.currentOfferIndex + 1,
+                    offerState.lastOfferIndex + 1,
+                ),
+                focusRequester = focusRequester,
+                modifier = Modifier.offset { IntOffset(0, -1) },
+            )
             key(offerState.currentOfferIndex) {
                 OfferScopedViewModelStoreOwner(offerIndex = offerState.currentOfferIndex, cache = storeCache) {
                     factory.CreateComposable(

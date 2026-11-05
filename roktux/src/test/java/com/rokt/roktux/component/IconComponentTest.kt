@@ -1,5 +1,9 @@
 package com.rokt.roktux.component
 
+import androidx.compose.ui.semantics.SemanticsProperties
+import androidx.compose.ui.test.SemanticsMatcher
+import androidx.compose.ui.test.assert
+import androidx.compose.ui.test.assertContentDescriptionEquals
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.onNodeWithTag
@@ -121,5 +125,57 @@ class IconComponentTest : BaseDcuiEspressoTest() {
             .assertIsDisplayed()
             .assertTextEquals("Car")
             .assertTextColor("#FF0000")
+    }
+
+    @Test
+    @DcuiNodeJson(
+        jsonString = """
+            {
+              "type": "DataIcon",
+              "node": {
+                "iconKey": "icon.1"
+              }
+            }
+    """,
+    )
+    @DcuiConfig(testInInnerLayout = true, componentTag = "TestTag")
+    @DcuiOfferJson(jsonFile = "offer/Offer_with_valid_key.json")
+    fun `data icon glyph name is hidden from accessibility services`() {
+        composeTestRule.onNodeWithTag("TestTag")
+            .assert(SemanticsMatcher.keyIsDefined(SemanticsProperties.HideFromAccessibility))
+    }
+
+    @Test
+    @DcuiNodeJson(
+        jsonString = """
+            {
+              "type": "StaticIcon",
+              "node": {
+                "name": "PercentIcon"
+              }
+            }
+    """,
+    )
+    fun `static icon without a description is hidden from accessibility services`() {
+        composeTestRule.onNodeWithTag(DCUI_COMPONENT_TAG)
+            .assert(SemanticsMatcher.keyIsDefined(SemanticsProperties.HideFromAccessibility))
+    }
+
+    @Test
+    @DcuiNodeJson(
+        jsonString = """
+            {
+              "type": "StaticIcon",
+              "node": {
+                "name": "PercentIcon",
+                "description": "Discount"
+              }
+            }
+    """,
+    )
+    fun `static icon with a description is announced by its description`() {
+        composeTestRule.onNodeWithTag(DCUI_COMPONENT_TAG)
+            .assertContentDescriptionEquals("Discount")
+            .assert(SemanticsMatcher.keyNotDefined(SemanticsProperties.HideFromAccessibility))
     }
 }

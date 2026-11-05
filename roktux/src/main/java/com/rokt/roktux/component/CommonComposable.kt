@@ -1,12 +1,19 @@
 package com.rokt.roktux.component
 
+import androidx.compose.foundation.focusable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.layout.layout
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalWindowInfo
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.dp
 import com.rokt.modelmapper.uimodel.ButtonUiModel
 import com.rokt.modelmapper.uimodel.ConditionalStyleState
@@ -111,4 +118,26 @@ internal fun evaluateState(
     } else {
         ConditionalStyleState.Normal
     }
+}
+
+/**
+ * An empty focus target that announces the offer position. Distributions move focus here after an offer change, so
+ * screen readers announce the position and continue into the new offer. It must not wrap the offer: a focusable node
+ * with a content description hides the text and links inside it from screen readers. Compose it before the offer, as
+ * screen readers follow drawing order, and outside the offer's bounds, as a node drawn under the offer is left out of
+ * the accessibility tree.
+ */
+@Composable
+internal fun OfferPositionAnnouncement(text: String, focusRequester: FocusRequester, modifier: Modifier = Modifier) {
+    Box(
+        modifier
+            // 1px rather than 0: accessibility services skip nodes with no layout size.
+            .layout { measurable, _ ->
+                val placeable = measurable.measure(Constraints.fixed(1, 1))
+                layout(placeable.width, placeable.height) { placeable.place(0, 0) }
+            }
+            .semantics { contentDescription = text }
+            .focusRequester(focusRequester)
+            .focusable(),
+    )
 }

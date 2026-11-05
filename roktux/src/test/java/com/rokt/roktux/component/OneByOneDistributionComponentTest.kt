@@ -5,11 +5,23 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.semantics.SemanticsActions
+import androidx.compose.ui.test.SemanticsMatcher
+import androidx.compose.ui.test.assert
+import androidx.compose.ui.test.assertCountEquals
+import androidx.compose.ui.test.getUnclippedBoundsInRoot
+import androidx.compose.ui.test.hasAnyAncestor
+import androidx.compose.ui.test.hasContentDescription
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onChildren
+import androidx.compose.ui.test.onNodeWithText
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
+import com.rokt.core.testutils.TestJsonLoader
 import com.rokt.modelmapper.uimodel.LayoutSchemaUiModel
 import com.rokt.modelmapper.uimodel.TransitionUiModel
+import com.rokt.roktux.RoktLayout
+import com.rokt.roktux.RoktUxConfig
 import com.rokt.roktux.di.layout.LayoutComponent
 import com.rokt.roktux.di.layout.LocalLayoutComponent
 import com.rokt.roktux.imagehandler.NetworkStrategy
@@ -17,6 +29,7 @@ import com.rokt.roktux.viewmodel.layout.LayoutContract
 import com.rokt.roktux.viewmodel.layout.OfferUiState
 import kotlinx.collections.immutable.persistentMapOf
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Rule
@@ -161,5 +174,58 @@ class OneByOneDistributionComponentTest {
 
         val setCurrentOffers = events.filterIsInstance<LayoutContract.LayoutEvent.SetCurrentOffer>()
         assertEquals(listOf(1, 0), setCurrentOffers.map { it.currentOffer })
+    }
+
+    @Test
+    fun `the offer position announcement does not wrap the offer content`() {
+        val dispatcher = UnconfinedTestDispatcher()
+        composeTestRule.setContent {
+            RoktLayout(
+                experienceResponse = TestJsonLoader.loadJsonFromAssetsDirectory(
+                    "Snapshot",
+                    "EmbeddedStretchSiblingAboveOneByOne.json",
+                ),
+                location = "Location1",
+                roktUxConfig = RoktUxConfig.builder().build(),
+                mainDispatcher = dispatcher,
+                ioDispatcher = dispatcher,
+            )
+        }
+
+        composeTestRule.onNode(hasContentDescription("Offer 1 of 2")).assertExists()
+        composeTestRule.onNodeWithText("Offer without a carousel")
+            .assert(!hasAnyAncestor(hasContentDescription("Offer 1 of 2")))
+    }
+
+    @Test
+    fun `the offer position announcement is a focus target that wraps no content`() {
+        setContent({ offerState(current = 0) }, onEventSent = {})
+        composeTestRule.waitForIdle()
+
+        composeTestRule.onNode(hasContentDescription("Offer 1 of 4"))
+            .assert(SemanticsMatcher.keyIsDefined(SemanticsActions.RequestFocus))
+            .onChildren()
+            .assertCountEquals(0)
+    }
+
+    @Test
+    fun `the offer position announcement sits above the offer content, so it is read first`() {
+        val dispatcher = UnconfinedTestDispatcher()
+        composeTestRule.setContent {
+            RoktLayout(
+                experienceResponse = TestJsonLoader.loadJsonFromAssetsDirectory(
+                    "Snapshot",
+                    "EmbeddedStretchSiblingAboveOneByOne.json",
+                ),
+                location = "Location1",
+                roktUxConfig = RoktUxConfig.builder().build(),
+                mainDispatcher = dispatcher,
+                ioDispatcher = dispatcher,
+            )
+        }
+
+        val announcement = composeTestRule.onNode(hasContentDescription("Offer 1 of 2")).getUnclippedBoundsInRoot()
+        val offerText = composeTestRule.onNodeWithText("Offer without a carousel").getUnclippedBoundsInRoot()
+        assertTrue("announcement must end above the offer content", announcement.bottom <= offerText.top)
     }
 }
