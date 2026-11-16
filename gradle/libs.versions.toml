@@ -1,5 +1,6 @@
 [versions]
 androidGradlePlugin = "8.13.2"
+bouncycastle = "1.87"                 # Overrides the vulnerable 1.79 the Android Gradle plugin pulls in
 androidxActivity = "1.10.1"
 androidxAppCompat = "1.7.1"
 androidxComposeBom = "2026.05.01"
@@ -72,6 +73,9 @@ assertj-core = { group = "org.assertj", name = "assertj-core", version.ref = "as
 dcui-schema = { group = "com.rokt.internal.network.types", name = "dcui-schema", version.ref = "dcui" }
 robolectric = { group = "org.robolectric", name = "robolectric", version.ref = "robolectric" }
 dokka-android = { group = "org.jetbrains.dokka", name = "android-documentation-plugin", version.ref = "dokka" }
+bouncycastle-bcprov = { group = "org.bouncycastle", name = "bcprov-jdk18on", version.ref = "bouncycastle" }
+bouncycastle-bcpkix = { group = "org.bouncycastle", name = "bcpkix-jdk18on", version.ref = "bouncycastle" }
+bouncycastle-bcutil = { group = "org.bouncycastle", name = "bcutil-jdk18on", version.ref = "bouncycastle" }
 
 
 # Dependencies of the included build-logic
