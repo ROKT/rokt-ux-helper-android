@@ -231,6 +231,8 @@ jobs:
           makeLatest: ${{ needs.setup-and-version.outputs.is_prerelease != 'true' && github.ref_name == 'main' }}
           prerelease: ${{ needs.setup-and-version.outputs.is_prerelease == 'true' }}
           tag: ${{ needs.setup-and-version.outputs.full_release_version }}
+          # Tag the commit this run releases, not main's tip when the step runs.
+          commit: ${{ github.sha }}
           body: |
             ## Release notes:
             ${{ steps.extract-release-notes.outputs.release_notes }}
