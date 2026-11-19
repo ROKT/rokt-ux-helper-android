@@ -128,7 +128,7 @@ internal fun transformModifier(
         ?.dp,
     shadowSpreadRadius = containerProperties?.shadow?.spreadRadius,
     borderColor = borderProperties?.borderColor?.let { ThemeColorUiModel(it.light, it.dark) },
-    borderRadius = borderProperties?.borderRadius?.dp,
+    borderRadius = transformBorderRadius(borderProperties?.borderRadius)?.dp,
     borderWidth = borderProperties?.borderWidth?.let { transformBorderWidth(it) },
     borderStyle = if (borderProperties?.borderStyle ==
         BorderStyle.Dashed
@@ -256,6 +256,12 @@ private fun transformGap(gap: Float?): Float? = gap?.takeIf { it.isFinite() }?.c
 // A fixed, min or max size must be finite and within [0, MAX_DIMENSION_DP]. Width and height share one
 // pixel limit in Compose constraints, so the cap must fit both axes at once, otherwise measuring throws.
 private fun transformSize(value: Float?): Float? = value?.takeIf { it.isFinite() }?.coerceIn(0f, MAX_DIMENSION_DP)
+
+// A corner radius must be finite and within [0, MAX_DIMENSION_DP]. A non-finite radius gives the rounded shape a
+// NaN corner size, which can fail while drawing. Corners already shrink to fit their shape, so a radius past the
+// size cap draws the same as the cap.
+private fun transformBorderRadius(radius: Float?): Float? =
+    radius?.takeIf { it.isFinite() }?.coerceIn(0f, MAX_DIMENSION_DP)
 
 private fun transformArrangement(arrangementModel: FlexJustification?) = arrangementModel?.let { arrangement ->
     when (arrangement) {
