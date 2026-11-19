@@ -10,6 +10,7 @@ import com.rokt.modelmapper.uimodel.ModifierProperties
 import com.rokt.modelmapper.uimodel.StateBlock
 import com.rokt.modelmapper.uimodel.WidthUiModel
 import com.rokt.network.model.BasicStateStylingBlock
+import com.rokt.network.model.BorderStylingProperties
 import com.rokt.network.model.ContainerStylingProperties
 import com.rokt.network.model.DimensionHeightValue
 import com.rokt.network.model.DimensionStylingProperties
@@ -221,6 +222,35 @@ class ModifierMapperTest {
     }
 
     @Test
+    fun `non-finite border radius becomes null`() {
+        listOf(Float.NaN, Float.POSITIVE_INFINITY, Float.NEGATIVE_INFINITY).forEach { radius ->
+            assertThat(borderRadiusOf(radius)).isNull()
+        }
+    }
+
+    @Test
+    fun `oversized border radius is capped at 5000dp`() {
+        listOf(1e7f, Float.MAX_VALUE).forEach { radius ->
+            assertThat(borderRadiusOf(radius)).isEqualTo(5000.dp)
+        }
+    }
+
+    @Test
+    fun `negative border radius becomes zero`() {
+        listOf(-1f, -1e7f).forEach { radius ->
+            assertThat(borderRadiusOf(radius)).isEqualTo(0.dp)
+        }
+    }
+
+    @Test
+    fun `in-range border radius is preserved`() {
+        listOf(0f, 12f, 5000f).forEach { radius ->
+            assertThat(borderRadiusOf(radius)).isEqualTo(radius.dp)
+        }
+        assertThat(borderRadiusOf(null)).isNull()
+    }
+
+    @Test
     fun `percentage width is preserved`() {
         val result = transformModifier(
             spacingProperties = null,
@@ -251,6 +281,13 @@ class ModifierMapperTest {
         borderProperties = null,
         containerProperties = ContainerStylingProperties(shadow = shadow(blur)),
     ).shadowBlurRadius
+
+    private fun borderRadiusOf(radius: Float?): Dp? = transformModifier(
+        spacingProperties = null,
+        dimensionProperties = null,
+        backgroundProperties = null,
+        borderProperties = BorderStylingProperties(borderRadius = radius),
+    ).borderRadius
 
     private fun blurOf(blur: Float?): Float? = transformModifier(
         spacingProperties = null,
