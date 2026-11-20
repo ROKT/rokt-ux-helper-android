@@ -13,6 +13,9 @@ import android.text.style.URLSpan
 import android.text.style.UnderlineSpan
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.semantics.semantics
@@ -77,22 +80,33 @@ internal class RichTextComponent(private val modifierFactory: ModifierFactory) :
         )
 
         if (value.isNotEmpty()) {
-            val content = textStyleUiState.value.asHTML(
-                fontSize = textStyleUiState.textStyle.fontSize,
-                urlSpanStyle = SpanStyle(
-                    color = linkStyleUiState.textStyle.color,
-                    fontSize = linkStyleUiState.textStyle.fontSize,
-                    fontFamily = linkStyleUiState.textStyle.fontFamily,
-                    fontWeight = linkStyleUiState.textStyle.fontWeight,
-                    baselineShift = linkStyleUiState.textStyle.baselineShift,
-                    fontStyle = linkStyleUiState.textStyle.fontStyle,
-                    letterSpacing = linkStyleUiState.textStyle.letterSpacing,
-                    textDecoration = linkStyleUiState.textStyle.textDecoration,
-                ),
-                textTransform = textStyleUiState.textTransform,
-                linkTextTransform = linkStyleUiState.textTransform,
-            ) { url ->
-                onEventSent(LayoutContract.LayoutEvent.UrlSelected(url, model.openLinks))
+            val html = textStyleUiState.value
+            val fontSize = textStyleUiState.textStyle.fontSize
+            val urlSpanStyle = SpanStyle(
+                color = linkStyleUiState.textStyle.color,
+                fontSize = linkStyleUiState.textStyle.fontSize,
+                fontFamily = linkStyleUiState.textStyle.fontFamily,
+                fontWeight = linkStyleUiState.textStyle.fontWeight,
+                baselineShift = linkStyleUiState.textStyle.baselineShift,
+                fontStyle = linkStyleUiState.textStyle.fontStyle,
+                letterSpacing = linkStyleUiState.textStyle.letterSpacing,
+                textDecoration = linkStyleUiState.textStyle.textDecoration,
+            )
+            val textTransform = textStyleUiState.textTransform
+            val linkTextTransform = linkStyleUiState.textTransform
+            val openLinks = model.openLinks
+            val currentOnEventSent by rememberUpdatedState(onEventSent)
+            // Parsing the HTML is the costly part, so it runs again only when its inputs change,
+            // not on every recomposition (for example a press state change).
+            val content = remember(html, fontSize, urlSpanStyle, textTransform, linkTextTransform, openLinks) {
+                html.asHTML(
+                    fontSize = fontSize,
+                    urlSpanStyle = urlSpanStyle,
+                    textTransform = textTransform,
+                    linkTextTransform = linkTextTransform,
+                ) { url ->
+                    currentOnEventSent(LayoutContract.LayoutEvent.UrlSelected(url, openLinks))
+                }
             }
             Text(
                 text = content,
@@ -119,7 +133,6 @@ internal class RichTextComponent(private val modifierFactory: ModifierFactory) :
     }
 }
 
-@Composable
 private fun String.asHTML(
     fontSize: TextUnit,
     urlSpanStyle: SpanStyle,
@@ -128,13 +141,18 @@ private fun String.asHTML(
     onClick: (url: String) -> Unit,
 ) = buildAnnotatedString {
     val spanned = HtmlCompat.fromHtml(this@asHTML, HtmlCompat.FROM_HTML_MODE_COMPACT)
-    val spans = spanned.getSpans<Any>(0, spanned.length)
-    var spannedString = getTransformText(spanned.toString(), textTransform)
-    spans.filter { it !is BulletSpan }.forEach { span ->
-        val start = spanned.getSpanStart(span)
-        val end = spanned.getSpanEnd(span)
-        val spanString = getTransformText(spannedString.substring(start, end), linkTextTransform)
-        spannedString = spannedString.replaceRange(start, end, spanString)
+    val spans = spanned.getSpans<Any>(0, spanned.length).filter { it !is BulletSpan }
+    val spanStarts = IntArray(spans.size) { spanned.getSpanStart(spans[it]) }
+    val spanEnds = IntArray(spans.size) { spanned.getSpanEnd(spans[it]) }
+    val spannedString = transformSpanRanges(
+        text = getTransformText(spanned.toString(), textTransform),
+        starts = spanStarts,
+        ends = spanEnds,
+        transform = linkTextTransform,
+    )
+    spans.forEachIndexed { index, span ->
+        val start = spanStarts[index]
+        val end = spanEnds[index]
         when (span) {
             is RelativeSizeSpan -> span.spanStyle(fontSize)
 
@@ -228,3 +246,62 @@ private fun getTransformText(text: String, textTransform: TextUiTransform?): Str
         TextUiTransform.None -> text
     }
 } ?: text
+
+/**
+ * Applies [transform] to every character covered by at least one `[starts[i], ends[i])` range, in
+ * one pass over [text]. The result matches transforming each range in turn, but the cost grows
+ * with the text length plus the number of ranges, not with their product, so text with many
+ * small spans cannot block the main thread.
+ */
+internal fun transformSpanRanges(text: String, starts: IntArray, ends: IntArray, transform: TextUiTransform?): String {
+    if (transform == null || transform == TextUiTransform.None || starts.isEmpty()) return text
+    val length = text.length
+    // depthChange[i] is how many ranges open at i minus how many close at i.
+    val depthChange = IntArray(length + 1)
+    val rangeStart = BooleanArray(length)
+    for (index in starts.indices) {
+        val start = starts[index].coerceIn(0, length)
+        val end = ends[index].coerceIn(start, length)
+        if (start < end) {
+            depthChange[start]++
+            depthChange[end]--
+            rangeStart[start] = true
+        }
+    }
+    val covered = BooleanArray(length)
+    var depth = 0
+    for (position in 0 until length) {
+        depth += depthChange[position]
+        covered[position] = depth > 0
+    }
+    val result = StringBuilder(length)
+    var runStart = 0
+    while (runStart < length) {
+        if (!covered[runStart]) {
+            result.append(text[runStart])
+            runStart++
+            continue
+        }
+        // A maximal run of covered characters.
+        var runEnd = runStart
+        while (runEnd < length && covered[runEnd]) runEnd++
+        if (transform == TextUiTransform.Capitalize) {
+            // Transforming a range capitalizes its first character and every character after a
+            // space inside it. A covered character that starts no range has a range that started
+            // earlier, so the character before it is in the same range.
+            for (position in runStart until runEnd) {
+                val char = text[position]
+                val capitalize = rangeStart[position] || (position > runStart && text[position - 1] == ' ')
+                if (capitalize && char.isLowerCase()) {
+                    result.append(char.titlecase(Locale.getDefault()))
+                } else {
+                    result.append(char)
+                }
+            }
+        } else {
+            result.append(getTransformText(text.substring(runStart, runEnd), transform))
+        }
+        runStart = runEnd
+    }
+    return result.toString()
+}
