@@ -2,7 +2,7 @@
 androidGradlePlugin = "8.13.2"
 bouncycastle = "1.87"                 # Overrides the vulnerable 1.79 the Android Gradle plugin pulls in
 androidxActivity = "1.10.1"
-androidxAppCompat = "1.7.1"
+androidxAppCompat = "1.8.0"
 androidxComposeBom = "2026.05.01"
 androidxCore = "1.16.0"
 androidxEspresso = "3.7.0"
